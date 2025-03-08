@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function App() {
-  return <></>;
+  return <>Nest-FE is Start now!</>;
 }
 
 export default App;
