@@ -11,6 +11,7 @@ import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,22 +19,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Slf4j  // ✅ 로깅 추가
+import org.springframework.context.annotation.Lazy;
+
+@Slf4j
 @Service
 public class AuthService {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
-    public AuthService(MemberRepository memberRepository,
-        PasswordEncoder passwordEncoder,
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthService(
+        MemberRepository memberRepository,
         JwtTokenProvider jwtTokenProvider,
-        AuthenticationManager authenticationManager) {
+        @Lazy AuthenticationManager authenticationManager,
+        @Lazy PasswordEncoder passwordEncoder
+    ) {
         this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
