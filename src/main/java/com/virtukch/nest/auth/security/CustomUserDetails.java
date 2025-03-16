@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
+
     private final Member member;
 
     @Override

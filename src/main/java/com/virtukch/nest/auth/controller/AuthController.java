@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponseDto> signup(@RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<SignupResponseDto> signup(
+        @RequestBody SignupRequestDto signupRequestDto) {
         return ResponseEntity.ok(authService.signup(signupRequestDto));
     }
 
@@ -26,7 +28,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDto> refresh(@RequestHeader("Authorization") String refreshToken) {
+    public ResponseEntity<LoginResponseDto> refresh(
+        @RequestHeader("Authorization") String refreshToken) {
         return ResponseEntity.ok(authService.refreshToken(refreshToken));
     }
 }

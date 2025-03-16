@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 public class Member {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;  // ✅ ID 필드명 변경

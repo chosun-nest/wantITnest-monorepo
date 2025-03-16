@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class SignupResponseDto {
+
     private Long memberId;
     private String email;
     private String accessToken;

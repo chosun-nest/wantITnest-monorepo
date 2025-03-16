@@ -22,6 +22,7 @@ import java.io.IOException;
 @Slf4j  // ✅ 로깅 추가
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService; // ✅ 사용자 정보 로드
 
@@ -40,7 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 3️⃣ 사용자 정보 로드
                 UserDetails userDetails = customUserDetailsService.loadUserByUserId(memberId);
                 UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(userDetails, null,
+                        userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 log.info("JWT 인증 성공: 사용자 ID {}", memberId);
