@@ -18,6 +18,6 @@ spring:
     show-sql: true
 
 jwt:
-  secret: your_jwt_secret_key
+  secret: VUkwMS0xMjM0LTU2NzgtOWFiYy1kZWZnaGk=
   access-token-expiration: 3600000  # 1?? (??? ??)
-  refresh-token-expiration: 86400000  # 24?? (??? ??)
+  refresh-token-expiration: 604800000  # 7? (??? ??)
