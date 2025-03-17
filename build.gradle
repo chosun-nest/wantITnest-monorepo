@@ -32,25 +32,28 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // 📌 MySQL 드라이버
+    // 📌 MySQL Driver
     implementation 'mysql:mysql-connector-java:8.0.33'
 
     // 📌 JJWT (JSON Web Token) 관련 의존성 개별 추가
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'  // Jackson을 이용한 JSON 처리
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'  // Jackson for JSON
 
-    // 📌 DTO 검증용 Validation 추가
+    // 📌 Validation to Dto
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // 📌 Lombok (컴파일 시 자동 생성)
+    // 📌 Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Swagger API
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
-dependencyManagement {
+    dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
