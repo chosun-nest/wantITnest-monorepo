@@ -18,8 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import org.springframework.context.annotation.Lazy;
-
 @Slf4j
 @Service
 public class AuthService {
@@ -33,8 +31,8 @@ public class AuthService {
     public AuthService(
         MemberRepository memberRepository,
         JwtTokenProvider jwtTokenProvider,
-        @Lazy AuthenticationManager authenticationManager,
-        @Lazy PasswordEncoder passwordEncoder
+        AuthenticationManager authenticationManager,
+        PasswordEncoder passwordEncoder
     ) {
         this.memberRepository = memberRepository;
         this.jwtTokenProvider = jwtTokenProvider;
