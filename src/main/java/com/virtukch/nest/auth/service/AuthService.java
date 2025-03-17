@@ -25,7 +25,6 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-
     private final PasswordEncoder passwordEncoder;
 
     public AuthService(
@@ -68,7 +67,7 @@ public class AuthService {
     }
 
     public LoginResponseDto login(LoginRequestDto request) {
-        // ✅ Spring Security의 인증 매니저 사용 (비밀번호 체크 포함)
+        // ✅ Spring Security 의 인증 매니저 사용 (비밀번호 체크 포함)
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
@@ -92,8 +91,7 @@ public class AuthService {
 
         Long memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken);
         String newAccessToken = jwtTokenProvider.createToken(memberId);
-        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
-        return new LoginResponseDto(newAccessToken, newRefreshToken);
+        return new LoginResponseDto(newAccessToken, refreshToken);
     }
 }
