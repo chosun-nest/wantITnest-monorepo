@@ -20,6 +20,11 @@ const router = createBrowserRouter([
         path: "profile/",
         element: <Profile />,
       },
+      {
+        path: "",
+        index: true,
+        element: <Home />,
+      },
     ],
   },
   // 이 윗 줄 까진 Layout의 children임.

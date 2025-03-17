@@ -1,4 +1,4 @@
-import * as S from "../assets/styles/login";
+import * as S from "../assets/styles/login.styles";
 import useResponsive from "../hooks/responsive";
 
 export default function Login() {
@@ -40,7 +40,7 @@ export default function Login() {
           Log in with Google
         </S.OAuthButton>
         <S.OAuthButton>
-          <img src="../assets/images/naver.png" />
+          <img src="/assets/images/naver.png" />
           Log in with NAVER
         </S.OAuthButton>
 
