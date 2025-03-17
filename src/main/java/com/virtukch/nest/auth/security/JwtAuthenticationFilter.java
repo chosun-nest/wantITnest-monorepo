@@ -1,6 +1,5 @@
 package com.virtukch.nest.auth.security;
 
-import com.virtukch.nest.auth.security.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -9,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Slf4j  // ✅ 로깅 추가
 @RequiredArgsConstructor
@@ -27,9 +25,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService; // ✅ 사용자 정보 로드
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/v3/api-docs") ||
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/swagger-resources") ||
+            path.startsWith("/webjars");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
         HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
+
+        String requestURI = request.getRequestURI();
+        log.info("Incoming request URI: {}", requestURI);  // ✅ 요청이 들어올 때마다 로깅
+
         try {
             // 1️⃣ 요청 헤더에서 JWT 토큰 추출
             String token = getTokenFromRequest(request);

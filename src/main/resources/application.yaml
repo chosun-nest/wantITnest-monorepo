@@ -21,3 +21,14 @@ jwt:
   secret: VUkwMS0xMjM0LTU2NzgtOWFiYy1kZWZnaGk=
   access-token-expiration: 3600000  # 1?? (??? ??)
   refresh-token-expiration: 604800000  # 7? (??? ??)
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
+    csrf:
+      enabled: false  # ✅ CSRF 설정이 Swagger 요청을 차단할 수 있으므로 비활성화
