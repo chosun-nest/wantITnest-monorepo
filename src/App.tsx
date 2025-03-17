@@ -17,16 +17,16 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "",
-        element: <Home />,
-      },
-      {
         path: "profile/",
         element: <Profile />,
       },
     ],
   },
   // 이 윗 줄 까진 Layout의 children임.
+  {
+    path: "/home",
+    element: <Home />,
+  },
   {
     path: "/login",
     element: <NavigateToHome />,
@@ -45,7 +45,6 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
-      Nest-FE is Start now!
     </>
   );
 }
