@@ -10,7 +10,7 @@ export default function Home() {
       <Layout />
       <S.GridContainer $isMobile={isMobile}>
         <S.Item1>게시판</S.Item1>
-        <S.Item2>채팅</S.Item2>
+        <S.Item2>관심분야</S.Item2>
         <S.Item3>공지사항</S.Item3>
         <S.Item4>프로젝트 모집</S.Item4>
       </S.GridContainer>

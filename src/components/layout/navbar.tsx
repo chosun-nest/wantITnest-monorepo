@@ -25,7 +25,7 @@ export default function Navbar() {
 
         {/* 로고 */}
         <S.Logo>
-          <img src="../../assets/images/logo.png" />
+          <img src="assets/images/logo.png" />
           CSU-NEST
         </S.Logo>
 
