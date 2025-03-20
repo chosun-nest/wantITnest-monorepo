@@ -1,4 +1,11 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
+
+export const SLink = styled(Link)`
+  text-decoration-line: none;
+  text-decoration: none;
+  color: inherit;
+`;
 
 export const Container = styled.div`
   display: flex;

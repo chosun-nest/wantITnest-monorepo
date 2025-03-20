@@ -24,7 +24,7 @@ export default function Navbar() {
         </S.NavMenu>
 
         {/* 로고 */}
-        <S.Logo>
+        <S.Logo to="/">
           <img src="assets/images/logo.png" />
           CSU-NEST
         </S.Logo>

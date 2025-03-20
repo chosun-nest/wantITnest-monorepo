@@ -10,7 +10,7 @@ export default function Login() {
         <S.LogoText>CHOSUN-NEST</S.LogoText>
       </S.Header>
       <S.LoginBox>
-        <S.Title>Welcome to CHOSUN-NEST</S.Title>
+        <S.Title>Welcome to CSU-NEST</S.Title>
 
         {/* OAuth 로그인 버튼 */}
         <S.OAuthButton>

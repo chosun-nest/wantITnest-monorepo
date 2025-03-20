@@ -1,4 +1,3 @@
-import Layout from "../components/layout/layout";
 import useResponsive from "../hooks/responsive"; // 반응형 훅 가져오기
 import * as S from "../assets/styles/home.styles"; // Styled Components 스타일 가져오기
 
@@ -7,7 +6,6 @@ export default function Home() {
 
   return (
     <>
-      <Layout />
       <S.GridContainer $isMobile={isMobile}>
         <S.Item1>게시판</S.Item1>
         <S.Item2>관심분야</S.Item2>

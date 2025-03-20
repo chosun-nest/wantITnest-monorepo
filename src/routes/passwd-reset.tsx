@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function PasswdReset() {
-  return <>prs</>;
+  return <div className="bg-rose-500">hello</div>;
 }

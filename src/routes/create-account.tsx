@@ -10,7 +10,7 @@ export default function Login() {
         <S.LogoText>CHOSUN-NEST</S.LogoText>
       </S.Header>
       <S.LoginBox>
-        <S.Title>Welcome to CHOSUN-NEST</S.Title>
+        <S.Title>Welcome to CSU-NEST</S.Title>
         <S.SubText>
           이미 계정이 있나요? <a href="#">로그인 하기</a>
         </S.SubText>

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const NavbarContainer = styled.nav`
@@ -12,17 +13,20 @@ export const NavbarContainer = styled.nav`
 `;
 
 export const NavbarContent = styled.div`
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0rem;
 `;
 
-export const Logo = styled.div`
+export const Logo = styled(Link)`
   display: flex;
   align-items: center;
   justify-content: right;
+  text-decoration-line: none;
+  color: inherit;
   font-size: 1.2rem;
   font-weight: bold;
   color: #002f6c;
@@ -59,6 +63,7 @@ export const NavRight = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  min-width: 0;
 `;
 
 export const SearchIcon = styled.div`
