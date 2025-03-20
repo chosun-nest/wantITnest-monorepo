@@ -77,7 +77,8 @@ export const SearchIcon = styled.div`
   }
 `;
 
-export const LoginButton = styled.button`
+export const LoginLink = styled(Link)`
+  display: inline-block;
   background: white;
   border: 1px solid #002f6c;
   padding: 0.5rem 1rem;
@@ -85,6 +86,7 @@ export const LoginButton = styled.button`
   font-size: 0.9rem;
   font-weight: 500;
   color: #002f6c;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.2s;
 
@@ -94,7 +96,7 @@ export const LoginButton = styled.button`
   }
 `;
 
-export const SignUpButton = styled(LoginButton)`
+export const SignUpLink = styled(LoginLink)`
   background: #002f6c;
   color: white;
   border: none;

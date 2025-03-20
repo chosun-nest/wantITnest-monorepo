@@ -1,7 +1,7 @@
 import * as S from "../assets/styles/login.styles";
 import useResponsive from "../hooks/responsive";
 
-export default function Login() {
+export default function SignIn() {
   const isMobile = useResponsive(); // 가로/세로 상태 감지
   return (
     <S.Container>
@@ -12,7 +12,8 @@ export default function Login() {
       <S.LoginBox>
         <S.Title>Welcome to CSU-NEST</S.Title>
         <S.SubText>
-          이미 계정이 있나요? <a href="#">로그인 하기</a>
+          이미 계정이 있나요?{" "}
+          <S.AccountLink to="/login">로그인 하기</S.AccountLink>
         </S.SubText>
 
         {/* OAuth 로그인 버튼 */}

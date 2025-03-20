@@ -32,8 +32,8 @@ export default function Navbar() {
         {/* 우측 아이콘 및 버튼 */}
         <S.NavRight>
           <S.SearchIcon></S.SearchIcon>
-          <S.LoginButton>Login</S.LoginButton>
-          <S.SignUpButton>Sign In</S.SignUpButton>
+          <S.LoginLink to="/login">Login</S.LoginLink>
+          <S.SignUpLink to="/signin">Sign In</S.SignUpLink>
         </S.NavRight>
       </S.NavbarContent>
     </S.NavbarContainer>

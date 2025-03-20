@@ -52,9 +52,7 @@ export default function Login() {
 
         <S.LoginButton>Log in</S.LoginButton>
 
-        <S.ForgotPassword>
-          <a href="#">비밀번호 잊어버렸어요</a>
-        </S.ForgotPassword>
+        <S.AccountLink to="/signin">계정이 없어요</S.AccountLink>
       </S.LoginBox>
     </S.Container>
   );

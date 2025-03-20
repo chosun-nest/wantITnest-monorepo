@@ -3,11 +3,10 @@ import {
   Navigate,
   createBrowserRouter,
 } from "react-router-dom";
-import { useState } from "react";
 import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
-import CreateAccount from "./routes/create-account";
+import Signin from "./routes/signin";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 
@@ -37,8 +36,8 @@ const router = createBrowserRouter([
     element: <NavigateToHome />,
   },
   {
-    path: "/create-account",
-    element: <CreateAccount />,
+    path: "/signin",
+    element: <Signin />,
   },
   {
     path: "/password-reset",

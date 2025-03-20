@@ -1,12 +1,6 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-export const SLink = styled(Link)`
-  text-decoration-line: none;
-  text-decoration: none;
-  color: inherit;
-`;
-
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -104,9 +98,10 @@ export const Divider = styled.div`
 `;
 
 export const Input = styled.input`
-  width: 94%;
+  width: 100%;
   padding: 0.75rem;
   border: 1px solid #ddd;
+  background-color: white;
   border-radius: 6px;
   font-size: 0.875rem;
   margin-bottom: 0.75rem;
@@ -134,17 +129,16 @@ export const LoginButton = styled.button`
   }
 `;
 
-export const ForgotPassword = styled.p`
+export const AccountLink = styled(Link)`
   font-size: 0.875rem;
   color: #666;
   margin-top: 1rem;
+  text-decoration: none;
+  text-decoration-line: none;
+  text-decoration: none;
+  color: inherit;
 
-  a {
-    color: #00256c;
-    text-decoration: none;
-  }
-
-  a:hover {
+  &:hover {
     text-decoration: underline;
   }
 `;
