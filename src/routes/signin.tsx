@@ -54,8 +54,9 @@ export default function SignIn() {
         <S.Input type="name" placeholder="Name" />
         <S.Input type="email" placeholder="Email" />
         <S.Input type="password" placeholder="Password" />
-
-        <S.LoginButton>Sign in</S.LoginButton>
+        <S.AccountLink to="/create-profile">
+          <S.LoginButton>Sign in</S.LoginButton>
+        </S.AccountLink>
       </S.LoginBox>
     </S.Container>
   );

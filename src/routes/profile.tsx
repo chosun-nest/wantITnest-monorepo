@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Profile() {
-  return <>hi</>;
+  return <div>hi</div>;
 }

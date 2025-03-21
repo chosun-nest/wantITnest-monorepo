@@ -52,7 +52,9 @@ export default function Login() {
 
         <S.LoginButton>Log in</S.LoginButton>
 
-        <S.AccountLink to="/signin">계정이 없어요</S.AccountLink>
+        <S.AccountLink to="/signin">
+          <S.NoAccount>계정이 없어요</S.NoAccount>
+        </S.AccountLink>
       </S.LoginBox>
     </S.Container>
   );

@@ -1,14 +1,11 @@
-import {
-  RouterProvider,
-  Navigate,
-  createBrowserRouter,
-} from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
 import Signin from "./routes/signin";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
+import CreateProfile from "./routes/create-profile";
 
 const router = createBrowserRouter([
   {
@@ -21,16 +18,12 @@ const router = createBrowserRouter([
       },
       {
         path: "",
-        index: true,
         element: <Home />,
       },
     ],
   },
   // 이 윗 줄 까진 Layout의 children임.
-  {
-    path: "/home",
-    element: <Home />,
-  },
+
   {
     path: "/login",
     element: <NavigateToHome />,
@@ -38,6 +31,11 @@ const router = createBrowserRouter([
   {
     path: "/signin",
     element: <Signin />,
+  },
+
+  {
+    path: "/create-profile",
+    element: <CreateProfile />,
   },
   {
     path: "/password-reset",

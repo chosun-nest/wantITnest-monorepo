@@ -142,3 +142,100 @@ export const AccountLink = styled(Link)`
     text-decoration: underline;
   }
 `;
+
+export const NoAccount = styled.a`
+  color: #00256c;
+  text-decoration: none;
+  font-weight: 200;
+`;
+
+export const ProfileImageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+`;
+
+// 파일 입력은 화면에서 숨김
+export const FileInput = styled.input`
+  display: none;
+`;
+
+export const ProfilePlaceholder = styled.div`
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #999;
+  text-align: center;
+  cursor: pointer;
+`;
+
+export const ProfileImage = styled.img`
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  cursor: pointer;
+`;
+
+/* ✅ 보유 기술 입력란 스타일 */
+export const SkillContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+`;
+
+export const Label = styled.label`
+  font-size: 0.875rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+`;
+
+export const SkillRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.3rem; /* 버튼과 입력 칸 간격 조정 */
+  margin-bottom: 0.5rem;
+`;
+
+/* ✅ 버튼 크기 조정 */
+export const AddButton = styled.button`
+  background: #28a745;
+  color: white;
+  border: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #218838;
+  }
+`;
+
+export const RemoveButton = styled.button`
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+
+  &:hover {
+    background: #c82333;
+  }
+`;
