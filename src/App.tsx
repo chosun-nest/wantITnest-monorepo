@@ -1,14 +1,15 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/home";
-import Profile from "./routes/profile";           //yeong-eun
-import ProfileEdit from "./routes/profile-edit";  //yeong-eun
+import Profile from "./routes/profile"; //yeong-eun
+import ProfileEdit from "./routes/profile-edit"; //yeong-eun
 import Login from "./routes/login";
 import Signin from "./routes/signin";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import CreateProfile from "./routes/create-profile";
-import ProjectBoard from "./routes/project-board";  //yeong-eun
-
+import ProjectBoard from "./routes/project-board"; //yu-geum
+import NoticeBoard from "./routes/notice-board"; //yu-geum
+import Notice from "./routes/notice"; //yu-geum
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,14 @@ const router = createBrowserRouter([
       {
         path: "project-board/",
         element: <ProjectBoard />,
+      },
+      {
+        path: "notice-board/",
+        element: <NoticeBoard />,
+      },
+      {
+        path: "notice/",
+        element: <Notice />,
       },
     ],
   },
