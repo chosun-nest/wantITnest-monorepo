@@ -1,11 +1,14 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/home";
-import Profile from "./routes/profile";
+import Profile from "./routes/profile";           //yeong-eun
+import ProfileEdit from "./routes/profile-edit";  //yeong-eun
 import Login from "./routes/login";
 import Signin from "./routes/signin";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import CreateProfile from "./routes/create-profile";
+import ProjectBoard from "./routes/project-board";  //yeong-eun
+
 
 const router = createBrowserRouter([
   {
@@ -19,6 +22,14 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <Home />,
+      },
+      {
+        path: "profile-edit/",
+        element: <ProfileEdit />,
+      },
+      {
+        path: "project-board/",
+        element: <ProjectBoard />,
       },
     ],
   },
