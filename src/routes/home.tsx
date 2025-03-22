@@ -10,7 +10,7 @@ export default function Home() {
         학사 공지
       </S.GridItem>
       <S.GridItem row="1" col="3">
-        참여중인 채팅방
+        게시판
       </S.GridItem>
       <S.GridItem row="2" col="2">
         AI Global Conference
