@@ -19,5 +19,5 @@ public class Tag {
     private String name;
 
     @OneToMany(mappedBy = "tag")
-    private List<PostTag> postTags  = new ArrayList<>();
+    private List<PostTag> postTags = new ArrayList<>();
 }

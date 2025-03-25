@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class TagResponseDto {
+public class TagListResponseDto {
     Long tagId;
     String tagName;
     int postCount;
