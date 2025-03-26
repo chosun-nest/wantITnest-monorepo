@@ -1,5 +1,5 @@
-import Cropper from "react-easy-crop";
-import Modal from "react-modal";
+// import Cropper from "react-easy-crop";
+// import Modal from "react-modal";
 import { useState } from "react";
 import getCroppedImg from "../../utils/imagecrop";
 
