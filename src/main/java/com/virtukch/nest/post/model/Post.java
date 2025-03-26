@@ -1,8 +1,10 @@
 package com.virtukch.nest.post.model;
 
+import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.postTag.model.PostTag;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,8 +17,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Post {
-
+public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,10 +33,18 @@ public class Post {
     @Lob
     private String content;
 
-    private Integer viewCount; // 조회수
+    @Column(nullable = false)
+    private Integer viewCount = 0; // 조회수
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    @Builder
+    public Post(Member member, String title, String content) {
+        this.member = member;
+        this.title = title;
+        this.content = content;
+    }
+
+    public void addPostTag(PostTag postTag) {
+        postTags.add(postTag);
+        postTag.setPost(this);
+    }
 }

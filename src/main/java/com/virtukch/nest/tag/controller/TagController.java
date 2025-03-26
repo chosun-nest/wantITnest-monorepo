@@ -22,7 +22,7 @@ public class TagController {
 
     @Operation(summary = "태그 리스트 반환", description = "현재까지 생성된 모든 태그 목록을 반환합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "작성 성공"),
+            @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
     @GetMapping
