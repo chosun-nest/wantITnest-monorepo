@@ -24,7 +24,7 @@ export default function Login() {
 
         <S.Divider>혹은</S.Divider>
 
-        <S.AccountLink to="/passwd-reset">
+        <S.AccountLink to="/password-reset">
           <S.NoAccount>비밀번호를 까먹었어요</S.NoAccount>
         </S.AccountLink>
       </S.LoginBox>
