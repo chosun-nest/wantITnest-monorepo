@@ -1,8 +1,6 @@
 import { useState } from "react";
 import * as S from "../assets/styles/login.styles";
 import useResponsive from "../hooks/responsive";
-import ImageModal from "../components/layout/imagemodal"; // 모달 컴포넌트 추가
-
 export default function CreateProfile() {
   const isMobile = useResponsive();
   const [skills, setSkills] = useState([""]);

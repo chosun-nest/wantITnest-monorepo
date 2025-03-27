@@ -7,25 +7,27 @@ export default function Login() {
     <S.Container>
       {/* 로고 위치를 동적으로 조절 */}
       <S.Header $isMobile={isMobile}>
-        <S.LogoText>CHOSUN-NEST</S.LogoText>
+        <S.LogoText>WantIT-Nest</S.LogoText>
       </S.Header>
+      {/*로그인 박스*/}
       <S.LoginBox>
-        <S.Title>Welcome to CSU-NEST</S.Title>
-
         {/* 이메일 및 비밀번호 입력 */}
-        <S.Input type="email" placeholder="Email" />
-        <S.Input type="password" placeholder="Password" />
+        <S.InputTitle>아이디</S.InputTitle>
+        <S.Input type="id" placeholder="아이디" />
+        <S.InputTitle>비밀번호</S.InputTitle>
+        <S.Input type="password" placeholder="비밀번호" />
 
-        <S.LoginButton>Log in</S.LoginButton>
-
+        <S.LoginButton>로그인</S.LoginButton>
+        <S.FindContainer>
+          <S.AccountLink to="/find-id">
+            <S.FindButton>아이디 찾기</S.FindButton>
+          </S.AccountLink>
+          <S.AccountLink to="/find-password">
+            <S.FindButton>비밀번호 찾기</S.FindButton>
+          </S.AccountLink>
+        </S.FindContainer>
         <S.AccountLink to="/signin">
-          <S.NoAccount>계정이 없어요</S.NoAccount>
-        </S.AccountLink>
-
-        <S.Divider>혹은</S.Divider>
-
-        <S.AccountLink to="/password-reset">
-          <S.NoAccount>비밀번호를 까먹었어요</S.NoAccount>
+          <S.SigninButton>회원 가입하기</S.SigninButton>
         </S.AccountLink>
       </S.LoginBox>
     </S.Container>
