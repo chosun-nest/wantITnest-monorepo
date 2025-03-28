@@ -332,11 +332,16 @@ export const SubTextBox = styled.div`
   flex-direction: column;
   align-items: start;
 `;
-export const SubText = styled.p`
+export const SubText = styled.p<{ $isValid?: boolean }>`
   font-size: 14px;
-  color: #b7b9bd;
   margin-bottom: 4px;
   margin-left: 4px;
+  color: ${(props) =>
+    props.$isValid === undefined
+      ? "#b7b9bd"
+      : props.$isValid
+        ? "#0066ff"
+        : "#ff4d4f"};
 
   a {
     color: #00256c;
@@ -347,4 +352,71 @@ export const SubText = styled.p`
   a:hover {
     text-decoration: underline;
   }
+`;
+
+export const EmailRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
+export const TimerInputWrapper = styled.div`
+  position: relative;
+  margin-top: 1rem;
+  width: 100%;
+`;
+
+export const TimerText = styled.span`
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #999;
+`;
+export const PasswordInputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
+
+export const EyeIcon = styled.span`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: #999;
+  user-select: none;
+`;
+export const ButtonRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 445px;
+`;
+export const CheckCodeButton = styled.button`
+  width: 150px;
+  min-height: 40px;
+  border: 1px solid #00256c;
+  background-color: white;
+  color: #00256c;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #00256c;
+    color: white;
+  }
+`;
+export const CodeVerifyRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.75rem;
 `;
