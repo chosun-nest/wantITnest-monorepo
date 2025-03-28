@@ -4,7 +4,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://221.156.215.197:5040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
     username: VIRTUKCH
     password: VIRTUKCH
     driver-class-name: com.mysql.cj.jdbc.Driver
