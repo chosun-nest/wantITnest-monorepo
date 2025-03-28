@@ -1,5 +1,6 @@
+# Port Number
 server:
-  port: 8080
+  port: 5030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
 
 spring:
   datasource:
