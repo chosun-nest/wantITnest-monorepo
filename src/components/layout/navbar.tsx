@@ -36,6 +36,27 @@ export default function Navbar() {
           <S.SignUpLink to="/signin">Sign In</S.SignUpLink>
         </S.NavRight>
       </S.NavbarContent>
+      <S.WebBar>
+        {" "}
+        <S.NavbarLink to="/">
+          <S.WebBarItem>Nest-FE 소개</S.WebBarItem>
+        </S.NavbarLink>
+        <S.NavbarLink to="/notice-board">
+          <S.WebBarItem>학사공지</S.WebBarItem>
+        </S.NavbarLink>
+        <S.NavbarLink to="/projects">
+          <S.WebBarItem>프로젝트 모집</S.WebBarItem>
+        </S.NavbarLink>
+        <S.NavbarLink to="/interests-board">
+          <S.WebBarItem>관심분야 정보</S.WebBarItem>
+        </S.NavbarLink>
+        <S.NavbarLink to="/chat">
+          <S.WebBarItem>채팅방</S.WebBarItem>
+        </S.NavbarLink>
+        <S.NavbarLink to="/events">
+          <S.WebBarItem>행사</S.WebBarItem>
+        </S.NavbarLink>
+      </S.WebBar>
     </S.NavbarContainer>
   );
 }
