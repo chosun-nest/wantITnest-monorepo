@@ -23,7 +23,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/posts")
-@Tag(name = "게시글 API", description = "게시글 생성, 조회, 수정, 삭제 등 게시판 관련 API")
+@Tag(name = "게시판 API", description = "게시글 생성, 조회, 수정, 삭제 등 게시판 관련 API")
 public class PostController {
 
     private final PostService postService;
@@ -54,8 +54,6 @@ public class PostController {
             @ApiResponse(responseCode = "201", description = "게시글 생성 성공")
     })
     @PostMapping("/new")
-    // 🔐 이 API는 CSRF 설정에 따라 POST 요청이 차단될 수 있으므로,
-    // Spring Security 설정(SecurityConfig.java)에서 CSRF를 비활성화하거나, 해당 엔드포인트를 예외로 등록해야 합니다.
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<PostCreateResponseDto> savePost(@AuthenticationPrincipal CustomUserDetails user,
                                                           @RequestBody PostCreateRequestDto postCreateRequestDto) {

@@ -40,4 +40,10 @@ public class Post extends BaseTimeEntity {
         this.content = content;
     }
 
+    
+    // 연관관계 편의 메소드
+    public void addPostTag(PostTag postTag) {
+        postTags.add(postTag);           // 리스트에 추가
+        postTag.setPost(this);           // 양방향 연관관계 설정
+    }
 }
