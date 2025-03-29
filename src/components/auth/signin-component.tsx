@@ -161,6 +161,14 @@ export default function SigninComponent({
       <S.ButtonRow>
         <S.LoginButton onClick={onNext}>다음</S.LoginButton>
       </S.ButtonRow>
+      <div className="flex justify-center mb-[50px]">
+        <div className="flex items-center gap-1 text-sm text-gray-600">
+          <span>이미 계정이 있나요?</span>
+          <a href="/login" className="text-blue-500 hover:underline">
+            로그인 하기
+          </a>
+        </div>
+      </div>
     </S.LoginBox>
   );
 }

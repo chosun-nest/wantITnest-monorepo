@@ -14,9 +14,6 @@ export default function SigninStudent({ onPrev }: Props) {
       <S.Input placeholder="이름을 입력해주세요" />
       <S.SubText $isValid={false}>⚠ 실명으로 입력해주세요!</S.SubText>
 
-      <S.InputTitle>학과 검색</S.InputTitle>
-      <S.Input placeholder="학과를 입력하세요" />
-
       <S.InputTitle>관심 분야</S.InputTitle>
       <S.Input placeholder="ex) 백엔드 개발, AI" />
 
@@ -32,6 +29,14 @@ export default function SigninStudent({ onPrev }: Props) {
         </S.LoginButton>
         <S.LoginButton>회원가입</S.LoginButton>
       </S.ButtonRow>
+      <div className="flex justify-center">
+        <div className="flex items-center gap-1 text-sm text-gray-600">
+          <span>이미 계정이 있나요?</span>
+          <a href="/login" className="text-blue-500 hover:underline">
+            로그인 하기
+          </a>
+        </div>
+      </div>
     </S.LoginBox>
   );
 }
