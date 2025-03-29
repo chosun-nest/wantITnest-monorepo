@@ -1,6 +1,6 @@
 package com.virtukch.nest.tag.model;
 
-import com.virtukch.nest.postTag.model.PostTag;
+import com.virtukch.nest.post_tag.model.PostTag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

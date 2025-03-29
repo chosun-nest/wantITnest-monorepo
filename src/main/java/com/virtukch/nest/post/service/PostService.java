@@ -5,7 +5,7 @@ import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.dto.PostCreateRequestDto;
 import com.virtukch.nest.post.model.Post;
 import com.virtukch.nest.post.repository.PostRepository;
-import com.virtukch.nest.postTag.model.PostTag;
+import com.virtukch.nest.post_tag.model.PostTag;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.service.TagService;
 import jakarta.persistence.EntityNotFoundException;

@@ -1,4 +1,4 @@
-package com.virtukch.nest.postTag.model;
+package com.virtukch.nest.post_tag.model;
 
 import com.virtukch.nest.post.model.Post;
 import com.virtukch.nest.tag.model.Tag;

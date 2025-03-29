@@ -2,15 +2,12 @@ package com.virtukch.nest.post.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.postTag.model.PostTag;
+import com.virtukch.nest.post_tag.model.PostTag;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +40,14 @@ public class Post extends BaseTimeEntity {
         this.content = content;
     }
 
+    // 연관관계 편의 메서드
     public void addPostTag(PostTag postTag) {
         postTags.add(postTag);
         postTag.setPost(this);
+    }
+
+    public void removePostTag(PostTag postTag) {
+        postTags.remove(postTag);
+        postTag.setPost(null); //orphanRemoval = true 이므로 자동으로 postTag 필드도 삭제됨.
     }
 }
