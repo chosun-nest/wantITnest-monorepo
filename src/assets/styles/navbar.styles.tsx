@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const NavbarContainer = styled.nav`
+  display: flex;
+  flex-direction: column;
   width: 100%;
   background: white;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.75rem 1.5rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -13,12 +13,15 @@ export const NavbarContainer = styled.nav`
 `;
 
 export const NavbarContent = styled.div`
+  display: flex;
+  flex-direction: row;
   width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
+
   justify-content: space-between;
-  padding: 0rem;
+  padding: 1rem;
 `;
 
 export const Logo = styled(Link)`
@@ -103,5 +106,36 @@ export const SignUpLink = styled(LoginLink)`
 
   &:hover {
     background: #001b40;
+  }
+`;
+
+export const WebBar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px; /* 아이템 간 간격 (적절히 조절 가능) */
+  width: 100%;
+  height: 40px;
+  background-color: #f3f3f3;
+`;
+
+export const NavbarLink = styled(Link)`
+  text-decoration: none;
+  text-decoration-line: none;
+  text-decoration: none;
+`;
+
+export const WebBarItem = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  cursor: pointer;
+
+  &:hover {
+    font-weight: 700;
+  }
+
+  &.active {
+    font-weight: 700;
   }
 `;
