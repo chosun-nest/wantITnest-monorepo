@@ -40,14 +40,4 @@ public class Post extends BaseTimeEntity {
         this.content = content;
     }
 
-    // 연관관계 편의 메서드
-    public void addPostTag(PostTag postTag) {
-        postTags.add(postTag);
-        postTag.setPost(this);
-    }
-
-    public void removePostTag(PostTag postTag) {
-        postTags.remove(postTag);
-        postTag.setPost(null); //orphanRemoval = true 이므로 자동으로 postTag 필드도 삭제됨.
-    }
 }
