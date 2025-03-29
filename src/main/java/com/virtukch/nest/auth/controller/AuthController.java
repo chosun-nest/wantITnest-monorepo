@@ -29,6 +29,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginRequestDto));
     }
 
+    // Refresh Token 을 사용하여 Access Token 을 재발급 받는 메서드
+    // Refresh Token 은 그냥 돌려주는 것임.
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDto> refresh(
         @RequestHeader("Authorization") String refreshToken) {
