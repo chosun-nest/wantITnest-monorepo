@@ -11,6 +11,7 @@ import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,24 +21,13 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
-
-    public AuthService(
-        MemberRepository memberRepository,
-        JwtTokenProvider jwtTokenProvider,
-        AuthenticationManager authenticationManager,
-        PasswordEncoder passwordEncoder
-    ) {
-        this.memberRepository = memberRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         // 이메일 중복 확인
