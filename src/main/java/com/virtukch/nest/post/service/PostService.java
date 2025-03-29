@@ -36,7 +36,7 @@ public class PostService {
         for (String tagName : postCreateRequestDto.getTags()) {
             Tag tag = tagService.findOrCreateTag(tagName);
             PostTag postTag = new PostTag(post, tag);
-            post.addPostTag(postTag);
+//            post.addPostTag(postTag);
         }
 
         return postRepository.save(post).getId();
