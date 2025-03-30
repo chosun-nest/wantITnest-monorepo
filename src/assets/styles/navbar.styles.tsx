@@ -5,11 +5,14 @@ export const NavbarContainer = styled.nav`
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: 80px;
+  max-height: 120px;
   background: white;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
 export const NavbarContent = styled.div`
@@ -36,7 +39,8 @@ export const Logo = styled(Link)`
   gap: 0.5rem;
 
   img {
-    height: 30px;
+    width: 42px;
+    height: 42px;
   }
 `;
 

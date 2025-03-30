@@ -1,6 +1,9 @@
 import * as S from "../../assets/styles/navbar.styles";
+import useResponsive from "../../hooks/responsive";
 
 export default function Navbar() {
+  const isMobile = useResponsive();
+
   return (
     <S.NavbarContainer>
       <S.NavbarContent>
@@ -36,27 +39,29 @@ export default function Navbar() {
           <S.SignUpLink to="/signin">Sign In</S.SignUpLink>
         </S.NavRight>
       </S.NavbarContent>
-      <S.WebBar>
-        {" "}
-        <S.NavbarLink to="/">
-          <S.WebBarItem>Nest-FE 소개</S.WebBarItem>
-        </S.NavbarLink>
-        <S.NavbarLink to="/notice-board">
-          <S.WebBarItem>학사공지</S.WebBarItem>
-        </S.NavbarLink>
-        <S.NavbarLink to="/projects">
-          <S.WebBarItem>프로젝트 모집</S.WebBarItem>
-        </S.NavbarLink>
-        <S.NavbarLink to="/interests-board">
-          <S.WebBarItem>관심분야 정보</S.WebBarItem>
-        </S.NavbarLink>
-        <S.NavbarLink to="/chat">
-          <S.WebBarItem>채팅방</S.WebBarItem>
-        </S.NavbarLink>
-        <S.NavbarLink to="/events">
-          <S.WebBarItem>행사</S.WebBarItem>
-        </S.NavbarLink>
-      </S.WebBar>
+      {!isMobile ? (
+        <S.WebBar>
+          {" "}
+          <S.NavbarLink to="/">
+            <S.WebBarItem>Nest-FE 소개</S.WebBarItem>
+          </S.NavbarLink>
+          <S.NavbarLink to="/notice-board">
+            <S.WebBarItem>학사공지</S.WebBarItem>
+          </S.NavbarLink>
+          <S.NavbarLink to="/project-board">
+            <S.WebBarItem>프로젝트 모집</S.WebBarItem>
+          </S.NavbarLink>
+          <S.NavbarLink to="/interests-board">
+            <S.WebBarItem>관심분야 정보</S.WebBarItem>
+          </S.NavbarLink>
+          <S.NavbarLink to="/chat">
+            <S.WebBarItem>채팅방</S.WebBarItem>
+          </S.NavbarLink>
+          <S.NavbarLink to="/events">
+            <S.WebBarItem>행사</S.WebBarItem>
+          </S.NavbarLink>
+        </S.WebBar>
+      ) : null}
     </S.NavbarContainer>
   );
 }
