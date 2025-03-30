@@ -40,10 +40,25 @@ public class Post extends BaseTimeEntity {
         this.content = content;
     }
 
-    
     // 연관관계 편의 메소드
     public void addPostTag(PostTag postTag) {
         postTags.add(postTag);           // 리스트에 추가
         postTag.setPost(this);           // 양방향 연관관계 설정
+    }
+
+    // 비즈니스 로직
+    public void increaseViewCount() {
+        this.viewCount += 1;
+    }
+
+    public void updatePost(String title, String content) {
+        if (title != null && !title.isBlank()) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        
+        //TODO : PostTag 수정 로직 구현 (다른 클래스로 위임할 수도 있음)
     }
 }
