@@ -51,7 +51,7 @@ const router = createBrowserRouter([
     ],
   },
   // 이 윗 줄 까진 Layout의 children임.
-
+  // 인증이 필요한 부분
   {
     path: "/login",
     element: <NavigateToHome />,
@@ -67,6 +67,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/password-reset",
+    element: <PasswdReset />,
+  },
+  {
+    path: "/find-id",
     element: <PasswdReset />,
   },
 ]);

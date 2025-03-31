@@ -2,17 +2,28 @@ import * as S from "../../assets/styles/login.styles";
 
 type Props = {
   onPrev: () => void;
+  selected: "재학생" | "일반";
 };
 
-export default function SigninStudent({ onPrev }: Props) {
+export default function SigninDetail({ onPrev, selected }: Props) {
   return (
     <S.LoginBox>
-      <S.Title>Welcome to WantIT-Nest</S.Title>
-      <S.SigninTitle>회원가입</S.SigninTitle>
+      <S.HeaderBox>
+        <S.HeaderLogo src="/assets/images/logo.png" />
+        <S.Title>Welcome to WantIT-NEST</S.Title>
+        <S.SigninTitle>회원가입</S.SigninTitle>
+      </S.HeaderBox>
 
       <S.InputTitle>이름</S.InputTitle>
       <S.Input placeholder="이름을 입력해주세요" />
       <S.SubText $isValid={false}>⚠ 실명으로 입력해주세요!</S.SubText>
+
+      {selected === "재학생" && (
+        <>
+          <S.InputTitle>학과 검색</S.InputTitle>
+          <S.Input placeholder="학과를 입력하세요" />
+        </>
+      )}
 
       <S.InputTitle>관심 분야</S.InputTitle>
       <S.Input placeholder="ex) 백엔드 개발, AI" />
@@ -29,6 +40,7 @@ export default function SigninStudent({ onPrev }: Props) {
         </S.LoginButton>
         <S.LoginButton>회원가입</S.LoginButton>
       </S.ButtonRow>
+
       <div className="flex justify-center">
         <div className="flex items-center gap-1 text-sm text-gray-600">
           <span>이미 계정이 있나요?</span>

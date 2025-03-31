@@ -1,8 +1,7 @@
 import { useState } from "react";
 import * as S from "../assets/styles/login.styles";
 import SigninComponent from "../components/auth/signin-component";
-import SigninStudent from "../components/auth/signin-student";
-import SigninNormal from "../components/auth/signin-normal";
+import SigninDetail from "../components/auth/signin-deatil";
 
 export default function SignIn() {
   const [step, setStep] = useState<1 | 2>(1);
@@ -58,10 +57,8 @@ export default function SignIn() {
           setIsPasswordVisible={setIsPasswordVisible}
           onNext={handleNextStep}
         />
-      ) : selected === "재학생" ? (
-        <SigninStudent onPrev={handlePrevStep} />
       ) : (
-        <SigninNormal onPrev={handlePrevStep} />
+        <SigninDetail selected={selected} onPrev={handlePrevStep} />
       )}
     </S.Container>
   );
