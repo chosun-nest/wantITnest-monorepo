@@ -1,10 +1,33 @@
 import { useBackdrop } from "../../context/Backdropcontext";
 import * as S from "../../assets/styles/navbar.styles";
 import useResponsive from "../../hooks/responsive";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 
 export default function Navbar() {
   const isMobile = useResponsive();
   const { setShowBackdrop } = useBackdrop();
+  const navigate = useNavigate();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // 바깥 클릭 시 메뉴 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   return (
     <S.NavbarContainer>
@@ -20,7 +43,7 @@ export default function Navbar() {
             </div>
           ) : (
             <svg
-              data-Slot="icon"
+              data-slot="icon"
               fill="none"
               strokeWidth={1.5}
               stroke="currentColor"
@@ -45,9 +68,45 @@ export default function Navbar() {
 
         {/* 우측 아이콘 및 버튼 */}
         <S.NavRight>
-          <S.SearchIcon></S.SearchIcon>
-          <S.LoginLink to="/login">Login</S.LoginLink>
-          <S.SignUpLink to="/signin">Sign In</S.SignUpLink>
+          <S.SearchIcon />
+
+          {localStorage.getItem("accesstoken") ? (
+            <>
+              <S.ProfileWrapper ref={menuRef}>
+                <S.ProfileIcon
+                  src="/assets/images/user.png"
+                  onClick={() => setIsMenuOpen((prev) => !prev)}
+                />
+                {isMenuOpen && (
+                  <S.ProfileMenu $visible={isMenuOpen}>
+                    <S.ProfileMenuItem
+                      onClick={() => {
+                        navigate("/profile");
+                      }}
+                    >
+                      내 프로필
+                    </S.ProfileMenuItem>
+                    <S.ProfileMenuItem
+                      onClick={() => {
+                        localStorage.removeItem("accesstoken");
+                        localStorage.removeItem("refreshToken");
+                        localStorage.removeItem("user");
+                        setIsMenuOpen(false);
+                        navigate("/login");
+                      }}
+                    >
+                      로그아웃
+                    </S.ProfileMenuItem>
+                  </S.ProfileMenu>
+                )}
+              </S.ProfileWrapper>
+            </>
+          ) : (
+            <>
+              <S.LoginLink to="/login">Login</S.LoginLink>
+              <S.SignUpLink to="/signin">Sign In</S.SignUpLink>
+            </>
+          )}
         </S.NavRight>
       </S.NavbarContent>
       {!isMobile ? (
