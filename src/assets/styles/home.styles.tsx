@@ -1,14 +1,14 @@
 import styled from "styled-components";
 
 interface GridContainerProps {
-  isMobile: boolean;
+  $isMobile: boolean;
 }
 interface GridItemProps {
-  isMobile: boolean;
-  row: string;
-  col: string;
-  rowSpan?: string;
-  colSpan?: string;
+  $isMobile: boolean;
+  $row: string;
+  $col: string;
+  $rowSpan?: string;
+  $colSpan?: string;
 }
 
 export const GridContainer = styled.div<GridContainerProps>`
@@ -18,8 +18,8 @@ export const GridContainer = styled.div<GridContainerProps>`
   margin: 0 auto;
   max-width: 1200px;
 
-  grid-template-columns: ${({ isMobile }) =>
-    isMobile ? "1fr" : "repeat(3, 1fr)"};
+  grid-template-columns: ${({ $isMobile }) =>
+    $isMobile ? "1fr" : "repeat(3, 1fr)"};
   grid-template-rows: repeat(auto-fit, auto);
 `;
 
@@ -33,11 +33,11 @@ export const GridItem = styled.div<GridItemProps>`
 
   min-height: 160px;
 
-  grid-row: ${({ row, isMobile, rowSpan }) =>
-    isMobile ? "auto" : `${row} / span ${rowSpan || 1}`};
+  grid-row: ${({ $row, $isMobile, $rowSpan }) =>
+    $isMobile ? "auto" : `${$row} / span ${$rowSpan || 1}`};
 
-  grid-column: ${({ col, isMobile, colSpan }) =>
-    isMobile ? "auto" : `${col} / span ${colSpan || 1}`};
+  grid-column: ${({ $col, $isMobile, $colSpan }) =>
+    $isMobile ? "auto" : `${$col} / span ${$colSpan || 1}`};
 `;
 
 export const ItemTitle = styled.div`
