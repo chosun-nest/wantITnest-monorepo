@@ -10,7 +10,10 @@ import CreateProfile from "./routes/create-profile";
 import ProjectBoard from "./routes/project-board"; //yu-geum
 import NoticeBoard from "./routes/notice-board"; //yu-geum
 import Notice from "./routes/notice"; //yu-geum
-import InterestsBorad from "./routes/interests-borad";  //yeong-eun
+import InterestsBorad from "./routes/interests-borad"; //yeong-eun
+import { useState } from "react";
+import GlobalBackdrop from "./components/easter/GlobalBackdrop";
+import { BackdropContext } from "./context/Backdropcontext";
 
 const router = createBrowserRouter([
   {
@@ -43,7 +46,7 @@ const router = createBrowserRouter([
       },
       {
         path: "interests-board/",
-        element: <InterestsBorad />
+        element: <InterestsBorad />,
       },
     ],
   },
@@ -69,9 +72,13 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const [showBackdrop, setShowBackdrop] = useState(false);
   return (
     <>
-      <RouterProvider router={router} />
+      <BackdropContext.Provider value={{ showBackdrop, setShowBackdrop }}>
+        <GlobalBackdrop visible={showBackdrop} />
+        <RouterProvider router={router} />
+      </BackdropContext.Provider>
     </>
   );
 }
