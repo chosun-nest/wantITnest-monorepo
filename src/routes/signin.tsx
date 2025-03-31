@@ -56,6 +56,17 @@ export default function SignIn() {
       };
 
       const res = await signup(payload);
+      // ✅ 응답에서 정보 추출
+      const { accessToken, refreshToken, memberId, email: userEmail } = res;
+
+      // ✅ 로컬 스토리지에 저장
+      localStorage.setItem("accesstoken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ memberId, email: userEmail })
+      );
+
       alert("회원가입이 완료되었습니다!");
       console.log("가입한 사용자 ID:", res.userId);
       navigate("/login");

@@ -73,6 +73,47 @@ export const NavRight = styled.div`
   min-width: 0;
 `;
 
+export const ProfileWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+export const ProfileIcon = styled.img`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+export const ProfileMenu = styled.div<{ $visible: boolean }>`
+  display: ${({ $visible }) => ($visible ? "block" : "none")};
+  position: absolute;
+  width: 100px;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 0;
+  z-index: 9999;
+`;
+
+export const ProfileMenuItem = styled.button`
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  color: #00256c;
+
+  &:hover {
+    background-color: #f2f4f8;
+  }
+`;
+
 export const SearchIcon = styled.div`
   cursor: pointer;
   display: flex;

@@ -16,7 +16,13 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const res = await login(id, password);
-      localStorage.setItem("token", res.token);
+      const { accessToken, refreshToken, memberId, email: userEmail } = res;
+      localStorage.setItem("accesstoken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ memberId, email: userEmail })
+      );
       navigate("/");
     } catch (error) {
       const err = error as AxiosError;
