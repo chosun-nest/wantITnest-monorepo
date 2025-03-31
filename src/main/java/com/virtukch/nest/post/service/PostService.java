@@ -9,9 +9,7 @@ import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.post_tag.model.PostTag;
 import com.virtukch.nest.post_tag.repository.PostTagRepository;
 import com.virtukch.nest.tag.model.Tag;
-import com.virtukch.nest.tag.repository.TagRepository;
 import com.virtukch.nest.tag.service.TagService;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +27,10 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
-
     private final TagService tagService;
+
     private final PostTagRepository postTagRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public PostCreateResponseDto createPost(Long memberId, PostCreateRequestDto requestDto) {
@@ -45,11 +44,14 @@ public class PostService {
                 .content(requestDto.getContent())
                 .build();
 
-        for (String tagName : requestDto.getTags()) {
-            Tag tag = tagService.findByNameOrThrow(tagName);
-            PostTag postTag = new PostTag(post, tag);
-            post.addPostTag(postTag);
-        }
+        // 태그가 설정되지 않았다면, 기본 태그인 "UNCATEGORIZED"로 자동 설정
+        List<String> tags = requestDto.getTags().isEmpty() ? List.of("UNCATEGORIZED") : requestDto.getTags();
+
+        tags.stream()
+                .map(tagService::findByNameOrThrow)
+                .map(tag -> new PostTag(post, tag))
+                .forEachOrdered(post::addPostTag);
+
         Post savedPost = postRepository.save(post);
         log.info("[게시글 생성 완료] postId={}", savedPost.getId());
 
@@ -67,8 +69,9 @@ public class PostService {
     // 게시글 목록 조회
     @Transactional(readOnly = true)
     public PostListResponseDto getPostList() {
-        List<PostSummaryDto> summaries = new ArrayList<>();
-        postRepository.findAll().forEach(post -> summaries.add(PostDtoConverter.toSummaryDto(post)));
+        List<PostSummaryDto> summaries = postRepository.findAll().stream()
+                .map(PostDtoConverter::toSummaryDto)
+                .collect(Collectors.toList());
         return PostDtoConverter.toListResponseDto(summaries);
     }
 
@@ -88,12 +91,13 @@ public class PostService {
     @Transactional
     public PostUpdateResponseDto updatePost(Long postId, Long memberId, PostUpdateRequestDto requestDto) {
         Post post = findByIdOrThrow(postId);
-
         if (!post.getMember().getMemberId().equals(memberId)) {
             throw new AccessDeniedException("수정 권한 없음");
         }
 
-        post.updatePost(requestDto.getTitle(), requestDto.getContent());
+        List<Tag> tags = requestDto.getTags().stream().map(tagService::findByNameOrThrow).toList();
+        post.updatePost(requestDto.getTitle(), requestDto.getContent(), tags);
+
         return PostDtoConverter.toUpdateResponseDto(postId);
     }
 

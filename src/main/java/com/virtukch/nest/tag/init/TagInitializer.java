@@ -21,6 +21,7 @@ public class TagInitializer implements CommandLineRunner {
         if (tagRepository.count() > 0) return;
 
         List<Tag> defaultTags = List.of(
+                new Tag("UNCATEGORIZED"),
                 new Tag("JAVA"),
                 new Tag("SPRING"),
                 new Tag("웹개발"),
@@ -35,6 +36,6 @@ public class TagInitializer implements CommandLineRunner {
 
         tagRepository.saveAll(defaultTags);
 
-        log.info("✅ [TagInitializer] 태그 10개 자동 등록 완료");
+        log.info("✅ [TagInitializer] 태그 {}개 자동 등록 완료", defaultTags.size());
     }
 }

@@ -3,6 +3,7 @@ package com.virtukch.nest.post.model;
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post_tag.model.PostTag;
+import com.virtukch.nest.tag.model.Tag;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,6 +34,9 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer viewCount = 0; // 조회수
 
+    @Column(nullable = false)
+    private Integer likeCount = 0;
+
     @Builder
     public Post(Member member, String title, String content) {
         this.member = member;
@@ -51,14 +55,23 @@ public class Post extends BaseTimeEntity {
         this.viewCount += 1;
     }
 
-    public void updatePost(String title, String content) {
+    public void updatePost(String title, String content, List<Tag> newTags) {
         if (title != null && !title.isBlank()) {
             this.title = title;
         }
         if (content != null) {
             this.content = content;
         }
-        
-        //TODO : PostTag 수정 로직 구현 (다른 클래스로 위임할 수도 있음)
+        if(newTags != null) {
+            updatePostTags(newTags);
+        }
+    }
+
+    private void updatePostTags(List<Tag> newTags) {
+        postTags.clear();  // orphanRemoval = true 이므로 DB에서도 삭제됨
+        for (Tag tag : newTags) {
+            PostTag postTag = new PostTag(this, tag);
+            this.addPostTag(postTag);
+        }
     }
 }

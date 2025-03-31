@@ -32,13 +32,9 @@ public class PostController {
             summary = "게시글 작성",
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "게시글 생성 성공")
-    })
     @PostMapping("/new")
     public ResponseEntity<PostCreateResponseDto> createPost(@AuthenticationPrincipal CustomUserDetails user,
                                                             @RequestBody PostCreateRequestDto requestDto) {
-
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 작성 요청] memberId={}", memberId);
         PostCreateResponseDto responseDto = postService.createPost(memberId, requestDto);
@@ -52,29 +48,9 @@ public class PostController {
             description = "게시글 ID를 기반으로 상세 조회",
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "404", description = "게시글 없음")
-    })
     @GetMapping("/{postId}")
     public ResponseEntity<PostDetailResponseDto> getPostDetail(@PathVariable Long postId) {
         PostDetailResponseDto responseDto = postService.getPostDetail(postId);
-        return ResponseEntity.ok(responseDto);
-    }
-
-    @Operation(
-            summary = "게시글 목록 조회",
-            description = "RequestParam으로 태그를 포함할 경우, 해당 태그에 속한 게시글들을 반환. 태그를 포함하지 않을 경우에는, 전체 게시글 반환"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-    })
-    @GetMapping
-    public ResponseEntity<PostListResponseDto> getPostList(@RequestParam(required = false) List<String> tags) {
-        PostListResponseDto responseDto;
-        if (tags == null || tags.isEmpty()) responseDto = postService.getPostList();
-        else responseDto = postService.getPostList(tags);
-
         return ResponseEntity.ok(responseDto);
     }
 
@@ -86,7 +62,37 @@ public class PostController {
                     - 태그를 필터링하려면 ?tags=JAVA&tags=SPRING 와 같이 쿼리 파라미터로 전달하세요.
                     """
     )
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "조회 성공")})
+    @GetMapping
+    public ResponseEntity<PostListResponseDto> getPostList(@RequestParam(required = false) List<String> tags) {
+        PostListResponseDto responseDto;
+        if (tags == null || tags.isEmpty()) responseDto = postService.getPostList();
+        else responseDto = postService.getPostList(tags);
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "게시글 수정 요청",
+            description = """
+                    PATCH 요청 시, 각 JSON 필드의 처리 방식은 다음과 같습니다:
+                    
+                    📌 title
+                    - "title": null 또는 생략 → 수정하지 않음
+                    - "title": "" (빈 문자열) → 수정하지 않음 *특히 주의*
+                    - "title": "새 제목" → 제목 수정
+                    
+                    📌 content
+                    - "content": null 또는 생략 → 수정하지 않음
+                    - "content": "" → 본문 내용을 전부 삭제
+                    - "content": "새 내용" → 본문 수정
+                    
+                    📌 tags
+                    - "tags": null 또는 생략 → 수정하지 않음
+                    - "tags": [] → 태그 전부 제거
+                    - "tags": ["Java", "Spring"] → 태그 재설정
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
     @PatchMapping("/update/{postId}")
     public ResponseEntity<PostUpdateResponseDto> updatePost(@AuthenticationPrincipal CustomUserDetails user,
                                                             @PathVariable Long postId,
