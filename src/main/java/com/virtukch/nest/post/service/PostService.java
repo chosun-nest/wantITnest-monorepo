@@ -4,6 +4,10 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.dto.converter.PostDtoConverter;
+import com.virtukch.nest.post.exception.CannotDeletePostException;
+import com.virtukch.nest.post.exception.InvalidPostTitleException;
+import com.virtukch.nest.post.exception.NoPostAuthorityException;
+import com.virtukch.nest.post.exception.PostNotFoundException;
 import com.virtukch.nest.post.model.Post;
 import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.post_tag.model.PostTag;
@@ -13,12 +17,13 @@ import com.virtukch.nest.tag.service.TagService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +42,15 @@ public class PostService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        log.info("[게시글 생성 시작] title={}, memberId={}", requestDto.getTitle(), memberId);
+        String title = requestDto.getTitle();
+        if(title == null || title.isBlank()) {
+            throw new InvalidPostTitleException();
+        }
+
+        log.info("[게시글 생성 시작] title={}, memberId={}", title, memberId);
         Post post = Post.builder()
                 .member(member)
-                .title(requestDto.getTitle())
+                .title(title)
                 .content(requestDto.getContent())
                 .build();
 
@@ -90,20 +100,41 @@ public class PostService {
 
     @Transactional
     public PostUpdateResponseDto updatePost(Long postId, Long memberId, PostUpdateRequestDto requestDto) {
-        Post post = findByIdOrThrow(postId);
-        if (!post.getMember().getMemberId().equals(memberId)) {
-            throw new AccessDeniedException("수정 권한 없음");
+        Post post = findOwnedPostOrThrow(postId, memberId);
+        List<Tag> tags = requestDto.getTags().stream()
+                .map(tagService::findByNameOrThrow).collect(Collectors.toList());
+
+        if(tags.isEmpty()) {
+            tags.add(tagService.findByNameOrThrow("UNCATEGORIZED"));
         }
 
-        List<Tag> tags = requestDto.getTags().stream().map(tagService::findByNameOrThrow).toList();
         post.updatePost(requestDto.getTitle(), requestDto.getContent(), tags);
+        return PostDtoConverter.toUpdateResponseDto(post);
+    }
 
-        return PostDtoConverter.toUpdateResponseDto(postId);
+    @Transactional
+    public PostDeleteResponseDto deletePost(Long memberId, Long postId) {
+        Post post = findOwnedPostOrThrow(postId, memberId);
+        try { // TODO : 추후에 댓글 기능, 좋아요 기능 등등 추가하면 고려하여 수정해야함.
+            postRepository.delete(post);
+            return PostDtoConverter.toDeleteResponseDto(post);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("게시글 삭제 실패 - 연관 데이터 문제 postId={}, memberId={}", postId, memberId);
+            throw new CannotDeletePostException(postId);
+        }
     }
 
     @Transactional(readOnly = true)
     public Post findByIdOrThrow(Long postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found with ID: " + postId));
+        return postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
+    }
+
+    @Transactional(readOnly = true)
+    public Post findOwnedPostOrThrow(Long postId, Long memberId) {
+        Post post = findByIdOrThrow(postId);
+        if (!Objects.equals(post.getMember().getMemberId(), memberId)) {
+            throw new NoPostAuthorityException(postId, memberId);
+        }
+        return post;
     }
 }

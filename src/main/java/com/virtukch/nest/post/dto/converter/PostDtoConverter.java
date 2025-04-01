@@ -51,10 +51,17 @@ public class PostDtoConverter {
                 .build();
     }
 
-    public static PostUpdateResponseDto toUpdateResponseDto(Long postId) {
+    public static PostUpdateResponseDto toUpdateResponseDto(Post post) {
         return PostUpdateResponseDto.builder()
-                .postId(postId)
+                .postId(post.getId())
                 .message("게시글이 성공적으로 등록되었습니다.")
+                .build();
+    }
+
+    public static PostDeleteResponseDto toDeleteResponseDto(Post post) {
+        return PostDeleteResponseDto.builder()
+                .postId(post.getId())
+                .message("게시글이 성공적으로 삭제되었습니다.")
                 .build();
     }
 

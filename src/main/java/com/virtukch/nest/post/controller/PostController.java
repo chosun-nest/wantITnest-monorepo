@@ -4,19 +4,15 @@ import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -60,7 +56,8 @@ public class PostController {
                     게시글 목록을 조회합니다.
                     - 태그 필터링을 하지 않으면 전체 게시글을 반환합니다.
                     - 태그를 필터링하려면 ?tags=JAVA&tags=SPRING 와 같이 쿼리 파라미터로 전달하세요.
-                    """
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
     )
     @GetMapping
     public ResponseEntity<PostListResponseDto> getPostList(@RequestParam(required = false) List<String> tags) {
@@ -78,7 +75,7 @@ public class PostController {
                     
                     📌 title
                     - "title": null 또는 생략 → 수정하지 않음
-                    - "title": "" (빈 문자열) → 수정하지 않음 *특히 주의*
+                    - "title": "" (빈 문자열) → 수정하지 않음 ***특히 주의***
                     - "title": "새 제목" → 제목 수정
                     
                     📌 content
@@ -99,7 +96,24 @@ public class PostController {
                                                             @RequestBody PostUpdateRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 수정 요청] postId={}, memberId={}", postId, memberId);
-        PostUpdateResponseDto responseDto = postService.updatePost(postId, memberId, requestDto);
+        PostUpdateResponseDto responseDto = postService.updatePost(memberId, postId, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "게시글 삭제",
+            description ="""
+            회원 ID를 기반으로 게시글 삭제
+            - 작성자와 삭제하려는 사용자의 memberId가 다를 경우 **NoPostAuthorityException**
+            """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @DeleteMapping("/delete/{postId}")
+    public ResponseEntity<PostDeleteResponseDto> deletePost(@AuthenticationPrincipal CustomUserDetails user,
+                                                            @PathVariable Long postId) {
+        Long memberId = user.getMember().getMemberId();
+        log.info("[게시글 삭제 요청] postId={}, memberId={}", postId, memberId);
+        PostDeleteResponseDto responseDto = postService.deletePost(memberId, postId);
         return ResponseEntity.ok(responseDto);
     }
 }

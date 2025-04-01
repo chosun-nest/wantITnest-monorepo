@@ -2,6 +2,7 @@ package com.virtukch.nest.post.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.post.exception.InvalidPostTitleException;
 import com.virtukch.nest.post_tag.model.PostTag;
 import com.virtukch.nest.tag.model.Tag;
 import jakarta.persistence.*;
@@ -56,15 +57,11 @@ public class Post extends BaseTimeEntity {
     }
 
     public void updatePost(String title, String content, List<Tag> newTags) {
-        if (title != null && !title.isBlank()) {
-            this.title = title;
-        }
-        if (content != null) {
-            this.content = content;
-        }
-        if(newTags != null) {
-            updatePostTags(newTags);
-        }
+        if (title != null && !title.isBlank()) this.title = title;
+        else throw new InvalidPostTitleException();
+
+        if (content != null) this.content = content;
+        if (newTags != null) updatePostTags(newTags);
     }
 
     private void updatePostTags(List<Tag> newTags) {
