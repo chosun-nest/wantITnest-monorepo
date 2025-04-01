@@ -22,8 +22,8 @@ export default function SignIn() {
   // 컴포넌트 values를 여기에 모아줌
   const [name, setName] = useState("");
   const [department, setDepartment] = useState(""); // 재학생 전용
-  const [interest, setInterest] = useState("");
-  const [skills, setSkills] = useState("");
+  const [interest, setInterest] = useState<string[]>([]);
+  const [skills, setSkills] = useState<string[]>([]);
 
   const handleSendCode = () => {
     setTimer(300);
