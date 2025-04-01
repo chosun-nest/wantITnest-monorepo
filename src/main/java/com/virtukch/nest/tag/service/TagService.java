@@ -51,7 +51,7 @@ public class TagService {
         Optional<Tag> existingTag = tagRepository.findByName(tagName);
         return existingTag.orElseThrow(() -> {
             log.warn("[TagService] 태그 없음: {}", tagName);
-            return new TagNotFoundException("존재하지 않는 태그입니다 : " + tagName);
+            return new TagNotFoundException(tagName);
         });
     }
 }

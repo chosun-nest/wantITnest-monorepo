@@ -96,7 +96,7 @@ public class PostController {
                                                             @RequestBody PostUpdateRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 수정 요청] postId={}, memberId={}", postId, memberId);
-        PostUpdateResponseDto responseDto = postService.updatePost(memberId, postId, requestDto);
+        PostUpdateResponseDto responseDto = postService.updatePost(postId, memberId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
