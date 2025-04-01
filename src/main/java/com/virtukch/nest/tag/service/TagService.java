@@ -10,10 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,7 +22,10 @@ public class TagService {
 
     @Transactional(readOnly = true)
     public TagListResponseDto getAllTags() {
+        log.info("[TagService] 전체 태그 조회 시작");
         List<Tag> tags = tagRepository.findAll();
+        log.info("[TagService] 조회된 태그 수: {}", tags.size());
+
         List<TagResponseDto> tagResponseDtos = tags.stream()
                 .map(tag -> TagResponseDto.builder()
                         .tagId(tag.getId())
@@ -46,7 +47,11 @@ public class TagService {
 
     @Transactional(readOnly = true)
     public Tag findByNameOrThrow(String tagName) {
+        log.info("[TagService] 태그 검색 요청: {}", tagName);
         Optional<Tag> existingTag = tagRepository.findByName(tagName);
-        return existingTag.orElseThrow(() -> new TagNotFoundException("존재하지 않는 태그입니다 : " + tagName));
+        return existingTag.orElseThrow(() -> {
+            log.warn("[TagService] 태그 없음: {}", tagName);
+            return new TagNotFoundException("존재하지 않는 태그입니다 : " + tagName);
+        });
     }
 }

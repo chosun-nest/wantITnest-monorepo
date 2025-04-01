@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/tags")
@@ -25,7 +23,8 @@ public class TagController {
 
     @Operation(
             summary = "태그 리스트 반환",
-            description = "현재까지 생성된 모든 태그 목록을 반환합니다."
+            description = "현재까지 생성된 모든 태그 목록을 반환합니다.",
+            security = {@SecurityRequirement(name = "bearer-key")}
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -33,6 +32,7 @@ public class TagController {
     })
     @GetMapping
     public ResponseEntity<TagListResponseDto> getTags() {
+        log.info("[TagController] GET /api/v1/tags 요청 들어옴");
         return ResponseEntity.ok(tagService.getAllTags());
     }
 }
