@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   display: flex;
+  padding: 1rem;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
@@ -419,4 +420,35 @@ export const CodeVerifyRow = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 0.75rem;
+`;
+
+// login.styles.ts 내부에 아래 추가
+
+export const TagList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+export const TagItem = styled.span`
+  background: #eee;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+`;
+
+export const TagRemoveButton = styled.button`
+  margin-left: 6px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    color: #f00;
+  }
 `;
