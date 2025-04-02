@@ -1,54 +1,19 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+# WantIt-Nest-FE
+- 여기는 WantIt-Nest의 Front-End 개인 개발 허브입니다.
+- 인증 관련 로직과 메인 화면의 대시보드, 레이아웃 등을 개발합니다.
+## 인증 로직
+### 로그인
+- 백엔드 API를 따와 acc토큰, ref토큰을 locastorage에 저장하여 로그인을 하거나, 자동 로그인되어있게 만들었습니다.
+- 추 후 acc 토큰이 valid한지를 검사하여 일정 시간이 지나면 자동 로그인이 풀리도록 만들 계획입니다.
+### 회원 가입
+- 현재는 회원가입을 개발중이며 백엔드와 API 협의를 하고 있습니다.
+- 회원 가입 시에 기술 스택 및 관심 분야 데이터 베이스를 가져와 #태그를 달고 검색을 할 경우 드롭다운으로 연관 검색어가 나오도록 개발할 계획입니다.
+## 대시보드
+- 팀원들의 컴포넌트를 가져와 대시보드에 띄울 계획입니다.
+- 아직 팀원들이 덜 완성해 완벽하지 않은 상태입니다.
+## 레이아웃
+- 현재 팀원의 요청을 받아 간단한 수정을 마쳤습니다.
+- nabvar.tsx를 forwardRef로 감싼 뒤 context를 하나 만들어 전역 변수로 navbar의 높이를 가져올 수 있도록 수정했습니다.
+# 여담
+- 팀원이랑 같이 협업하려니깐 소통이 가장 중요하단걸 알았네요.
+- 혼자 개발할 땐 대충 암거나 막 지어서 편했지만 지금은 불편하더라도 틀이 잡혀있으니 개발 방향이 명확해 보입니다.
