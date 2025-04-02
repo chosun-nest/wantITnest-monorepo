@@ -3,7 +3,7 @@ import Home from "./routes/home";
 import Profile from "./routes/profile"; //yeong-eun
 import ProfileEdit from "./routes/profile-edit"; //yeong-eun
 import Login from "./routes/login";
-import Signin from "./routes/signin";
+import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import CreateProfile from "./routes/create-profile";
@@ -57,8 +57,8 @@ const router = createBrowserRouter([
     element: <NavigateToHome />,
   },
   {
-    path: "/signin",
-    element: <Signin />,
+    path: "/signup",
+    element: <SignUp />,
   },
 
   {
