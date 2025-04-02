@@ -2,23 +2,29 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const NavbarContainer = styled.nav`
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  min-height: 80px;
+  max-height: 120px;
   background: white;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.75rem 1.5rem;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
 export const NavbarContent = styled.div`
+  display: flex;
+  flex-direction: row;
   width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
+
   justify-content: space-between;
-  padding: 0rem;
+  padding: 1rem;
 `;
 
 export const Logo = styled(Link)`
@@ -33,7 +39,8 @@ export const Logo = styled(Link)`
   gap: 0.5rem;
 
   img {
-    height: 30px;
+    width: 42px;
+    height: 42px;
   }
 `;
 
@@ -64,6 +71,47 @@ export const NavRight = styled.div`
   align-items: center;
   gap: 1rem;
   min-width: 0;
+`;
+
+export const ProfileWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+export const ProfileIcon = styled.img`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+export const ProfileMenu = styled.div<{ $visible: boolean }>`
+  display: ${({ $visible }) => ($visible ? "block" : "none")};
+  position: absolute;
+  width: 100px;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 0;
+  z-index: 9999;
+`;
+
+export const ProfileMenuItem = styled.button`
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  color: #00256c;
+
+  &:hover {
+    background-color: #f2f4f8;
+  }
 `;
 
 export const SearchIcon = styled.div`
@@ -103,5 +151,36 @@ export const SignUpLink = styled(LoginLink)`
 
   &:hover {
     background: #001b40;
+  }
+`;
+
+export const WebBar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px; /* 아이템 간 간격 (적절히 조절 가능) */
+  width: 100%;
+  height: 40px;
+  background-color: #f3f3f3;
+`;
+
+export const NavbarLink = styled(Link)`
+  text-decoration: none;
+  text-decoration-line: none;
+  text-decoration: none;
+`;
+
+export const WebBarItem = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  cursor: pointer;
+
+  &:hover {
+    font-weight: 700;
+  }
+
+  &.active {
+    font-weight: 700;
   }
 `;

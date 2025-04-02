@@ -10,7 +10,10 @@ import CreateProfile from "./routes/create-profile";
 import ProjectBoard from "./routes/project-board"; //yu-geum
 import NoticeBoard from "./routes/notice-board"; //yu-geum
 import Notice from "./routes/notice"; //yu-geum
-import InterestsBorad from "./routes/interests-borad";  //yeong-eun
+import InterestsBorad from "./routes/interests-borad"; //yeong-eun
+import { useState } from "react";
+import GlobalBackdrop from "./components/easter/GlobalBackdrop";
+import { BackdropContext } from "./context/Backdropcontext";
 
 const router = createBrowserRouter([
   {
@@ -43,12 +46,12 @@ const router = createBrowserRouter([
       },
       {
         path: "interests-board/",
-        element: <InterestsBorad />
+        element: <InterestsBorad />,
       },
     ],
   },
   // 이 윗 줄 까진 Layout의 children임.
-
+  // 인증이 필요한 부분
   {
     path: "/login",
     element: <NavigateToHome />,
@@ -66,12 +69,20 @@ const router = createBrowserRouter([
     path: "/password-reset",
     element: <PasswdReset />,
   },
+  {
+    path: "/find-id",
+    element: <PasswdReset />,
+  },
 ]);
 
 function App() {
+  const [showBackdrop, setShowBackdrop] = useState(false);
   return (
     <>
-      <RouterProvider router={router} />
+      <BackdropContext.Provider value={{ showBackdrop, setShowBackdrop }}>
+        <GlobalBackdrop visible={showBackdrop} />
+        <RouterProvider router={router} />
+      </BackdropContext.Provider>
     </>
   );
 }
