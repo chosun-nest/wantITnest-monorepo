@@ -8,7 +8,7 @@ export default function ProfileComponent() {
         {/* 프로필 이미지 */}
         <div className="flex justify-center mb-7">
           <img
-            src="../public/assets/images/user.png"
+            src="/assets/images/user.png"
             alt="Profile"
             className="w-30 h-30 rounded-full border"
           />
