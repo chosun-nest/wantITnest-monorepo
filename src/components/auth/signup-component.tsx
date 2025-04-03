@@ -41,7 +41,7 @@ export default function SignUpComponent({
     );
   const isLengthValid = /^.{8,32}$/.test(password) && !/\s/.test(password);
   const hasNoRepeatedChars = !/(.)\1\1/.test(password);
-  const isConfirmMatch = confirmPassword === "" || password === confirmPassword;
+  const isConfirmMatch = confirmPassword !== "" && password === confirmPassword;
   const formatTime = (time: number) =>
     `${String(Math.floor(time / 60))}:${String(time % 60).padStart(2, "0")}`;
   // 비밀번호 유효성 검사
@@ -155,7 +155,7 @@ export default function SignUpComponent({
       <S.SigninText>비밀번호 확인</S.SigninText>
       <S.Input
         type="password"
-        placeholder="*********"
+        placeholder=""
         value={confirmPassword}
         onChange={(e) => onChangeConfirmPassword(e.target.value)}
       />
