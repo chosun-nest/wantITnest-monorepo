@@ -57,38 +57,6 @@ export const Title = styled.h2`
   color: #00256c;
 `;
 
-export const OAuthButton = styled.button`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  font-weight: bold;
-  color: #444;
-  cursor: pointer;
-  margin-bottom: 0.75rem;
-  transition: background 0.2s;
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  img {
-    width: 18px;
-    height: 18px;
-  }
-
-  &:hover {
-    background: #f8f9fa;
-  }
-`;
-
 export const Divider = styled.div`
   font-size: 0.875rem;
   color: #999;
@@ -128,6 +96,12 @@ export const LoginButton = styled.button`
 
   &:hover {
     background: #0046c9;
+  }
+
+  &:disabled {
+    background: #ccc;
+    color: #888;
+    cursor: not-allowed;
   }
 `;
 

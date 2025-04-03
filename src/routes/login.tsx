@@ -74,7 +74,7 @@ export default function Login() {
             <S.FindButton>비밀번호 찾기</S.FindButton>
           </S.AccountLink>
         </S.FindContainer>
-        <S.AccountLink to="/signin">
+        <S.AccountLink to="/signup">
           <S.SigninButton>회원 가입하기</S.SigninButton>
         </S.AccountLink>
       </S.LoginBox>
