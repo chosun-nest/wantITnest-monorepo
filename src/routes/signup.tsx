@@ -60,6 +60,7 @@ export default function SignUp() {
         ...(selected === "재학생" && { department }),
       };
 
+      console.log(payload);
       const res = await signup(payload);
       // ✅ 응답에서 정보 추출
       const { accessToken, refreshToken, memberId, email: userEmail } = res;
@@ -71,7 +72,6 @@ export default function SignUp() {
         "user",
         JSON.stringify({ memberId, email: userEmail })
       );
-
       alert("회원가입이 완료되었습니다!");
       console.log("가입한 사용자 ID:", res.userId);
       navigate("/login");
