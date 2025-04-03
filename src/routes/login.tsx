@@ -9,13 +9,13 @@ export default function Login() {
   const isMobile = useResponsive();
   const navigate = useNavigate();
 
-  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
 
   const handleLogin = async () => {
     try {
-      const res = await login(id, password);
+      const res = await login(email, password);
       const { accessToken, refreshToken, memberId, email: userEmail } = res;
       localStorage.setItem("accesstoken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
@@ -49,8 +49,8 @@ export default function Login() {
         <S.Input
           type="email"
           placeholder="이메일"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <S.InputTitle>비밀번호</S.InputTitle>
         <S.Input
@@ -74,7 +74,7 @@ export default function Login() {
             <S.FindButton>비밀번호 찾기</S.FindButton>
           </S.AccountLink>
         </S.FindContainer>
-        <S.AccountLink to="/signin">
+        <S.AccountLink to="/signup">
           <S.SigninButton>회원 가입하기</S.SigninButton>
         </S.AccountLink>
       </S.LoginBox>
