@@ -28,6 +28,12 @@ public class MemberService {
             .memberId(member.getMemberId())
             .memberEmail(member.getMemberEmail())
             .memberRole(member.getMemberRole())
+            .memberName(member.getMemberName())
+            .memberSnsUrl1(member.getMemberSnsUrl1())
+            .memberSnsUrl2(member.getMemberSnsUrl2())
+            .memberSnsUrl3(member.getMemberSnsUrl3())
+            .memberSnsUrl4(member.getMemberSnsUrl4())
+            .memberIsStudent(member.isMemberIsStudent())
             .build();
     }
 }

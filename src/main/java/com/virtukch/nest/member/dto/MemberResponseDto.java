@@ -15,4 +15,10 @@ public class MemberResponseDto {
     private Long memberId;
     private String memberEmail;
     private Role memberRole;
+    private String memberName;
+    private String memberSnsUrl1;
+    private String memberSnsUrl2;
+    private String memberSnsUrl3;
+    private String memberSnsUrl4;
+    private boolean memberIsStudent;
 }
