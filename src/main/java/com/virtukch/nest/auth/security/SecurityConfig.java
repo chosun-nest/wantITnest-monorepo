@@ -53,7 +53,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/v1/auth/**",
-                    "/api/v1/tech-stacks"
+                    "/api/v1/tech-stacks",
+                    "/api/v1/interests"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
