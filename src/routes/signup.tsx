@@ -12,6 +12,7 @@ export default function SignUp() {
   const [selected, setSelected] = useState<"재학생" | "일반">("재학생");
 
   const [email, setEmail] = useState("");
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const [authCode, setAuthCode] = useState("");
   const [timer, setTimer] = useState(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
@@ -26,6 +27,10 @@ export default function SignUp() {
   const [skills, setSkills] = useState<string[]>([]);
 
   const handleSendCode = () => {
+    if (!isEmailValid) {
+      alert("이메일 형식이 올바르지 않습니다.");
+      return;
+    }
     setTimer(300);
     if (intervalId) clearInterval(intervalId);
 
