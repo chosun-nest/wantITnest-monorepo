@@ -15,7 +15,7 @@ type Props = {
   onChangeSkills: (values: string[]) => void;
 };
 
-export default function SigninDetail({
+export default function SignUpDetail({
   selected,
   onPrev,
   onSubmit,

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import * as S from "../assets/styles/login.styles";
-import SigninComponent from "../components/auth/signin-component";
-import SigninDetail from "../components/auth/signin-deatil";
+import SignUpComponent from "../components/auth/signup-component";
+import SignUpDetail from "../components/auth/signup-deatil";
 import { signup } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
 
-export default function SignIn() {
+export default function SignUp() {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -82,7 +82,7 @@ export default function SignIn() {
   return (
     <S.Container>
       {step === 1 ? (
-        <SigninComponent
+        <SignUpComponent
           selected={selected}
           onChangeSelected={setSelected}
           email={email}
@@ -100,7 +100,7 @@ export default function SignIn() {
           onNext={handleNextStep}
         />
       ) : (
-        <SigninDetail
+        <SignUpDetail
           selected={selected}
           onPrev={handlePrevStep}
           name={name}

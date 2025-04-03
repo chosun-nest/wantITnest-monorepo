@@ -18,7 +18,7 @@ type SigninComponentProps = {
   onNext: () => void;
 };
 
-export default function SigninComponent({
+export default function SignUpComponent({
   selected,
   onChangeSelected,
   email,
