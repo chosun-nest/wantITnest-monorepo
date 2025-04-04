@@ -14,7 +14,6 @@ import com.virtukch.nest.post_tag.model.PostTag;
 import com.virtukch.nest.post_tag.repository.PostTagRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.service.TagService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,7 +34,6 @@ public class PostService {
     private final TagService tagService;
 
     private final PostTagRepository postTagRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     public PostCreateResponseDto createPost(Member member, PostCreateRequestDto requestDto) {
@@ -48,7 +46,11 @@ public class PostService {
         Post post = Post.createPost(member, title, requestDto.getContent());
 
         // 태그가 설정되지 않았다면, 기본 태그인 "UNCATEGORIZED"로 자동 설정
-        List<String> tags = requestDto.getTags().isEmpty() ? List.of("UNCATEGORIZED") : requestDto.getTags();
+        List<String> tagsFromRequest = requestDto.getTags();
+        if (tagsFromRequest == null || tagsFromRequest.isEmpty()) {
+            tagsFromRequest = List.of("UNCATEGORIZED");
+        }
+        List<String> tags = tagsFromRequest;
 
         tags.stream()
                 .map(tagService::findByNameOrThrow)
