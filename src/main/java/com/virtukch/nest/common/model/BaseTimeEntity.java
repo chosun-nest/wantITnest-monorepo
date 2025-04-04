@@ -10,9 +10,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-// 엔티티 생성 시각, 수정 시각을 자동으로 관리해줌.
-// 상속받으면 자동으로 컬럼으로 들어감.
-
+/*
+ * 이 클래스를 상속받는 엔티티의 생성 시각(createdAt)과 수정 시각(updatedAt)을 자동으로 관리합니다.
+ * 상속 시, 해당 칼럼이 엔티티에 자동으로 추가되어 작성 및 갱신 시간을 기록합니다.
+ */
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
