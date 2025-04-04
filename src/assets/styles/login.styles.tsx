@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   display: flex;
+  padding: 1rem;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
@@ -56,38 +57,6 @@ export const Title = styled.h2`
   color: #00256c;
 `;
 
-export const OAuthButton = styled.button`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  font-weight: bold;
-  color: #444;
-  cursor: pointer;
-  margin-bottom: 0.75rem;
-  transition: background 0.2s;
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  img {
-    width: 18px;
-    height: 18px;
-  }
-
-  &:hover {
-    background: #f8f9fa;
-  }
-`;
-
 export const Divider = styled.div`
   font-size: 0.875rem;
   color: #999;
@@ -127,6 +96,12 @@ export const LoginButton = styled.button`
 
   &:hover {
     background: #0046c9;
+  }
+
+  &:disabled {
+    background: #ccc;
+    color: #888;
+    cursor: not-allowed;
   }
 `;
 
@@ -419,4 +394,35 @@ export const CodeVerifyRow = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 0.75rem;
+`;
+
+// login.styles.ts 내부에 아래 추가
+
+export const TagList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+export const TagItem = styled.span`
+  background: #eee;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+`;
+
+export const TagRemoveButton = styled.button`
+  margin-left: 6px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    color: #f00;
+  }
 `;

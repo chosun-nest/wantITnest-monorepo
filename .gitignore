@@ -11,7 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
-
+<<<<<<< HEAD
+README.md
+=======
+>>>>>>> feature/geum-sang
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

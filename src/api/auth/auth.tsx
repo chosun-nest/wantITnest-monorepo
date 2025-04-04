@@ -11,8 +11,8 @@ export const signup = async (payload: {
   password: string;
   name: string;
   userType: "재학생" | "일반";
-  interest: string;
-  skills: string;
+  interest: string[];
+  skills: string[];
   department?: string; // 재학생일 경우만 전달
 }) => {
   const { email, password } = payload;

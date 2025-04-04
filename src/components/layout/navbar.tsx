@@ -1,10 +1,10 @@
+import { forwardRef, useEffect, useRef, useState, ForwardedRef } from "react";
 import { useBackdrop } from "../../context/Backdropcontext";
 import * as S from "../../assets/styles/navbar.styles";
 import useResponsive from "../../hooks/responsive";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
 
-export default function Navbar() {
+function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const isMobile = useResponsive();
   const { setShowBackdrop } = useBackdrop();
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <S.NavbarContainer>
+    <S.NavbarContainer ref={ref}>
       <S.NavbarContent>
         {/* 네비게이션 메뉴 */}
         <S.NavMenu>
@@ -71,36 +71,30 @@ export default function Navbar() {
           <S.SearchIcon />
 
           {localStorage.getItem("accesstoken") ? (
-            <>
-              <S.ProfileWrapper ref={menuRef}>
-                <S.ProfileIcon
-                  src="/assets/images/user.png"
-                  onClick={() => setIsMenuOpen((prev) => !prev)}
-                />
-                {isMenuOpen && (
-                  <S.ProfileMenu $visible={isMenuOpen}>
-                    <S.ProfileMenuItem
-                      onClick={() => {
-                        navigate("/profile");
-                      }}
-                    >
-                      내 프로필
-                    </S.ProfileMenuItem>
-                    <S.ProfileMenuItem
-                      onClick={() => {
-                        localStorage.removeItem("accesstoken");
-                        localStorage.removeItem("refreshToken");
-                        localStorage.removeItem("user");
-                        setIsMenuOpen(false);
-                        navigate("/login");
-                      }}
-                    >
-                      로그아웃
-                    </S.ProfileMenuItem>
-                  </S.ProfileMenu>
-                )}
-              </S.ProfileWrapper>
-            </>
+            <S.ProfileWrapper ref={menuRef}>
+              <S.ProfileIcon
+                src="/assets/images/user.png"
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+              />
+              {isMenuOpen && (
+                <S.ProfileMenu $visible={isMenuOpen}>
+                  <S.ProfileMenuItem onClick={() => navigate("/profile")}>
+                    내 프로필
+                  </S.ProfileMenuItem>
+                  <S.ProfileMenuItem
+                    onClick={() => {
+                      localStorage.removeItem("accesstoken");
+                      localStorage.removeItem("refreshToken");
+                      localStorage.removeItem("user");
+                      setIsMenuOpen(false);
+                      navigate("/login");
+                    }}
+                  >
+                    로그아웃
+                  </S.ProfileMenuItem>
+                </S.ProfileMenu>
+              )}
+            </S.ProfileWrapper>
           ) : (
             <>
               <S.LoginLink to="/login">Login</S.LoginLink>
@@ -109,9 +103,9 @@ export default function Navbar() {
           )}
         </S.NavRight>
       </S.NavbarContent>
-      {!isMobile ? (
+
+      {!isMobile && (
         <S.WebBar>
-          {" "}
           <S.NavbarLink to="/">
             <S.WebBarItem>Nest-FE 소개</S.WebBarItem>
           </S.NavbarLink>
@@ -131,7 +125,10 @@ export default function Navbar() {
             <S.WebBarItem>행사</S.WebBarItem>
           </S.NavbarLink>
         </S.WebBar>
-      ) : null}
+      )}
     </S.NavbarContainer>
   );
 }
+
+// ✅ forwardRef 적용하여 export default 유지
+export default forwardRef<HTMLDivElement, unknown>(Navbar);

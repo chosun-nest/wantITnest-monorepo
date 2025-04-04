@@ -18,7 +18,7 @@ type SigninComponentProps = {
   onNext: () => void;
 };
 
-export default function SigninComponent({
+export default function SignUpComponent({
   selected,
   onChangeSelected,
   email,
@@ -41,9 +41,21 @@ export default function SigninComponent({
     );
   const isLengthValid = /^.{8,32}$/.test(password) && !/\s/.test(password);
   const hasNoRepeatedChars = !/(.)\1\1/.test(password);
-  const isConfirmMatch = confirmPassword === "" || password === confirmPassword;
+  const isConfirmMatch = confirmPassword !== "" && password === confirmPassword;
   const formatTime = (time: number) =>
     `${String(Math.floor(time / 60))}:${String(time % 60).padStart(2, "0")}`;
+  // 비밀번호 유효성 검사
+  const isPasswordValid =
+    hasTwoCharTypes && isLengthValid && hasNoRepeatedChars && isConfirmMatch;
+
+  const handleNextClick = () => {
+    if (!isPasswordValid) {
+      alert("비밀번호 조건을 모두 만족해야 합니다.");
+      return;
+    }
+
+    onNext();
+  };
 
   return (
     <S.LoginBox>
@@ -52,7 +64,6 @@ export default function SigninComponent({
         <S.Title>Welcome to WantIT-NEST</S.Title>
         <S.SigninTitle>회원가입</S.SigninTitle>
       </S.HeaderBox>
-
       <S.DivisionContainer>
         <S.SigninText>구분</S.SigninText>
         <S.RadioGroup>
@@ -78,7 +89,6 @@ export default function SigninComponent({
           </S.RadioLabel>
         </S.RadioGroup>
       </S.DivisionContainer>
-
       <S.SigninText>이메일 인증</S.SigninText>
       <S.EmailRow>
         <S.Input
@@ -98,7 +108,6 @@ export default function SigninComponent({
           )}
         </S.AuthCodeButton>
       </S.EmailRow>
-
       {timer > 0 && (
         <>
           <S.TimerInputWrapper>
@@ -119,7 +128,6 @@ export default function SigninComponent({
           </S.CheckCodeButton>
         </>
       )}
-
       <S.SigninText>비밀번호</S.SigninText>
       <S.PasswordInputWrapper
         onMouseEnter={() => setIsPasswordVisible(true)}
@@ -133,7 +141,6 @@ export default function SigninComponent({
         />
         <S.EyeIcon>👁️</S.EyeIcon>
       </S.PasswordInputWrapper>
-
       <S.SubTextBox>
         <S.SubText $isValid={hasTwoCharTypes}>
           ✓ 영문/숫자/특수문자 중, 2가지 이상 포함
@@ -145,21 +152,20 @@ export default function SigninComponent({
           ✓ 연속 3자 이상 동일한 문자/숫자 제외
         </S.SubText>
       </S.SubTextBox>
-
       <S.SigninText>비밀번호 확인</S.SigninText>
       <S.Input
         type="password"
-        placeholder="*********"
+        placeholder=""
         value={confirmPassword}
         onChange={(e) => onChangeConfirmPassword(e.target.value)}
       />
-
       {!isConfirmMatch && (
         <S.SubText $isValid={false}>비밀번호가 일치하지 않습니다.</S.SubText>
       )}
-
       <S.ButtonRow>
-        <S.LoginButton onClick={onNext}>다음</S.LoginButton>
+        <S.LoginButton disabled={!isPasswordValid} onClick={handleNextClick}>
+          다음
+        </S.LoginButton>
       </S.ButtonRow>
       <div className="flex justify-center mb-[50px]">
         <div className="flex items-center gap-1 text-sm text-gray-600">
