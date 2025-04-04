@@ -38,21 +38,14 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public PostCreateResponseDto createPost(Long memberId, PostCreateRequestDto requestDto) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+    public PostCreateResponseDto createPost(Member member, PostCreateRequestDto requestDto) {
         String title = requestDto.getTitle();
         if(title == null || title.isBlank()) {
             throw new InvalidPostTitleException();
         }
 
-        log.info("[게시글 생성 시작] title={}, memberId={}", title, memberId);
-        Post post = Post.builder()
-                .member(member)
-                .title(title)
-                .content(requestDto.getContent())
-                .build();
+        log.info("[게시글 생성 시작] title={}, memberId={}", title, member.getMemberId());
+        Post post = Post.createPost(member, title, requestDto.getContent());
 
         // 태그가 설정되지 않았다면, 기본 태그인 "UNCATEGORIZED"로 자동 설정
         List<String> tags = requestDto.getTags().isEmpty() ? List.of("UNCATEGORIZED") : requestDto.getTags();

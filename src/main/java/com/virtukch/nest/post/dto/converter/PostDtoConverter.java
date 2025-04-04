@@ -22,7 +22,7 @@ public class PostDtoConverter {
                 .title(post.getTitle())
                 .previewContent(generatePreview(post.getContent()))
                 .tags(extractTagNames(post))
-                .authorName(post.getMember().getMemberEmail())
+                .authorName(post.getMember().getMemberName())
                 .viewCount(post.getViewCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .build();
@@ -36,7 +36,7 @@ public class PostDtoConverter {
                 .tags(extractTagNames(post))
                 .author(AuthorDto.builder()
                         .id(post.getMember().getMemberId())
-                        .name(post.getMember().getMemberEmail())
+                        .name(post.getMember().getMemberName())
                         .build())
                 .viewCount(post.getViewCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
