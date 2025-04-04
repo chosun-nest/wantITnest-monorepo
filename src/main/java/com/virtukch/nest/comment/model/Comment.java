@@ -1,26 +1,41 @@
 package com.virtukch.nest.comment.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.virtukch.nest.common.model.BaseTimeEntity;
+import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.post.model.Post;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comment")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+@Builder
+public class Comment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
-    private Long postId;
-    private Long memberId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @Column(length = 500, nullable = false)
     private String commentContent;
-    private String commentCreatedAt;
-    private String commentUpdatedAt;
+
+    // 생성 편의 메서드
+    public static Comment createComment(Post post, Member member, String content) {
+        return Comment.builder()
+                .post(post)
+                .member(member)
+                .commentContent(content)
+                .build();
+    }
 }
