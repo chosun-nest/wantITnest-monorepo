@@ -1,4 +1,4 @@
-package com.virtukch.nest.tech_stack.model;
+package com.virtukch.nest.interest.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,12 +12,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class TechStack {
+@NoArgsConstructor
+public class Interest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long techStackId;
-    private String techStackName;
+    private Long interestId;
+
+    private String interestName;
 }
