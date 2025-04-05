@@ -19,3 +19,13 @@ export const signup = async (payload: {
   const res = await API.post("/api/v1/auth/signup", { email, password });
   return res.data;
 };
+
+export const sendcode = async (email: string) => {
+  const res = await API.post("/api/v1/auth/send-code", { email });
+  return res.data;
+};
+
+export const verifycode = async (email: string, code: string) => {
+  const res = await API.post("/api/v1/auth/verify-code", { email, code });
+  return res.data;
+};
