@@ -20,4 +20,4 @@ docker run -d \
   -p $PORT:5173 \
   $IMAGE_NAME
 
-echo "✅ 완료! http://localhost:$PORT 에서 확인 가능해요!"
+echo "✅ 완료! http://119.219.30.209:$PORT 에서 확인 가능해요!"
