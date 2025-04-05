@@ -1,6 +1,7 @@
 package com.virtukch.nest.post.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,9 +32,9 @@ public class PostController {
     @PostMapping("/new")
     public ResponseEntity<PostCreateResponseDto> createPost(@AuthenticationPrincipal CustomUserDetails user,
                                                             @RequestBody PostCreateRequestDto requestDto) {
-        Long memberId = user.getMember().getMemberId();
-        log.info("[게시글 작성 요청] memberId={}", memberId);
-        PostCreateResponseDto responseDto = postService.createPost(memberId, requestDto);
+        Member member = user.getMember();
+        log.info("[게시글 작성 요청] memberId={}", member.getMemberId());
+        PostCreateResponseDto responseDto = postService.createPost(member, requestDto);
         return ResponseEntity
                 .created(URI.create("/api/posts/" + responseDto.getPostId()))
                 .body(responseDto);

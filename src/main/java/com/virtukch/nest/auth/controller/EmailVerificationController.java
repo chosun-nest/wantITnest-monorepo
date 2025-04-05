@@ -15,14 +15,14 @@ public class EmailVerificationController {
 
     @Operation(summary = "이메일 인증 코드 전송", description = "입력된 이메일 주소로 6자리 인증 코드를 전송합니다.")
     @PostMapping("/send-code")
-    public ResponseEntity<String> sendCode(@RequestParam String email) {
+    public ResponseEntity<String> sendCode(@RequestBody String email) {
         emailVerificationService.sendVerificationCode(email);
         return ResponseEntity.ok("Verification code sent");
     }
 
     @Operation(summary = "인증 코드 검증", description = "이메일과 인증 코드를 검증합니다.")
     @PostMapping("/verify-code")
-    public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) {
+    public ResponseEntity<String> verifyCode(@RequestBody String email, @RequestBody String code) {
         emailVerificationService.verifyCode(email, code);
         return ResponseEntity.ok("Email verified successfully");
     }
