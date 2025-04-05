@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 하나라도 실패하면 스크립트 바로 종료
+set -e
+
 cd "$(dirname "$0")"
 
 IMAGE_NAME="nest-fe-react-dev-5173-image"
@@ -7,7 +10,6 @@ CONTAINER_NAME="nest-fe-react-dev-5173-container"
 PORT=5173
 
 echo "🧹 기존 컨테이너 정리 중..."
-
 docker stop $CONTAINER_NAME
 docker rm $CONTAINER_NAME
 
