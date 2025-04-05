@@ -4,7 +4,7 @@ import SignUpComponent from "../components/auth/signup-component";
 import SignUpDetail from "../components/auth/signup-deatil";
 import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
-import { getInterests, getTech } from "../api/common/common";
+import { getDepartments, getInterests, getTech } from "../api/common/common";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -29,21 +29,26 @@ export default function SignUp() {
 
   const [techList, setTechList] = useState<string[]>([]);
   const [interestsList, setInterestsList] = useState<string[]>([]);
+  const [departmentsList, setDepartmentsList] = useState<string[]>([]);
 
   const getItems = async () => {
     try {
       const techResponse = await getTech(); // ✅ await 추가
       const interestsResponse = await getInterests(); // ✅ await 추가
-
+      const departmentsResponse = await getDepartments();
       const techNames = techResponse.map(
         (item: { techStackName: unknown }) => item.techStackName
       );
-      const interestNames = interestsResponse.map(
+      const interestsNames = interestsResponse.map(
+        (item: { interestName: unknown }) => item.interestName
+      );
+      const departmentsNames = departmentsResponse.map(
         (item: { interestName: unknown }) => item.interestName
       );
 
       setTechList(techNames);
-      setInterestsList(interestNames);
+      setInterestsList(interestsNames);
+      setDepartmentsList(departmentsNames);
     } catch (e) {
       console.log("아이템 불러오기 실패", e);
     }
@@ -161,6 +166,7 @@ export default function SignUp() {
           onSubmit={handleSignup}
           techList={techList}
           interestsList={interestsList}
+          departmentsList={departmentsList}
         />
       )}
     </S.Container>
