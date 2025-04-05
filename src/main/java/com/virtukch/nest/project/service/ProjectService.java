@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,8 +23,11 @@ public class ProjectService {
 
     @Transactional
     public Long createProject(ProjectRequestDTO dto) {
-        Member leader = memberRepository.findById(dto.getProjectLeaderId())
-                .orElseThrow(() -> new IllegalArgumentException("팀장을 찾을 수 없습니다."));
+        Member leader = null;
+        if(dto.getProjectLeaderId() != null){
+            leader = memberRepository.findById(dto.getProjectLeaderId())
+                    .orElseThrow(() -> new IllegalArgumentException("팀장을 찾을 수 없습니다."));
+        }
 
         Project project = new Project(
                 leader,
@@ -48,6 +52,7 @@ public class ProjectService {
                         .projectEndDate(project.getProjectEndDate())
                         .isClosed(project.isClosed())
                         .maxMember(project.getMaxMember())
+                        .projectLeaderId(Optional.ofNullable(project.getProjectLeader()).map((Member::getMemberId)).orElse(null)) //NULL 허용을 위해 수정함
                         .build())
                 .collect(Collectors.toList());
     }

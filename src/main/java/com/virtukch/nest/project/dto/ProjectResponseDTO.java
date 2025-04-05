@@ -12,6 +12,7 @@ public class ProjectResponseDTO {
     private String projectTitle;
     private String projectDescription;
     private int maxMember;
+    private Long projectLeaderId;
     private boolean isClosed;
     private LocalDate projectStartDate;
     private LocalDate projectEndDate;
