@@ -15,6 +15,7 @@ type Props = {
   onChangeSkills: (values: string[]) => void;
   techList: string[];
   interestsList: string[];
+  departmentsList: string[];
 };
 
 export default function SignUpDetail({
@@ -31,6 +32,7 @@ export default function SignUpDetail({
   onChangeSkills,
   techList,
   interestsList,
+  departmentsList,
 }: Props) {
   const [interestInput, setInterestInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
@@ -80,8 +82,14 @@ export default function SignUpDetail({
           <S.Input
             placeholder="학과를 입력하세요"
             value={department}
+            list="department-options"
             onChange={(e) => onChangeDepartment(e.target.value)}
-          />
+          />{" "}
+          <datalist id="department-options">
+            {departmentsList.map((department, idx) => (
+              <option key={idx} value={department} />
+            ))}
+          </datalist>
         </>
       )}
       {/* 관심 분야 */}
