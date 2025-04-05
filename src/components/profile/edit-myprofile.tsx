@@ -56,7 +56,7 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
       <h2 className="text-xl font-bold mb-4">내 프로필 변경</h2>
       
       {/* 이미지 */}
