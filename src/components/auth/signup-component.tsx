@@ -8,6 +8,7 @@ type SigninComponentProps = {
   authCode: string;
   onChangeAuthCode: (value: string) => void;
   handleSendCode: () => void;
+  handleVerifyCode: () => void;
   timer: number;
   password: string;
   onChangePassword: (value: string) => void;
@@ -26,6 +27,7 @@ export default function SignUpComponent({
   authCode,
   onChangeAuthCode,
   handleSendCode,
+  handleVerifyCode,
   timer,
   password,
   onChangePassword,
@@ -121,9 +123,7 @@ export default function SignUpComponent({
           </S.TimerInputWrapper>
 
           {/* ✅ 인증번호 확인하기 버튼 */}
-          <S.CheckCodeButton
-            onClick={() => console.log("입력된 인증번호:", authCode)}
-          >
+          <S.CheckCodeButton onClick={handleVerifyCode}>
             인증번호 확인하기
           </S.CheckCodeButton>
         </>

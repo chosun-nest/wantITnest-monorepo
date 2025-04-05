@@ -2,7 +2,7 @@ import { useState } from "react";
 import * as S from "../assets/styles/login.styles";
 import SignUpComponent from "../components/auth/signup-component";
 import SignUpDetail from "../components/auth/signup-deatil";
-import { signup } from "../api/auth/auth";
+import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
@@ -26,26 +26,43 @@ export default function SignUp() {
   const [interest, setInterest] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
 
+  const handleVerifyCode = () => {
+    try {
+      const res = verifycode(email, authCode);
+      console.log(res);
+    } catch (e) {
+      alert("오류 발생!");
+      console.log(e);
+    }
+  };
+
   const handleSendCode = () => {
     if (!isEmailValid) {
       alert("이메일 형식이 올바르지 않습니다.");
       return;
     }
-    setTimer(300);
-    if (intervalId) clearInterval(intervalId);
+    try {
+      // 중복 검사
+      const data = sendcode(email);
+      console.log(data);
+      setTimer(300);
+      if (intervalId) clearInterval(intervalId);
 
-    const newInterval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(newInterval);
-          setIntervalId(null);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      const newInterval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(newInterval);
+            setIntervalId(null);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
-    setIntervalId(newInterval);
+      setIntervalId(newInterval);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleSignup = async () => {
@@ -95,6 +112,7 @@ export default function SignUp() {
           authCode={authCode}
           onChangeAuthCode={setAuthCode}
           handleSendCode={handleSendCode}
+          handleVerifyCode={handleVerifyCode}
           timer={timer}
           password={password}
           onChangePassword={setPassword}
