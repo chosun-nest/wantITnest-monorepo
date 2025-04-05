@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function ProfileComponent() {
+export default function ProfileCard() {
   const navigate = useNavigate(); //페이지 이동을 위한 hook
 
   return (

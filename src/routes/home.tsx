@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import * as S from "../assets/styles/home.styles";
-import ProfileComponent from "../components/profile/profile-component";
+import ProfileComponent from "../components/profile/profile-card";
 import useResponsive from "../hooks/responsive";
 
 export default function Home() {
