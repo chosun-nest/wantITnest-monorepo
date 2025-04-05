@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/projects")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
 public class ProjectController {
 
     private final ProjectService projectService;
