@@ -57,35 +57,31 @@ export default function MyProfile() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-bold mb-4">내 프로필</h2>
-
+      <h2 className="text-xl font-bold mb-4">내 프로필 변경</h2>
+      
       {/* 이미지 */}
       <div className="flex items-center gap-4 mb-4">
-        <img src={profile.image} alt="프로필" className="w-24 h-24 rounded-full border" />
-        {isEditing && (
-          <div className="flex flex-col gap-2">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-            />
-            <button
-              className="text-blue-500"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              변경
-            </button>
-            <button
-              className="text-gray-500"
-              onClick={() => handleChange("image", "/assets/images/user.png")}
-            >
-              초기화
-            </button>
-            <p className="text-xs text-blue-600">1MB 이하 png/jpg</p>
-          </div>
-        )}
+        <label htmlFor="avatar" className="relative group cursor-pointer">
+          <img
+            src={profile.image}
+            alt="프로필"
+            className="w-24 h-24 rounded-full border object-cover group-hover:opacity-80 transition"
+          />
+
+          {/* 이미지 클릭하면 로컬에서 이미지 불러올 수 있음 */}
+          {isEditing && (
+            <>
+              <input
+                id="avatar"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+              />
+            </>
+          )}
+        </label>
       </div>
 
       {/* 이름 / 이메일 (고정) */}
@@ -180,7 +176,7 @@ export default function MyProfile() {
           <div className="flex gap-2 mt-2">
             {profile.sns.map((link, i) => (
               <a key={i} href={link} className="text-blue-600 underline" target="_blank">
-                🔗
+                github&linkedin🔗
               </a>
             ))}
           </div>

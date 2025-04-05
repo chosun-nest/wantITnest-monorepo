@@ -1,6 +1,7 @@
-import Navbar from "../components/layout/navbar";
-import MyProfileComponent from "../components/profile/profile-edit-myprofile-component";
 import { useRef, useEffect, useState } from "react";
+import Navbar from "../components/layout/navbar";
+import EditMyProfile from "../components/profile/edit-myprofile";
+import EditMyAccount from "../components/profile/edit-myaccount";
 
 export default function ProfileEdit() {
     const navbarRef = useRef<HTMLDivElement>(null);
@@ -11,27 +12,21 @@ export default function ProfileEdit() {
             setNavHeight(navbarRef.current.offsetHeight);
         }
     }, []);
+return (
+    <>
+        <Navbar ref={navbarRef} />
 
-    return (
-        <>
-        <div ref={navbarRef}>
-            <Navbar />
-        </div>
-        <div className="flex px-8 bg-white min-h-screen" style={{ marginTop: navHeight }}>
-            <div
-                //className="flex pt-40 px-20 pt-25 text-[20px] font-bold text-[#00256c] font-sans"
-                className="pt-16 px-4 text-[20px] font-bold text-[#00256c] font-sans"
-                style={{
-                    fontFamily: "Monomaniac One",
-                }}
-            > 계정 정보
+        {/* 콘텐츠 전체 영역 */}
+        <div className="px-8 bg-white min-h-screen" style={{ paddingTop: navHeight + 20 }}>
+        {/* 내 프로필 */}
+        <div className="w-full px-4 mt-6">
+            <EditMyProfile />
+            <div className="w-full px-2 mt-6">
+                <EditMyAccount />
             </div>
+        </div>
 
-            <div className="w-full px-4">
-                <MyProfileComponent />
-            </div>
-            
         </div>
-        </>
+    </>
     );
 }
