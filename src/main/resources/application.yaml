@@ -1,6 +1,6 @@
 # Port Number
 server:
-  port: 5030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
+  port: 6030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
 
 # mysql -h 221.156.215.197 -P 5040 -u VIRTUKCH -p --default-character-set=utf8 nest_db
 spring:
