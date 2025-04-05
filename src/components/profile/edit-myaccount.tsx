@@ -25,8 +25,8 @@ export default function Account() {
   passwords.new === passwords.confirm;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-bold mb-4">비밀번호 변경</h2>
+    <div className="max-w-2xl mx-auto p-10 bg-white rounded-xl shadow">
+      <h2 className="text-xl font-bold text-blue-900 mb-4">계정 관리</h2>
 
       {/* 현재 비밀번호 */}
       <div className="mb-4">

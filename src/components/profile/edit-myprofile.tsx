@@ -56,23 +56,29 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-bold mb-4">내 프로필 변경</h2>
+    <div className="max-w-2xl mx-auto p-10 bg-white rounded-xl shadow">
+      <h2 className="text-xl font-bold text-blue-900 mb-4">내 프로필 변경</h2>
       
       {/* 이미지 */}
-      <div className="flex items-center gap-4 mb-4">
-        <label htmlFor="avatar" className="relative group cursor-pointer">
-          <img
+      <div className="flex items-start gap-4 mb-4">
+        <label htmlFor="user-image" className="w-28 text-sm font-semibold">
+          이미지 
+        </label>
+        <div 
+          className="relative group cursor-pointer"
+          onClick={() => fileInputRef.current?.click()}
+        >
+           <img
             src={profile.image}
             alt="프로필"
-            className="w-24 h-24 rounded-full border object-cover group-hover:opacity-80 transition"
+            className="w-24 h-24 rounded-lg object-cover group-hover:opacity-80 transition"
           />
 
           {/* 이미지 클릭하면 로컬에서 이미지 불러올 수 있음 */}
           {isEditing && (
             <>
               <input
-                id="avatar"
+                id="user-image"
                 type="file"
                 accept="image/*"
                 className="hidden"
@@ -81,106 +87,143 @@ export default function MyProfile() {
               />
             </>
           )}
-        </label>
       </div>
 
-      {/* 이름 / 이메일 (고정) */}
-      <div className="mb-2">
-        <label className="text-sm font-semibold">이름</label>
+    </div>
+
+      {/* 이름 / 이메일 (고정된 항목) */}
+      <div className="flex items-center mb-4">
+        <label className="w-28 text-sm font-semibold">이름</label>
         <input
           type="text"
           value={profile.name}
           disabled
-          className="block w-full bg-gray-100 p-2 rounded mt-1"
+          className="flex-1 bg-gray-100 p-2 rounded"
         />
       </div>
-      <div className="mb-2">
-        <label className="text-sm font-semibold">이메일</label>
+
+      <div className="flex items-center mb-4">
+        <label className="w-28 text-sm font-semibold">이메일</label>
         <input
           type="email"
           value={profile.email}
           disabled
-          className="block w-full bg-gray-100 p-2 rounded mt-1"
+          className="flex-1 bg-gray-100 p-2 rounded"
         />
       </div>
-
+      
       {/* 학과 */}
-      <div className="mb-2">
-        <label className="text-sm font-semibold">학과</label>
+      <div className="flex items-center mb-4">
+        <label className="w-28 text-sm font-semibold">학과</label>
         <input
           type="text"
           value={profile.major}
           onChange={(e) => handleChange("major", e.target.value)}
           disabled={!isEditing}
-          className="block w-full p-2 rounded mt-1 border"
+          className="flex-1 p-2 border rounded"
         />
       </div>
 
+
       {/* 자기소개 */}
-      <div className="mb-2">
-        <label className="text-sm font-semibold">자기소개</label>
+      <div className="flex items-start mb-4">
+        <label className="w-28 text-sm font-semibold mt-2">자기소개</label>
         <textarea
           value={profile.bio}
           onChange={(e) => handleChange("bio", e.target.value)}
           disabled={!isEditing}
-          className="block w-full p-2 rounded mt-1 border min-h-[80px]"
+          className="flex-1 p-2 rounded border min-h-[80px]"
         />
       </div>
 
+
       {/* 관심사 */}
-      <div className="mb-2">
-        <label className="text-sm font-semibold">관심사</label>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {profile.interests.map((tag, i) => (
-            <span
-              key={i}
-              className="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-            >
-              #{tag}
-              {isEditing && (
-                <button onClick={() => handleDeleteInterest(i)} className="text-red-500">×</button>
-              )}
-            </span>
-          ))}
+      <div className="flex items-start mb-4">
+        <label className="w-28 text-sm font-semibold mt-2">관심사</label>
+        <div className="flex-1">
+          <div className="flex flex-wrap gap-2 mt-1">
+            {profile.interests.map((tag, i) => (
+              <span
+                key={i}
+                className="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-1"
+              >
+                #{tag}
+                {isEditing && (
+                  <button
+                    onClick={() => handleDeleteInterest(i)}
+                    className="text-red-500"
+                  >
+                    ×
+                  </button>
+                )}
+              </span>
+            ))}
+          </div>
+          {isEditing && (
+            <input
+              type="text"
+              placeholder="관심사 입력 후 Enter"
+              value={newInterest}
+              onChange={(e) => setNewInterest(e.target.value)}
+              onKeyDown={handleAddInterest}
+              className="mt-2 w-full p-2 border rounded"
+            />
+          )}
         </div>
-        {isEditing && (
-          <input
-            type="text"
-            placeholder="관심사 입력 후 Enter"
-            value={newInterest}
-            onChange={(e) => setNewInterest(e.target.value)}
-            onKeyDown={handleAddInterest}
-            className="mt-2 w-full p-2 border rounded"
-          />
-        )}
       </div>
 
       {/* SNS 링크 */}
-      <div className="mb-4">
-        <label className="text-sm font-semibold">SNS 링크</label>
-        {isEditing ? (
-          profile.sns.map((link, i) => (
-            <input
-              key={i}
-              type="text"
-              value={link}
-              onChange={(e) => {
-                const newSns = [...profile.sns];
-                newSns[i] = e.target.value;
-                setProfile({ ...profile, sns: newSns });
-              }}
-              className="block w-full mt-1 p-2 rounded border"
-            />
-          ))
-        ) : (
-          <div className="flex gap-2 mt-2">
-            {profile.sns.map((link, i) => (
-              <a key={i} href={link} className="text-blue-600 underline" target="_blank">
-                github&linkedin🔗
+      <div className="flex items-start mb-4">
+        <label className="w-28 text-sm font-semibold mt-2">SNS 링크</label>
+        <div className="flex-1">
+          {isEditing ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-20 text-sm font-semibold">Github</span>
+                <input
+                  type="text"
+                  value={profile.sns[0]}
+                  onChange={(e) => {
+                    const newSns = [...profile.sns];
+                    newSns[0] = e.target.value;
+                    setProfile({ ...profile, sns: newSns });
+                  }}
+                  className="flex-1 p-2 border rounded"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-20 text-sm font-semibold">LinkedIn</span>
+                <input
+                  type="text"
+                  value={profile.sns[1]}
+                  onChange={(e) => {
+                    const newSns = [...profile.sns];
+                    newSns[1] = e.target.value;
+                    setProfile({ ...profile, sns: newSns });
+                  }}
+                  className="flex-1 p-2 border rounded"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 mt-2">
+              <a href={profile.sns[0]} target="_blank" rel="noreferrer">
+                <img
+                  src="/assets/images/github-mark.png"
+                  alt="GitHub"
+                  className="w-8 h-8 hover:opacity-80"
+                />
               </a>
-            ))}
-          </div>
-        )}
+              <a href={profile.sns[1]} target="_blank" rel="noreferrer">
+                <img
+                  src="/assets/images/LinkedIn-logo.png"
+                  alt="LinkedIn"
+                  className="w-9 h-8 hover:opacity-80"
+                />
+              </a>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 버튼 영역 */}
