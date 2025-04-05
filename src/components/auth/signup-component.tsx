@@ -17,6 +17,7 @@ type SigninComponentProps = {
   isPasswordVisible: boolean;
   setIsPasswordVisible: (visible: boolean) => void;
   onNext: () => void;
+  getItems: () => void;
 };
 
 export default function SignUpComponent({
@@ -36,6 +37,7 @@ export default function SignUpComponent({
   isPasswordVisible,
   setIsPasswordVisible,
   onNext,
+  getItems,
 }: SigninComponentProps) {
   const hasTwoCharTypes =
     /(?=(?:.*[a-zA-Z])(?:.*[0-9!@#$%^&*()\-_=+{};:,<.>])|(?:.*[0-9])(?:.*[a-zA-Z!@#$%^&*()\-_=+{};:,<.>])|(?:.*[!@#$%^&*()\-_=+{};:,<.>])(?:.*[a-zA-Z0-9])).{2,}/.test(
@@ -163,7 +165,13 @@ export default function SignUpComponent({
         <S.SubText $isValid={false}>비밀번호가 일치하지 않습니다.</S.SubText>
       )}
       <S.ButtonRow>
-        <S.LoginButton disabled={!isPasswordValid} onClick={handleNextClick}>
+        <S.LoginButton
+          disabled={!isPasswordValid}
+          onClick={() => {
+            handleNextClick();
+            getItems();
+          }}
+        >
           다음
         </S.LoginButton>
       </S.ButtonRow>

@@ -13,6 +13,8 @@ type Props = {
   onChangeInterest: (values: string[]) => void;
   skills: string[];
   onChangeSkills: (values: string[]) => void;
+  techList: string[];
+  interestsList: string[];
 };
 
 export default function SignUpDetail({
@@ -27,6 +29,8 @@ export default function SignUpDetail({
   onChangeInterest,
   skills,
   onChangeSkills,
+  techList,
+  interestsList,
 }: Props) {
   const [interestInput, setInterestInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
@@ -63,7 +67,6 @@ export default function SignUpDetail({
         <S.Title>Welcome to WantIT-NEST</S.Title>
         <S.SigninTitle>회원가입</S.SigninTitle>
       </S.HeaderBox>
-
       <S.InputTitle>이름</S.InputTitle>
       <S.Input
         placeholder="이름을 입력해주세요"
@@ -71,7 +74,6 @@ export default function SignUpDetail({
         onChange={(e) => onChangeName(e.target.value)}
       />
       <S.SubText $isValid={!!name}>⚠ 실명으로 입력해주세요!</S.SubText>
-
       {selected === "재학생" && (
         <>
           <S.InputTitle>학과 검색</S.InputTitle>
@@ -82,7 +84,6 @@ export default function SignUpDetail({
           />
         </>
       )}
-
       {/* 관심 분야 */}
       <S.InputTitle>관심 분야</S.InputTitle>
       <S.Input
@@ -98,7 +99,13 @@ export default function SignUpDetail({
             onChangeInterest
           )
         }
+        list="interests-options"
       />
+      <datalist id="interests-options">
+        {interestsList.map((interests, idx) => (
+          <option key={idx} value={interests} />
+        ))}
+      </datalist>
       <S.TagList>
         {interest.map((item, idx) => (
           <S.TagItem key={idx}>
@@ -111,17 +118,22 @@ export default function SignUpDetail({
           </S.TagItem>
         ))}
       </S.TagList>
-
       {/* 기술 스택 */}
       <S.InputTitle>기술 스택</S.InputTitle>
       <S.Input
         placeholder="보유 기술 스택을 입력하세요 (예: #React, #TS)"
         value={skillsInput}
+        list="tech-options"
         onChange={(e) => setSkillsInput(e.target.value)}
         onKeyDown={(e) =>
           handleKeyDown(e, skillsInput, setSkillsInput, skills, onChangeSkills)
         }
       />
+      <datalist id="tech-options">
+        {techList.map((tech, idx) => (
+          <option key={idx} value={tech} />
+        ))}
+      </datalist>
       <S.TagList>
         {skills.map((item, idx) => (
           <S.TagItem key={idx}>
@@ -134,7 +146,6 @@ export default function SignUpDetail({
           </S.TagItem>
         ))}
       </S.TagList>
-
       <S.ButtonRow>
         <S.LoginButton
           onClick={onPrev}
@@ -144,7 +155,6 @@ export default function SignUpDetail({
         </S.LoginButton>
         <S.LoginButton onClick={onSubmit}>회원가입</S.LoginButton>
       </S.ButtonRow>
-
       <div className="flex justify-center">
         <div className="flex items-center gap-1 text-sm text-gray-600">
           <span>이미 계정이 있나요?</span>

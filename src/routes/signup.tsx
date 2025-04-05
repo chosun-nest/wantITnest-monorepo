@@ -4,6 +4,7 @@ import SignUpComponent from "../components/auth/signup-component";
 import SignUpDetail from "../components/auth/signup-deatil";
 import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
+import { getInterests, getTech } from "../api/common/common";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -25,6 +26,28 @@ export default function SignUp() {
   const [department, setDepartment] = useState(""); // 재학생 전용
   const [interest, setInterest] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+
+  const [techList, setTechList] = useState<string[]>([]);
+  const [interestsList, setInterestsList] = useState<string[]>([]);
+
+  const getItems = async () => {
+    try {
+      const techResponse = await getTech(); // ✅ await 추가
+      const interestsResponse = await getInterests(); // ✅ await 추가
+
+      const techNames = techResponse.map(
+        (item: { techStackName: unknown }) => item.techStackName
+      );
+      const interestNames = interestsResponse.map(
+        (item: { interestName: unknown }) => item.interestName
+      );
+
+      setTechList(techNames);
+      setInterestsList(interestNames);
+    } catch (e) {
+      console.log("아이템 불러오기 실패", e);
+    }
+  };
 
   const handleVerifyCode = () => {
     try {
@@ -121,6 +144,7 @@ export default function SignUp() {
           isPasswordVisible={isPasswordVisible}
           setIsPasswordVisible={setIsPasswordVisible}
           onNext={handleNextStep}
+          getItems={getItems}
         />
       ) : (
         <SignUpDetail
@@ -134,7 +158,9 @@ export default function SignUp() {
           onChangeInterest={setInterest}
           skills={skills}
           onChangeSkills={setSkills}
-          onSubmit={handleSignup} // 아래 3번에서 만들 예정
+          onSubmit={handleSignup}
+          techList={techList}
+          interestsList={interestsList}
         />
       )}
     </S.Container>
