@@ -5,9 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 @Builder
-public class AuthorDto {
-    private Long id;
-    private String name;
+@AllArgsConstructor
+public class PostUpdateResponseDto {
+    private Long postId;
+    private String message;
 }

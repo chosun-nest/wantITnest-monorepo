@@ -23,7 +23,7 @@ public class PostTag {
     @ManyToOne(fetch = FetchType.LAZY)
     private Tag tag;
 
-    // ✅ 생성자에서 연관관계 설정 (기본)
+    // ✅ 생성 편의 메서드
     @Builder
     public PostTag(Post post, Tag tag) {
         this.post = post;
