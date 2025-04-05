@@ -2,8 +2,8 @@
 
 cd "$(dirname "$0")"
 
-IMAGE_NAME="nest-js-react-image"
-CONTAINER_NAME="nest-js-react-dev-5173"
+IMAGE_NAME="nest-fe-react-dev-5173-image"
+CONTAINER_NAME="nest-fe-react-dev-5173-container"
 PORT=5173
 
 echo "🧹 기존 컨테이너 정리 중..."
