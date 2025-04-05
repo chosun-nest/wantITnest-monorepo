@@ -1,35 +1,57 @@
 package com.virtukch.nest.tag.service;
 
 import com.virtukch.nest.tag.dto.TagListResponseDto;
+import com.virtukch.nest.tag.dto.TagResponseDto;
+import com.virtukch.nest.tag.exception.TagNotFoundException;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TagService {
 
     private final TagRepository tagRepository;
 
-    public List<TagListResponseDto> getAllTags() {
+    @Transactional(readOnly = true)
+    public TagListResponseDto getAllTags() {
+        log.info("[TagService] 전체 태그 조회 시작");
         List<Tag> tags = tagRepository.findAll();
-        List<TagListResponseDto> tagResponseDtos = new ArrayList<>();
-        for (Tag tag : tags) {
-            tagResponseDtos.add(new TagListResponseDto(tag.getId(), tag.getName(), tag.getPostTags().size()));
-        }
-        return tagResponseDtos;
+        log.info("[TagService] 조회된 태그 수: {}", tags.size());
+
+        List<TagResponseDto> tagResponseDtos = tags.stream()
+                .map(tag -> TagResponseDto.builder()
+                        .tagId(tag.getId())
+                        .tagName(tag.getName())
+                        .postCount(tag.getPostTags().size()).build()
+                ).toList();
+
+        return TagListResponseDto.builder()
+                .tags(tagResponseDtos)
+                .tagCount(tags.size())
+                .build();
     }
 
     @Transactional
     public Tag findOrCreateTag(String tagName) {
-        // 태그 이름으로 태그가 이미 존재하는지 조회
         Optional<Tag> existingTag = tagRepository.findByName(tagName);
         return existingTag.orElseGet(() -> tagRepository.save(new Tag(tagName)));
+    }
+
+    @Transactional(readOnly = true)
+    public Tag findByNameOrThrow(String tagName) {
+        log.info("[TagService] 태그 검색 요청: {}", tagName);
+        Optional<Tag> existingTag = tagRepository.findByName(tagName);
+        return existingTag.orElseThrow(() -> {
+            log.warn("[TagService] 태그 없음: {}", tagName);
+            return new TagNotFoundException(tagName);
+        });
     }
 }

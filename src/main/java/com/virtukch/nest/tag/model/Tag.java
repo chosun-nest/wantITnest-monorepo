@@ -16,12 +16,20 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @Column(nullable = false)
+    private boolean isActive = true;
 
     @OneToMany(mappedBy = "tag")
     private List<PostTag> postTags = new ArrayList<>();
 
     public Tag(String name) {
         this.name = name;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 }
