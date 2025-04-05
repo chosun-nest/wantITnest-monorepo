@@ -1,3 +1,5 @@
+import * as S from "../assets/styles/login.styles";
+
 export default function PasswdReset() {
-  return <div className="bg-rose-500">hello</div>;
+  return <S.Container>hi</S.Container>;
 }
