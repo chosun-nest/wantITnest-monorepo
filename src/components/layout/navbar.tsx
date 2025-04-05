@@ -98,7 +98,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
           ) : (
             <>
               <S.LoginLink to="/login">Login</S.LoginLink>
-              <S.SignUpLink to="/signin">Sign In</S.SignUpLink>
+              <S.SignUpLink to="/signup">Sign Up</S.SignUpLink>
             </>
           )}
         </S.NavRight>
