@@ -38,11 +38,20 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer likeCount = 0;
 
+    // 생성 편의 메서드
     @Builder
     public Post(Member member, String title, String content) {
         this.member = member;
         this.title = title;
         this.content = content;
+    }
+
+    public static Post createPost(Member member, String title, String content) {
+        return Post.builder()
+                .member(member)
+                .title(title)
+                .content(content)
+                .build();
     }
 
     // 연관관계 편의 메소드
