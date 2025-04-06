@@ -11,6 +11,9 @@ import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member.repository.MemberRepository;
+import com.virtukch.nest.member_department.service.MemberDepartmentService;
+import com.virtukch.nest.member_interest.service.MemberInterestService;
+import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +31,9 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final MemberDepartmentService memberDepartmentService;
+    private final MemberTechStackService memberTechStackService;
+    private final MemberInterestService memberInterestService;
 
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         // 이메일 중복 확인
@@ -36,17 +42,32 @@ public class AuthService {
             throw new EmailAlreadyExistException("Email already in use");
         }
 
-        // 회원 저장
+        // 1. member Table 저장
+        // 이메일, 비밀번호, 이름, 하생 여부, ROLE
         Member member = Member.builder()
             .memberEmail(signupRequestDto.getEmail())
             .memberPassword(passwordEncoder.encode(signupRequestDto.getPassword()))
+            .memberName(signupRequestDto.getMemberName())
+            .memberIsStudent(signupRequestDto.getMemberIsStudent())
             .memberRole(Role.ROLE_USER) // ✅ 기본적으로 일반 유저
             .build();
         memberRepository.save(member);
 
-        // JWT 토큰 생성
+        // 2. JWT 토큰 생성
         String accessToken = jwtTokenProvider.createToken(member.getMemberId());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
+
+        // 3. Token 에서 memberId 추출
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(accessToken);
+
+        // 4. memberDepartment 데이터 삽입 (다대다 테이블 고려)
+        memberDepartmentService.create(memberId, signupRequestDto.getDepartmentIdList());
+
+        // 5. memberInterest 데이터 삽입 (다대다 테이블 고려)
+        memberInterestService.create(memberId, signupRequestDto.getInterestIdList());
+
+        // 6. memberTechStack 데이터 삽입 (다대다 테이블 고려)
+        memberTechStackService.create(memberId, signupRequestDto.getTechStackIdList());
 
         return SignupResponseDto.builder()
             .memberId(member.getMemberId())
