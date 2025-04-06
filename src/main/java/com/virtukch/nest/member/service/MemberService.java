@@ -33,7 +33,7 @@ public class MemberService {
             .memberSnsUrl2(member.getMemberSnsUrl2())
             .memberSnsUrl3(member.getMemberSnsUrl3())
             .memberSnsUrl4(member.getMemberSnsUrl4())
-            .memberIsStudent(member.isMemberIsStudent())
+            .memberIsStudent(member.getMemberIsStudent())
             .build();
     }
 }

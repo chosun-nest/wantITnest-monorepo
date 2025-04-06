@@ -35,7 +35,7 @@ public class Member {
     private String memberSnsUrl4;
 
     @Column(columnDefinition = "TINYINT(1)", nullable = false)
-    private boolean memberIsStudent;
+    private Boolean memberIsStudent;
 
     @Builder
     public Member(String memberEmail, String memberPassword, Role memberRole,
