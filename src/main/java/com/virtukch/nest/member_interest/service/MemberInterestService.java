@@ -1,5 +1,6 @@
 package com.virtukch.nest.member_interest.service;
 
+import com.virtukch.nest.member_interest.dto.MemberInterestResponseDto;
 import com.virtukch.nest.member_interest.model.MemberInterest;
 import com.virtukch.nest.member_interest.repository.MemberInterestRepository;
 import java.util.List;
@@ -22,5 +23,16 @@ public class MemberInterestService {
             .toList();
 
         memberInterestRepository.saveAll(memberInterestList);
+    }
+
+    // 2. findByMemberId
+    public List<MemberInterestResponseDto> findByMemberId(Long memberId) {
+        List<MemberInterest> memberInterestList = memberInterestRepository.findByMemberId(memberId);
+
+        return memberInterestList.stream().map(memberInterest -> MemberInterestResponseDto.builder()
+                .memberId(memberInterest.getMemberId())
+                .interestId(memberInterest.getInterestId())
+                .build())
+            .toList();
     }
 }

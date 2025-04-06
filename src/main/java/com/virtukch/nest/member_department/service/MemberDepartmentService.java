@@ -1,5 +1,6 @@
 package com.virtukch.nest.member_department.service;
 
+import com.virtukch.nest.member_department.dto.MemberDepartmentResponseDto;
 import com.virtukch.nest.member_department.model.MemberDepartment;
 import com.virtukch.nest.member_department.repository.MemberDepartmentRepository;
 import java.util.List;
@@ -22,5 +23,18 @@ public class MemberDepartmentService {
             .toList();
 
         memberDepartmentRepository.saveAll(memberDepartmentList);
+    }
+
+    // 2. findByMemberId
+    public List<MemberDepartmentResponseDto> findByMemberId(Long memberId) {
+        List<MemberDepartment> memberDepartmentList = memberDepartmentRepository.findByMemberId(
+            memberId);
+
+        return memberDepartmentList.stream()
+            .map(memberDepartment -> MemberDepartmentResponseDto.builder()
+                .memberId(memberDepartment.getMemberId())
+                .departmentId(memberDepartment.getDepartmentId())
+                .build())
+            .toList();
     }
 }
