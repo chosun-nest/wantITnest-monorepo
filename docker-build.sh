@@ -13,6 +13,9 @@ echo "🧹 기존 컨테이너 정리 중..."
 docker stop $CONTAINER_NAME
 docker rm $CONTAINER_NAME
 
+echo "🗑 기존 이미지 삭제 중..."
+docker rmi $IMAGE_NAME || true
+
 echo "🐳 Docker 이미지 빌드 시작!"
 docker build -t $IMAGE_NAME .
 
