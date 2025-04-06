@@ -84,12 +84,14 @@ export default function SignUpDetail({
             value={department}
             list="department-options"
             onChange={(e) => onChangeDepartment(e.target.value)}
-          />{" "}
-          <datalist id="department-options">
-            {departmentsList.map((department, idx) => (
-              <option key={idx} value={department} />
-            ))}
-          </datalist>
+          />
+          {departmentsList.length > 0 && (
+            <datalist id="department-options">
+              {departmentsList.map((department, idx) => (
+                <option key={idx} value={department} />
+              ))}
+            </datalist>
+          )}
         </>
       )}
       {/* 관심 분야 */}
@@ -109,11 +111,14 @@ export default function SignUpDetail({
         }
         list="interests-options"
       />
-      <datalist id="interests-options">
-        {interestsList.map((interests, idx) => (
-          <option key={idx} value={interests} />
-        ))}
-      </datalist>
+      {interestsList.length > 0 && (
+        <datalist id="interests-options">
+          {interestsList.map((interest, idx) => (
+            <option key={idx} value={interest} />
+          ))}
+        </datalist>
+      )}
+
       <S.TagList>
         {interest.map((item, idx) => (
           <S.TagItem key={idx}>
@@ -137,11 +142,14 @@ export default function SignUpDetail({
           handleKeyDown(e, skillsInput, setSkillsInput, skills, onChangeSkills)
         }
       />
-      <datalist id="tech-options">
-        {techList.map((tech, idx) => (
-          <option key={idx} value={tech} />
-        ))}
-      </datalist>
+      {techList.length > 0 && (
+        <datalist id="tech-options">
+          {techList.map((tech, idx) => (
+            <option key={idx} value={tech} />
+          ))}
+        </datalist>
+      )}
+
       <S.TagList>
         {skills.map((item, idx) => (
           <S.TagItem key={idx}>
