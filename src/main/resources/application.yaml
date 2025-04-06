@@ -1,11 +1,17 @@
 # Port Number
 server:
-  port: 5030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
+  port: 6030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
 
 # mysql -h 221.156.215.197 -P 5040 -u VIRTUKCH -p --default-character-set=utf8 nest_db
 spring:
   datasource:
-    url: jdbc:mysql://221.156.215.197:5040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+#    url: jdbc:mysql://119.219.30.209:6040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+#    username: VIRTUKCH
+#    password: VIRTUKCH
+
+# mysql -h localhost -P 3306 -u VIRTUKCH -p --default-character-set=utf8 nest_db
+#    url : jdbc:mysql://localhost:3306/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://119.219.30.209:6040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
     username: VIRTUKCH
     password: VIRTUKCH
 
