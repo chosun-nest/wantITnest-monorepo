@@ -58,17 +58,17 @@ export default function MyProfile() {
   return (
     <div className="max-w-2xl mx-auto p-10 bg-white rounded-xl shadow">
       <h2 className="text-xl font-bold text-blue-900 mb-4">내 프로필 변경</h2>
-      
+
       {/* 이미지 */}
       <div className="flex items-start gap-4 mb-4">
         <label htmlFor="user-image" className="w-28 text-sm font-semibold">
-          이미지 
+          이미지
         </label>
-        <div 
+        <div
           className="relative group cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
         >
-           <img
+          <img
             src={profile.image}
             alt="프로필"
             className="w-24 h-24 rounded-lg object-cover group-hover:opacity-80 transition"
@@ -87,9 +87,8 @@ export default function MyProfile() {
               />
             </>
           )}
+        </div>
       </div>
-
-    </div>
 
       {/* 이름 / 이메일 (고정된 항목) */}
       <div className="flex items-center mb-4">
@@ -111,7 +110,7 @@ export default function MyProfile() {
           className="flex-1 bg-gray-100 p-2 rounded"
         />
       </div>
-      
+
       {/* 학과 */}
       <div className="flex items-center mb-4">
         <label className="w-28 text-sm font-semibold">학과</label>
@@ -124,7 +123,6 @@ export default function MyProfile() {
         />
       </div>
 
-
       {/* 자기소개 */}
       <div className="flex items-start mb-4">
         <label className="w-28 text-sm font-semibold mt-2">자기소개</label>
@@ -135,7 +133,6 @@ export default function MyProfile() {
           className="flex-1 p-2 rounded border min-h-[80px]"
         />
       </div>
-
 
       {/* 관심사 */}
       <div className="flex items-start mb-4">
@@ -209,7 +206,7 @@ export default function MyProfile() {
             <div className="flex items-center gap-4 mt-2">
               <a href={profile.sns[0]} target="_blank" rel="noreferrer">
                 <img
-                  src="/assets/images/github-mark.png"
+                  src="/assets/images/github-logo.png"
                   alt="GitHub"
                   className="w-8 h-8 hover:opacity-80"
                 />
@@ -230,7 +227,10 @@ export default function MyProfile() {
       <div className="text-right">
         {isEditing ? (
           <>
-            <button onClick={handleCancel} className="px-4 py-2 mr-2 rounded border">
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 mr-2 rounded border"
+            >
               취소
             </button>
             <button
