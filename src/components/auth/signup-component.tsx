@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import * as S from "../../assets/styles/auth.styles";
 
 type SigninComponentProps = {
@@ -18,6 +19,7 @@ type SigninComponentProps = {
   setIsPasswordVisible: (visible: boolean) => void;
   onNext: () => void;
   getItems: () => void;
+  isEmailVerified: boolean;
 };
 
 export default function SignUpComponent({
@@ -38,6 +40,7 @@ export default function SignUpComponent({
   setIsPasswordVisible,
   onNext,
   getItems,
+  isEmailVerified,
 }: SigninComponentProps) {
   const hasTwoCharTypes =
     /(?=(?:.*[a-zA-Z])(?:.*[0-9!@#$%^&*()\-_=+{};:,<.>])|(?:.*[0-9])(?:.*[a-zA-Z!@#$%^&*()\-_=+{};:,<.>])|(?:.*[!@#$%^&*()\-_=+{};:,<.>])(?:.*[a-zA-Z0-9])).{2,}/.test(
@@ -52,6 +55,13 @@ export default function SignUpComponent({
   const isPasswordValid =
     hasTwoCharTypes && isLengthValid && hasNoRepeatedChars && isConfirmMatch;
 
+  useEffect(() => {
+    if (timer === 0) {
+      onChangeAuthCode("");
+    }
+  }, [timer, onChangeAuthCode]);
+
+  // 혹시나 뚫을까봐 막아둔 코드
   const handleNextClick = () => {
     if (!isPasswordValid) {
       alert("비밀번호 조건을 모두 만족해야 합니다.");
@@ -101,16 +111,14 @@ export default function SignUpComponent({
           onChange={(e) => onChangeEmail(e.target.value)}
           placeholder="example@chosun.ac.kr"
         />
-        <S.AuthCodeButton onClick={handleSendCode} disabled={timer > 0}>
-          {timer > 0 ? (
-            <>
-              인증코드
-              <br /> 다시 보내기
-            </>
-          ) : (
-            "인증코드 보내기"
-          )}
-        </S.AuthCodeButton>
+
+        {timer > 0 ? (
+          <></>
+        ) : (
+          <S.AuthCodeButton onClick={handleSendCode} disabled={timer > 0}>
+            "인증코드 보내기"{" "}
+          </S.AuthCodeButton>
+        )}
       </S.EmailRow>
       {timer > 0 && (
         <>
@@ -124,7 +132,7 @@ export default function SignUpComponent({
             <S.TimerText>{formatTime(timer)}</S.TimerText>
           </S.TimerInputWrapper>
 
-          {/* ✅ 인증번호 확인하기 버튼 */}
+          {/* 인증번호 확인하기 버튼 */}
           <S.CheckCodeButton onClick={handleVerifyCode}>
             인증번호 확인하기
           </S.CheckCodeButton>
@@ -157,7 +165,7 @@ export default function SignUpComponent({
       <S.SigninText>비밀번호 확인</S.SigninText>
       <S.Input
         type="password"
-        placeholder=""
+        placeholder="*********"
         value={confirmPassword}
         onChange={(e) => onChangeConfirmPassword(e.target.value)}
       />
@@ -166,7 +174,7 @@ export default function SignUpComponent({
       )}
       <S.ButtonRow>
         <S.LoginButton
-          disabled={!isPasswordValid}
+          disabled={!(isPasswordValid && isEmailVerified)}
           onClick={() => {
             handleNextClick();
             getItems();

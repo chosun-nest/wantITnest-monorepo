@@ -30,6 +30,7 @@ export default function SignUp() {
   const [techList, setTechList] = useState<string[]>([]);
   const [interestsList, setInterestsList] = useState<string[]>([]);
   const [departmentsList, setDepartmentsList] = useState<string[]>([]);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const getItems = async () => {
     try {
@@ -55,13 +56,21 @@ export default function SignUp() {
     }
   };
 
-  const handleVerifyCode = () => {
+  const handleVerifyCode = async () => {
     try {
-      const res = verifycode(email, authCode);
-      console.log(res);
+      const res = await verifycode(email, authCode);
+      console.log("응답 데이터:", res);
+
+      if (res === "Email verified successfully") {
+        alert("이메일 인증 성공!");
+        setIsEmailVerified(true);
+      } else {
+        alert("이메일 인증 실패!");
+        setIsEmailVerified(false);
+      }
     } catch (e) {
-      alert("오류 발생!");
-      console.log(e);
+      alert("오류 발생! 인증에 실패했습니다.");
+      console.error(e);
     }
   };
 
@@ -72,6 +81,7 @@ export default function SignUp() {
     }
     try {
       // 중복 검사
+      setIsEmailVerified(false);
       const data = sendcode(email);
       console.log(data);
       setTimer(300);
@@ -108,10 +118,10 @@ export default function SignUp() {
 
       console.log(payload);
       const res = await signup(payload);
-      // ✅ 응답에서 정보 추출
+      // 응답에서 정보 추출
       const { accessToken, refreshToken, memberId, email: userEmail } = res;
 
-      // ✅ 로컬 스토리지에 저장
+      // 로컬 스토리지에 저장
       localStorage.setItem("accesstoken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem(
@@ -151,6 +161,7 @@ export default function SignUp() {
           setIsPasswordVisible={setIsPasswordVisible}
           onNext={handleNextStep}
           getItems={getItems}
+          isEmailVerified={isEmailVerified}
         />
       ) : (
         <SignUpDetail
