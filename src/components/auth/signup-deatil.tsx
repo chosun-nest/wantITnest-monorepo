@@ -88,7 +88,7 @@ export default function SignUpDetail({
   };
 
   const handleSelectDepartment = (item: string) => {
-    onChangeDepartment(item); // ✅ 선택된 학과를 저장
+    onChangeDepartment(item);
     setFilteredDepartments([]); // 드롭다운 닫기
   };
 
