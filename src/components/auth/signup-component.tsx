@@ -105,22 +105,31 @@ export default function SignUpComponent({
       </S.DivisionContainer>
       <S.SigninText>이메일 인증</S.SigninText>
       <S.EmailRow>
+        {timer > 0 ? (
+          <></>
+        ) : (
+          <S.AuthCodeButton onClick={handleSendCode} disabled={timer > 0}>
+            인증코드 보내기
+          </S.AuthCodeButton>
+        )}
+      </S.EmailRow>
+      <S.EmailRow>
         <S.Input
           type="email"
           value={email}
           onChange={(e) => onChangeEmail(e.target.value)}
           placeholder="example@chosun.ac.kr"
+          disabled={isEmailVerified}
         />
 
-        {timer > 0 ? (
-          <></>
-        ) : (
-          <S.AuthCodeButton onClick={handleSendCode} disabled={timer > 0}>
-            "인증코드 보내기"{" "}
+        {!isEmailVerified && timer <= 0 && (
+          <S.AuthCodeButton onClick={handleSendCode}>
+            인증코드 보내기
           </S.AuthCodeButton>
         )}
       </S.EmailRow>
-      {timer > 0 && (
+
+      {!isEmailVerified && timer > 0 && (
         <>
           <S.TimerInputWrapper>
             <S.Input
@@ -138,6 +147,15 @@ export default function SignUpComponent({
           </S.CheckCodeButton>
         </>
       )}
+
+      {isEmailVerified && (
+        <div
+          style={{ marginTop: "10px", color: "#4CAF50", fontWeight: "bold" }}
+        >
+          ✅ 이메일 인증 완료
+        </div>
+      )}
+
       <S.SigninText>비밀번호</S.SigninText>
       <S.PasswordInputWrapper
         onMouseEnter={() => setIsPasswordVisible(true)}
