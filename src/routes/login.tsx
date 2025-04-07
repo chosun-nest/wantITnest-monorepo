@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import * as S from "../assets/styles/login.styles";
+import * as S from "../assets/styles/auth.styles";
 import useResponsive from "../hooks/responsive";
 import { useState } from "react";
 import { login } from "../api/auth/auth";

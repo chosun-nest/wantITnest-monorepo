@@ -1,4 +1,4 @@
-import * as S from "../../assets/styles/login.styles";
+import * as S from "../../assets/styles/auth.styles";
 
 type SigninComponentProps = {
   selected: "재학생" | "일반";
