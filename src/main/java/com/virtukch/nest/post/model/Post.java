@@ -6,7 +6,7 @@ import com.virtukch.nest.post.exception.InvalidPostTitleException;
 import com.virtukch.nest.post_tag.model.PostTag;
 import com.virtukch.nest.tag.model.Tag;
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Post extends BaseTimeEntity {
     @Id
@@ -38,20 +38,15 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer likeCount = 0;
 
-    // 생성 편의 메서드
-    @Builder
-    public Post(Member member, String title, String content) {
-        this.member = member;
-        this.title = title;
-        this.content = content;
-    }
 
+    // 생성 편의 메서드
     public static Post createPost(Member member, String title, String content) {
-        return Post.builder()
-                .member(member)
-                .title(title)
-                .content(content)
-                .build();
+        Post post = new Post();
+        post.member = member;
+        post.title = title;
+        post.content = content;
+
+        return post;
     }
 
     // 연관관계 편의 메소드

@@ -1,7 +1,6 @@
 package com.virtukch.nest.post.service;
 
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.dto.converter.PostDtoConverter;
 import com.virtukch.nest.post.exception.CannotDeletePostException;
@@ -95,7 +94,7 @@ public class PostService {
 
     @Transactional
     public PostUpdateResponseDto updatePost(Long postId, Long memberId, PostUpdateRequestDto requestDto) {
-        Post post = findOwnedPostOrThrow(postId, memberId);
+        Post post = validatePostOwnershipAndGet(postId, memberId);
         List<Tag> tags = requestDto.getTags().stream()
                 .map(tagService::findByNameOrThrow).collect(Collectors.toList());
 
@@ -109,7 +108,7 @@ public class PostService {
 
     @Transactional
     public PostDeleteResponseDto deletePost(Long memberId, Long postId) {
-        Post post = findOwnedPostOrThrow(postId, memberId);
+        Post post = validatePostOwnershipAndGet(postId, memberId);
         try { // TODO : 추후에 댓글 기능, 좋아요 기능 등등 추가하면 고려하여 수정해야함.
             postRepository.delete(post);
             return PostDtoConverter.toDeleteResponseDto(post);
@@ -125,7 +124,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Post findOwnedPostOrThrow(Long postId, Long memberId) {
+    public Post validatePostOwnershipAndGet(Long postId, Long memberId) {
         Post post = findByIdOrThrow(postId);
         if (!Objects.equals(post.getMember().getMemberId(), memberId)) {
             throw new NoPostAuthorityException(postId, memberId);

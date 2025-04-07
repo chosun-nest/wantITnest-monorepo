@@ -36,7 +36,7 @@ public class PostController {
         log.info("[게시글 작성 요청] memberId={}", member.getMemberId());
         PostCreateResponseDto responseDto = postService.createPost(member, requestDto);
         return ResponseEntity
-                .created(URI.create("/api/posts/" + responseDto.getPostId()))
+                .created(URI.create("/api/v1/posts/" + responseDto.getPostId()))
                 .body(responseDto);
     }
 
