@@ -104,15 +104,7 @@ export default function SignUpComponent({
         </S.RadioGroup>
       </S.DivisionContainer>
       <S.SigninText>이메일 인증</S.SigninText>
-      <S.EmailRow>
-        {timer > 0 ? (
-          <></>
-        ) : (
-          <S.AuthCodeButton onClick={handleSendCode} disabled={timer > 0}>
-            인증코드 보내기
-          </S.AuthCodeButton>
-        )}
-      </S.EmailRow>
+      <S.EmailRow></S.EmailRow>
       <S.EmailRow>
         <S.Input
           type="email"
