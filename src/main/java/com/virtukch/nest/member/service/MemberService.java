@@ -4,6 +4,13 @@ import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
+import com.virtukch.nest.member_department.dto.MemberDepartmentResponseDto;
+import com.virtukch.nest.member_department.service.MemberDepartmentService;
+import com.virtukch.nest.member_interest.dto.MemberInterestResponseDto;
+import com.virtukch.nest.member_interest.service.MemberInterestService;
+import com.virtukch.nest.member_tech_stack.dto.MemberTechStackResponseDto;
+import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +19,11 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberInterestService memberInterestService;
+    private final MemberDepartmentService memberDepartmentService;
+    private final MemberTechStackService memberTechStackService;
 
-    // CustomUserDetails 기반으로 현재 로그인한 회원 정보 반환
+    // CustomUserDetails 기반으로 현재 로그인한 회원 정보 반환 + 프로필 정보 확인 위한 최대한의 많은 정보 포함
     public MemberResponseDto getCurrentMemberByCustomUserDetails(
         CustomUserDetails customUserDetails) {
 
@@ -24,6 +34,13 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
+        List<MemberInterestResponseDto> memberInterestResponseDtoList = memberInterestService.findByMemberId(
+            memberId);
+        List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList = memberDepartmentService.findByMemberId(
+            memberId);
+        List<MemberTechStackResponseDto> memberTechStackResponseDtoList = memberTechStackService.findByMemberId(
+            memberId);
+
         return MemberResponseDto.builder()
             .memberId(member.getMemberId())
             .memberEmail(member.getMemberEmail())
@@ -33,7 +50,10 @@ public class MemberService {
             .memberSnsUrl2(member.getMemberSnsUrl2())
             .memberSnsUrl3(member.getMemberSnsUrl3())
             .memberSnsUrl4(member.getMemberSnsUrl4())
-            .memberIsStudent(member.isMemberIsStudent())
+            .memberIsStudent(member.getMemberIsStudent())
+            .memberInterestResponseDtoList(memberInterestResponseDtoList)
+            .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
+            .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
             .build();
     }
 }
