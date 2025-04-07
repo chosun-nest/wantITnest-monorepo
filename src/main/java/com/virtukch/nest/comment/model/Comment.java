@@ -38,4 +38,11 @@ public class Comment extends BaseTimeEntity {
                 .commentContent(content)
                 .build();
     }
+
+    // 비즈니스 로직
+    public void updateComment(String commentContent) {
+        if(commentContent != null && !commentContent.isBlank()) {
+            this.commentContent = commentContent;
+        }
+    }
 }

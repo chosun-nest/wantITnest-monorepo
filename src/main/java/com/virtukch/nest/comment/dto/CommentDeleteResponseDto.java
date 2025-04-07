@@ -5,13 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @AllArgsConstructor
-public class CommentResponseDto {
+@Builder
+public class CommentDeleteResponseDto {
     private Long commentId;
-    private String content;
-    private String authorName;
-    private String createdAt;
-    private String updatedAt;
+    private String message;
 }
-

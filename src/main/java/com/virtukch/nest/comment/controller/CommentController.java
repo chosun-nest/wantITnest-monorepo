@@ -1,32 +1,31 @@
 package com.virtukch.nest.comment.controller;
 
+import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.comment.dto.CommentListResponseDto;
+import com.virtukch.nest.comment.dto.CommentRequestDto;
+import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
+import com.virtukch.nest.comment.dto.CommentResponseDto;
+import com.virtukch.nest.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.comment.dto.CommentCreateResponseDto;
-import com.virtukch.nest.comment.dto.CommentCreateRequestDto;
-import com.virtukch.nest.comment.service.CommentService;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/posts/{postId}/comments")
 @Tag(
         name = "댓글 API",
-        description = """
-                게시글 상세 페이지에서 사용되는 댓글 관련 API입니다.
-                댓글 생성, 조회, 수정, 삭제 기능을 제공합니다.
-                """
+        description = "게시글 상세 페이지에서 사용되는 댓글 생성, 조회, 수정, 삭제 API"
 )
 @RequiredArgsConstructor
 public class CommentController {
@@ -42,13 +41,71 @@ public class CommentController {
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @PostMapping("/new")
-    public ResponseEntity<CommentCreateResponseDto> createComment(
+    @PostMapping
+    public ResponseEntity<CommentResponseDto> createComment(
             @PathVariable Long postId,
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @RequestBody CommentCreateRequestDto requestDto
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody CommentRequestDto requestDto
     ) {
-        CommentCreateResponseDto response = commentService.createComment(postId, userDetails.getMember(), requestDto);
-        return ResponseEntity.ok(response);
+        CommentResponseDto response = commentService.createComment(postId, user.getMember(), requestDto);
+        URI location = URI.create("/api/v1/posts/" + postId + "/comments/" + response.getCommentId());
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @Operation(
+            summary = "댓글 목록 조회",
+            description = "특정 게시글에 작성된 댓글 목록을 조회합니다.",
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "댓글 목록 조회 성공",
+                    content = @Content(schema = @Schema(implementation = CommentListResponseDto.class)))
+    })
+    @GetMapping
+    public ResponseEntity<CommentListResponseDto> getCommentList(@PathVariable Long postId) {
+        return ResponseEntity.ok(commentService.getCommentList(postId));
+    }
+
+    @Operation(
+            summary = "댓글 수정",
+            description = """
+                    특정 댓글의 내용을 수정합니다.
+                    - 본인이 작성한 댓글만 수정할 수 있습니다.
+                    - 댓글 내용은 최대 500자까지 작성할 수 있습니다.
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "댓글 수정 성공",
+                    content = @Content(schema = @Schema(implementation = CommentResponseDto.class)))
+    })
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<CommentResponseDto> updateComment(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody CommentRequestDto requestDto) {
+        CommentResponseDto responseDto = commentService.updateComment(commentId, user.getMember(), requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "댓글 삭제",
+            description = """
+                    특정 댓글을 삭제합니다.
+                    - 본인이 작성한 댓글만 삭제할 수 있습니다.
+                    - 삭제 후 commentId와 메시지를 응답합니다.
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "댓글 삭제 성공",
+                    content = @Content(schema = @Schema(implementation = CommentDeleteResponseDto.class)))
+    })
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<CommentDeleteResponseDto> deleteComment(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        CommentDeleteResponseDto responseDto = commentService.deleteComment(commentId, user.getMember());
+        return ResponseEntity.ok(responseDto);
     }
 }
