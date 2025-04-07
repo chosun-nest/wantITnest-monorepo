@@ -5,6 +5,7 @@ import SignUpDetail from "../components/auth/signup-deatil";
 import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
 import { getDepartments, getInterests, getTech } from "../api/common/common";
+import { Item } from "../types/signup";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -27,9 +28,9 @@ export default function SignUp() {
   const [interest, setInterest] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
 
-  const [techList, setTechList] = useState<string[]>([]);
-  const [interestsList, setInterestsList] = useState<string[]>([]);
-  const [departmentsList, setDepartmentsList] = useState<string[]>([]);
+  const [techList, setTechList] = useState<Item[]>([]);
+  const [interestsList, setInterestsList] = useState<Item[]>([]);
+  const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const getItems = async () => {
@@ -38,13 +39,24 @@ export default function SignUp() {
       const interestsResponse = await getInterests();
       const departmentsResponse = await getDepartments();
       const techNames = techResponse.map(
-        (item: { techStackName: unknown }) => item.techStackName
+        (item: { techStackId: number; techStackName: string }) => ({
+          id: item.techStackId,
+          name: item.techStackName,
+        })
       );
+
       const interestsNames = interestsResponse.map(
-        (item: { interestName: unknown }) => item.interestName
+        (item: { interestId: number; interestName: string }) => ({
+          id: item.interestId,
+          name: item.interestName,
+        })
       );
+
       const departmentsNames = departmentsResponse.map(
-        (item: { departmentName: unknown }) => item.departmentName
+        (item: { departmentId: number; departmentName: string }) => ({
+          id: item.departmentId,
+          name: item.departmentName,
+        })
       );
 
       setTechList(techNames);

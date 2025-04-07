@@ -1,26 +1,6 @@
 import { useEffect } from "react";
 import * as S from "../../assets/styles/auth.styles";
-
-type SigninComponentProps = {
-  selected: "재학생" | "일반";
-  onChangeSelected: (value: "재학생" | "일반") => void;
-  email: string;
-  onChangeEmail: (value: string) => void;
-  authCode: string;
-  onChangeAuthCode: (value: string) => void;
-  handleSendCode: () => void;
-  handleVerifyCode: () => void;
-  timer: number;
-  password: string;
-  onChangePassword: (value: string) => void;
-  confirmPassword: string;
-  onChangeConfirmPassword: (value: string) => void;
-  isPasswordVisible: boolean;
-  setIsPasswordVisible: (visible: boolean) => void;
-  onNext: () => void;
-  getItems: () => void;
-  isEmailVerified: boolean;
-};
+import { SignUpComponentProps } from "../../types/signup";
 
 export default function SignUpComponent({
   selected,
@@ -41,7 +21,7 @@ export default function SignUpComponent({
   onNext,
   getItems,
   isEmailVerified,
-}: SigninComponentProps) {
+}: SignUpComponentProps) {
   const hasTwoCharTypes =
     /(?=(?:.*[a-zA-Z])(?:.*[0-9!@#$%^&*()\-_=+{};:,<.>])|(?:.*[0-9])(?:.*[a-zA-Z!@#$%^&*()\-_=+{};:,<.>])|(?:.*[!@#$%^&*()\-_=+{};:,<.>])(?:.*[a-zA-Z0-9])).{2,}/.test(
       password

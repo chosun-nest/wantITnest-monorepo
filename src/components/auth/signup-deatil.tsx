@@ -1,22 +1,6 @@
 import { useState } from "react";
 import * as S from "../../assets/styles/auth.styles";
-
-type Props = {
-  selected: "재학생" | "일반";
-  onPrev: () => void;
-  onSubmit: () => void;
-  name: string;
-  onChangeName: (value: string) => void;
-  department: string;
-  onChangeDepartment: (value: string) => void;
-  interest: string[];
-  onChangeInterest: (values: string[]) => void;
-  skills: string[];
-  onChangeSkills: (values: string[]) => void;
-  techList: string[];
-  interestsList: string[];
-  departmentsList: string[];
-};
+import { Item, SignUpDetailProps } from "../../types/signup";
 
 export default function SignUpDetail({
   selected,
@@ -33,13 +17,13 @@ export default function SignUpDetail({
   techList,
   interestsList,
   departmentsList,
-}: Props) {
+}: SignUpDetailProps) {
   const [interestInput, setInterestInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
 
-  const [filteredInterests, setFilteredInterests] = useState<string[]>([]);
-  const [filteredSkills, setFilteredSkills] = useState<string[]>([]);
-  const [filteredDepartments, setFilteredDepartments] = useState<string[]>([]);
+  const [filteredInterests, setFilteredInterests] = useState<Item[]>([]);
+  const [filteredSkills, setFilteredSkills] = useState<Item[]>([]);
+  const [filteredDepartments, setFilteredDepartments] = useState<Item[]>([]);
 
   // 드롭다운 코드
   const handleInterestInputChange = (
@@ -50,7 +34,7 @@ export default function SignUpDetail({
 
     if (value.trim() !== "") {
       const filtered = interestsList.filter((item) =>
-        item.toLowerCase().includes(value.toLowerCase())
+        item.name.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredInterests(filtered);
     } else {
@@ -64,7 +48,7 @@ export default function SignUpDetail({
 
     if (value.trim() !== "") {
       const filtered = techList.filter((item) =>
-        item.toLowerCase().includes(value.toLowerCase())
+        item.name.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredSkills(filtered);
     } else {
@@ -78,10 +62,8 @@ export default function SignUpDetail({
     const value = e.target.value;
     onChangeDepartment(value);
     if (value.trim() !== "") {
-      const filtered = departmentsList.filter(
-        (item) =>
-          typeof item === "string" &&
-          item.toLowerCase().includes(value.toLowerCase())
+      const filtered = departmentsList.filter((item) =>
+        item.name.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredDepartments(filtered);
     } else {
@@ -146,9 +128,9 @@ export default function SignUpDetail({
                 {filteredDepartments.map((item, idx) => (
                   <S.DropdownItem
                     key={idx}
-                    onClick={() => handleSelectDepartment(item)}
+                    onClick={() => handleSelectDepartment(item.name)}
                   >
-                    {item}
+                    {item.name}
                   </S.DropdownItem>
                 ))}
               </S.Dropdown>
@@ -170,9 +152,9 @@ export default function SignUpDetail({
             {filteredInterests.map((item, idx) => (
               <S.DropdownItem
                 key={idx}
-                onClick={() => handleSelectInterest(item)}
+                onClick={() => handleSelectInterest(item.name)}
               >
-                {item}
+                {item.name}
               </S.DropdownItem>
             ))}
           </S.Dropdown>
@@ -202,8 +184,11 @@ export default function SignUpDetail({
         {filteredSkills.length > 0 && (
           <S.Dropdown>
             {filteredSkills.map((item, idx) => (
-              <S.DropdownItem key={idx} onClick={() => handleSelectSkill(item)}>
-                {item}
+              <S.DropdownItem
+                key={idx}
+                onClick={() => handleSelectSkill(item.name)}
+              >
+                {item.name}
               </S.DropdownItem>
             ))}
           </S.Dropdown>
