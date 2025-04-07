@@ -1,5 +1,5 @@
-import { useState, KeyboardEvent } from "react";
-import * as S from "../../assets/styles/login.styles";
+import { useState } from "react";
+import * as S from "../../assets/styles/auth.styles";
 
 type Props = {
   selected: "재학생" | "일반";
@@ -37,21 +37,77 @@ export default function SignUpDetail({
   const [interestInput, setInterestInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
 
-  const handleKeyDown = (
-    e: KeyboardEvent<HTMLInputElement>,
-    input: string,
-    setInput: (v: string) => void,
-    list: string[],
-    setList: (v: string[]) => void
+  const [filteredInterests, setFilteredInterests] = useState<string[]>([]);
+  const [filteredSkills, setFilteredSkills] = useState<string[]>([]);
+  const [filteredDepartments, setFilteredDepartments] = useState<string[]>([]);
+
+  // 드롭다운 코드
+  const handleInterestInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    if ((e.key === "Enter" || e.key === ",") && input.trim()) {
-      e.preventDefault();
-      const newItem = input.trim().replace(/^#/, "");
-      if (!list.includes(newItem)) {
-        setList([...list, newItem]);
-      }
-      setInput("");
+    const value = e.target.value;
+    setInterestInput(value);
+
+    if (value.trim() !== "") {
+      const filtered = interestsList.filter((item) =>
+        item.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredInterests(filtered);
+    } else {
+      setFilteredInterests([]);
     }
+  };
+
+  const handleSkillsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSkillsInput(value);
+
+    if (value.trim() !== "") {
+      const filtered = techList.filter((item) =>
+        item.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSkills(filtered);
+    } else {
+      setFilteredSkills([]);
+    }
+  };
+
+  const handleDepartmentsInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    onChangeDepartment(value);
+    if (value.trim() !== "") {
+      const filtered = departmentsList.filter(
+        (item) =>
+          typeof item === "string" &&
+          item.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredDepartments(filtered);
+    } else {
+      setFilteredDepartments([]);
+    }
+  };
+
+  const handleSelectInterest = (item: string) => {
+    if (!interest.includes(item)) {
+      onChangeInterest([...interest, item]);
+    }
+    setInterestInput("");
+    setFilteredInterests([]);
+  };
+
+  const handleSelectSkill = (item: string) => {
+    if (!skills.includes(item)) {
+      onChangeSkills([...skills, item]);
+    }
+    setSkillsInput("");
+    setFilteredSkills([]);
+  };
+
+  const handleSelectDepartment = (item: string) => {
+    onChangeDepartment(item); // ✅ 선택된 학과를 저장
+    setFilteredDepartments([]); // 드롭다운 닫기
   };
 
   const handleRemove = (
@@ -79,45 +135,49 @@ export default function SignUpDetail({
       {selected === "재학생" && (
         <>
           <S.InputTitle>학과 검색</S.InputTitle>
-          <S.Input
-            placeholder="학과를 입력하세요"
-            value={department}
-            list="department-options"
-            onChange={(e) => onChangeDepartment(e.target.value)}
-          />
-          {departmentsList.length > 0 && (
-            <datalist id="department-options">
-              {departmentsList.map((department, idx) => (
-                <option key={idx} value={department} />
-              ))}
-            </datalist>
-          )}
+          <S.InputWrapper>
+            <S.Input
+              placeholder="학과를 입력하세요"
+              value={department} // ✅ props department 사용
+              onChange={handleDepartmentsInputChange}
+            />
+            {filteredDepartments.length > 0 && (
+              <S.Dropdown>
+                {filteredDepartments.map((item, idx) => (
+                  <S.DropdownItem
+                    key={idx}
+                    onClick={() => handleSelectDepartment(item)}
+                  >
+                    {item}
+                  </S.DropdownItem>
+                ))}
+              </S.Dropdown>
+            )}
+          </S.InputWrapper>
         </>
       )}
+
       {/* 관심 분야 */}
       <S.InputTitle>관심 분야</S.InputTitle>
-      <S.Input
-        placeholder="ex) 백엔드, AI"
-        value={interestInput}
-        onChange={(e) => setInterestInput(e.target.value)}
-        onKeyDown={(e) =>
-          handleKeyDown(
-            e,
-            interestInput,
-            setInterestInput,
-            interest,
-            onChangeInterest
-          )
-        }
-        list="interests-options"
-      />
-      {interestsList.length > 0 && (
-        <datalist id="interests-options">
-          {interestsList.map((interest, idx) => (
-            <option key={idx} value={interest} />
-          ))}
-        </datalist>
-      )}
+      <S.InputWrapper>
+        <S.Input
+          placeholder="ex) 백엔드, AI"
+          value={interestInput}
+          onChange={handleInterestInputChange}
+        />
+        {filteredInterests.length > 0 && (
+          <S.Dropdown>
+            {filteredInterests.map((item, idx) => (
+              <S.DropdownItem
+                key={idx}
+                onClick={() => handleSelectInterest(item)}
+              >
+                {item}
+              </S.DropdownItem>
+            ))}
+          </S.Dropdown>
+        )}
+      </S.InputWrapper>
 
       <S.TagList>
         {interest.map((item, idx) => (
@@ -133,22 +193,22 @@ export default function SignUpDetail({
       </S.TagList>
       {/* 기술 스택 */}
       <S.InputTitle>기술 스택</S.InputTitle>
-      <S.Input
-        placeholder="보유 기술 스택을 입력하세요 (예: #React, #TS)"
-        value={skillsInput}
-        list="tech-options"
-        onChange={(e) => setSkillsInput(e.target.value)}
-        onKeyDown={(e) =>
-          handleKeyDown(e, skillsInput, setSkillsInput, skills, onChangeSkills)
-        }
-      />
-      {techList.length > 0 && (
-        <datalist id="tech-options">
-          {techList.map((tech, idx) => (
-            <option key={idx} value={tech} />
-          ))}
-        </datalist>
-      )}
+      <S.InputWrapper>
+        <S.Input
+          placeholder="ex) React, TypeScript"
+          value={skillsInput}
+          onChange={handleSkillsInputChange}
+        />
+        {filteredSkills.length > 0 && (
+          <S.Dropdown>
+            {filteredSkills.map((item, idx) => (
+              <S.DropdownItem key={idx} onClick={() => handleSelectSkill(item)}>
+                {item}
+              </S.DropdownItem>
+            ))}
+          </S.Dropdown>
+        )}
+      </S.InputWrapper>
 
       <S.TagList>
         {skills.map((item, idx) => (

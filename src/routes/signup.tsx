@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as S from "../assets/styles/login.styles";
+import * as S from "../assets/styles/auth.styles";
 import SignUpComponent from "../components/auth/signup-component";
 import SignUpDetail from "../components/auth/signup-deatil";
 import { sendcode, signup, verifycode } from "../api/auth/auth";
@@ -33,8 +33,8 @@ export default function SignUp() {
 
   const getItems = async () => {
     try {
-      const techResponse = await getTech(); // ✅ await 추가
-      const interestsResponse = await getInterests(); // ✅ await 추가
+      const techResponse = await getTech();
+      const interestsResponse = await getInterests();
       const departmentsResponse = await getDepartments();
       const techNames = techResponse.map(
         (item: { techStackName: unknown }) => item.techStackName
@@ -43,12 +43,13 @@ export default function SignUp() {
         (item: { interestName: unknown }) => item.interestName
       );
       const departmentsNames = departmentsResponse.map(
-        (item: { interestName: unknown }) => item.interestName
+        (item: { departmentName: unknown }) => item.departmentName
       );
 
       setTechList(techNames);
       setInterestsList(interestsNames);
       setDepartmentsList(departmentsNames);
+      console.log(techList, interestsList, departmentsList);
     } catch (e) {
       console.log("아이템 불러오기 실패", e);
     }

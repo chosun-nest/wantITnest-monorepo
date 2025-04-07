@@ -426,3 +426,29 @@ export const TagRemoveButton = styled.button`
     color: #f00;
   }
 `;
+export const Dropdown = styled.ul`
+  position: absolute;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  z-index: 999;
+  margin-top: 4px;
+  padding: 0;
+  list-style: none;
+`;
+
+export const DropdownItem = styled.li`
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #f2f2f2;
+  }
+`;
+export const InputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+`;
