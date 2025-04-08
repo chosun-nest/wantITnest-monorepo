@@ -9,10 +9,22 @@ import java.util.List;
 
 public class PostDtoConverter {
 
-    public static PostCreateResponseDto toCreateResponseDto(Post savedPost) {
-        return PostCreateResponseDto.builder()
-                .postId(savedPost.getId())
-                .message("게시글이 성공적으로 등록되었습니다.")
+    public static PostResponseDto toCreateResponseDto(Post post) {
+        return buildResponse(post, "게시글이 성공적으로 등록되었습니다.");
+    }
+
+    public static PostResponseDto toUpdateResponseDto(Post post) {
+        return buildResponse(post, "게시글이 성공적으로 수정되었습니다.");
+    }
+
+    public static PostResponseDto toDeleteResponseDto(Post post) {
+        return buildResponse(post, "게시글이 성공적으로 삭제되었습니다.");
+    }
+
+    private static PostResponseDto buildResponse(Post post, String message) {
+        return PostResponseDto.builder()
+                .postId(post.getId())
+                .message(message)
                 .build();
     }
 
@@ -51,19 +63,7 @@ public class PostDtoConverter {
                 .build();
     }
 
-    public static PostUpdateResponseDto toUpdateResponseDto(Post post) {
-        return PostUpdateResponseDto.builder()
-                .postId(post.getId())
-                .message("게시글이 성공적으로 등록되었습니다.")
-                .build();
-    }
 
-    public static PostDeleteResponseDto toDeleteResponseDto(Post post) {
-        return PostDeleteResponseDto.builder()
-                .postId(post.getId())
-                .message("게시글이 성공적으로 삭제되었습니다.")
-                .build();
-    }
 
     private static List<String> extractTagNames(Post post) {
         return post.getPostTags().stream().map(pt -> pt.getTag().getName()).toList();
