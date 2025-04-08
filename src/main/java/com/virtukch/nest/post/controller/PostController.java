@@ -2,7 +2,10 @@ package com.virtukch.nest.post.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.post.dto.*;
+import com.virtukch.nest.post.dto.PostDetailResponseDto;
+import com.virtukch.nest.post.dto.PostListResponseDto;
+import com.virtukch.nest.post.dto.PostRequestDto;
+import com.virtukch.nest.post.dto.PostResponseDto;
 import com.virtukch.nest.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,14 +30,19 @@ public class PostController {
 
     @Operation(
             summary = "게시글 작성",
+            description = """
+                    - `title`: 빈 문자열 또는 null 값 불가
+                    - `content`: 빈 문자열은 허용 (null 값은 빈 문자열로 간주)
+                    - `tags`: 태그 목록에 존재하는 태그만 설정 가능
+                    """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @PostMapping("/new")
-    public ResponseEntity<PostCreateResponseDto> createPost(@AuthenticationPrincipal CustomUserDetails user,
-                                                            @RequestBody PostCreateRequestDto requestDto) {
+    public ResponseEntity<PostResponseDto> createPost(@AuthenticationPrincipal CustomUserDetails user,
+                                                      @RequestBody PostRequestDto requestDto) {
         Member member = user.getMember();
         log.info("[게시글 작성 요청] memberId={}", member.getMemberId());
-        PostCreateResponseDto responseDto = postService.createPost(member, requestDto);
+        PostResponseDto responseDto = postService.createPost(member, requestDto);
         return ResponseEntity
                 .created(URI.create("/api/v1/posts/" + responseDto.getPostId()))
                 .body(responseDto);
@@ -57,8 +65,7 @@ public class PostController {
                     게시글 목록을 조회합니다.
                     - 태그 필터링을 하지 않으면 전체 게시글을 반환합니다.
                     - 태그를 필터링하려면 ?tags=JAVA&tags=SPRING 와 같이 쿼리 파라미터로 전달하세요.
-                    """,
-            security = {@SecurityRequirement(name = "bearer-key")}
+                    """
     )
     @GetMapping
     public ResponseEntity<PostListResponseDto> getPostList(@RequestParam(required = false) List<String> tags) {
@@ -92,29 +99,29 @@ public class PostController {
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @PatchMapping("/update/{postId}")
-    public ResponseEntity<PostUpdateResponseDto> updatePost(@AuthenticationPrincipal CustomUserDetails user,
-                                                            @PathVariable Long postId,
-                                                            @RequestBody PostUpdateRequestDto requestDto) {
+    public ResponseEntity<PostResponseDto> updatePost(@AuthenticationPrincipal CustomUserDetails user,
+                                                      @PathVariable Long postId,
+                                                      @RequestBody PostRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 수정 요청] postId={}, memberId={}", postId, memberId);
-        PostUpdateResponseDto responseDto = postService.updatePost(postId, memberId, requestDto);
+        PostResponseDto responseDto = postService.updatePost(postId, memberId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @Operation(
             summary = "게시글 삭제",
-            description ="""
-            회원 ID를 기반으로 게시글 삭제
-            - 작성자와 삭제하려는 사용자의 memberId가 다를 경우 **NoPostAuthorityException**
-            """,
+            description = """
+                    회원 ID를 기반으로 게시글 삭제
+                    - 작성자와 삭제하려는 사용자의 memberId가 다를 경우 **NoPostAuthorityException**
+                    """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<PostDeleteResponseDto> deletePost(@AuthenticationPrincipal CustomUserDetails user,
-                                                            @PathVariable Long postId) {
+    public ResponseEntity<PostResponseDto> deletePost(@AuthenticationPrincipal CustomUserDetails user,
+                                                      @PathVariable Long postId) {
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 삭제 요청] postId={}, memberId={}", postId, memberId);
-        PostDeleteResponseDto responseDto = postService.deletePost(memberId, postId);
+        PostResponseDto responseDto = postService.deletePost(memberId, postId);
         return ResponseEntity.ok(responseDto);
     }
 }

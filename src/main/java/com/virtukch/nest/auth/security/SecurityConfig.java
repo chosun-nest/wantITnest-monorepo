@@ -55,7 +55,9 @@ public class SecurityConfig {
                     "/api/v1/auth/**",
                     "/api/v1/tech-stacks",
                     "/api/v1/interests",
-                    "/api/v1/departments"
+                    "/api/v1/departments",
+                    "/api/v1/tags",
+                    "/api/v1/posts"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
