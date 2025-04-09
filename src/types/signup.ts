@@ -32,15 +32,31 @@ type SignUpDetailProps = {
   onSubmit: () => void;
   name: string;
   onChangeName: (value: string) => void;
-  department: string;
-  onChangeDepartment: (value: string) => void;
-  interest: string[];
-  onChangeInterest: (values: string[]) => void;
-  skills: string[];
-  onChangeSkills: (values: string[]) => void;
+  department: Item | null;
+  onChangeDepartment: (value: Item) => void;
+  interest: Item[];
+  onChangeInterest: (values: Item[]) => void;
+  skills: Item[];
+  onChangeSkills: (values: Item[]) => void;
   techList: Item[];
   interestsList: Item[];
   departmentsList: Item[];
 };
 
-export type { UserType, Item, SignUpComponentProps, SignUpDetailProps };
+type SignupPayload = {
+  email: string;
+  password: string;
+  memberName: string;
+  memberIsStudent: boolean;
+  departmentIdList: number[];
+  interestIdList: number[];
+  techStackIdList: number[];
+};
+
+export type {
+  SignupPayload,
+  UserType,
+  Item,
+  SignUpComponentProps,
+  SignUpDetailProps,
+};

@@ -1,3 +1,4 @@
+import { SignupPayload } from "../../types/signup";
 import API from "../index";
 
 export const login = async (email: string, password: string) => {
@@ -5,21 +6,8 @@ export const login = async (email: string, password: string) => {
   return res.data;
 };
 
-export const signup = async (payload: {
-  email: string;
-  password: string;
-  name: string;
-  userType: "재학생" | "일반";
-  interest: string[];
-  skills: string[];
-  department?: string; // 재학생일 경우만 전달
-}) => {
-  const { email, password } = payload;
-  const res = await API.post("/api/v1/auth/signup", {
-    email,
-    password,
-    memberName: name,
-  });
+export const signup = async (payload: SignupPayload) => {
+  const res = await API.post("/api/v1/auth/signup", payload);
   return res.data;
 };
 
