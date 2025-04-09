@@ -45,7 +45,7 @@ export default function Login() {
       {/*로그인 박스*/}
       <S.LoginBox>
         {/* 이메일 및 비밀번호 입력 */}
-        <S.InputTitle>아이디</S.InputTitle>
+        <S.InputTitle>이메일</S.InputTitle>
         <S.Input
           type="email"
           placeholder="이메일"
