@@ -20,18 +20,18 @@ export default function SignUpDetail({
 }: SignUpDetailProps) {
   const [interestInput, setInterestInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
+  const [departmentInput, setDepartmentInput] = useState("");
 
   const [filteredInterests, setFilteredInterests] = useState<Item[]>([]);
   const [filteredSkills, setFilteredSkills] = useState<Item[]>([]);
   const [filteredDepartments, setFilteredDepartments] = useState<Item[]>([]);
 
-  // 드롭다운 코드
+  // 관심 분야 입력
   const handleInterestInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
     setInterestInput(value);
-
     if (value.trim() !== "") {
       const filtered = interestsList.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
@@ -42,10 +42,10 @@ export default function SignUpDetail({
     }
   };
 
+  // 기술 스택 입력
   const handleSkillsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSkillsInput(value);
-
     if (value.trim() !== "") {
       const filtered = techList.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
@@ -56,11 +56,12 @@ export default function SignUpDetail({
     }
   };
 
-  const handleDepartmentsInputChange = (
+  // 학과 입력
+  const handleDepartmentInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
-    onChangeDepartment(value);
+    setDepartmentInput(value);
     if (value.trim() !== "") {
       const filtered = departmentsList.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase())
@@ -71,31 +72,32 @@ export default function SignUpDetail({
     }
   };
 
-  const handleSelectInterest = (item: string) => {
-    if (!interest.includes(item)) {
+  const handleSelectInterest = (item: Item) => {
+    if (!interest.some((i) => i.id === item.id)) {
       onChangeInterest([...interest, item]);
     }
     setInterestInput("");
     setFilteredInterests([]);
   };
 
-  const handleSelectSkill = (item: string) => {
-    if (!skills.includes(item)) {
+  const handleSelectSkill = (item: Item) => {
+    if (!skills.some((i) => i.id === item.id)) {
       onChangeSkills([...skills, item]);
     }
     setSkillsInput("");
     setFilteredSkills([]);
   };
 
-  const handleSelectDepartment = (item: string) => {
+  const handleSelectDepartment = (item: Item) => {
     onChangeDepartment(item);
-    setFilteredDepartments([]); // 드롭다운 닫기
+    setDepartmentInput(item.name);
+    setFilteredDepartments([]);
   };
 
   const handleRemove = (
     index: number,
-    list: string[],
-    setList: (v: string[]) => void
+    list: Item[],
+    setList: (v: Item[]) => void
   ) => {
     setList(list.filter((_, i) => i !== index));
   };
@@ -107,6 +109,7 @@ export default function SignUpDetail({
         <S.Title>Welcome to WantIT-NEST</S.Title>
         <S.SigninTitle>회원가입</S.SigninTitle>
       </S.HeaderBox>
+
       <S.InputTitle>이름</S.InputTitle>
       <S.Input
         placeholder="이름을 입력해주세요"
@@ -114,21 +117,22 @@ export default function SignUpDetail({
         onChange={(e) => onChangeName(e.target.value)}
       />
       <S.SubText $isValid={!!name}>⚠ 실명으로 입력해주세요!</S.SubText>
+
       {selected === "재학생" && (
         <>
           <S.InputTitle>학과 검색</S.InputTitle>
           <S.InputWrapper>
             <S.Input
               placeholder="학과를 입력하세요"
-              value={department} // ✅ props department 사용
-              onChange={handleDepartmentsInputChange}
+              value={departmentInput}
+              onChange={handleDepartmentInputChange}
             />
             {filteredDepartments.length > 0 && (
               <S.Dropdown>
                 {filteredDepartments.map((item, idx) => (
                   <S.DropdownItem
                     key={idx}
-                    onClick={() => handleSelectDepartment(item.name)}
+                    onClick={() => handleSelectDepartment(item)}
                   >
                     {item.name}
                   </S.DropdownItem>
@@ -152,7 +156,7 @@ export default function SignUpDetail({
             {filteredInterests.map((item, idx) => (
               <S.DropdownItem
                 key={idx}
-                onClick={() => handleSelectInterest(item.name)}
+                onClick={() => handleSelectInterest(item)}
               >
                 {item.name}
               </S.DropdownItem>
@@ -160,11 +164,10 @@ export default function SignUpDetail({
           </S.Dropdown>
         )}
       </S.InputWrapper>
-
       <S.TagList>
         {interest.map((item, idx) => (
           <S.TagItem key={idx}>
-            {item}
+            {item.name}
             <S.TagRemoveButton
               onClick={() => handleRemove(idx, interest, onChangeInterest)}
             >
@@ -173,6 +176,7 @@ export default function SignUpDetail({
           </S.TagItem>
         ))}
       </S.TagList>
+
       {/* 기술 스택 */}
       <S.InputTitle>기술 스택</S.InputTitle>
       <S.InputWrapper>
@@ -184,21 +188,17 @@ export default function SignUpDetail({
         {filteredSkills.length > 0 && (
           <S.Dropdown>
             {filteredSkills.map((item, idx) => (
-              <S.DropdownItem
-                key={idx}
-                onClick={() => handleSelectSkill(item.name)}
-              >
+              <S.DropdownItem key={idx} onClick={() => handleSelectSkill(item)}>
                 {item.name}
               </S.DropdownItem>
             ))}
           </S.Dropdown>
         )}
       </S.InputWrapper>
-
       <S.TagList>
         {skills.map((item, idx) => (
           <S.TagItem key={idx}>
-            #{item}
+            #{item.name}
             <S.TagRemoveButton
               onClick={() => handleRemove(idx, skills, onChangeSkills)}
             >
@@ -207,6 +207,7 @@ export default function SignUpDetail({
           </S.TagItem>
         ))}
       </S.TagList>
+
       <S.ButtonRow>
         <S.LoginButton
           onClick={onPrev}
@@ -216,14 +217,6 @@ export default function SignUpDetail({
         </S.LoginButton>
         <S.LoginButton onClick={onSubmit}>회원가입</S.LoginButton>
       </S.ButtonRow>
-      <div className="flex justify-center">
-        <div className="flex items-center gap-1 text-sm text-gray-600">
-          <span>이미 계정이 있나요?</span>
-          <a href="/login" className="text-blue-500 hover:underline">
-            로그인 하기
-          </a>
-        </div>
-      </div>
     </S.LoginBox>
   );
 }
