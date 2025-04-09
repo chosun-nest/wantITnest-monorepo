@@ -1,6 +1,7 @@
 package com.virtukch.nest.tech_stack.service;
 
 import com.virtukch.nest.tech_stack.dto.TechStackResponseDto;
+import com.virtukch.nest.tech_stack.exception.TechStackNotFoundException;
 import com.virtukch.nest.tech_stack.model.TechStack;
 import com.virtukch.nest.tech_stack.repository.TechStackRepository;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class TechStackService {
+
     private final TechStackRepository techStackRepository;
 
     public List<TechStackResponseDto> findAll() {
@@ -19,6 +21,15 @@ public class TechStackService {
                 .techStackId(techStack.getTechStackId())
                 .techStackName(techStack.getTechStackName())
                 .build())
-            .collect(Collectors.toList());
+            .toList();
+    }
+
+    public TechStackResponseDto findById(Long techStackId) {
+        return techStackRepository.findById(techStackId)
+            .map(techStack -> TechStackResponseDto.builder()
+                .techStackId(techStack.getTechStackId())
+                .techStackName(techStack.getTechStackName())
+                .build())
+            .orElseThrow(() -> new TechStackNotFoundException("Tech Stack Not Found"));
     }
 }

@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberTechStackResponseDto {
 
+    private Long memberTechStackId;
+
     private Long memberId;
 
     private Long techStackId;
+
+    private String techStackName;
 }

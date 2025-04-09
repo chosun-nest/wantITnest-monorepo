@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberInterestResponseDto {
 
+    private Long memberInterestId;
+
     private Long memberId;
 
     private Long interestId;
+
+    private String interestName;
 }
