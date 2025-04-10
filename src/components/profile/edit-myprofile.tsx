@@ -5,7 +5,7 @@ export default function MyProfile() {
   const [profile, setProfile] = useState({
     name: "도레미",
     email: "domremi404@gmail.com",
-    major: "컴퓨터학부 20학번",
+    major: "컴퓨터학과 20학번",
     bio: "AI/Data 개발자가 되고 싶은 도레미 입니다.",
     interests: ["AI", "Data", "Web"],
     sns: ["https://github.com/", "https://linkedin.com/"],

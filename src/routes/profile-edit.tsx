@@ -15,15 +15,15 @@ export default function ProfileEdit() {
 return (
     <>
         <Navbar ref={navbarRef} />
-
         {/* 콘텐츠 전체 영역 */}
         <div className="px-8 bg-white min-h-screen" style={{ paddingTop: navHeight + 20 }}>
-        {/* 내 프로필 */}
+        {/* 내 프로필 변경 */}
         <div className="w-full px-4 mt-6">
-            <EditMyProfile />
-            <div className="w-full px-2 mt-6">
-                <EditMyAccount />
-            </div>
+            <EditMyProfile />            
+        </div>
+        {/* 계정 관리 */}
+        <div className="w-full px-4 mt-6">
+            <EditMyAccount />
         </div>
 
         </div>

@@ -20,7 +20,7 @@ export default function ProfileCard() {
       {/* 이름 및 전공 정보 */}
       <div className="flex items-center justify-left mt-2 gap-2">
         <h2 className="text-lg font-bold">도레미</h2>
-        <p className="text-gray-500">컴퓨터학부 20학번</p>
+        <p className="text-gray-500">컴퓨터학과 20학번</p>
       </div>
 
       {/* 한 줄 소개 */}
