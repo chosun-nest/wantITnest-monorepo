@@ -46,7 +46,9 @@ export default function GuestCard({ onEdit }: GuestCardProps) {
         </a>
       </div>
       <div className="flex justify-end gap-2 mt-5">
-        <button onClick={onEdit} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+        <button 
+        onClick={onEdit} 
+        className="px-4 py-2 bg-blue-500 text-white rounded-md">
           수정
         </button>
       </div>
