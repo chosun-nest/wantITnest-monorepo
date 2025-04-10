@@ -9,6 +9,8 @@ import { Item } from "../types/signup";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  // 디버그 모드 추가
+  const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [selected, setSelected] = useState<"재학생" | "일반">("재학생");
@@ -77,6 +79,11 @@ export default function SignUp() {
       alert("이메일 형식이 올바르지 않습니다.");
       return;
     }
+    if (isDebugMode) {
+      console.log("[디버그] 인증 스킵");
+      setIsEmailVerified(true);
+      return;
+    }
     try {
       await sendcode(email);
       setIsEmailVerified(false);
@@ -131,8 +138,9 @@ export default function SignUp() {
         interestIdList: interest.length > 0 ? interest.map((i) => i.id) : [],
         techStackIdList: skills.length > 0 ? skills.map((i) => i.id) : [],
       };
-
-      console.log("회원가입 payload:", payload);
+      if (isDebugMode) {
+        console.log("[디버그] 회원가입 payload:", payload);
+      }
       const res = await signup(payload);
 
       const { accessToken, refreshToken, memberId, email: userEmail } = res;
@@ -153,9 +161,28 @@ export default function SignUp() {
 
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
-
+  useEffect(() => {
+    if (isDebugMode) {
+      console.log("[디버그] 기본 입력 세팅 중");
+      setEmail("debug@example.com");
+      setPassword("Debug1234!");
+      setConfirmPassword("Debug1234!");
+      setName("디버그유저");
+    }
+  }, [isDebugMode]);
   return (
     <S.Container>
+      <S.ButtonRow>
+        <S.LoginButton
+          onClick={() => setIsDebugMode((prev) => !prev)}
+          style={{
+            background: isDebugMode ? "#4CAF50" : "#ccc",
+            color: "#fff",
+          }}
+        >
+          디버그 모드 {isDebugMode ? "ON" : "OFF"}
+        </S.LoginButton>
+      </S.ButtonRow>
       {step === 1 ? (
         <SignUpComponent
           selected={selected}
