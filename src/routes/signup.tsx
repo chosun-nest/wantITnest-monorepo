@@ -24,9 +24,9 @@ export default function SignUp() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   // 컴포넌트 values를 여기에 모아줌
   const [name, setName] = useState("");
-  const [department, setDepartment] = useState(""); // 재학생 전용
-  const [interest, setInterest] = useState<string[]>([]);
-  const [skills, setSkills] = useState<string[]>([]);
+  const [department, setDepartment] = useState<Item | null>(null);
+  const [interest, setInterest] = useState<Item[]>([]);
+  const [skills, setSkills] = useState<Item[]>([]);
 
   const [techList, setTechList] = useState<Item[]>([]);
   const [interestsList, setInterestsList] = useState<Item[]>([]);
@@ -121,11 +121,11 @@ export default function SignUp() {
       const payload = {
         email,
         password,
-        userType: selected,
-        name,
-        interest,
-        skills,
-        ...(selected === "재학생" && { department }),
+        memberName: name,
+        memberIsStudent: selected === "재학생",
+        departmentIdList: department ? [department.id] : [], // 없으면 빈 배열
+        interestIdList: interest.length > 0 ? interest.map((i) => i.id) : [],
+        techStackIdList: skills.length > 0 ? skills.map((i) => i.id) : [],
       };
 
       console.log(payload);
