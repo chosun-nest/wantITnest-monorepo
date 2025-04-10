@@ -8,7 +8,6 @@ export default function SignUpDetail({
   onSubmit,
   name,
   onChangeName,
-  department,
   onChangeDepartment,
   interest,
   onChangeInterest,

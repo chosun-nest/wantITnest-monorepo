@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as S from "../assets/styles/auth.styles";
 import SignUpComponent from "../components/auth/signup-component";
 import SignUpDetail from "../components/auth/signup-deatil";
@@ -9,6 +9,8 @@ import { Item } from "../types/signup";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  // 디버그 모드 추가
+  const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [selected, setSelected] = useState<"재학생" | "일반">("재학생");
@@ -22,7 +24,7 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  // 컴포넌트 values를 여기에 모아줌
+
   const [name, setName] = useState("");
   const [department, setDepartment] = useState<Item | null>(null);
   const [interest, setInterest] = useState<Item[]>([]);
@@ -33,38 +35,77 @@ export default function SignUp() {
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
+  useEffect(() => {
+    getItems();
+  }, []);
+
   const getItems = async () => {
     try {
       const techResponse = await getTech();
       const interestsResponse = await getInterests();
       const departmentsResponse = await getDepartments();
-      const techNames = techResponse.map(
-        (item: { techStackId: number; techStackName: string }) => ({
-          id: item.techStackId,
-          name: item.techStackName,
-        })
-      );
 
-      const interestsNames = interestsResponse.map(
-        (item: { interestId: number; interestName: string }) => ({
-          id: item.interestId,
-          name: item.interestName,
-        })
+      setTechList(
+        techResponse.map(
+          (item: { techStackId: number; techStackName: string }) => ({
+            id: item.techStackId,
+            name: item.techStackName,
+          })
+        )
       );
-
-      const departmentsNames = departmentsResponse.map(
-        (item: { departmentId: number; departmentName: string }) => ({
-          id: item.departmentId,
-          name: item.departmentName,
-        })
+      setInterestsList(
+        interestsResponse.map(
+          (item: { interestId: number; interestName: string }) => ({
+            id: item.interestId,
+            name: item.interestName,
+          })
+        )
       );
-
-      setTechList(techNames);
-      setInterestsList(interestsNames);
-      setDepartmentsList(departmentsNames);
-      console.log(techList, interestsList, departmentsList);
+      setDepartmentsList(
+        departmentsResponse.map(
+          (item: { departmentId: number; departmentName: string }) => ({
+            id: item.departmentId,
+            name: item.departmentName,
+          })
+        )
+      );
     } catch (e) {
-      console.log("아이템 불러오기 실패", e);
+      console.error("아이템 불러오기 실패:", e);
+    }
+  };
+
+  const handleSendCode = async () => {
+    if (!isEmailValid) {
+      alert("이메일 형식이 올바르지 않습니다.");
+      return;
+    }
+    if (isDebugMode) {
+      console.log("[디버그] 인증 스킵");
+      setIsEmailVerified(true);
+      return;
+    }
+    try {
+      await sendcode(email);
+      setIsEmailVerified(false);
+      setTimer(300);
+      if (intervalId) clearInterval(intervalId);
+
+      const newInterval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(newInterval);
+            setIntervalId(null);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      setIntervalId(newInterval);
+      alert("인증코드가 전송되었습니다!");
+    } catch (error) {
+      console.error("인증코드 전송 실패:", error);
+      alert("인증코드 전송에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -81,38 +122,8 @@ export default function SignUp() {
         setIsEmailVerified(false);
       }
     } catch (e) {
-      alert("오류 발생! 인증에 실패했습니다.");
-      console.error(e);
-    }
-  };
-
-  const handleSendCode = () => {
-    if (!isEmailValid) {
-      alert("이메일 형식이 올바르지 않습니다.");
-      return;
-    }
-    try {
-      // 중복 검사
-      setIsEmailVerified(false);
-      const data = sendcode(email);
-      console.log(data);
-      setTimer(300);
-      if (intervalId) clearInterval(intervalId);
-
-      const newInterval = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(newInterval);
-            setIntervalId(null);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      setIntervalId(newInterval);
-    } catch (e) {
-      console.log(e);
+      console.error("이메일 인증 실패:", e);
+      alert("이메일 인증 중 오류가 발생했습니다.");
     }
   };
 
@@ -123,37 +134,55 @@ export default function SignUp() {
         password,
         memberName: name,
         memberIsStudent: selected === "재학생",
-        departmentIdList: department ? [department.id] : [], // 없으면 빈 배열
+        departmentIdList: department ? [department.id] : [],
         interestIdList: interest.length > 0 ? interest.map((i) => i.id) : [],
         techStackIdList: skills.length > 0 ? skills.map((i) => i.id) : [],
       };
-
-      console.log(payload);
+      if (isDebugMode) {
+        console.log("[디버그] 회원가입 payload:", payload);
+      }
       const res = await signup(payload);
-      // 응답에서 정보 추출
-      const { accessToken, refreshToken, memberId, email: userEmail } = res;
 
-      // 로컬 스토리지에 저장
+      const { accessToken, refreshToken, memberId, email: userEmail } = res;
       localStorage.setItem("accesstoken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem(
         "user",
         JSON.stringify({ memberId, email: userEmail })
       );
+
       alert("회원가입이 완료되었습니다!");
-      console.log("가입한 사용자 ID:", res.userId);
       navigate("/login");
     } catch (error) {
       console.error("회원가입 실패:", error);
-      alert("회원가입에 실패했습니다.");
+      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
-
+  useEffect(() => {
+    if (isDebugMode) {
+      console.log("[디버그] 기본 입력 세팅 중");
+      setEmail("debug@example.com");
+      setPassword("Debug1234!");
+      setConfirmPassword("Debug1234!");
+      setName("디버그유저");
+    }
+  }, [isDebugMode]);
   return (
     <S.Container>
+      <S.ButtonRow>
+        <S.LoginButton
+          onClick={() => setIsDebugMode((prev) => !prev)}
+          style={{
+            background: isDebugMode ? "#4CAF50" : "#ccc",
+            color: "#fff",
+          }}
+        >
+          디버그 모드 {isDebugMode ? "ON" : "OFF"}
+        </S.LoginButton>
+      </S.ButtonRow>
       {step === 1 ? (
         <SignUpComponent
           selected={selected}
