@@ -1,29 +1,55 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GuestCard from "./profile-card-guest";
 import API from "../../api";
 
-interface ProfileCardProps {
-  profile: {
-    name: string;
-    major: string;
-    bio: string;
-    email: string;
-    profileImageUrl?: string;
-    interests?: string[];
-    sns?: string[];
-    techStacks?: string[];
-  };
-  onEdit: () => void;
+interface ProfileType {
+  name: string;
+  major: string;
+  bio: string;
+  email: string;
+  profileImageUrl?: string;
+  interests?: string[];
+  sns?: string[];
+  techStacks?: string[];
 }
 
-export default function ProfileCard({ profile, onEdit }: ProfileCardProps) {
+export default function ProfileCard() {
   const navigate = useNavigate();
-  
-  if (!profile || !profile.name || profile.email === "bimo972@chosun.ac.kr") {
-    return <GuestCard onEdit={onEdit} />;
-  }
+  const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("accesstoken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await API.get("/api/v1/members/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setProfile(res.data);
+      } catch (e) {
+        console.error("프로필 정보를 불러오지 못했습니다", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (loading || !profile) {
+    return (
+      <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">
+        <p className="text-gray-500 text-sm">🛜 불러오는 중...</p>
+      </div>
+    );
+  }
   return (
     <div className="w-80 p-4 border rounded-xl shadow-md bg-white">
       {/* 프로필 이미지 */}

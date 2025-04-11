@@ -1,16 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
 import Navbar from "../components/layout/navbar";
-import GuestCard from "../components/profile/profile-card-guest";
 import ProfileCard from "../components/profile/profile-card";
 
 export default function Profile() {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [navHeight, setNavHeight] = useState(0);
-  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   // Navbar 높이 계산
   useEffect(() => {
@@ -25,30 +22,15 @@ export default function Profile() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 사용자 정보 API 호출
+  // 로그인 여부 확인
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("accesstoken");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await axios.get("/api/v1/members/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setProfile(res.data);
-      } catch (err) {
-        console.error("프로필 정보를 불러오지 못했습니다", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
+    const token = localStorage.getItem("accesstoken");
+    if (!token) {
+      alert("로그인이 필요한 페이지입니다.");
+      window.location.href = "/login"; // 로그인 페이지로 이동
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   return (
@@ -64,14 +46,14 @@ export default function Profile() {
             <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">
               <p className="text-gray-500 text-sm">🛜 불러오는 중...</p>
             </div>
-          ) : profile && profile.name ? (
-            <ProfileCard profile={profile} onEdit={() => navigate("/profile-edit")} />
           ) : (
-            <GuestCard onEdit={() => navigate("/profile-edit")} />  /* 게스트 카드 사용 가능 */
-        )}
+            <ProfileCard />
+          )}
         </div>
 
-        <div className="flex-1 pl-8">{/* 나중에 히스토리, 채팅방 등 들어갈 자리 */}</div>
+        <div className="flex-1 pl-8">
+          {/* 나중에 히스토리, 채팅방 등 들어갈 자리 */}
+        </div>
       </div>
     </>
   );
