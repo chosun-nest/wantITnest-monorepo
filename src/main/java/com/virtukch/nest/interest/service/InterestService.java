@@ -1,6 +1,7 @@
 package com.virtukch.nest.interest.service;
 
 import com.virtukch.nest.interest.dto.InterestResponseDto;
+import com.virtukch.nest.interest.exception.InterestNotFoundException;
 import com.virtukch.nest.interest.repository.InterestRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,5 +20,14 @@ public class InterestService {
                 .interestName(interest.getInterestName())
                 .build())
             .toList();
+    }
+
+    public InterestResponseDto findById(long interestId) {
+        return interestRepository.findById(interestId)
+            .map(interest -> InterestResponseDto.builder()
+                .interestId(interest.getInterestId())
+                .interestName(interest.getInterestName())
+                .build())
+            .orElseThrow(() -> new InterestNotFoundException("Interest Not Found"));
     }
 }

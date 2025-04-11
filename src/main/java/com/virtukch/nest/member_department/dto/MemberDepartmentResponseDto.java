@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberDepartmentResponseDto {
 
+    private Long memberDepartmentId;
+
     private Long memberId;
 
     private Long departmentId;
