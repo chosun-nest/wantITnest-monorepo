@@ -1,3 +1,4 @@
+// 검색 + 선택 + API 연동
 import React, { useState, useEffect, useRef } from "react";
 import API from "../../api";
 import { getDepartments, getInterests, getTech } from "../../api/common/common";
@@ -24,10 +25,12 @@ export default function MyProfile() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [techList, setTechList] = useState<Item[]>([]);
 
-  const [newInterest, setNewInterest] = useState("");
-  const [newTech, setNewTech] = useState("");
-  const [filteredDepartments, setFilteredDepartments] = useState<Item[]>([]);
   const [departmentInput, setDepartmentInput] = useState("");
+  const [filteredDepartments, setFilteredDepartments] = useState<Item[]>([]);
+  const [newInterest, setNewInterest] = useState("");
+  const [filteredInterests, setFilteredInterests] = useState<Item[]>([]);
+  const [newTech, setNewTech] = useState("");
+  const [filteredTechs, setFilteredTechs] = useState<Item[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,65 +65,64 @@ export default function MyProfile() {
       getInterests(),
       getTech(),
     ]);
-    setDepartmentsList(deps.map((d: any) => ({ id: d.departmentId, name: d.departmentName })));
-    setInterestsList(ints.map((i: any) => ({ id: i.interestId, name: i.interestName })));
-    setTechList(techs.map((t: any) => ({ id: t.techStackId, name: t.techStackName })));
+    setDepartmentsList(deps.map((d: { departmentId: number; departmentName: string }) => ({
+      id: d.departmentId,
+      name: d.departmentName,
+    })));
+    
+    setInterestsList(ints.map((i: { interestId: number; interestName: string }) => ({
+      id: i.interestId,
+      name: i.interestName,
+    })));
+    
+    setTechList(techs.map((t: { techStackId: number; techStackName: string }) => ({
+      id: t.techStackId,
+      name: t.techStackName,
+    })));
+    
   };
 
   const handleChange = (field: string, value: string) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddInterest = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && newInterest.trim()) {
-      e.preventDefault();
-      setProfile((prev) => ({
-        ...prev,
-        interests: [...prev.interests, newInterest.trim()],
-      }));
-      setNewInterest("");
+  const handleInterestInputChange = (value: string) => {
+    setNewInterest(value);
+    if (!value.trim()) return setFilteredInterests([]);
+    const filtered = interestsList.filter((item) =>
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredInterests(filtered);
+  };
+
+  const handleSelectInterest = (item: Item) => {
+    if (!profile.interests.includes(item.name)) {
+      setProfile((prev) => ({ ...prev, interests: [...prev.interests, item.name] }));
     }
+    setNewInterest("");
+    setFilteredInterests([]);
   };
 
-  const handleDeleteInterest = (index: number) => {
-    setProfile((prev) => ({
-      ...prev,
-      interests: prev.interests.filter((_, i) => i !== index),
-    }));
+  const handleTechInputChange = (value: string) => {
+    setNewTech(value);
+    if (!value.trim()) return setFilteredTechs([]);
+    const filtered = techList.filter((item) =>
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredTechs(filtered);
   };
 
-  const handleAddTech = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && newTech.trim()) {
-      e.preventDefault();
-      setProfile((prev) => ({
-        ...prev,
-        techStacks: [...prev.techStacks, newTech.trim()],
-      }));
-      setNewTech("");
+  const handleSelectTech = (item: Item) => {
+    if (!profile.techStacks.includes(item.name)) {
+      setProfile((prev) => ({ ...prev, techStacks: [...prev.techStacks, item.name] }));
     }
-  };
-
-  const handleDeleteTech = (index: number) => {
-    setProfile((prev) => ({
-      ...prev,
-      techStacks: prev.techStacks.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfile((prev) => ({ ...prev, image: imageUrl }));
-    }
+    setNewTech("");
+    setFilteredTechs([]);
   };
 
   const handleDepartmentChange = (value: string) => {
     setDepartmentInput(value);
-    if (value.trim() === "") {
-      setFilteredDepartments([]);
-      return;
-    }
+    if (!value.trim()) return setFilteredDepartments([]);
     const filtered = departmentsList.filter((dep) =>
       dep.name.toLowerCase().includes(value.toLowerCase())
     );
@@ -151,9 +153,23 @@ export default function MyProfile() {
       alert("프로필이 저장되었습니다.");
       setIsEditing(false);
     } catch (e) {
-      console.error("프로필 저장 실패", e);
       alert("저장 중 오류가 발생했습니다.");
     }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setProfile((prev) => ({ ...prev, image: imageUrl }));
+    }
+  };
+
+  const handleDeleteItem = (field: "interests" | "techStacks", index: number) => {
+    setProfile((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
   };
 
   return (
@@ -162,9 +178,7 @@ export default function MyProfile() {
 
       {/* 이미지 */}
       <div className="flex items-start gap-4 mb-4">
-        <label htmlFor="user-image" className="w-28 text-sm font-semibold">
-          이미지
-        </label>
+        <label className="w-28 text-sm font-semibold">이미지</label>
         <div
           className="relative group cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
@@ -174,7 +188,6 @@ export default function MyProfile() {
             alt="프로필"
             className="w-24 h-24 rounded-lg object-cover group-hover:opacity-80 transition"
           />
-
           {isEditing && (
             <input
               id="user-image"
@@ -188,24 +201,14 @@ export default function MyProfile() {
         </div>
       </div>
 
-      {/* 이름, 이메일 */}
+      {/* 이름 / 이메일 */}
       <div className="flex items-center mb-4">
         <label className="w-28 text-sm font-semibold">이름</label>
-        <input
-          type="text"
-          value={profile.name}
-          disabled
-          className="flex-1 bg-gray-100 p-2 rounded"
-        />
+        <input value={profile.name} disabled className="flex-1 bg-gray-100 p-2 rounded" />
       </div>
       <div className="flex items-center mb-4">
         <label className="w-28 text-sm font-semibold">이메일</label>
-        <input
-          type="email"
-          value={profile.email}
-          disabled
-          className="flex-1 bg-gray-100 p-2 rounded"
-        />
+        <input value={profile.email} disabled className="flex-1 bg-gray-100 p-2 rounded" />
       </div>
 
       {/* 학과 */}
@@ -213,13 +216,12 @@ export default function MyProfile() {
         <label className="w-28 text-sm font-semibold mt-2">학과</label>
         <div className="flex-1">
           <input
-            type="text"
             value={departmentInput}
             onChange={(e) => handleDepartmentChange(e.target.value)}
             disabled={!isEditing}
-            className="block w-full p-2 border rounded"
+            className="block w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
           />
-          {filteredDepartments.length > 0 && (
+          {isEditing && filteredDepartments.length > 0 && (
             <ul className="border mt-1 rounded max-h-40 overflow-y-auto">
               {filteredDepartments.map((item) => (
                 <li
@@ -242,7 +244,7 @@ export default function MyProfile() {
           value={profile.bio}
           onChange={(e) => handleChange("bio", e.target.value)}
           disabled={!isEditing}
-          className="flex-1 p-2 rounded border min-h-[80px]"
+          className="flex-1 p-2 rounded border min-h-[80px]  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
         />
       </div>
 
@@ -251,27 +253,33 @@ export default function MyProfile() {
         <label className="w-28 text-sm font-semibold mt-2">관심분야</label>
         <div className="flex-1">
           {isEditing && (
-            <input
-              type="text"
-              placeholder="관심분야 입력 후 Enter"
-              value={newInterest}
-              onChange={(e) => setNewInterest(e.target.value)}
-              onKeyDown={handleAddInterest}
-              className="mt-2 w-full p-2 border rounded mb-2"
-            />
+            <>
+              <input
+                value={newInterest}
+                onChange={(e) => handleInterestInputChange(e.target.value)}
+                placeholder="ex) 백엔드, AI"
+                className="mt-2 w-full p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
+              />
+              {filteredInterests.length > 0 && (
+                <ul className="border mt-1 rounded max-h-40 overflow-y-auto">
+                  {filteredInterests.map((item) => (
+                    <li
+                      key={item.id}
+                      onClick={() => handleSelectInterest(item)}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mt-2">
             {profile.interests.map((tag, i) => (
-              <span
-                key={i}
-                className="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-              >
+              <span key={i} className="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-1">
                 #{tag}
-                {isEditing && (
-                  <button onClick={() => handleDeleteInterest(i)} className="text-red-500">
-                    ×
-                  </button>
-                )}
+                {isEditing && <button onClick={() => handleDeleteItem("interests", i)} className="text-red-500">×</button>}
               </span>
             ))}
           </div>
@@ -283,82 +291,69 @@ export default function MyProfile() {
         <label className="w-28 text-sm font-semibold mt-2">기술 스택</label>
         <div className="flex-1">
           {isEditing && (
-            <input
-              type="text"
-              placeholder="기술 스택 입력 후 Enter"
-              value={newTech}
-              onChange={(e) => setNewTech(e.target.value)}
-              onKeyDown={handleAddTech}
-              className="mt-2 w-full p-2 border rounded mb-2"
-            />
+            <>
+              <input
+                value={newTech}
+                onChange={(e) => handleTechInputChange(e.target.value)}
+                placeholder="ex) React, TypeScript"
+                className="mt-2 w-full p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
+              />
+              {filteredTechs.length > 0 && (
+                <ul className="border mt-1 rounded max-h-40 overflow-y-auto">
+                  {filteredTechs.map((item) => (
+                    <li
+                      key={item.id}
+                      onClick={() => handleSelectTech(item)}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mt-2">
             {profile.techStacks.map((tag, i) => (
-              <span
-                key={i}
-                className="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-              >
+              <span key={i} className="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-1">
                 #{tag}
-                {isEditing && (
-                  <button onClick={() => handleDeleteTech(i)} className="text-red-500">
-                    ×
-                  </button>
-                )}
+                {isEditing && <button onClick={() => handleDeleteItem("techStacks", i)} className="text-red-500">×</button>}
               </span>
             ))}
           </div>
         </div>
       </div>
 
-      {/* SNS 링크 */}
+      {/* SNS */}
       <div className="flex items-start mb-4">
         <label className="w-28 text-sm font-semibold mt-2">SNS 링크</label>
         <div className="flex-1">
           {isEditing ? (
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-20 text-sm font-semibold">Github</span>
-                <input
-                  type="text"
-                  value={profile.sns[0]}
-                  onChange={(e) => {
-                    const newSns = [...profile.sns];
-                    newSns[0] = e.target.value;
-                    setProfile({ ...profile, sns: newSns });
-                  }}
-                  className="flex-1 p-2 border rounded"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-20 text-sm font-semibold">LinkedIn</span>
-                <input
-                  type="text"
-                  value={profile.sns[1]}
-                  onChange={(e) => {
-                    const newSns = [...profile.sns];
-                    newSns[1] = e.target.value;
-                    setProfile({ ...profile, sns: newSns });
-                  }}
-                  className="flex-1 p-2 border rounded"
-                />
-              </div>
+              {['Github', 'LinkedIn'].map((label, i) => (
+                <div className="flex items-center gap-2" key={i}>
+                  <span className="w-20 text-sm font-semibold">{label}</span>
+                  <input
+                    type="text"
+                    value={profile.sns[i]}
+                    onChange={(e) => {
+                      const snsCopy = [...profile.sns];
+                      snsCopy[i] = e.target.value;
+                      setProfile({ ...profile, sns: snsCopy });
+                    }}
+                    className="flex-1 p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
+                  />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="flex items-center gap-4 mt-2">
-              <a href={profile.sns[0]} target="_blank" rel="noreferrer">
-                <img
-                  src="/assets/images/github-logo.png"
-                  alt="GitHub"
-                  className="w-8 h-8 hover:opacity-80"
-                />
-              </a>
-              <a href={profile.sns[1]} target="_blank" rel="noreferrer">
-                <img
-                  src="/assets/images/LinkedIn-logo.png"
-                  alt="LinkedIn"
-                  className="w-9 h-8 hover:opacity-80"
-                />
-              </a>
+              {profile.sns[0] && <a href={profile.sns[0]} target="_blank" rel="noreferrer">
+                <img src="/assets/images/github-logo.png" alt="GitHub" className="w-8 h-8 hover:opacity-80" />
+              </a>}
+              {profile.sns[1] && <a href={profile.sns[1]} target="_blank" rel="noreferrer">
+                <img src="/assets/images/LinkedIn-logo.png" alt="LinkedIn" className="w-9 h-8 hover:opacity-80" />
+              </a>}
             </div>
           )}
         </div>
@@ -368,26 +363,11 @@ export default function MyProfile() {
       <div className="text-right">
         {isEditing ? (
           <>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="px-4 py-2 mr-2 rounded border"
-            >
-              취소
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              저장
-            </button>
+            <button onClick={() => setIsEditing(false)} className="px-4 py-2 mr-2 rounded border">취소</button>
+            <button onClick={handleSave} className="px-4 py-2 bg-blue-500 text-white rounded">저장</button>
           </>
         ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            설정
-          </button>
+          <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-blue-500 text-white rounded">설정</button>
         )}
       </div>
     </div>
