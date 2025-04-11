@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-//import { verifyPassword, updatePassword } from "../../api";  //api에서 정보 가져오기
+import API from "../../api";
 
 export default function AccountPassword() {
   const [passwords, setPasswords] = useState({
@@ -8,7 +8,6 @@ export default function AccountPassword() {
     confirm: "",
   });
 
-  const getMaskedPassword = (pw: string) => "*".repeat(pw.length);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordEditing, setPasswordEditing] = useState(false);
   const [isPasswordSaved, setIsPasswordSaved] = useState(false);
@@ -19,6 +18,32 @@ export default function AccountPassword() {
   const hasNoRepeatedChars = !/(.)\1\1/.test(passwords.new);
   const isPasswordValid =
     hasTwoCharTypes && isLengthValid && hasNoRepeatedChars && passwords.new === passwords.confirm;
+
+  const handleVerifyAndUpdate = async () => {
+    try {
+      await API.post("/api/v1/members/check-password", {
+        password: passwords.current,
+      });
+      setIsCurrentPwVerified(true);
+
+      await API.patch("/api/v1/members/password", {
+        currentPassword: passwords.current,
+        newPassword: passwords.new,
+      });
+
+      alert("비밀번호가 성공적으로 변경되었습니다.");
+      setPasswordEditing(false);
+      setIsPasswordSaved(true);
+    } catch (err: any) {
+      console.error("비밀번호 변경 실패:", err);
+      alert(
+        err.response?.status === 401
+        ? "현재 비밀번호가 일치하지 않습니다."
+        : "비밀번호 변경 중 오류가 발생했습니다."
+      );
+      setIsCurrentPwVerified(false);
+    }
+  };
 
   return (
     <div className="mb-8">
@@ -89,33 +114,12 @@ export default function AccountPassword() {
             >
               취소
             </button>
-            {/* <button
-              onClick={async () => {
-                try {
-                  await verifyPassword(passwords.current);
-                  setIsCurrentPwVerified(true);
-                  await updatePassword({
-                    currentPassword: passwords.current,
-                    newPassword: passwords.new,
-                  });
-                  alert("비밀번호가 성공적으로 변경되었습니다.");
-                  setPasswordEditing(false);
-                  setIsPasswordSaved(true);
-                } catch (err: any) {
-                  console.error("비밀번호 변경 실패:", err);
-                  alert(
-                    err.response?.status === 401
-                      ? "현재 비밀번호가 일치하지 않습니다."
-                      : "비밀번호 변경 중 오류가 발생했습니다."
-                  );
-                  setIsCurrentPwVerified(false);
-                }
-              }}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-              disabled={!isPasswordValid}
+            <button
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+            disabled={!isPasswordValid}
             >
-              저장          // 현재 비밀번호가 일치하면 저장 버튼이 뜸.
-            </button> */}
+            저장
+            </button>
           </>
         ) : (
           <button
