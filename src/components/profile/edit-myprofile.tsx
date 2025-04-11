@@ -13,10 +13,10 @@ export default function MyProfile() {
     name: "",
     email: "",
     major: "",
-    bio: "",  // 한 줄 소개
-    interests: [] as string[], //["AI", "Data", "Web"],
-    sns: ["", ""], //["https://github.com/", "https://linkedin.com/"],
-    image: "",    //"/assets/images/user.png",
+    bio: "",
+    interests: [] as string[],
+    sns: ["", ""],
+    image: "",
     techStacks: [] as string[],
   });
 
@@ -175,23 +175,20 @@ export default function MyProfile() {
             className="w-24 h-24 rounded-lg object-cover group-hover:opacity-80 transition"
           />
 
-          {/* 이미지 클릭하면 로컬에서 이미지 불러올 수 있음 */}
           {isEditing && (
-            <>
-              <input
-                id="user-image"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-              />
-            </>
+            <input
+              id="user-image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+            />
           )}
         </div>
       </div>
 
-      {/* 이름 / 이메일 (고정된 항목) */}
+      {/* 이름, 이메일 */}
       <div className="flex items-center mb-4">
         <label className="w-28 text-sm font-semibold">이름</label>
         <input
@@ -201,7 +198,6 @@ export default function MyProfile() {
           className="flex-1 bg-gray-100 p-2 rounded"
         />
       </div>
-
       <div className="flex items-center mb-4">
         <label className="w-28 text-sm font-semibold">이메일</label>
         <input
@@ -239,21 +235,31 @@ export default function MyProfile() {
         </div>
       </div>
 
+      {/* 자기소개 */}
+      <div className="flex items-start mb-4">
+        <label className="w-28 text-sm font-semibold mt-2">자기소개</label>
+        <textarea
+          value={profile.bio}
+          onChange={(e) => handleChange("bio", e.target.value)}
+          disabled={!isEditing}
+          className="flex-1 p-2 rounded border min-h-[80px]"
+        />
+      </div>
 
       {/* 관심분야 */}
       <div className="flex items-start mb-4">
         <label className="w-28 text-sm font-semibold mt-2">관심분야</label>
         <div className="flex-1">
           {isEditing && (
-              <input
-                type="text"
-                placeholder="관심분야 입력 후 Enter"
-                value={newInterest}
-                onChange={(e) => setNewInterest(e.target.value)}
-                onKeyDown={handleAddInterest}
-                className="mt-2 w-full p-2 border rounded mb-2"
-              />
-            )}
+            <input
+              type="text"
+              placeholder="관심분야 입력 후 Enter"
+              value={newInterest}
+              onChange={(e) => setNewInterest(e.target.value)}
+              onKeyDown={handleAddInterest}
+              className="mt-2 w-full p-2 border rounded mb-2"
+            />
+          )}
           <div className="flex flex-wrap gap-2">
             {profile.interests.map((tag, i) => (
               <span
@@ -262,10 +268,7 @@ export default function MyProfile() {
               >
                 #{tag}
                 {isEditing && (
-                  <button
-                    onClick={() => handleDeleteInterest(i)}
-                    className="text-red-500"
-                  >
+                  <button onClick={() => handleDeleteInterest(i)} className="text-red-500">
                     ×
                   </button>
                 )}
@@ -280,15 +283,15 @@ export default function MyProfile() {
         <label className="w-28 text-sm font-semibold mt-2">기술 스택</label>
         <div className="flex-1">
           {isEditing && (
-              <input
-                type="text"
-                placeholder="기술 스택 입력 후 Enter"
-                value={newTech}
-                onChange={(e) => setNewTech(e.target.value)}
-                onKeyDown={handleAddTech}
-                className="mt-2 w-full p-2 border rounded mb-2"
-              />
-            )}
+            <input
+              type="text"
+              placeholder="기술 스택 입력 후 Enter"
+              value={newTech}
+              onChange={(e) => setNewTech(e.target.value)}
+              onKeyDown={handleAddTech}
+              className="mt-2 w-full p-2 border rounded mb-2"
+            />
+          )}
           <div className="flex flex-wrap gap-2">
             {profile.techStacks.map((tag, i) => (
               <span
@@ -297,10 +300,7 @@ export default function MyProfile() {
               >
                 #{tag}
                 {isEditing && (
-                  <button
-                    onClick={() => handleDeleteTech(i)}
-                    className="text-red-500"
-                  >
+                  <button onClick={() => handleDeleteTech(i)} className="text-red-500">
                     ×
                   </button>
                 )}
@@ -310,7 +310,61 @@ export default function MyProfile() {
         </div>
       </div>
 
-      {/* 버튼 영역 */}
+      {/* SNS 링크 */}
+      <div className="flex items-start mb-4">
+        <label className="w-28 text-sm font-semibold mt-2">SNS 링크</label>
+        <div className="flex-1">
+          {isEditing ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-20 text-sm font-semibold">Github</span>
+                <input
+                  type="text"
+                  value={profile.sns[0]}
+                  onChange={(e) => {
+                    const newSns = [...profile.sns];
+                    newSns[0] = e.target.value;
+                    setProfile({ ...profile, sns: newSns });
+                  }}
+                  className="flex-1 p-2 border rounded"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-20 text-sm font-semibold">LinkedIn</span>
+                <input
+                  type="text"
+                  value={profile.sns[1]}
+                  onChange={(e) => {
+                    const newSns = [...profile.sns];
+                    newSns[1] = e.target.value;
+                    setProfile({ ...profile, sns: newSns });
+                  }}
+                  className="flex-1 p-2 border rounded"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4 mt-2">
+              <a href={profile.sns[0]} target="_blank" rel="noreferrer">
+                <img
+                  src="/assets/images/github-logo.png"
+                  alt="GitHub"
+                  className="w-8 h-8 hover:opacity-80"
+                />
+              </a>
+              <a href={profile.sns[1]} target="_blank" rel="noreferrer">
+                <img
+                  src="/assets/images/LinkedIn-logo.png"
+                  alt="LinkedIn"
+                  className="w-9 h-8 hover:opacity-80"
+                />
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 버튼 */}
       <div className="text-right">
         {isEditing ? (
           <>
