@@ -67,7 +67,7 @@ export default function Profile() {
           ) : profile && profile.name ? (
             <ProfileCard profile={profile} onEdit={() => navigate("/profile-edit")} />
           ) : (
-            <GuestCard onEdit={() => navigate("/onEdit")} />  /* 게스트 카드 사용 가능 */
+            <GuestCard onEdit={() => navigate("/profile-edit")} />  /* 게스트 카드 사용 가능 */
         )}
         </div>
 

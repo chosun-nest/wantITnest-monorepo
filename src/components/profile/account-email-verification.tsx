@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { sendcode, verifycode } from "../../api/auth/auth";
+import API from "../../api";
 
 export default function AccountStudentEmail() {
   const [isStudentMailEditing, setStudentMailEditing] = useState(false);
@@ -12,22 +13,7 @@ export default function AccountStudentEmail() {
   const formatTime = (time: number) => `${Math.floor(time / 60)}:${String(time % 60).padStart(2, "0")}`;
 
   useEffect(() => {
-    if (studentTimer === 0 && studentIntervalId) {
-      clearInterval(studentIntervalId);
-      setStudentIntervalId(null);
-    }
-  }, [studentTimer, studentIntervalId]);
-
-  const handleSendStudentCode = () => {
-    if (!studentEmail.includes("@chosun.ac.kr")) {
-      alert("조선대 이메일만 인증할 수 있어요.");
-      return;
-    }
-    try {
-      setIsStudentEmailVerified(false);
-      sendcode(studentEmail);
-      setStudentTimer(300);
-      if (studentIntervalId) clearInterval(studentIntervalId);
+    if (studentTimer > 0 && !studentIntervalId) {
       const newInterval = setInterval(() => {
         setStudentTimer((prev) => {
           if (prev <= 1) {
@@ -39,10 +25,24 @@ export default function AccountStudentEmail() {
         });
       }, 1000);
       setStudentIntervalId(newInterval);
+    }
+  }, [studentTimer]);
+  
+  const handleSendStudentCode = async () => {
+    if (!studentEmail.includes("@chosun.ac.kr")) {
+      alert("조선대 이메일만 인증할 수 있어요.");
+      return;
+    }
+    try {
+      await sendcode(studentEmail);
+      setIsStudentEmailVerified(false);
+      if (studentIntervalId) clearInterval(studentIntervalId);
+      setStudentTimer(300); // 타이머 시작은 useEffect에서 처리
     } catch (e) {
       console.error("인증코드 전송 실패", e);
+      alert("인증코드 전송 실패");
     }
-  };
+  };  
 
   const handleVerifyStudentCode = async () => {
     try {
@@ -65,6 +65,13 @@ export default function AccountStudentEmail() {
         alert("이메일 인증이 완료되지 않았습니다.");
         return;
       }
+      const token = localStorage.getItem("accesstoken");
+      if (!token) return;
+      await API.patch(
+        "/api/v1/members/student-email",
+        { studentEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       alert("이메일이 저장되었습니다!");
       setStudentMailEditing(false);
     } catch (e) {
@@ -82,7 +89,7 @@ export default function AccountStudentEmail() {
             type="text"
             value={studentEmail}
             disabled
-            className="flex-1 bg-gray-100 p-2 rounded"
+            className="flex-1 bg-gray-100 p-2 rounded "
           />
         )}
       </div>
@@ -92,7 +99,7 @@ export default function AccountStudentEmail() {
           <div className="flex items-center mb-4">
             <label className="w-36 text-sm font-semibold">학교 이메일</label>
             <input
-              className="flex-1 border p-2 rounded"
+              className="flex-1 border p-2 rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
               placeholder="example@chosun.ac.kr"
               value={studentEmail}
               onChange={(e) => setStudentEmail(e.target.value)}
@@ -103,7 +110,7 @@ export default function AccountStudentEmail() {
           <div className="flex items-center mb-4 relative">
             <label className="w-36 text-sm font-semibold">인증번호</label>
             <input
-              className="flex-1 border p-2 rounded pr-16"
+              className="flex-1 border p-2 rounded pr-16  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
               placeholder="인증번호 입력"
               value={studentAuthCode}
               onChange={(e) => setStudentAuthCode(e.target.value)}
@@ -168,9 +175,7 @@ export default function AccountStudentEmail() {
           </>
         ) : (
           <button
-            onClick={() => {
-              setStudentMailEditing(true);
-            }}
+            onClick={() => setStudentMailEditing(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded"
           >
             설정

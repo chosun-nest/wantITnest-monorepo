@@ -76,7 +76,7 @@ export default function AccountPassword() {
               type={isPasswordVisible ? "text" : "password"}
               value={passwords.new}
               onChange={(e) => setPasswords((prev) => ({ ...prev, new: e.target.value }))}
-              className="flex-1 p-2 border rounded"
+              className="flex-1 p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
             />
           </div>
           <ul className="text-xs ml-36 mb-4 space-y-1">
@@ -91,7 +91,7 @@ export default function AccountPassword() {
               type={isPasswordVisible ? "text" : "password"}
               value={passwords.confirm}
               onChange={(e) => setPasswords((prev) => ({ ...prev, confirm: e.target.value }))}
-              className="flex-1 p-2 border rounded"
+              className="flex-1 p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
             />
           </div>
           <p className="text-xs text-gray-500 ml-36 mb-4">
