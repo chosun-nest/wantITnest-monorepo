@@ -8,7 +8,7 @@ export default function ProfileEdit() {
     const [navHeight, setNavHeight] = useState(0);
 
     useEffect(() => {
-        if (navbarRef.current) {
+        if (navbarRef.current) {      
             setNavHeight(navbarRef.current.offsetHeight);
         }
     }, []);
