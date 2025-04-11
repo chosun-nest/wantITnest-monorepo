@@ -1,5 +1,6 @@
 package com.virtukch.nest.tag.service;
 
+import com.virtukch.nest.post_tag.repository.PostTagRepository;
 import com.virtukch.nest.tag.dto.TagListResponseDto;
 import com.virtukch.nest.tag.dto.TagResponseDto;
 import com.virtukch.nest.tag.exception.TagNotFoundException;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class TagService {
 
     private final TagRepository tagRepository;
+    private final PostTagRepository postTagRepository;
 
     @Transactional(readOnly = true)
     public TagListResponseDto getAllTags() {
@@ -26,15 +28,16 @@ public class TagService {
         List<Tag> tags = tagRepository.findAll();
         log.info("[TagService] 조회된 태그 수: {}", tags.size());
 
-        List<TagResponseDto> tagResponseDtos = tags.stream()
+        List<TagResponseDto> tagSummaries = tags.stream()
                 .map(tag -> TagResponseDto.builder()
                         .tagId(tag.getId())
                         .tagName(tag.getName())
-                        .postCount(tag.getPostTags().size()).build()
+                        .postCount(postTagRepository.findAllByTagId(tag.getId()).size())
+                        .build()
                 ).toList();
 
         return TagListResponseDto.builder()
-                .tags(tagResponseDtos)
+                .tags(tagSummaries)
                 .tagCount(tags.size())
                 .build();
     }

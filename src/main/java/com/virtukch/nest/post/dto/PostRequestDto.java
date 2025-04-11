@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 public class PostRequestDto {
-    @NotBlank
+    @NotBlank(message = "게시글 제목은 비어 있을 수 없습니다.")
     private String title;
     private String content;
     private List<String> tags;

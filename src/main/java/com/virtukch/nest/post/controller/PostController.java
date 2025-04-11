@@ -1,7 +1,6 @@
 package com.virtukch.nest.post.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.PostDetailResponseDto;
 import com.virtukch.nest.post.dto.PostListResponseDto;
 import com.virtukch.nest.post.dto.PostRequestDto;
@@ -10,6 +9,7 @@ import com.virtukch.nest.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +39,10 @@ public class PostController {
     )
     @PostMapping("/new")
     public ResponseEntity<PostResponseDto> createPost(@AuthenticationPrincipal CustomUserDetails user,
-                                                      @RequestBody PostRequestDto requestDto) {
-        Member member = user.getMember();
-        log.info("[게시글 작성 요청] memberId={}", member.getMemberId());
-        PostResponseDto responseDto = postService.createPost(member, requestDto);
+                                                      @Valid @RequestBody PostRequestDto requestDto) {
+        Long memberId = user.getMember().getMemberId();
+        log.info("[게시글 작성 요청] memberId={}", memberId);
+        PostResponseDto responseDto = postService.createPost(memberId, requestDto);
         return ResponseEntity
                 .created(URI.create("/api/v1/posts/" + responseDto.getPostId()))
                 .body(responseDto);
@@ -64,7 +64,7 @@ public class PostController {
             description = """
                     게시글 목록을 조회합니다.
                     - 태그 필터링을 하지 않으면 전체 게시글을 반환합니다.
-                    - 태그를 필터링하려면 ?tags=JAVA&tags=SPRING 와 같이 쿼리 파라미터로 전달하세요.
+                    - 태그를 필터링하려면 `?tags=JAVA&tags=SPRING`과 같이 쿼리 파라미터로 전달하세요.
                     """
     )
     @GetMapping
@@ -101,7 +101,7 @@ public class PostController {
     @PatchMapping("/update/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(@AuthenticationPrincipal CustomUserDetails user,
                                                       @PathVariable Long postId,
-                                                      @RequestBody PostRequestDto requestDto) {
+                                                      @Valid @RequestBody PostRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 수정 요청] postId={}, memberId={}", postId, memberId);
         PostResponseDto responseDto = postService.updatePost(postId, memberId, requestDto);

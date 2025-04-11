@@ -1,5 +1,6 @@
 package com.virtukch.nest.post.dto.converter;
 
+import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.model.Post;
 
@@ -28,33 +29,18 @@ public class PostDtoConverter {
                 .build();
     }
 
-    public static PostSummaryDto toSummaryDto(Post post) {
+    public static PostSummaryDto toSummaryDto(Post post, String memberName, List<String> tagNames) {
         return PostSummaryDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .previewContent(generatePreview(post.getContent()))
-                .tags(extractTagNames(post))
-                .authorName(post.getMember().getMemberName())
+                .tags(tagNames)
+                .authorName(memberName)
                 .viewCount(post.getViewCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .build();
     }
 
-    public static PostDetailResponseDto toDetailResponseDto(Post post) {
-        return PostDetailResponseDto.builder()
-                .postId(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .tags(extractTagNames(post))
-                .author(AuthorDto.builder()
-                        .id(post.getMember().getMemberId())
-                        .name(post.getMember().getMemberName())
-                        .build())
-                .viewCount(post.getViewCount())
-                .createdAt(timeFormat(post.getCreatedAt()))
-                .updatedAt(timeFormat(post.getUpdatedAt()))
-                .build();
-    }
 
     public static PostListResponseDto toListResponseDto(List<PostSummaryDto> summaries) {
         return PostListResponseDto.builder()
@@ -63,10 +49,20 @@ public class PostDtoConverter {
                 .build();
     }
 
-
-
-    private static List<String> extractTagNames(Post post) {
-        return post.getPostTags().stream().map(pt -> pt.getTag().getName()).toList();
+    public static PostDetailResponseDto toDetailResponseDto(Post post, Member member, List<String> tagNames) {
+        return PostDetailResponseDto.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .tags(tagNames)
+                .author(AuthorDto.builder()
+                        .id(member.getMemberId())
+                        .name(member.getMemberName())
+                        .build())
+                .viewCount(post.getViewCount())
+                .createdAt(timeFormat(post.getCreatedAt()))
+                .updatedAt(timeFormat(post.getUpdatedAt()))
+                .build();
     }
 
     private static String timeFormat(LocalDateTime dateTime) {
