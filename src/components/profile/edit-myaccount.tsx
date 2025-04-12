@@ -1,5 +1,5 @@
-import AccountPassword from "./account-password";
-import AccountEmailVerification from "./account-email-verification";
+import AccountPassword from "./edit-myaccount-components/password";
+import AccountEmailVerification from "./edit-myaccount-components/email-verification";
 import Withdraw from "./withdraw";
 
 export default function EditMyAccount() {
@@ -13,6 +13,7 @@ export default function EditMyAccount() {
       {/* 재학생 이메일 인증하기 */}
       <AccountEmailVerification />
 
+      {/* 탈퇴하기 */}
       <div className="border-t mt-12 pt-8">
         <Withdraw />
       </div>

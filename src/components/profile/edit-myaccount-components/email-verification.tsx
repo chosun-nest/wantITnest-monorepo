@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { sendcode, verifycode } from "../../api/auth/auth";
-import API from "../../api";
+import { sendcode, verifycode } from "../../../api/auth/auth";
+import API from "../../../api";
 
 export default function AccountStudentEmail() {
   const [isStudentMailEditing, setStudentMailEditing] = useState(false);

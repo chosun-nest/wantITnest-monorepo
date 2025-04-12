@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import API from "../../api";
 
 interface ProfileType {
+  image: string;  //api/v1/members/me에 이미지 컬럼 추가 시 확인하기
   name: string;
+  email: string;
   major: string;
   bio: string;
-  email: string;
-  profileImageUrl?: string;
-  interests?: string[];
-  sns?: string[];
-  techStacks?: string[];
+  interests: string[];
+  techStacks: string[];
+  sns: string[];
 }
 
 export default function ProfileCard() {
@@ -21,25 +21,36 @@ export default function ProfileCard() {
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("accesstoken");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+      if (!token) return;
 
       try {
         const res = await API.get("/api/v1/members/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setProfile(res.data);
-      } catch (e) {
-        console.error("프로필 정보를 불러오지 못했습니다", e);
+
+        const data = res.data;
+        
+        setProfile({
+          image: data.memberImage,  //api/v1/members/me에 이미지 컬럼 추가 시 확인하기
+          name: data.memberName,
+          email: data.memberEmail,
+          major: data.memberDepartmentResponseDtoList[0]?.departmentName || "",
+          bio: data.bio || "",
+          interests: data.memberInterestResponseDtoList.map((i:any) => i.interestName),
+          techStacks: data.memberTechStackResponseDtoList.map((t:any) => t.techStackName),
+          sns: [
+            data.memberSnsUrl1,
+            data.memberSnsUrl2,
+            data.memberSnsUrl3,
+            data.memberSnsUrl4,
+          ].filter(Boolean)
+        });        
+      } catch (err) {
+        console.error("프로필 정보를 불러오지 못했습니다", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -55,7 +66,7 @@ export default function ProfileCard() {
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-7">
         <img
-          src={profile.profileImageUrl || "/assets/images/user.png"}
+          src={profile.image || "/assets/images/user.png"}
           alt="Profile"
           className="w-30 h-30 rounded-full border"
         />
@@ -89,24 +100,40 @@ export default function ProfileCard() {
       </div>
 
       {/* SNS 아이콘 */}
-      <div className="flex justify-center items-center gap-10 mt-10">
-        {profile.sns?.[0] && (
+      <div className="flex justify-center items-center gap-10 mt-10">  
+      {/* Github */}
+      {profile.sns?.[0] ? (
           <a href={profile.sns[0]} target="_blank" rel="noreferrer">
             <img
               src="/assets/images/github-logo.png"
               alt="GitHub"
-              className="w-12 h-12 hover:opacity-80"
+              className="w-12 h-12 hover:opacity-80 cursor-pointer"
             />
           </a>
+        ) : (
+          <img
+            src="/assets/images/github-logo.png"
+            alt="Github"
+            className="w-12 h-12 hover:opacity-80 cursor-pointer"
+            onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
+          />
         )}
-        {profile.sns?.[1] && (
+        {/* LinkedIn */}
+        {profile.sns?.[1] ? (
           <a href={profile.sns[1]} target="_blank" rel="noreferrer">
             <img
               src="/assets/images/LinkedIn-logo.png"
               alt="LinkedIn"
-              className="w-13 h-12 hover:opacity-80"
+              className="w-12 h-12 hover:opacity-80 cursor-pointer"
             />
           </a>
+        ) : (
+          <img
+          src="/assets/images/LinkedIn-logo.png"
+          alt="LinkedIn"
+          className="w-12 h-12 hover:opacity-80 cursor-pointer"
+          onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
+          />
         )}
       </div>
 

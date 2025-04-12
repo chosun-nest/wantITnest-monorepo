@@ -23,27 +23,27 @@ export default function Profile() {
   }, []);
 
   // 로그인 여부 확인
-  useEffect(() => {
-    const token = localStorage.getItem("accesstoken");
-    if (!token) {
-      alert("로그인이 필요한 페이지입니다.");
-      window.location.href = "/login"; // 로그인 페이지로 이동
-    } else {
-      setLoading(false);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("accesstoken");
+  //   if (!token) {
+  //     alert("로그인이 필요한 페이지입니다.");
+  //     window.location.href = "/login"; // 로그인 페이지로 이동
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // }, []);
 
   return (
     <>
       <Navbar ref={navbarRef} />
 
       <div
-        className="px-10 min-h-screen bg-white flex"
-        style={{ paddingTop: `${navHeight}px` }}
+        className="px-15 min-h-screen bg-white flex"
+        style={{ paddingTop: navHeight + 20 }}
       >
         <div className="w-1/4">
           {loading ? (
-            <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">
+            <div className="w-80 p-4 border rounded-xl shadow-md bg-white z-10 relative">
               <p className="text-gray-500 text-sm">🛜 불러오는 중...</p>
             </div>
           ) : (
