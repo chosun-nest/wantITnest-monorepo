@@ -63,7 +63,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
         {/* 로고 */}
         <S.Logo to="/">
           <img src="assets/images/logo.png" />
-          CSU-NEST
+          WantIT-NEST
         </S.Logo>
 
         {/* 우측 아이콘 및 버튼 */}
