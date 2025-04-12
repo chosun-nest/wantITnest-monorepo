@@ -1,6 +1,6 @@
 import * as S from "../../assets/styles/notice.styles";
-import { FaPaperclip } from "react-icons/fa"; // 아이콘용
-
+import { FaPaperclip } from "react-icons/fa";
+import { Link } from "react-router-dom";
 interface NoticeProps {
   notice: {
     id: number;
@@ -15,8 +15,10 @@ interface NoticeProps {
 export default function NoticeRow({ notice }: NoticeProps) {
   return (
     <S.TableRow>
-      <span>{notice.id}</span>
-      <S.NoticeTitle>{notice.title}</S.NoticeTitle>
+      <span>{notice.id}</span>{" "}
+      <Link to={`/notice/${notice.id}`}>
+        <S.NoticeTitle>{notice.title}</S.NoticeTitle>{" "}
+      </Link>
       <span>{notice.date}</span>
       <span>{notice.author}</span>
       <span>{notice.views}</span>
