@@ -14,6 +14,7 @@ import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
+import Chat from "./routes/chat";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "interests-board/",
         element: <InterestsBorad />,
+      },
+      {
+        path: "chat/",
+        element: <Chat />,
       },
     ],
   },

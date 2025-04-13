@@ -1,5 +1,13 @@
 import { createContext, useContext } from "react";
 
-export const NavbarHeightContext = createContext<number>(0);
+interface NavbarHeightContextType {
+  navbarHeight: number;
+  setNavbarHeight: (height: number) => void;
+}
+
+export const NavbarHeightContext = createContext<NavbarHeightContextType>({
+  navbarHeight: 0,
+  setNavbarHeight: () => {},
+});
 
 export const useNavbarHeight = () => useContext(NavbarHeightContext);

@@ -4,10 +4,12 @@ import ProfileComponent from "../components/profile/profile-card";
 import useResponsive from "../hooks/responsive";
 import { useEffect, useState } from "react";
 import GuestCard from "../components/profile/profile-card-guest";
+import { useNavbarHeight } from "../context/NavbarHeightContext";
 
 export default function Home() {
   const isMobile = useResponsive();
   const [isLogin, setIsLogin] = useState(false);
+  const { navbarHeight } = useNavbarHeight();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accesstoken");
@@ -15,7 +17,7 @@ export default function Home() {
   }, []);
 
   return (
-    <S.GridContainer $isMobile={isMobile}>
+    <S.GridContainer $navbarHeight={navbarHeight} $isMobile={isMobile}>
       <S.GridItem $row="1" $isMobile={isMobile} $col="1">
         {!isLogin ? <GuestCard /> : <ProfileComponent />}
       </S.GridItem>

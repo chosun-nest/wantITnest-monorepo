@@ -13,7 +13,7 @@ export default function Layout() {
     }
   }, []);
   return (
-    <NavbarHeightContext.Provider value={navbarHeight}>
+    <NavbarHeightContext.Provider value={{ navbarHeight, setNavbarHeight }}>
       <Navbar ref={navbarRef} />
       <Ai />
       <Outlet />
