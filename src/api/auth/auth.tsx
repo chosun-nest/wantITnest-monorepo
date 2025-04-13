@@ -1,5 +1,5 @@
 import { SignupPayload } from "../../types/signup";
-import { API } from "../index";
+import { API } from "../index_c";
 
 export const login = async (email: string, password: string) => {
   const res = await API.post(

@@ -1,5 +1,5 @@
 // 팀장님꺼니 건들지 마라
-import { API } from "../index";
+import { API } from "../index_c";
 
 export const getTech = async () => {
   const res = API.get("/api/v1/tech-stacks", { headers: { skipAuth: true } });
