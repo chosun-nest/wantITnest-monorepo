@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 interface GridContainerProps {
   $isMobile: boolean;
+  $navbarHeight: number;
 }
 interface GridItemProps {
   $isMobile: boolean;
@@ -14,7 +15,7 @@ interface GridItemProps {
 export const GridContainer = styled.div<GridContainerProps>`
   display: grid;
   gap: 20px;
-  padding: 120px 20px 40px;
+  padding: ${({ $navbarHeight }) => `${$navbarHeight + 20}px 20px 40px`};
   margin: 0 auto;
   max-width: 1200px;
 

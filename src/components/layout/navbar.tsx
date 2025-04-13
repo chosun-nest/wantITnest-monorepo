@@ -3,14 +3,31 @@ import { useBackdrop } from "../../context/Backdropcontext";
 import * as S from "../../assets/styles/navbar.styles";
 import useResponsive from "../../hooks/responsive";
 import { useNavigate } from "react-router-dom";
+import { useNavbarHeight } from "../../context/NavbarHeightContext";
 
 function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const isMobile = useResponsive();
   const { setShowBackdrop } = useBackdrop();
+  const { setNavbarHeight } = useNavbarHeight();
   const navigate = useNavigate();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // ResizeObserver로 Navbar 높이 자동 감지
+  useEffect(() => {
+    if (!ref || !("current" in ref) || !ref.current) return;
+
+    const observer = new ResizeObserver(() => {
+      if (ref.current) {
+        setNavbarHeight(ref.current.offsetHeight);
+      }
+    });
+
+    observer.observe(ref.current);
+
+    return () => observer.disconnect();
+  }, [ref, setNavbarHeight]);
 
   // 바깥 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -32,7 +49,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   return (
     <S.NavbarContainer ref={ref}>
       <S.NavbarContent>
-        {/* 네비게이션 메뉴 */}
+        {/* 메뉴 토글 버튼 */}
         <S.NavMenu>
           {!isMobile ? (
             <div
@@ -66,7 +83,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
           WantIT-NEST
         </S.Logo>
 
-        {/* 우측 아이콘 및 버튼 */}
+        {/* 우측 버튼 */}
         <S.NavRight>
           <S.SearchIcon />
 
@@ -76,24 +93,22 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
                 src="/assets/images/user.png"
                 onClick={() => setIsMenuOpen((prev) => !prev)}
               />
-              {isMenuOpen && (
-                <S.ProfileMenu $visible={isMenuOpen}>
-                  <S.ProfileMenuItem onClick={() => navigate("/profile")}>
-                    내 프로필
-                  </S.ProfileMenuItem>
-                  <S.ProfileMenuItem
-                    onClick={() => {
-                      localStorage.removeItem("accesstoken");
-                      localStorage.removeItem("refreshToken");
-                      localStorage.removeItem("user");
-                      setIsMenuOpen(false);
-                      navigate("/login");
-                    }}
-                  >
-                    로그아웃
-                  </S.ProfileMenuItem>
-                </S.ProfileMenu>
-              )}
+              <S.ProfileMenu $visible={isMenuOpen}>
+                <S.ProfileMenuItem onClick={() => navigate("/profile")}>
+                  내 프로필
+                </S.ProfileMenuItem>
+                <S.ProfileMenuItem
+                  onClick={() => {
+                    localStorage.removeItem("accesstoken");
+                    localStorage.removeItem("refreshToken");
+                    localStorage.removeItem("user");
+                    setIsMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
+                  로그아웃
+                </S.ProfileMenuItem>
+              </S.ProfileMenu>
             </S.ProfileWrapper>
           ) : (
             <>
@@ -104,6 +119,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
         </S.NavRight>
       </S.NavbarContent>
 
+      {/* 데스크탑용 하단바 */}
       {!isMobile && (
         <S.WebBar>
           <S.NavbarLink to="/">
@@ -130,5 +146,4 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   );
 }
 
-// ✅ forwardRef 적용하여 export default 유지
 export default forwardRef<HTMLDivElement, unknown>(Navbar);
