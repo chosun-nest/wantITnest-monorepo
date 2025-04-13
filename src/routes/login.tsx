@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as S from "../assets/styles/auth.styles";
 import useResponsive from "../hooks/responsive";
 import { useState } from "react";
@@ -40,7 +40,9 @@ export default function Login() {
     <S.Container>
       {/* 로고 위치를 동적으로 조절 */}
       <S.Header $isMobile={isMobile}>
-        <S.LogoText>WantIT-Nest</S.LogoText>
+        <Link to="/">
+          <S.LogoText>WantIT-Nest</S.LogoText>
+        </Link>
       </S.Header>
       {/*로그인 박스*/}
       <S.LoginBox>
