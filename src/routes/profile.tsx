@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../api";
 import Navbar from "../components/layout/navbar";
 import ProfileCard from "../components/profile/profile-card";
 
@@ -8,6 +7,7 @@ export default function Profile() {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [navHeight, setNavHeight] = useState(0);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Navbar 높이 계산
   useEffect(() => {
@@ -23,15 +23,15 @@ export default function Profile() {
   }, []);
 
   // 로그인 여부 확인
-  // useEffect(() => {
-  //   const token = localStorage.getItem("accesstoken");
-  //   if (!token) {
-  //     alert("로그인이 필요한 페이지입니다.");
-  //     window.location.href = "/login"; // 로그인 페이지로 이동
-  //   } else {
-  //     setLoading(false);
-  //   }
-  // }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("accesstoken");
+    if (!token) {
+      alert("로그인이 필요한 페이지입니다.");
+      navigate("/login");
+    } else {
+      setLoading(false);
+    }
+  }, [navigate]);
 
   return (
     <>
@@ -44,7 +44,7 @@ export default function Profile() {
         <div className="w-1/4">
           {loading ? (
             <div className="w-80 p-4 border rounded-xl shadow-md bg-white z-10 relative">
-              <p className="text-gray-500 text-sm">🛜 불러오는 중...</p>
+              <p className="text-gray-500 text-sm"> 불러오는 중...</p>
             </div>
           ) : (
             <ProfileCard />
