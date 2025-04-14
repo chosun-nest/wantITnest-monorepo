@@ -35,7 +35,7 @@ public class MemberInterestService {
                 .memberInterestId(memberInterest.getMemberInterestId())
                 .memberId(memberInterest.getMemberId())
                 .interestId(memberInterest.getInterestId())
-                .interestName(interestService.findById(memberInterest.getMemberId()).getInterestName())
+                .interestName(interestService.findById(memberInterest.getInterestId()).getInterestName())
                 .build())
             .toList();
     }
