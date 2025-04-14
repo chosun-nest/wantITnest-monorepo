@@ -25,6 +25,8 @@ public class MemberResponseDto {
     private String memberSnsUrl3;
     private String memberSnsUrl4;
     private Boolean memberIsStudent;
+    private String memberIntroduce;
+    private String memberImageUrl;
     private List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList;
     private List<MemberInterestResponseDto> memberInterestResponseDtoList;
     private List<MemberTechStackResponseDto> memberTechStackResponseDtoList;
