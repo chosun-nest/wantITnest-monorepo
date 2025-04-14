@@ -57,7 +57,7 @@ export const updateMemberProfile = async ({
   return res.data;
 }
 
-// 회원 탈퇴 요청 (delete)
+// 회원 탈퇴 요청
 export const withdrawMember = async () => {
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
