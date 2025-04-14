@@ -51,6 +51,8 @@ public class MemberService {
             .memberSnsUrl3(member.getMemberSnsUrl3())
             .memberSnsUrl4(member.getMemberSnsUrl4())
             .memberIsStudent(member.getMemberIsStudent())
+            .memberIntroduce(member.getMemberIntroduce())
+            .memberImageUrl(member.getMemberImageUrl())
             .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
             .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
