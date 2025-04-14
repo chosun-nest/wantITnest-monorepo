@@ -141,7 +141,17 @@ export default function ProfileCard() {
 
       <div className="flex items-center justify-left mt-2 gap-2">
         <h2 className="text-lg font-bold">{profile.name}</h2>
-        <p className="text-gray-500">{profile.major}</p>
+        <div className="flex items-center gap-1">
+          <p className="text-gray-500">{profile.major}</p>
+          {(profile.email.endsWith("@chosun.ac.kr") || profile.email.endsWith("@chosun.kr")) && (
+            <img
+              src="/assets/images/verified-badge.png" // 원하는 뱃지 이미지 경로
+              alt="인증"
+              title="조선대 인증 이메일"
+              className="w-4 h-4"
+            />
+          )}
+        </div>
       </div>
 
       <p className="text-sm text-left mt-2">{profile.bio}</p>

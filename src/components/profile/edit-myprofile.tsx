@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import API from "../../api";
-import { getDepartments, getInterests, getTech } from "../../api/common/common";
+import { getMemberProfile, getTech, getInterests } from "../../api/profile/api";
+import { getDepartments } from "../../api/common/common";
+import { updateMemberProfile } from "../../api/profile/api";
 
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
@@ -49,13 +50,7 @@ export default function MyProfile() {
   }, []);
 
   const fetchData = async () => {
-    const token = localStorage.getItem("accesstoken");
-    if (!token) return;
-    const res = await API.get("/api/v1/members/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = res.data;
-
+    const data = await getMemberProfile();
     setProfile({
       name: data.memberName,
       email: data.memberEmail,
@@ -66,7 +61,6 @@ export default function MyProfile() {
       sns: [data.memberSnsUrl1 || "", data.memberSnsUrl2 || ""],
       image: data.memberImage || "/assets/images/user.png",
     });
-
     setDepartmentInput(data.memberDepartmentResponseDtoList?.[0]?.departmentName || "");
   };
 
@@ -76,18 +70,9 @@ export default function MyProfile() {
       getInterests(),
       getTech(),
     ]);
-    setDepartmentsList(deps.map((d: { departmentId: number; departmentName: string }) => ({
-      id: d.departmentId,
-      name: d.departmentName,
-    })));
-    setDepartmentsList(deps.map((i: { interestId: number; interestName: string }) => ({
-      id: i.interestId,
-      name: i.interestName,
-    })));
-    setDepartmentsList(deps.map((t: { techStackId: number; techStackName: string }) => ({
-      id: t.techStackId,
-      name: t.techStackName,
-    })));
+    setDepartmentsList(deps.map((d: any) => ({ id: d.departmentId, name: d.departmentName })));
+    setInterestsList(ints.map((i: any) => ({ id: i.interestId, name: i.interestName })));
+    setTechList(techs.map((t: any) => ({ id: t.techStackId, name: t.techStackName })));
   };
 
   const handleChange = (field: string, value: string) => {
@@ -171,18 +156,14 @@ export default function MyProfile() {
         .filter((t) => profile.techStacks.includes(t.name))
         .map((t) => t.id);
 
-      await API.patch(
-        "/api/v1/members/me",
-        {
+      await updateMemberProfile({
           departmentId,
           bio: profile.bio,
           interestIdList,
           techStackIdList,
           memberSnsUrl1: profile.sns[0],
           memberSnsUrl2: profile.sns[1],
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      });
 
       alert("프로필이 저장되었습니다.");
       setIsEditing(false);
