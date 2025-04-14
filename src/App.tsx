@@ -7,9 +7,9 @@ import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import CreateProfile from "./routes/create-profile";
-import ProjectBoard from "./routes/project-board"; //yu-geum
-import NoticeBoard from "./routes/notice-board"; //yu-geum
-import Notice from "./routes/notice"; //yu-geum
+import ProjectBoard from "./routes/project-board"; //yu-gyeom
+import NoticeBoard from "./routes/notice-board"; //yu-gyeom
+import Notice from "./routes/notice"; //yu-gyeom
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";

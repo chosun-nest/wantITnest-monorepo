@@ -1,5 +1,5 @@
 // src/constants/mock-notices.ts
-// mock 데이터는 보통 기획 초기, UI 설계 단계에서 사용
+// mock 데이터는 실제 API 개발 전, 프론트 UI 테스트용으로 사용
 // 백엔드 API가 완성되면 → mock 데이터 삭제하고 진짜 데이터로 교체!
 
 export const mockNotices = [
@@ -29,5 +29,68 @@ export const mockNotices = [
     views: 503,
     hasAttachment: true,
     content: "취업특강 많은 관심 바랍니다.",
+  },
+  {
+    id: 210,
+    title: "2025학년도 1학기 평생지도교수 배정 안내",
+    date: "2025.01.03",
+    author: "IT 융합대학 관리자",
+    views: 922,
+    hasAttachment: true,
+    content: "1학기 지도교수 배정표는 학생 포털에서 확인 가능합니다.",
+  },
+  {
+    id: 209,
+    title: "2024 조선대학교 IT Festival 행사 안내",
+    date: "2025.01.03",
+    author: "IT 융합대학 관리자",
+    views: 91,
+    hasAttachment: false,
+    content: "IT Festival에 많은 참여 부탁드립니다.",
+  },
+  {
+    id: 208,
+    title: "2025학년도 2학기 휴학신청 안내",
+    date: "2025.01.04",
+    author: "IT 융합대학 관리자",
+    views: 101,
+    hasAttachment: false,
+    content: "2학기 휴학은 5월 30일까지 신청해주세요.",
+  },
+  {
+    id: 207,
+    title: "2025 신입생 오리엔테이션 일정 안내",
+    date: "2025.01.04",
+    author: "IT 융합대학 관리자",
+    views: 300,
+    hasAttachment: false,
+    content: "신입생은 3월 2일 오전 10시까지 집합 바랍니다.",
+  },
+  {
+    id: 206,
+    title: "스마트캠퍼스 사용법 교육 안내",
+    date: "2025.01.05",
+    author: "IT 융합대학 관리자",
+    views: 88,
+    hasAttachment: true,
+    content: "스마트캠퍼스 교육은 온라인으로 진행됩니다.",
+  },
+  {
+    id: 205,
+    title: "학과 사무실 운영시간 변경 안내",
+    date: "2025.01.06",
+    author: "IT 융합대학 관리자",
+    views: 110,
+    hasAttachment: false,
+    content: "운영시간이 평일 오전 9시 ~ 오후 4시로 변경됩니다.",
+  },
+  {
+    id: 204,
+    title: "2025 졸업시험 접수 안내",
+    date: "2025.01.07",
+    author: "IT 융합대학 관리자",
+    views: 209,
+    hasAttachment: true,
+    content: "졸업시험은 4월 10일에 시행됩니다. 접수 마감은 3월 25일입니다.",
   },
 ];
