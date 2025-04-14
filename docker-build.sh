@@ -13,8 +13,8 @@ echo "🔨 Spring Boot 프로젝트 빌드 중..."
 ./gradlew bootJar
 
 echo "🧹 기존 컨테이너 정리 중..."
-docker stop $CONTAINER_NAME
-docker rm $CONTAINER_NAME
+docker stop $CONTAINER_NAME || true
+docker rm $CONTAINER_NAME || true
 
 echo "🗑 기존 이미지 삭제 중..."
 docker rmi $IMAGE_NAME || true
@@ -29,3 +29,8 @@ docker run -d \
   $IMAGE_NAME
 
 echo "✅ 완료! http://119.219.30.209:$PORT 에서 백엔드 확인 가능!"
+
+echo ""
+echo "📜 컨테이너 로그 출력 시작 (Ctrl+C로 중단)"
+echo "--------------------------------------------"
+docker logs -f $CONTAINER_NAME
