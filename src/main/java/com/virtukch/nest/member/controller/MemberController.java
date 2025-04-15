@@ -53,4 +53,11 @@ public class MemberController {
         memberService.changePassword(customUserDetails, memberPasswordChangeRequestDto);
         return ResponseEntity.noContent().build(); // 성공 시 응답 바디 없음
     }
+
+    @DeleteMapping("/me")
+    @Operation(summary = "회원 탈퇴", description = "로그인된 사용자가 자신의 계정을 삭제합니다.")
+    public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        memberService.deleteMember(customUserDetails);
+        return ResponseEntity.noContent().build();
+    }
 }

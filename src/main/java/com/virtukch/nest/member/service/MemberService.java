@@ -173,4 +173,17 @@ public class MemberService {
         }
         return types >= 2;
     }
+
+    @Transactional
+    public void deleteMember(CustomUserDetails customUserDetails) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+
+        // 연관된 관심사, 학과, 기술스택 먼저 삭제
+        memberInterestService.deleteByMemberId(memberId);
+        memberDepartmentService.deleteByMemberId(memberId);
+        memberTechStackService.deleteByMemberId(memberId);
+
+        // 회원 자체 삭제
+        memberRepository.deleteById(memberId);
+    }
 }

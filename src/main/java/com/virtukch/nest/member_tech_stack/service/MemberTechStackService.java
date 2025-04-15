@@ -42,4 +42,8 @@ public class MemberTechStackService {
                 .build())
             .toList();
     }
+
+    public void deleteByMemberId(Long memberId) {
+        memberTechStackRepository.deleteByMemberId(memberId);
+    }
 }

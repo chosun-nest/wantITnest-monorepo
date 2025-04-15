@@ -41,4 +41,8 @@ public class MemberDepartmentService {
                 .build())
             .toList();
     }
+
+    public void deleteByMemberId(Long memberId) {
+        memberDepartmentRepository.deleteByMemberId(memberId);
+    }
 }
