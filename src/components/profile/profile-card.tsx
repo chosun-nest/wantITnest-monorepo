@@ -131,6 +131,7 @@ export default function ProfileCard() {
 
   return (
     <div className="w-80 p-4 border rounded-xl shadow-md bg-white">
+      {/* 프로필 이미지 */}
       <div className="flex justify-center mb-7">
         <img
           src={profile.image || "/assets/images/user.png"}
@@ -139,6 +140,7 @@ export default function ProfileCard() {
         />
       </div>
 
+      {/* 이름 및 전공 정보, 재학생 인증 배찌 */}
       <div className="flex items-center justify-left mt-2 gap-2">
         <h2 className="text-lg font-bold">{profile.name}</h2>
         <div className="flex items-center gap-1">
@@ -153,9 +155,11 @@ export default function ProfileCard() {
           )}
         </div>
       </div>
-
+      
+      {/* 한 줄 소개 */}
       <p className="text-sm text-left mt-2">{profile.bio}</p>
-
+      
+      {/* 관심사 태그 */}
       <div className="flex flex-wrap justify-left gap-2 mt-5">
         {profile.interests?.map((tag, i) => (
           <span key={i} className="bg-gray-200 text-xs px-2 py-1 rounded-full">
@@ -164,6 +168,7 @@ export default function ProfileCard() {
         ))}
       </div>
 
+      {/* SNS 아이콘 */}
       <div className="flex justify-center items-center gap-10 mt-10">
         {profile.sns?.[0] ? (
           <a href={profile.sns[0]} target="_blank" rel="noreferrer">
@@ -198,7 +203,8 @@ export default function ProfileCard() {
           />
         )}
       </div>
-
+      
+      {/* 기술 스택 */}
       <div className="flex flex-wrap justify-left gap-2 mt-10">
         {profile.techStacks?.map((stack, i) => {
           const colorClass = techColorMap[stack] || "bg-blue-200 text-white";
@@ -212,7 +218,8 @@ export default function ProfileCard() {
           );
         })}
       </div>
-
+      
+      {/* 수정 버튼 */}
       <div className="flex justify-end gap-2 mt-5">
         <button
           onClick={() => navigate("/profile-edit")}
