@@ -1,6 +1,7 @@
 package com.virtukch.nest.member.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
 import com.virtukch.nest.member.service.MemberService;
@@ -39,6 +40,17 @@ public class MemberController {
     public ResponseEntity<MemberResponseDto> updateMemberInfo(
         @AuthenticationPrincipal CustomUserDetails customUserDetails,
         @RequestBody MemberUpdateRequestDto memberUpdateRequestDto) {
-        return ResponseEntity.ok(memberService.updateMemberInfo(customUserDetails, memberUpdateRequestDto));
+        return ResponseEntity.ok(
+            memberService.updateMemberInfo(customUserDetails, memberUpdateRequestDto));
+    }
+
+    @PatchMapping("/me/password")
+    @Operation(summary = "비밀번호 변경", description = "현재 비밀번호 확인 후 새 비밀번호로 변경합니다.")
+    public ResponseEntity<Void> changePassword(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestBody MemberPasswordChangeRequestDto memberPasswordChangeRequestDto
+    ) {
+        memberService.changePassword(customUserDetails, memberPasswordChangeRequestDto);
+        return ResponseEntity.noContent().build(); // 성공 시 응답 바디 없음
     }
 }

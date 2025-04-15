@@ -1,6 +1,7 @@
 package com.virtukch.nest.member.service;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
 import com.virtukch.nest.member.model.Member;
@@ -13,6 +14,7 @@ import com.virtukch.nest.member_tech_stack.dto.MemberTechStackResponseDto;
 import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
     private final MemberInterestService memberInterestService;
     private final MemberDepartmentService memberDepartmentService;
     private final MemberTechStackService memberTechStackService;
@@ -62,7 +65,8 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponseDto updateMemberInfo(CustomUserDetails customUserDetails, MemberUpdateRequestDto dto) {
+    public MemberResponseDto updateMemberInfo(CustomUserDetails customUserDetails,
+        MemberUpdateRequestDto dto) {
         Long memberId = customUserDetails.getMember().getMemberId();
 
         // 1. 기존 회원 엔티티 조회
@@ -121,5 +125,52 @@ public class MemberService {
             .memberDepartmentResponseDtoList(memberDepartmentService.findByMemberId(memberId))
             .memberTechStackResponseDtoList(memberTechStackService.findByMemberId(memberId))
             .build();
+    }
+
+    @Transactional
+    public void changePassword(CustomUserDetails customUserDetails,
+        MemberPasswordChangeRequestDto dto) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        // 1. 현재 비밀번호 검증
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), member.getMemberPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 2. 새 비밀번호 확인 일치 검증
+        if (!dto.getNewPassword().equals(dto.getNewPasswordConfirm())) {
+            throw new IllegalArgumentException("새 비밀번호와 확인이 일치하지 않습니다.");
+        }
+
+        // 3. (선택) 새 비밀번호 형식 유효성 검증
+        if (!isValidPasswordFormat(dto.getNewPassword())) {
+            throw new IllegalArgumentException("비밀번호 형식이 올바르지 않습니다.");
+        }
+
+        // 4. 비밀번호 업데이트
+        member.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
+    }
+
+    private boolean isValidPasswordFormat(String password) {
+        if (password.length() < 8 || password.length() > 32) {
+            return false;
+        }
+        if (password.matches(".*(.)\\1{2,}.*")) {
+            return false; // 연속 3자 이상
+        }
+        int types = 0;
+        if (password.matches(".*[a-zA-Z].*")) {
+            types++;
+        }
+        if (password.matches(".*[0-9].*")) {
+            types++;
+        }
+        if (password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\",.<>/?].*")) {
+            types++;
+        }
+        return types >= 2;
     }
 }
