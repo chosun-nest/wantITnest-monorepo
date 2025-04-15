@@ -3,8 +3,11 @@ package com.virtukch.nest.member.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member_department.dto.MemberDepartmentResponseDto;
+import com.virtukch.nest.member_department.service.MemberDepartmentService;
 import com.virtukch.nest.member_interest.dto.MemberInterestResponseDto;
+import com.virtukch.nest.member_interest.service.MemberInterestService;
 import com.virtukch.nest.member_tech_stack.dto.MemberTechStackResponseDto;
+import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,9 +21,6 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL) // null 이면 아예 JSON 에서 빠짐
 public class MemberUpdateRequestDto {
 
-    private Long memberId;
-    private String memberEmail;
-    private Role memberRole;
     private String memberName;
     private String memberSnsUrl1;
     private String memberSnsUrl2;
@@ -30,7 +30,8 @@ public class MemberUpdateRequestDto {
     private String memberIntroduce;
     private String memberImageUrl;
 
-    private List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList;
-    private List<MemberInterestResponseDto> memberInterestResponseDtoList;
-    private List<MemberTechStackResponseDto> memberTechStackResponseDtoList;
+    private List<Long> memberDepartmentUpdateRequestIdList;
+    private List<Long> memberInterestUpdateRequestIdList;
+    private List<Long> memberTechStackUpdateRequestIdList;
+
 }

@@ -45,4 +45,10 @@ public class MemberInterestService {
     public void deleteByMemberId(Long memberId) {
         memberInterestRepository.deleteByMemberId(memberId);
     }
+
+    @Transactional
+    public void updateMemberInterests(Long memberId, List<Long> interestIdList) {
+        memberInterestRepository.deleteByMemberId(memberId);
+        create(memberId, interestIdList);
+    }
 }

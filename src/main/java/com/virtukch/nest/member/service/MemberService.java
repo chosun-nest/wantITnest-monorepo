@@ -73,13 +73,7 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
 
-        // 2. null 이 아닌 값만 선택적으로 덮어쓰기
-        if (dto.getMemberEmail() != null) {
-            member.updateEmail(dto.getMemberEmail());
-        }
-        if (dto.getMemberRole() != null) {
-            member.updateRole(dto.getMemberRole());
-        }
+        // 2. null 이 아닌 값만 선택적으로 덮어쓰기\
         if (dto.getMemberName() != null) {
             member.updateName(dto.getMemberName());
         }
@@ -105,14 +99,22 @@ public class MemberService {
             member.updateImageUrl(dto.getMemberImageUrl());
         }
 
+        // 2-1. 연관된 정보 업데이트
+        if (dto.getMemberInterestUpdateRequestIdList() != null) {
+            memberInterestService.updateMemberInterests(memberId, dto.getMemberInterestUpdateRequestIdList());
+        }
+        if (dto.getMemberDepartmentUpdateRequestIdList() != null) {
+            memberDepartmentService.updateMemberDepartments(memberId, dto.getMemberDepartmentUpdateRequestIdList());
+        }
+        if (dto.getMemberTechStackUpdateRequestIdList() != null) {
+            memberTechStackService.updateMemberTechStacks(memberId, dto.getMemberTechStackUpdateRequestIdList());
+        }
+
         // 3. 변경 사항 저장 (영속성 컨텍스트 + @Transactional 이면 자동으로 반영됨)
         memberRepository.save(member);
 
         // 4. 최신 정보 기준으로 응답 Dto 생성
         return MemberResponseDto.builder()
-            .memberId(member.getMemberId())
-            .memberEmail(member.getMemberEmail())
-            .memberRole(member.getMemberRole())
             .memberName(member.getMemberName())
             .memberSnsUrl1(member.getMemberSnsUrl1())
             .memberSnsUrl2(member.getMemberSnsUrl2())
