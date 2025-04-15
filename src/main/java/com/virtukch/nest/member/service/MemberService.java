@@ -2,6 +2,7 @@ package com.virtukch.nest.member.service;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.member.dto.MemberResponseDto;
+import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.member_department.dto.MemberDepartmentResponseDto;
@@ -13,6 +14,7 @@ import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +58,68 @@ public class MemberService {
             .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
             .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
+            .build();
+    }
+
+    @Transactional
+    public MemberResponseDto updateMemberInfo(CustomUserDetails customUserDetails, MemberUpdateRequestDto dto) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+
+        // 1. 기존 회원 엔티티 조회
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+
+        // 2. null 이 아닌 값만 선택적으로 덮어쓰기
+        if (dto.getMemberEmail() != null) {
+            member.updateEmail(dto.getMemberEmail());
+        }
+        if (dto.getMemberRole() != null) {
+            member.updateRole(dto.getMemberRole());
+        }
+        if (dto.getMemberName() != null) {
+            member.updateName(dto.getMemberName());
+        }
+        if (dto.getMemberSnsUrl1() != null) {
+            member.updateSnsUrl1(dto.getMemberSnsUrl1());
+        }
+        if (dto.getMemberSnsUrl2() != null) {
+            member.updateSnsUrl2(dto.getMemberSnsUrl2());
+        }
+        if (dto.getMemberSnsUrl3() != null) {
+            member.updateSnsUrl3(dto.getMemberSnsUrl3());
+        }
+        if (dto.getMemberSnsUrl4() != null) {
+            member.updateSnsUrl4(dto.getMemberSnsUrl4());
+        }
+        if (dto.getMemberIsStudent() != null) {
+            member.updateIsStudent(dto.getMemberIsStudent());
+        }
+        if (dto.getMemberIntroduce() != null) {
+            member.updateIntroduce(dto.getMemberIntroduce());
+        }
+        if (dto.getMemberImageUrl() != null) {
+            member.updateImageUrl(dto.getMemberImageUrl());
+        }
+
+        // 3. 변경 사항 저장 (영속성 컨텍스트 + @Transactional 이면 자동으로 반영됨)
+        memberRepository.save(member);
+
+        // 4. 최신 정보 기준으로 응답 Dto 생성
+        return MemberResponseDto.builder()
+            .memberId(member.getMemberId())
+            .memberEmail(member.getMemberEmail())
+            .memberRole(member.getMemberRole())
+            .memberName(member.getMemberName())
+            .memberSnsUrl1(member.getMemberSnsUrl1())
+            .memberSnsUrl2(member.getMemberSnsUrl2())
+            .memberSnsUrl3(member.getMemberSnsUrl3())
+            .memberSnsUrl4(member.getMemberSnsUrl4())
+            .memberIsStudent(member.getMemberIsStudent())
+            .memberIntroduce(member.getMemberIntroduce())
+            .memberImageUrl(member.getMemberImageUrl())
+            .memberInterestResponseDtoList(memberInterestService.findByMemberId(memberId))
+            .memberDepartmentResponseDtoList(memberDepartmentService.findByMemberId(memberId))
+            .memberTechStackResponseDtoList(memberTechStackService.findByMemberId(memberId))
             .build();
     }
 }

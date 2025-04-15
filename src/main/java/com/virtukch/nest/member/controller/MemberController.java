@@ -2,6 +2,7 @@ package com.virtukch.nest.member.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.member.dto.MemberResponseDto;
+import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
 import com.virtukch.nest.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,5 +32,13 @@ public class MemberController {
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
             memberService.getCurrentMemberByCustomUserDetails(customUserDetails));
+    }
+
+    @PatchMapping("/me")
+    @Operation(summary = "회원 정보 수정", description = "변경하고자 하는 필드만 포함하여 전송하세요. 미포함된 필드는 기존 값을 유지합니다.")
+    public ResponseEntity<MemberResponseDto> updateMemberInfo(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestBody MemberUpdateRequestDto memberUpdateRequestDto) {
+        return ResponseEntity.ok(memberService.updateMemberInfo(customUserDetails, memberUpdateRequestDto));
     }
 }

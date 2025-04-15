@@ -58,4 +58,48 @@ public class Member {
         this.memberIntroduce = memberIntroduce;
         this.memberImageUrl = memberImageUrl;
     }
+
+    public void updateEmail(String memberEmail) {
+        this.memberEmail = memberEmail;
+    }
+
+    public void updatePassword(String memberPassword) {
+        this.memberPassword = memberPassword;
+    }
+
+    public void updateRole(Role memberRole) {
+        this.memberRole = memberRole;
+    }
+
+    public void updateName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public void updateSnsUrl1(String url) {
+        this.memberSnsUrl1 = url;
+    }
+
+    public void updateSnsUrl2(String url) {
+        this.memberSnsUrl2 = url;
+    }
+
+    public void updateSnsUrl3(String url) {
+        this.memberSnsUrl3 = url;
+    }
+
+    public void updateSnsUrl4(String url) {
+        this.memberSnsUrl4 = url;
+    }
+
+    public void updateIsStudent(Boolean isStudent) {
+        this.memberIsStudent = isStudent;
+    }
+
+    public void updateIntroduce(String introduce) {
+        this.memberIntroduce = introduce;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.memberImageUrl = imageUrl;
+    }
 }
