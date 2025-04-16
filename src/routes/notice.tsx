@@ -1,5 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { mockNotices } from "../constants/mock-notices";
+import { useContext } from "react";
+import { NavbarHeightContext } from "../context/NavbarHeightContext";
+
 
 export default function Notice() {
   const navigate = useNavigate();
@@ -12,8 +15,21 @@ export default function Notice() {
     );
   }
 
+  const { navbarHeight } = useContext(NavbarHeightContext);
+
   return (
-    <div style={{ padding: "100px 20px" }}>
+    <div
+    style={{
+      width: "100%",
+    padding: "100px 20px",
+    paddingTop: "140px",
+    maxWidth: "900px",
+    margin: "0 auto",
+    lineHeight: "1.8",
+    wordBreak: "keep-all",
+    whiteSpace: "pre-wrap",
+    }}
+    >
       <h2 style={{ color: "#00256C" }}>{notice.title}</h2>
 
       <div style={{ fontSize: "14px", marginBottom: "16px", color: "#555" }}>
@@ -33,6 +49,7 @@ export default function Notice() {
       <button
         onClick={() => navigate(-1)}
         style={{
+          marginTop: "30px",
           padding: "8px 16px",
           backgroundColor: "#00256C",
           color: "white",
