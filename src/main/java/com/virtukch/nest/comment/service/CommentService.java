@@ -7,6 +7,7 @@ import com.virtukch.nest.comment.dto.CommentResponseDto;
 import com.virtukch.nest.comment.dto.converter.CommentDtoConverter;
 import com.virtukch.nest.comment.exception.CommentNotFoundException;
 import com.virtukch.nest.comment.exception.NoCommentAuthorityException;
+import com.virtukch.nest.comment.model.BoardType;
 import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.member.model.Member;
@@ -31,20 +32,22 @@ public class CommentService {
     /**
      * 게시글에 새로운 댓글을 작성하고, 저장 후 응답 DTO로 반환합니다.
      *
-     * @param postId    댓글을 작성할 게시글 ID
-     * @param memberId  댓글을 작성한 사용자 ID
-     * @param requestDto 댓글 내용이 담긴 요청 DTO
+     * @param boardType     댓글을 작성한 게시판
+     * @param postId       댓글을 작성할 게시글 ID
+     * @param memberId      댓글을 작성한 사용자 ID
+     * @param requestDto    댓글 내용이 담긴 요청 DTO
      * @return 작성된 댓글에 대한 응답 DTO
      */
     @Transactional
-    public CommentResponseDto createComment(Long postId, Long memberId, CommentRequestDto requestDto) {
-        Comment comment = Comment.createComment(postId, memberId, requestDto.getContent());
+    public CommentResponseDto createComment(BoardType boardType, Long postId, Long memberId, CommentRequestDto requestDto) {
+        Comment comment = Comment.createComment(boardType, postId, memberId, requestDto.getContent());
         return saveAndConvert(comment, memberId);
     }
 
     /**
      * 기존 댓글(parentId)에 대한 대댓글을 작성하고 저장한 후, 응답 DTO로 반환합니다.
      *
+     * @param boardType     댓글을 작성한 게시판
      * @param postId     대댓글이 달릴 게시글 ID
      * @param parentId   부모 댓글 ID (대댓글 대상)
      * @param memberId   대댓글을 작성한 사용자 ID
@@ -52,8 +55,8 @@ public class CommentService {
      * @return 작성된 대댓글에 대한 응답 DTO
      */
     @Transactional
-    public CommentResponseDto createReply(Long postId, Long parentId, Long memberId, @Valid CommentRequestDto requestDto) {
-        Comment comment = Comment.createReply(postId, memberId, requestDto.getContent(), parentId);
+    public CommentResponseDto createReply(BoardType boardType, Long postId, Long parentId, Long memberId, @Valid CommentRequestDto requestDto) {
+        Comment comment = Comment.createReply(boardType, postId, memberId, requestDto.getContent(), parentId);
         return saveAndConvert(comment, memberId);
     }
 
@@ -71,30 +74,26 @@ public class CommentService {
      * - 댓글은 작성일 기준 오름차순으로 정렬되며, 자식 댓글은 부모 댓글 하위에 포함됩니다.
      * </p>
      *
+     * @param boardType 댓글을 조회할 대상 게시글이 속한 게시판
      * @param postId 댓글을 조회할 대상 게시글의 ID
      * @return {@link CommentListResponseDto} 트리 구조로 구성된 댓글 목록 DTO
      */
     @Transactional(readOnly = true)
-    public CommentListResponseDto getCommentList(Long postId) {
-        // 1. 전체 댓글 조회 (부모 + 대댓글)
-        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+    public CommentListResponseDto getCommentList(BoardType boardType, Long postId) {
+        List<Comment> comments = commentRepository.findByBoardTypeAndPostIdOrderByCreatedAtAsc(boardType, postId);
 
-        // 2. 회원 ID → 이름 매핑
         Map<Long, String> memberNameMap = memberRepository.findAllById(
                 comments.stream().map(Comment::getMemberId).distinct().toList()
         ).stream().collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
 
-        // 3. 댓글 ID → 응답 DTO 변환 Map
         Map<Long, CommentResponseDto> responseMap = new LinkedHashMap<>();
 
-        // 4. 모든 댓글을 DTO로 변환 (children은 빈 상태)
         for (Comment comment : comments) {
             String authorName = memberNameMap.get(comment.getMemberId());
             CommentResponseDto dto = CommentDtoConverter.toResponseDto(comment, authorName);
             responseMap.put(comment.getCommentId(), dto);
         }
 
-        // 5. 계층 구조
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
         for (Comment comment : comments) {
@@ -102,7 +101,7 @@ public class CommentService {
             Long parentId = comment.getParentId();
 
             if (parentId == null) {
-                rootComments.add(dto); // 최상위 댓글
+                rootComments.add(dto);
             } else {
                 CommentResponseDto parentDto = responseMap.get(parentId);
                 if (parentDto != null) {

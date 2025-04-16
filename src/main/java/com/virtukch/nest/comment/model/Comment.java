@@ -17,6 +17,7 @@ public class Comment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
+    private BoardType boardType;
     private Long postId;
 
     private Long memberId;
@@ -32,8 +33,9 @@ public class Comment extends BaseTimeEntity {
 
 
     // 생성 편의 메서드
-    public static Comment createComment(Long postId, Long memberId, String content) {
+    public static Comment createComment(BoardType boardType, Long postId, Long memberId, String content) {
         return Comment.builder()
+                .boardType(boardType)
                 .postId(postId)
                 .memberId(memberId)
                 .commentContent(content)
@@ -41,8 +43,9 @@ public class Comment extends BaseTimeEntity {
                 .build();
     }
 
-    public static Comment createReply(Long postId, Long memberId, String content, Long parentId) {
+    public static Comment createReply(BoardType boardType, Long postId, Long memberId, String content, Long parentId) {
         return Comment.builder()
+                .boardType(boardType)
                 .postId(postId)
                 .memberId(memberId)
                 .commentContent(content)

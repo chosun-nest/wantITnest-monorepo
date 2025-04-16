@@ -5,6 +5,7 @@ import com.virtukch.nest.comment.dto.CommentListResponseDto;
 import com.virtukch.nest.comment.dto.CommentRequestDto;
 import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
 import com.virtukch.nest.comment.dto.CommentResponseDto;
+import com.virtukch.nest.comment.model.BoardType;
 import com.virtukch.nest.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/v1/posts/{postId}/comments")
+@RequestMapping("/api/v1/{boardType}/{postId}/comments")
 @Tag(
         name = "댓글 API",
         description = "게시글 상세 페이지에서 사용되는 댓글 생성, 조회, 수정, 삭제 API"
@@ -45,11 +46,11 @@ public class CommentController {
     )
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
+            @PathVariable BoardType boardType,
             @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails user,
-            @Valid @RequestBody CommentRequestDto requestDto
-    ) {
-        CommentResponseDto response = commentService.createComment(postId, user.getMember().getMemberId(), requestDto);
+            @Valid @RequestBody CommentRequestDto requestDto) {
+        CommentResponseDto response = commentService.createComment(boardType, postId, user.getMember().getMemberId(), requestDto);
         URI location = URI.create("/api/v1/posts/" + postId + "/comments/" + response.getCommentId());
         return ResponseEntity.created(location).body(response);
     }
@@ -64,8 +65,8 @@ public class CommentController {
                     content = @Content(schema = @Schema(implementation = CommentListResponseDto.class)))
     })
     @GetMapping
-    public ResponseEntity<CommentListResponseDto> getCommentList(@PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.getCommentList(postId));
+    public ResponseEntity<CommentListResponseDto> getCommentList(@PathVariable BoardType boardType, @PathVariable Long postId) {
+        return ResponseEntity.ok(commentService.getCommentList(boardType, postId));
     }
 
     @Operation(
@@ -122,12 +123,13 @@ public class CommentController {
     )
     @PostMapping("/{parentId}/reply")
     public ResponseEntity<CommentResponseDto> createReply(
+            @PathVariable BoardType boardType,
             @PathVariable Long postId,
             @PathVariable Long parentId,
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody CommentRequestDto requestDto) {
 
-        CommentResponseDto response = commentService.createReply(postId, parentId, user.getMember().getMemberId(), requestDto);
+        CommentResponseDto response = commentService.createReply(boardType, postId, parentId, user.getMember().getMemberId(), requestDto);
         return ResponseEntity
                 .created(URI.create("/api/posts/" + postId + "/comments/" + response.getCommentId()))
                 .body(response);

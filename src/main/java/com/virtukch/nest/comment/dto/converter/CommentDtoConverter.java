@@ -18,6 +18,7 @@ public class CommentDtoConverter {
                 .authorName(memberName)
                 .createdAt(timeFormat(comment.getCreatedAt()))
                 .updatedAt(timeFormat(comment.getUpdatedAt()))
+                .isDeleted(comment.isDeleted())
                 .build();
     }
 

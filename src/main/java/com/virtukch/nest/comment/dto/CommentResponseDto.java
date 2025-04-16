@@ -18,6 +18,8 @@ public class CommentResponseDto {
     private String updatedAt;
     private Long parentId;
 
+    private Boolean isDeleted;
+
     @Builder.Default
     private List<CommentResponseDto> children = new ArrayList<>();
 }
