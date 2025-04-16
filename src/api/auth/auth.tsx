@@ -34,3 +34,39 @@ export const verifycode = async (email: string, code: string) => {
   );
   return res.data;
 };
+
+export async function refreshAccessToken() {
+  try {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!refreshToken) {
+      throw new Error("리프레시 토큰이 없습니다.");
+    }
+
+    const res = await API.post(
+      "/api/v1/auth/refresh-token",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+          skipAuth: true,
+        },
+      }
+    );
+
+    const { accessToken, refreshToken: newRefreshToken } = res.data;
+
+    if (accessToken && newRefreshToken) {
+      localStorage.setItem("accesstoken", accessToken);
+      localStorage.setItem("refreshToken", newRefreshToken);
+      console.log("토큰 재발급 성공");
+    } else {
+      throw new Error("재발급된 토큰이 없습니다.");
+    }
+  } catch (error) {
+    console.error("❌ 토큰 재발급 실패:", error);
+    localStorage.clear();
+    window.location.href = "/login"; // 실패시 강제 로그아웃
+    throw error;
+  }
+}
