@@ -1,43 +1,54 @@
 // src/routes/notice-board.tsx
-import * as S from "../assets/styles/notice.styles"
+import { useState } from "react";
+import * as S from "../assets/styles/notice.styles";
 import NoticeRow from "../components/notice/NoticeRow";
+import { mockNotices } from "../constants/mock-notices"; // ✅ 수정된 mock 데이터 10개
+import SearchInput from "../components/common/SearchInput";
 
 
-const mockNotices = [
-  {
-    id: 213,
-    title: "2025학년도 학생증 체크카드 발급 안내",
-    date: "2025.01.02",
-    author: "IT 융합대학 관리자",
-    views: 436,
-    hasAttachment: true,
-  },
-  {
-    id: 212,
-    title: "IT융합대학 M.space 사용안내",
-    date: "2025.01.02",
-    author: "IT 융합대학 관리자",
-    views: 255,
-    hasAttachment: false,
-  },
-  {
-    id: 211,
-    title: "2025 산업 채용 트렌드 취업특강",
-    date: "2025.01.02",
-    author: "IT 융합대학 관리자",
-    views: 503,
-    hasAttachment: true,
-  },
-];
+const ITEMS_PER_PAGE = 7;
 
 export default function NoticeBoard() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // 🔍 검색어 기준으로 제목 또는 작성자 필터링
+  const filteredNotices = mockNotices.filter((notice) =>
+    notice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    notice.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // 🔢 페이지네이션 계산
+  const totalPages = Math.ceil(filteredNotices.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentNotices = filteredNotices.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePageClick = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <S.Container>
+      {/* 타이틀 + 게시물 수 + 검색창 */}
       <S.TitleSection>
         <S.PageTitle>학사공지</S.PageTitle>
-        <S.SubText>총 <strong>{mockNotices.length}</strong>개의 게시물이 있습니다.</S.SubText>
+        <S.SubText>
+          총 <strong>{filteredNotices.length}</strong>개의 게시물이 있습니다.
+        </S.SubText>
+        <S.SearchInput
+          type="text"
+          placeholder="제목 또는 작성자 검색"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // 검색 시 페이지 초기화
+          }}
+        />
       </S.TitleSection>
 
+      {/* 테이블 헤더 */}
       <S.TableHeader>
         <span>No</span>
         <span>제목</span>
@@ -47,20 +58,40 @@ export default function NoticeBoard() {
         <span>첨부</span>
       </S.TableHeader>
 
+      {/* 공지사항 목록 */}
       <S.TableBody>
-        {mockNotices.map((notice) => (
+        {currentNotices.map((notice) => (
           <NoticeRow key={notice.id} notice={notice} />
         ))}
       </S.TableBody>
 
+      {/* 페이지네이션 */}
       <S.Pagination>
-        <button>{"<<"}</button>
-        <button>{"<"}</button>
-        <button className="active">1</button>
-        <button>2</button>
-        <button>3</button>
-        <button>{">"}</button>
-        <button>{">>"}</button>
+        <button onClick={() => handlePageClick(1)} disabled={currentPage === 1}>{"<<"}</button>
+        <button onClick={() => handlePageClick(currentPage - 1)} disabled={currentPage === 1}>{"<"}</button>
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageClick(page)}
+            className={page === currentPage ? "active" : ""}
+          >
+            {page}
+          </button>
+        ))}
+
+        <button
+          onClick={() => handlePageClick(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          {">"}
+        </button>
+        <button
+          onClick={() => handlePageClick(totalPages)}
+          disabled={currentPage === totalPages}
+        >
+          {">>"}
+        </button>
       </S.Pagination>
     </S.Container>
   );

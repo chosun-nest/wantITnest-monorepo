@@ -1,12 +1,24 @@
 import React, {useState} from "react";
 import WithdrawModal from "./modal/withdraw-modal";
 import WithdrawCompleteModal from "./modal/withdraw-complete-modal";
-//import { deleteAccount } from "../../../api/member"; 
+import { withdrawMember } from "../../api/profile/api";
 
 export default function Withdraw(){
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);  // 탈퇴하기 버튼 누른 후 모달
   const [showCompleteModal, setShowCompleteModal] = useState(false);  // 탈퇴 완료 모달
   
+  const handleWithdraw = async () => {
+    try {
+      await withdrawMember(); // 탈퇴 API 호출
+      localStorage.removeItem("accesstoken"); // 토큰 삭제
+      setShowWithdrawModal(false);
+      setShowCompleteModal(true);   // 회원 탈퇴 완료 모달 띄우기
+    } catch (err) {
+      console.error("회원 탈퇴 실패", err);
+      alert("회원 탈퇴 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <>
       <div className="text-right mb-4">
@@ -22,11 +34,7 @@ export default function Withdraw(){
       {showWithdrawModal && (
         <WithdrawModal
           onClose={() => setShowWithdrawModal(false)}
-          onConfirm={() => {
-            console.log("탈퇴 처리");
-            setShowWithdrawModal(false);
-            setShowCompleteModal(true);
-          }}
+          onConfirm={handleWithdraw}  // 탈퇴 API 호출
         />
       )}
 

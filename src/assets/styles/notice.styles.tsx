@@ -1,6 +1,15 @@
 // src/assets/styles/notice.styles.tsx
 import styled from "styled-components";
 
+export const SearchInput = styled.input`
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-left: auto;
+`;
+
 export const Container = styled.div`
   max-width: 1000px;
   margin: 120px auto 40px;
