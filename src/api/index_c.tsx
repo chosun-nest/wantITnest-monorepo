@@ -41,7 +41,7 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // ❗ accessToken 만료로 인한 401 에러
+    // accessToken 만료로 인한 401 에러
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         // 이미 리프레시 중이면 대기
@@ -70,7 +70,7 @@ API.interceptors.response.use(
         isRefreshing = false;
         return API(originalRequest);
       } catch (refreshError) {
-        console.error("❌ 토큰 재발급 실패:", refreshError);
+        console.error("토큰 재발급 실패:", refreshError);
         isRefreshing = false;
         localStorage.clear();
         window.location.href = "/login"; // 로그인 페이지로 강제 이동
@@ -78,7 +78,7 @@ API.interceptors.response.use(
       }
     }
 
-    // ❗ 리프레시 토큰도 만료됐을 경우 403
+    // 리프레시 토큰도 만료됐을 경우 403
     if (error.response?.status === 403) {
       console.warn("403 에러 발생, 토큰 무효. 로그아웃합니다.");
       localStorage.clear();
