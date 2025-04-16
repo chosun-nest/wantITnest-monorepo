@@ -1,8 +1,6 @@
 package com.virtukch.nest.comment.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
-import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.post.model.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,30 +17,48 @@ public class Comment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    private Long postId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private Long memberId;
 
     @Column(length = 500, nullable = false)
     private String commentContent;
 
+    @Column
+    private Long parentId; // 대댓글용, null이면 일반 댓글
+
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
+
     // 생성 편의 메서드
-    public static Comment createComment(Post post, Member member, String content) {
+    public static Comment createComment(Long postId, Long memberId, String content) {
         return Comment.builder()
-                .post(post)
-                .member(member)
+                .postId(postId)
+                .memberId(memberId)
                 .commentContent(content)
+                .parentId(null)
+                .build();
+    }
+
+    public static Comment createReply(Long postId, Long memberId, String content, Long parentId) {
+        return Comment.builder()
+                .postId(postId)
+                .memberId(memberId)
+                .commentContent(content)
+                .parentId(parentId)
                 .build();
     }
 
     // 비즈니스 로직
-    public void updateComment(String commentContent) {
+    public void update(String commentContent) {
         if(commentContent != null && !commentContent.isBlank()) {
             this.commentContent = commentContent;
         }
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+        this.commentContent = "삭제된 댓글입니다.";
     }
 }

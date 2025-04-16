@@ -35,6 +35,8 @@ public class CommentController {
             summary = "댓글 작성",
             description = """
                     특정 게시글에 댓글을 작성합니다.
+                    - 인증된 사용자만 작성 가능
+                    - 댓글 내용은 최대 500자까지 작성 가능
                     
                     요청 필드
                     - `content` (string, required): 댓글 내용 (최대 500자)
@@ -47,7 +49,7 @@ public class CommentController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody CommentRequestDto requestDto
     ) {
-        CommentResponseDto response = commentService.createComment(postId, user.getMember(), requestDto);
+        CommentResponseDto response = commentService.createComment(postId, user.getMember().getMemberId(), requestDto);
         URI location = URI.create("/api/v1/posts/" + postId + "/comments/" + response.getCommentId());
         return ResponseEntity.created(location).body(response);
     }
@@ -84,12 +86,12 @@ public class CommentController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto responseDto = commentService.updateComment(commentId, user.getMember(), requestDto);
+        CommentResponseDto responseDto = commentService.updateComment(commentId, user.getMember().getMemberId(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @Operation(
-            summary = "댓글 삭제",
+            summary = "댓글&대댓글 삭제",
             description = """
                     특정 댓글을 삭제합니다.
                     - 본인이 작성한 댓글만 삭제할 수 있습니다.
@@ -105,7 +107,29 @@ public class CommentController {
     public ResponseEntity<CommentDeleteResponseDto> deleteComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails user) {
-        CommentDeleteResponseDto responseDto = commentService.deleteComment(commentId, user.getMember());
+        CommentDeleteResponseDto responseDto = commentService.deleteComment(commentId, user.getMember().getMemberId());
         return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "대댓글 작성",
+            description = """
+                    특정 댓글에 대한 답글(대댓글)을 작성합니다.
+                    - 인증된 사용자만 작성 가능
+                    - 댓글 내용은 최대 500자까지 작성 가능
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PostMapping("/{parentId}/reply")
+    public ResponseEntity<CommentResponseDto> createReply(
+            @PathVariable Long postId,
+            @PathVariable Long parentId,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @RequestBody CommentRequestDto requestDto) {
+
+        CommentResponseDto response = commentService.createReply(postId, parentId, user.getMember().getMemberId(), requestDto);
+        return ResponseEntity
+                .created(URI.create("/api/posts/" + postId + "/comments/" + response.getCommentId()))
+                .body(response);
     }
 }

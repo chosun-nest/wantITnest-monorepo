@@ -11,11 +11,11 @@ import java.util.List;
 
 public class CommentDtoConverter {
 
-    public static CommentResponseDto toResponseDto(Comment comment) {
+    public static CommentResponseDto toResponseDto(Comment comment, String memberName) {
         return CommentResponseDto.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.getCommentContent())
-                .authorName(comment.getMember().getMemberName())
+                .authorName(memberName)
                 .createdAt(timeFormat(comment.getCreatedAt()))
                 .updatedAt(timeFormat(comment.getUpdatedAt()))
                 .build();
