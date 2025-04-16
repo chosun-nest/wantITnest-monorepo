@@ -25,7 +25,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/v1/{boardType}/{postId}/comments")
 @Tag(
-        name = "댓글 API",
+        name = "[모든 게시판 공용] 댓글 API",
         description = "게시글 상세 페이지에서 사용되는 댓글 생성, 조회, 수정, 삭제 API"
 )
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class CommentController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody CommentRequestDto requestDto) {
         CommentResponseDto response = commentService.createComment(boardType, postId, user.getMember().getMemberId(), requestDto);
-        URI location = URI.create("/api/v1/posts/" + postId + "/comments/" + response.getCommentId());
+        URI location = URI.create("/api/v1/" + boardType + "/" + postId + "/comments/" + response.getCommentId());
         return ResponseEntity.created(location).body(response);
     }
 

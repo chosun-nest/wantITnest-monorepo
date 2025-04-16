@@ -12,6 +12,8 @@ import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
+import com.virtukch.nest.post.repository.PostRepository;
+import com.virtukch.nest.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+    private final ProjectRepository projectRepository;
 
     /**
      * 게시글에 새로운 댓글을 작성하고, 저장 후 응답 DTO로 반환합니다.
@@ -40,6 +44,7 @@ public class CommentService {
      */
     @Transactional
     public CommentResponseDto createComment(BoardType boardType, Long postId, Long memberId, CommentRequestDto requestDto) {
+        validatePostExistence(boardType, postId);
         Comment comment = Comment.createComment(boardType, postId, memberId, requestDto.getContent());
         return saveAndConvert(comment, memberId);
     }
@@ -56,6 +61,7 @@ public class CommentService {
      */
     @Transactional
     public CommentResponseDto createReply(BoardType boardType, Long postId, Long parentId, Long memberId, @Valid CommentRequestDto requestDto) {
+        validatePostExistence(boardType, postId);
         Comment comment = Comment.createReply(boardType, postId, memberId, requestDto.getContent(), parentId);
         return saveAndConvert(comment, memberId);
     }
@@ -184,6 +190,23 @@ public class CommentService {
         }
         return comment;
     }
+
+    private void validatePostExistence(BoardType boardType, Long postId) {
+        switch (boardType) {
+            case TOPIC -> {
+                if (!postRepository.existsById(postId)) {
+                    throw new EntityNotFoundException("[관심분야 정보 게시판] 해당 게시글을 찾을 수 없습니다. postId = " + postId);
+                }
+            }
+            case PROJECT -> {
+                if (!projectRepository.existsById(postId)) {
+                    throw new EntityNotFoundException("[프로젝트 모집 게시판] 해당 게시글을 찾을 수 없습니다. postId = " + postId);
+                }
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 게시판 타입입니다: " + boardType);
+        }
+    }
+
 
     private Comment findByIdOrThrow(Long commentId) {
         return commentRepository.findById(commentId)

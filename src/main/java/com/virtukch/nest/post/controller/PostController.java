@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/posts")
-@Tag(name = "게시글 API", description = "게시글 생성, 조회, 수정, 삭제 등 게시판 관련 API")
+@Tag(name = "[관심분야 정보 게시판] 게시글 API", description = "게시글 생성, 조회, 수정, 삭제 등 게시판 관련 API")
 public class PostController {
 
     private final PostService postService;
