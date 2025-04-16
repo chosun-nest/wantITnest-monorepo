@@ -1,10 +1,7 @@
-import API from "../index";
+import {API} from "../index_c";
 
 export const getMemberProfile = async () => {
-  const token = localStorage.getItem("accesstoken");
-  const res = await API.get("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await API.get("/api/v1/members/me");
   return res.data;
 };
 
