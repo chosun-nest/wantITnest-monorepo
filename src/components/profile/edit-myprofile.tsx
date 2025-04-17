@@ -7,7 +7,7 @@ import { updateMemberProfile } from "../../api/profile/api";
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
 import EditProfileField from "./edit-myprofile-components/EditProfileField";
 import EditDepartment from "./edit-myprofile-components/EditDepartment";
-import EditBio from "./edit-myprofile-components/EditBio";
+import EditIntroduce from "./edit-myprofile-components/EditIntroduce";
 import EditInterests from "./edit-myprofile-components/EditInterests";
 import EditTechStacks from "./edit-myprofile-components/EditTechStacks";
 import EditSNS from "./edit-myprofile-components/EditSNS";
@@ -194,7 +194,7 @@ export default function MyProfile() {
         onSelect={handleSelectDepartment}
       />
 
-      <EditBio
+      <EditIntroduce
         value={profile.bio}
         isEditing={isEditing}
         onChange={(val) => handleChange("bio", val)}

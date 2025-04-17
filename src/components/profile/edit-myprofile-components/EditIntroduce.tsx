@@ -6,7 +6,7 @@ interface Props {
   onChange: (val: string) => void;
 }
 
-export default function EditBio({ value, isEditing, onChange }: Props) {
+export default function EditIntroduce({ value, isEditing, onChange }: Props) {
   return (
     <div className="flex items-start mb-4">
       <label className="w-28 text-sm font-semibold mt-2">자기소개</label>
