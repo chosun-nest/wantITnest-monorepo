@@ -7,7 +7,7 @@ interface ProfileType {
   name: string;
   email: string;
   major: string;
-  bio: string;
+  introduce: string;
   interests: string[];
   techStacks: string[];
   sns: string[];
@@ -98,13 +98,17 @@ export default function ProfileCard() {
       try {
         const data = await getMemberProfile();
         setProfile({
-          image: data.memberImage,
+          image: data.memberImageUrl,
           name: data.memberName,
           email: data.memberEmail,
           major: data.memberDepartmentResponseDtoList[0]?.departmentName || "",
-          bio: data.bio || "",
-          interests: data.memberInterestResponseDtoList.map((i: any) => i.interestName),
-          techStacks: data.memberTechStackResponseDtoList.map((t: any) => t.techStackName),
+          introduce: data.memberIntroduce || "",
+          interests: data.memberInterestResponseDtoList.map(
+            (i: { interestId: number; interestName: string }) => i.interestName
+          ),        
+          techStacks: data.memberTechStackResponseDtoList.map(
+            (t: { techStackId: number; techStackName: string }) => t.techStackName
+          ),
           sns: [
             data.memberSnsUrl1,
             data.memberSnsUrl2,
@@ -157,7 +161,7 @@ export default function ProfileCard() {
       </div>
       
       {/* 한 줄 소개 */}
-      <p className="text-sm text-left mt-2">{profile.bio}</p>
+      <p className="text-sm text-left mt-2">{profile.introduce}</p>
       
       {/* 관심사 태그 */}
       <div className="flex flex-wrap justify-left gap-2 mt-5">
