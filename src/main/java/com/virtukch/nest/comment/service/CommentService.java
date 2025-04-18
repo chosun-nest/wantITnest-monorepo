@@ -1,9 +1,6 @@
 package com.virtukch.nest.comment.service;
 
-import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
-import com.virtukch.nest.comment.dto.CommentListResponseDto;
-import com.virtukch.nest.comment.dto.CommentRequestDto;
-import com.virtukch.nest.comment.dto.CommentResponseDto;
+import com.virtukch.nest.comment.dto.*;
 import com.virtukch.nest.comment.dto.converter.CommentDtoConverter;
 import com.virtukch.nest.comment.exception.CommentNotFoundException;
 import com.virtukch.nest.comment.exception.NoCommentAuthorityException;
@@ -16,6 +13,7 @@ import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,6 +84,8 @@ public class CommentService {
      */
     @Transactional(readOnly = true)
     public CommentListResponseDto getCommentList(BoardType boardType, Long postId) {
+        validatePostExistence(boardType, postId);
+
         List<Comment> comments = commentRepository.findByBoardTypeAndPostIdOrderByCreatedAtAsc(boardType, postId);
 
         Map<Long, String> memberNameMap = memberRepository.findAllById(
@@ -183,6 +183,18 @@ public class CommentService {
         return CommentDtoConverter.toDeleteResponseDto(comment);
     }
 
+    @Transactional
+    public CommentReactionResponseDto reactToComment(Long commentId, Long memberId, @NotNull ReactionType reactionType) {
+        Comment comment = findByIdOrThrow(commentId);
+
+        switch (reactionType) {
+            case LIKE -> comment.increaseLikeCount();
+            case DISLIKE -> comment.increaseDislikeCount();
+        }
+
+        return CommentDtoConverter.toReactionResponseDto(comment, reactionType);
+    }
+
     private Comment validateCommentOwnershipAndGet(Long commentId, Long memberId) {
         Comment comment = findByIdOrThrow(commentId);
         if (!Objects.equals(comment.getMemberId(), memberId)) {
@@ -206,7 +218,6 @@ public class CommentService {
             default -> throw new IllegalArgumentException("지원하지 않는 게시판 타입입니다: " + boardType);
         }
     }
-
 
     private Comment findByIdOrThrow(Long commentId) {
         return commentRepository.findById(commentId)

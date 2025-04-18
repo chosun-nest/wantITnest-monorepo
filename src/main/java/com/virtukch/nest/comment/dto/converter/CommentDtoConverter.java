@@ -1,8 +1,6 @@
 package com.virtukch.nest.comment.dto.converter;
 
-import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
-import com.virtukch.nest.comment.dto.CommentListResponseDto;
-import com.virtukch.nest.comment.dto.CommentResponseDto;
+import com.virtukch.nest.comment.dto.*;
 import com.virtukch.nest.comment.model.Comment;
 
 import java.time.LocalDateTime;
@@ -33,6 +31,15 @@ public class CommentDtoConverter {
         return CommentListResponseDto.builder()
                 .comments(comments)
                 .totalCount(comments.size())
+                .build();
+    }
+
+    public static CommentReactionResponseDto toReactionResponseDto(Comment comment, ReactionType reactionType) {
+        return CommentReactionResponseDto.builder()
+                .commentId(comment.getCommentId())
+                .likeCount(comment.getLikeCount())
+                .dislikeCount(comment.getDislikeCount())
+                .message(reactionType + " 처리 완료")
                 .build();
     }
     

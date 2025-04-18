@@ -1,12 +1,12 @@
 package com.virtukch.nest.comment.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.comment.dto.CommentListResponseDto;
-import com.virtukch.nest.comment.dto.CommentRequestDto;
-import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
-import com.virtukch.nest.comment.dto.CommentResponseDto;
+import com.virtukch.nest.comment.dto.*;
 import com.virtukch.nest.comment.model.BoardType;
 import com.virtukch.nest.comment.service.CommentService;
+import com.virtukch.nest.comment.swagger.CommentCreateOperation;
+import com.virtukch.nest.comment.swagger.CommentListOperation;
+import com.virtukch.nest.comment.swagger.CommentReactionOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,25 +25,14 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/v1/{boardType}/{postId}/comments")
 @Tag(
-        name = "[모든 게시판 공용] 댓글 API",
-        description = "게시글 상세 페이지에서 사용되는 댓글 생성, 조회, 수정, 삭제 API"
+        name = "[모든 게시판 공통] 댓글 API",
+        description = "게시판 모든 게시글 상세 페이지에서 공통으로 사용되는 댓글 관련 API입니다."
 )
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
 
-    @Operation(
-            summary = "댓글 작성",
-            description = """
-                    특정 게시글에 댓글을 작성합니다.
-                    - 인증된 사용자만 작성 가능
-                    - 댓글 내용은 최대 500자까지 작성 가능
-                    
-                    요청 필드
-                    - `content` (string, required): 댓글 내용 (최대 500자)
-                    """,
-            security = {@SecurityRequirement(name = "bearer-key")}
-    )
+    @CommentCreateOperation
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
             @PathVariable BoardType boardType,
@@ -55,15 +44,7 @@ public class CommentController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @Operation(
-            summary = "댓글 목록 조회",
-            description = "특정 게시글에 작성된 댓글 목록을 조회합니다.",
-            security = {@SecurityRequirement(name = "bearer-key")}
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "댓글 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = CommentListResponseDto.class)))
-    })
+    @CommentListOperation
     @GetMapping
     public ResponseEntity<CommentListResponseDto> getCommentList(@PathVariable BoardType boardType, @PathVariable Long postId) {
         return ResponseEntity.ok(commentService.getCommentList(boardType, postId));
@@ -133,5 +114,22 @@ public class CommentController {
         return ResponseEntity
                 .created(URI.create("/api/posts/" + postId + "/comments/" + response.getCommentId()))
                 .body(response);
+    }
+
+    @CommentReactionOperation
+    @PostMapping("/{commentId}/reaction")
+    public ResponseEntity<CommentReactionResponseDto> reactToComment(
+            @PathVariable BoardType boardType,
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody @Valid CommentReactionRequestDto requestDto
+    ) {
+        CommentReactionResponseDto responseDto = commentService.reactToComment(
+                commentId,
+                user.getMember().getMemberId(),
+                requestDto.getReactionType()
+        );
+        return ResponseEntity.ok(responseDto);
     }
 }

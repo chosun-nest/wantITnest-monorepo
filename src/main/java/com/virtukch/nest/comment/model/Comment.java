@@ -31,6 +31,11 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
+    @Column(nullable = false)
+    private int likeCount = 0;
+
+    @Column(nullable = false)
+    private int dislikeCount = 0;
 
     // 생성 편의 메서드
     public static Comment createComment(BoardType boardType, Long postId, Long memberId, String content) {
@@ -63,5 +68,13 @@ public class Comment extends BaseTimeEntity {
     public void delete() {
         this.isDeleted = true;
         this.commentContent = "삭제된 댓글입니다.";
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount += 1;
+    }
+
+    public void increaseDislikeCount() {
+        this.dislikeCount += 1;
     }
 }
