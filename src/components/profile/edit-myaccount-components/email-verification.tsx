@@ -168,7 +168,7 @@ export default function AccountStudentEmail() {
             </button>
             <button
               onClick={handleSendStudentCode}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className="px-4 py-2 bg-blue-900 text-white rounded"
             >
               {studentTimer > 0 ? "다시 보내기" : "인증코드 보내기"}
             </button>
@@ -176,7 +176,7 @@ export default function AccountStudentEmail() {
         ) : (
           <button
             onClick={() => setStudentMailEditing(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="px-4 py-2 bg-blue-900 text-white rounded"
           >
             설정
           </button>
