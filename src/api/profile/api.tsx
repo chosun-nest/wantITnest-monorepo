@@ -94,19 +94,21 @@ export const withdrawMember = async (): Promise<{ message: string }> => {
   return res.data;
 }
 
+// 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)
 export const getTech = async () => {
-  const res = await API.get("/api/v1/tech-stacks", {
-    headers: { skipAuth: true },
-  });
-  return res.data;
+  const res = API.get("/api/v1/tech-stacks", { headers: { skipAuth: true } });
+  return (await res).data;
 };
 
 // 관심 기술 전체 조회 (GET)
 export const getInterests = async () => {
-  const res = await API.get("/api/v1/interests", {
-    headers: {skipAuth: true},
-  });
-  return res.data;
+  const res = API.get("/api/v1/interests", { headers: { skipAuth: true } });
+  return (await res).data;
 };
 
+// 학과 전체 조회 (GET)
+export const getDepartments = async () => {
+  const res = API.get("/api/v1/departments", { headers: { skipAuth: true } });
+  return (await res).data;
+};

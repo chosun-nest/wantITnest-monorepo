@@ -103,8 +103,12 @@ export default function ProfileCard() {
           email: data.memberEmail,
           major: data.memberDepartmentResponseDtoList[0]?.departmentName || "",
           introduce: data.memberIntroduce || "",
-          interests: data.memberInterestResponseDtoList.map((i: any) => i.interestName),
-          techStacks: data.memberTechStackResponseDtoList.map((t: any) => t.techStackName),
+          interests: data.memberInterestResponseDtoList.map(
+            (i: { interestId: number; interestName: string }) => i.interestName
+          ),        
+          techStacks: data.memberTechStackResponseDtoList.map(
+            (t: { techStackId: number; techStackName: string }) => t.techStackName
+          ),
           sns: [
             data.memberSnsUrl1,
             data.memberSnsUrl2,
