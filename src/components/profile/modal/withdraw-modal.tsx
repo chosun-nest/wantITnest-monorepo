@@ -24,7 +24,7 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-400 bg-opacity-50 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-xl w-[90%] max-w-md shadow-lg">
         <h3 className="text-lg font-bold text-gray-800 mb-3">둥지를 떠난다니 아쉽네요.</h3>
 

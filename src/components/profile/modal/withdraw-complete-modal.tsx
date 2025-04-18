@@ -15,7 +15,7 @@ export default function WithdrawCompleteModal({ onClose }: { onClose: () => void
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gray-400 bg-opacity-50 z-50 flex items-center justify-center">
+  <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
         <h3 className="text-lg font-bold text-gray-800 mb-4">탈퇴되었습니다</h3>
         <p className="text-sm text-gray-600 mb-6">이용해주셔서 감사합니다.</p>
