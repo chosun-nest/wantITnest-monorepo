@@ -1,139 +1,87 @@
 import React, { useState } from "react";
-import API from "../../../api";
+import PasswordSummary from "./password-summary";
+import PasswordVerify from "./passwordVerify";
+import PasswordChangeForm from "./password-changeform";
+import { AnimatePresence } from "framer-motion";
+import { updateMemberPassword } from "../../../api/profile/api"; // password API 호출
 
 export default function AccountPassword() {
-  const [passwords, setPasswords] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
+  const PasswordLength = 10; // TODO: 서버 연동으로 교체
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isPasswordEditing, setPasswordEditing] = useState(false);
-  const [isPasswordSaved, setIsPasswordSaved] = useState(false);
-  const [isCurrentPwVerified, setIsCurrentPwVerified] = useState(false);
+  const handleChange = (field: "current" | "new" | "confirm", value: string) => {
+    setPasswords((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const hasTwoCharTypes = /(?=.*[a-zA-Z])(?=.*[\d\W]).*/.test(passwords.new);
-  const isLengthValid = /^.{8,32}$/.test(passwords.new) && !/\s/.test(passwords.new);
-  const hasNoRepeatedChars = !/(.)\1\1/.test(passwords.new);
-  const isPasswordValid =
-    hasTwoCharTypes && isLengthValid && hasNoRepeatedChars && passwords.new === passwords.confirm;
+  const handleVerify = async () => {
+    if (passwords.current === "test1234") {
+      alert("✅ (임시) 비밀번호 확인 성공");
+      setStep(3);
+    } else {
+      alert("❌ (임시) 비밀번호가 올바르지 않습니다.");
+    }
+  };
 
-  const handleVerifyAndUpdate = async () => {
+  // const handleVerify = async () => {
+  //   try {
+  //     await API.post("/api/v1/members/check-password", { password: passwords.current });
+  //     setStep(3);
+  //   } catch {
+  //     alert("현재 비밀번호가 올바르지 않습니다.");
+  //   }
+  // };
+
+
+  const handleSave = async () => {
     try {
-      await API.post("/api/v1/members/check-password", {
-        password: passwords.current,
-      });
-      setIsCurrentPwVerified(true);
-
-      await API.patch("/api/v1/members/password", {
+      await updateMemberPassword({
         currentPassword: passwords.current,
         newPassword: passwords.new,
+        newPasswordConfirm: passwords.confirm,
       });
-
-      alert("비밀번호가 성공적으로 변경되었습니다.");
-      setPasswordEditing(false);
-      setIsPasswordSaved(true);
-    } catch (err: any) {
-      console.error("비밀번호 변경 실패:", err);
-      alert(
-        err.response?.status === 401
-        ? "현재 비밀번호가 일치하지 않습니다."
-        : "비밀번호 변경 중 오류가 발생했습니다."
-      );
-      setIsCurrentPwVerified(false);
+      alert("비밀번호가 변경되었습니다.");
+      setStep(1);
+      setPasswords({ current: "", new: "", confirm: "" });
+    } catch {
+      alert("비밀번호 변경 실패");
     }
+  };
+
+  const handleCancel = () => {
+    setStep(1);
+    setPasswords({ current: "", new: "", confirm: "" });
   };
 
   return (
     <div className="mb-8">
-      {/* 현재 비밀번호 */}
-      <div className="flex items-center mb-4">
-        <label className="w-36 text-sm font-semibold">현재 비밀번호</label>
-        <input
-          type={isPasswordVisible ? "text" : "password"}
-          value={isPasswordSaved ? "**********" : passwords.current}
-          onChange={(e) => setPasswords((prev) => ({ ...prev, current: e.target.value }))}
-          disabled={isPasswordSaved}
-          className="flex-1 bg-gray-100 p-2 rounded"
+      {step === 1 && (
+        <PasswordSummary
+          onEdit={() => setStep(2)}
+          passwordLength={PasswordLength}
         />
-      </div>
-      {isCurrentPwVerified && (
-        <p className="text-sm text-blue-600 ml-36 mb-2">✔️ 현재 비밀번호가 일치합니다</p>
-      )}
-      {!isPasswordSaved && !isCurrentPwVerified && (
-        <p className="text-xs text-gray-500 ml-36 mb-2">
-          확인을 위해 현재 비밀번호를 다시 입력해 주세요.
-        </p>
       )}
 
-      {/* 새 비밀번호 입력 */}
-      {isPasswordEditing && (
-        <>
-          <div className="flex items-center mb-4">
-            <label className="w-36 text-sm font-semibold">새 비밀번호</label>
-            <input
-              type={isPasswordVisible ? "text" : "password"}
-              value={passwords.new}
-              onChange={(e) => setPasswords((prev) => ({ ...prev, new: e.target.value }))}
-              className="flex-1 p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
-            />
-          </div>
-          <ul className="text-xs ml-36 mb-4 space-y-1">
-            <li className={hasTwoCharTypes ? "text-blue-600" : "text-red-500"}>✓ 영문/숫자/특수문자 중 2가지 이상 포함</li>
-            <li className={isLengthValid ? "text-blue-600" : "text-red-500"}>✓ 8자 이상 32자 이하 입력 (공백 제외)</li>
-            <li className={hasNoRepeatedChars ? "text-blue-600" : "text-red-500"}>✓ 연속 3자 이상 동일한 문자/숫자 제외</li>
-          </ul>
-
-          <div className="flex items-center mb-4">
-            <label className="w-36 text-sm font-semibold">새 비밀번호 확인</label>
-            <input
-              type={isPasswordVisible ? "text" : "password"}
-              value={passwords.confirm}
-              onChange={(e) => setPasswords((prev) => ({ ...prev, confirm: e.target.value }))}
-              className="flex-1 p-2 border rounded  focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
-            />
-          </div>
-          <p className="text-xs text-gray-500 ml-36 mb-4">
-            확인을 위해 새 비밀번호를 다시 입력해주세요.
-          </p>
-        </>
+      {step === 2 && (
+        <PasswordVerify
+          value={passwords.current}
+          onChange={(val) => handleChange("current", val)}
+          onNext={handleVerify}
+          onBack={handleCancel}
+        />
       )}
 
-      {/* 버튼 영역 */}
-      <div className="text-right mt-4">
-        {isPasswordEditing ? (
-          <>
-            <button
-              onClick={() => {
-                setPasswordEditing(false);
-                setPasswords({ current: "", new: "", confirm: "" });
-                setIsCurrentPwVerified(false);
-              }}
-              className="px-4 py-2 mr-2 rounded border"
-            >
-              취소
-            </button>
-            <button
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-            disabled={!isPasswordValid}
-            >
-            저장
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => {
-              setPasswordEditing(true);
-              setIsPasswordSaved(false);
-              setIsCurrentPwVerified(false);
-            }}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            설정
-          </button>
+      <AnimatePresence mode="wait">
+        {step === 3 && (
+          <PasswordChangeForm
+            key="step3"
+            passwords={passwords}
+            onChange={(field, val) => handleChange(field, val)}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 }

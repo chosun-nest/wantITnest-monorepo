@@ -2,6 +2,8 @@ import { API } from "../index_c";
 
 // 회원 정보 조회 (GET)
 export interface MemberProfile {
+  //memberPasswordLength: number; // BE에 비밀번호 길이 추가 요청하기
+  //memberPasswordDate: number; // BE에 비밀번호 변경 날짜 추가 요청하기
   memberId: number;
   memberEmail: string;
   memberRole: string;
