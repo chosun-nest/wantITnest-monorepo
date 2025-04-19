@@ -52,10 +52,32 @@ public class MemberDataLoader implements ApplicationRunner {
 
         memberRepository.save(member);
 
+        Member member2 = Member.builder()
+            .memberEmail("bimo972@chosun.ac.kr")
+            .memberPassword(passwordEncoder.encode("bimo972@chosun.ac.kr")) // 실제로는 BCrypt 등으로 암호화 필요
+            .memberRole(Role.ROLE_USER)
+            .memberName("김영은")
+            .memberSnsUrl1("https://github.com/azureun/")
+            .memberSnsUrl2("https://www.instagram.com/kazureun/")
+            .memberSnsUrl3(null)
+            .memberSnsUrl4(null)
+            .memberIsStudent(true)
+            .memberIntroduce("안녕하세요! 컴퓨터공학 전공 중입니다.")
+            .memberImageUrl("http://119.219.30.209/images/nest/bimo972@chosun.ac.kr")
+            .memberPasswordLength("bimo972@chosun.ac.kr".length())
+            .build();
+
+        memberRepository.save(member2);
+
         List<MemberDepartment> memberDepartmentList = List.of(
             MemberDepartment.builder().memberId(member.getMemberId()).departmentId(1L).build(),
             MemberDepartment.builder().memberId(member.getMemberId()).departmentId(2L).build(),
-            MemberDepartment.builder().memberId(member.getMemberId()).departmentId(3L).build()
+            MemberDepartment.builder().memberId(member.getMemberId()).departmentId(3L).build(),
+
+            MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(1L).build(),
+            MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(2L).build(),
+            MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(3L).build()
+
         );
 
         memberDepartmentRepository.saveAll(memberDepartmentList);
@@ -63,7 +85,11 @@ public class MemberDataLoader implements ApplicationRunner {
         List<MemberTechStack> memberTechStackList = List.of(
             MemberTechStack.builder().memberId(member.getMemberId()).techStackId(1L).build(),
             MemberTechStack.builder().memberId(member.getMemberId()).techStackId(2L).build(),
-            MemberTechStack.builder().memberId(member.getMemberId()).techStackId(3L).build()
+            MemberTechStack.builder().memberId(member.getMemberId()).techStackId(3L).build(),
+
+            MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(1L).build(),
+            MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(2L).build(),
+            MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(3L).build()
         );
 
         memberTechStackRepository.saveAll(memberTechStackList);
@@ -71,7 +97,11 @@ public class MemberDataLoader implements ApplicationRunner {
         List<MemberInterest> memberInterestList = List.of(
             MemberInterest.builder().memberId(member.getMemberId()).interestId(1L).build(),
             MemberInterest.builder().memberId(member.getMemberId()).interestId(2L).build(),
-            MemberInterest.builder().memberId(member.getMemberId()).interestId(3L).build()
+            MemberInterest.builder().memberId(member.getMemberId()).interestId(3L).build(),
+
+            MemberInterest.builder().memberId(member2.getMemberId()).interestId(1L).build(),
+            MemberInterest.builder().memberId(member2.getMemberId()).interestId(2L).build(),
+            MemberInterest.builder().memberId(member2.getMemberId()).interestId(3L).build()
         );
 
         memberInterestRepository.saveAll(memberInterestList);
