@@ -47,6 +47,7 @@ public class MemberDataLoader implements ApplicationRunner {
             .memberIsStudent(true)
             .memberIntroduce("안녕하세요! 컴퓨터공학 전공 중입니다.")
             .memberImageUrl("http://119.219.30.209/images/nest/kch4731@naver.com")
+            .memberPasswordLength("kch4731@naver.com".length())
             .build();
 
         memberRepository.save(member);
