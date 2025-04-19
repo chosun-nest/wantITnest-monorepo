@@ -1,9 +1,12 @@
 package com.virtukch.nest.member.service;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.common.exception.ImageDirectoryCreationException;
+import com.virtukch.nest.common.exception.ImageUploadFailedException;
 import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.member_department.dto.MemberDepartmentResponseDto;
@@ -12,11 +15,13 @@ import com.virtukch.nest.member_interest.dto.MemberInterestResponseDto;
 import com.virtukch.nest.member_interest.service.MemberInterestService;
 import com.virtukch.nest.member_tech_stack.dto.MemberTechStackResponseDto;
 import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
+import java.io.File;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -101,13 +106,16 @@ public class MemberService {
 
         // 2-1. 연관된 정보 업데이트
         if (dto.getMemberInterestUpdateRequestIdList() != null) {
-            memberInterestService.updateMemberInterests(memberId, dto.getMemberInterestUpdateRequestIdList());
+            memberInterestService.updateMemberInterests(memberId,
+                dto.getMemberInterestUpdateRequestIdList());
         }
         if (dto.getMemberDepartmentUpdateRequestIdList() != null) {
-            memberDepartmentService.updateMemberDepartments(memberId, dto.getMemberDepartmentUpdateRequestIdList());
+            memberDepartmentService.updateMemberDepartments(memberId,
+                dto.getMemberDepartmentUpdateRequestIdList());
         }
         if (dto.getMemberTechStackUpdateRequestIdList() != null) {
-            memberTechStackService.updateMemberTechStacks(memberId, dto.getMemberTechStackUpdateRequestIdList());
+            memberTechStackService.updateMemberTechStacks(memberId,
+                dto.getMemberTechStackUpdateRequestIdList());
         }
 
         // 3. 변경 사항 저장 (영속성 컨텍스트 + @Transactional 이면 자동으로 반영됨)
@@ -187,5 +195,35 @@ public class MemberService {
 
         // 회원 자체 삭제
         memberRepository.deleteById(memberId);
+    }
+
+    public String uploadProfileImage(CustomUserDetails customUserDetails, MultipartFile file) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+
+        String filename = "member_" + memberId + "_" + file.getOriginalFilename();
+        String savePath = new File("src/main/resources/static/images").getAbsolutePath();
+
+        // 디렉터리 없으면 생성
+        File dir = new File(savePath);
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new ImageDirectoryCreationException(savePath);
+        }
+
+        File dest = new File(savePath + File.separator + filename);
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("Member not found."));
+
+        try {
+            file.transferTo(dest); // 덮어쓰기 자동 처리
+        } catch (Exception e) {
+            throw new ImageUploadFailedException(
+                "이미지 저장 중 오류가 발생했습니다: " + e.getClass().getSimpleName(), e);
+        }
+
+        String imageUrl = "/images/" + filename;
+        member.updateImageUrl(imageUrl);
+        memberRepository.save(member);
+        return imageUrl;
     }
 }

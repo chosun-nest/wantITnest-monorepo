@@ -1,6 +1,7 @@
 package com.virtukch.nest.member.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.member.dto.MemberImageUploadResponseDto;
 import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -54,9 +56,20 @@ public class MemberController {
         return ResponseEntity.noContent().build(); // 성공 시 응답 바디 없음
     }
 
+    @PostMapping("/me/image")
+    @Operation(summary = "프로필 이미지 업로드", description = "이미지를 업로드하고 이미지 URL을 반환합니다.")
+    public ResponseEntity<MemberImageUploadResponseDto> uploadProfileImage(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestPart("file") MultipartFile file
+    ) {
+        String imageUrl = memberService.uploadProfileImage(customUserDetails, file);
+        return ResponseEntity.ok(MemberImageUploadResponseDto.builder().imageUrl(imageUrl).build());
+    }
+
     @DeleteMapping("/me")
     @Operation(summary = "회원 탈퇴", description = "로그인된 사용자가 자신의 계정을 삭제합니다.")
-    public ResponseEntity<Void> deleteMember(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<Void> deleteMember(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         memberService.deleteMember(customUserDetails);
         return ResponseEntity.noContent().build();
     }
