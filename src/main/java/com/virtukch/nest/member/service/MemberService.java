@@ -63,6 +63,7 @@ public class MemberService {
             .memberIsStudent(member.getMemberIsStudent())
             .memberIntroduce(member.getMemberIntroduce())
             .memberImageUrl(member.getMemberImageUrl())
+            .memberPasswordLength(member.getMemberPasswordLength())
             .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
             .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
@@ -160,8 +161,9 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호 형식이 올바르지 않습니다.");
         }
 
-        // 4. 비밀번호 업데이트
+        // 4. 비밀번호 업데이트 (JPA 의 Dirty Check 에 의해 실제로 업데이트 됨)
         member.updatePassword(passwordEncoder.encode(dto.getNewPassword()));
+        member.updatePasswordLength(dto.getNewPassword().length());
     }
 
     private boolean isValidPasswordFormat(String password) {

@@ -50,6 +50,7 @@ public class AuthService {
             .memberName(signupRequestDto.getMemberName())
             .memberIsStudent(signupRequestDto.getMemberIsStudent())
             .memberRole(Role.ROLE_USER) // ✅ 기본적으로 일반 유저
+            .memberPasswordLength(signupRequestDto.getPassword().length())
             .build();
         memberRepository.save(member);
 

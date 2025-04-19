@@ -27,6 +27,7 @@ public class MemberResponseDto {
     private Boolean memberIsStudent;
     private String memberIntroduce;
     private String memberImageUrl;
+    private Integer memberPasswordLength;
     private List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList;
     private List<MemberInterestResponseDto> memberInterestResponseDtoList;
     private List<MemberTechStackResponseDto> memberTechStackResponseDtoList;

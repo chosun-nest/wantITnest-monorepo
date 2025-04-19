@@ -41,11 +41,13 @@ public class Member {
 
     private String memberImageUrl;
 
+    private Integer memberPasswordLength;
+
     @Builder
     public Member(String memberEmail, String memberPassword, Role memberRole,
         String memberName, String memberSnsUrl1, String memberSnsUrl2,
         String memberSnsUrl3, String memberSnsUrl4, boolean memberIsStudent, String memberIntroduce,
-        String memberImageUrl) {
+        String memberImageUrl, Integer memberPasswordLength) {
         this.memberEmail = memberEmail;
         this.memberPassword = memberPassword;
         this.memberRole = memberRole;
@@ -57,6 +59,7 @@ public class Member {
         this.memberIsStudent = memberIsStudent;
         this.memberIntroduce = memberIntroduce;
         this.memberImageUrl = memberImageUrl;
+        this.memberPasswordLength = memberPasswordLength;
     }
 
     public void updateEmail(String memberEmail) {
@@ -101,5 +104,9 @@ public class Member {
 
     public void updateImageUrl(String imageUrl) {
         this.memberImageUrl = imageUrl;
+    }
+
+    public void updatePasswordLength(Integer passwordLength) {
+        this.memberPasswordLength = passwordLength;
     }
 }
