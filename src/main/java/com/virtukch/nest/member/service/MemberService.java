@@ -226,4 +226,13 @@ public class MemberService {
         memberRepository.save(member);
         return imageUrl;
     }
+
+    public boolean checkPassword(CustomUserDetails customUserDetails, String inputPassword) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
+
+        return passwordEncoder.matches(inputPassword, member.getMemberPassword());
+    }
 }

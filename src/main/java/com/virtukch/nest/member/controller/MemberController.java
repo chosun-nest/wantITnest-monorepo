@@ -1,10 +1,12 @@
 package com.virtukch.nest.member.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.member.dto.MemberCheckPasswordRequestDto;
 import com.virtukch.nest.member.dto.MemberImageUploadResponseDto;
 import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
+import com.virtukch.nest.member.dto.MemberCheckPasswordResponseDto;
 import com.virtukch.nest.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -72,5 +74,26 @@ public class MemberController {
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         memberService.deleteMember(customUserDetails);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+        summary = "비밀번호 확인",
+        description = """
+            사용자가 입력한 현재 비밀번호가 맞는지 확인합니다. 
+            민감한 정보 변경(예: 비밀번호 변경, 탈퇴 등) 전에 호출해 사용할 수 있습니다.
+            """)
+    @PostMapping("/check-password")
+    public ResponseEntity<MemberCheckPasswordResponseDto> checkPassword(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestBody MemberCheckPasswordRequestDto memberCheckPasswordRequestDto
+    ) {
+        boolean result = memberService.checkPassword(customUserDetails,
+            memberCheckPasswordRequestDto.getPassword());
+        if (result) {
+            return ResponseEntity.ok(new MemberCheckPasswordResponseDto("비밀번호가 일치합니다."));
+        } else {
+            return ResponseEntity.status(401)
+                .body(new MemberCheckPasswordResponseDto("비밀번호가 일치하지 않습니다."));
+        }
     }
 }
