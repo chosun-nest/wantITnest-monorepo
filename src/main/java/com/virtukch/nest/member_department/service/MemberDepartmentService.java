@@ -7,6 +7,7 @@ import com.virtukch.nest.member_department.repository.MemberDepartmentRepository
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +41,15 @@ public class MemberDepartmentService {
                 .departmentName(departmentService.findById(memberDepartment.getDepartmentId()).getDepartmentName())
                 .build())
             .toList();
+    }
+
+    public void deleteByMemberId(Long memberId) {
+        memberDepartmentRepository.deleteByMemberId(memberId);
+    }
+
+    @Transactional
+    public void updateMemberDepartments(Long memberId, List<Long> departmentIdList) {
+        memberDepartmentRepository.deleteByMemberId(memberId);
+        create(memberId, departmentIdList);
     }
 }

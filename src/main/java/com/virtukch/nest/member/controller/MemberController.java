@@ -1,7 +1,12 @@
 package com.virtukch.nest.member.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.member.dto.MemberCheckPasswordRequestDto;
+import com.virtukch.nest.member.dto.MemberImageUploadResponseDto;
+import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
+import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
+import com.virtukch.nest.member.dto.MemberCheckPasswordResponseDto;
 import com.virtukch.nest.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -31,5 +37,63 @@ public class MemberController {
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
             memberService.getCurrentMemberByCustomUserDetails(customUserDetails));
+    }
+
+    @PatchMapping("/me")
+    @Operation(summary = "회원 정보 수정", description = "변경하고자 하는 필드만 포함하여 전송하세요. 미포함된 필드는 기존 값을 유지합니다.")
+    public ResponseEntity<MemberResponseDto> updateMemberInfo(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestBody MemberUpdateRequestDto memberUpdateRequestDto) {
+        return ResponseEntity.ok(
+            memberService.updateMemberInfo(customUserDetails, memberUpdateRequestDto));
+    }
+
+    @PatchMapping("/me/password")
+    @Operation(summary = "비밀번호 변경", description = "현재 비밀번호 확인 후 새 비밀번호로 변경합니다.")
+    public ResponseEntity<Void> changePassword(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestBody MemberPasswordChangeRequestDto memberPasswordChangeRequestDto
+    ) {
+        memberService.changePassword(customUserDetails, memberPasswordChangeRequestDto);
+        return ResponseEntity.noContent().build(); // 성공 시 응답 바디 없음
+    }
+
+    @PostMapping("/me/image")
+    @Operation(summary = "프로필 이미지 업로드", description = "이미지를 업로드하고 이미지 URL을 반환합니다.")
+    public ResponseEntity<MemberImageUploadResponseDto> uploadProfileImage(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestPart("file") MultipartFile file
+    ) {
+        String imageUrl = memberService.uploadProfileImage(customUserDetails, file);
+        return ResponseEntity.ok(MemberImageUploadResponseDto.builder().imageUrl(imageUrl).build());
+    }
+
+    @DeleteMapping("/me")
+    @Operation(summary = "회원 탈퇴", description = "로그인된 사용자가 자신의 계정을 삭제합니다.")
+    public ResponseEntity<Void> deleteMember(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        memberService.deleteMember(customUserDetails);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+        summary = "비밀번호 확인",
+        description = """
+            사용자가 입력한 현재 비밀번호가 맞는지 확인합니다. 
+            민감한 정보 변경(예: 비밀번호 변경, 탈퇴 등) 전에 호출해 사용할 수 있습니다.
+            """)
+    @PostMapping("/check-password")
+    public ResponseEntity<MemberCheckPasswordResponseDto> checkPassword(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @RequestBody MemberCheckPasswordRequestDto memberCheckPasswordRequestDto
+    ) {
+        boolean result = memberService.checkPassword(customUserDetails,
+            memberCheckPasswordRequestDto.getPassword());
+        if (result) {
+            return ResponseEntity.ok(new MemberCheckPasswordResponseDto("비밀번호가 일치합니다."));
+        } else {
+            return ResponseEntity.status(401)
+                .body(new MemberCheckPasswordResponseDto("비밀번호가 일치하지 않습니다."));
+        }
     }
 }
