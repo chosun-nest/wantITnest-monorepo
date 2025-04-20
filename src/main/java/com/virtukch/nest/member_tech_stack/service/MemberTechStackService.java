@@ -7,6 +7,7 @@ import com.virtukch.nest.tech_stack.service.TechStackService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +42,15 @@ public class MemberTechStackService {
                     techStackService.findById(memberTechStack.getTechStackId()).getTechStackName())
                 .build())
             .toList();
+    }
+
+    public void deleteByMemberId(Long memberId) {
+        memberTechStackRepository.deleteByMemberId(memberId);
+    }
+
+    @Transactional
+    public void updateMemberTechStacks(Long memberId, List<Long> techStackIdList) {
+        memberTechStackRepository.deleteByMemberId(memberId);
+        create(memberId, techStackIdList);
     }
 }

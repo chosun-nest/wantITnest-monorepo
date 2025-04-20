@@ -7,6 +7,7 @@ import com.virtukch.nest.member_interest.repository.MemberInterestRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +36,19 @@ public class MemberInterestService {
                 .memberInterestId(memberInterest.getMemberInterestId())
                 .memberId(memberInterest.getMemberId())
                 .interestId(memberInterest.getInterestId())
-                .interestName(interestService.findById(memberInterest.getMemberId()).getInterestName())
+                .interestName(interestService.findById(memberInterest.getInterestId()).getInterestName())
                 .build())
             .toList();
+    }
+
+    @Transactional
+    public void deleteByMemberId(Long memberId) {
+        memberInterestRepository.deleteByMemberId(memberId);
+    }
+
+    @Transactional
+    public void updateMemberInterests(Long memberId, List<Long> interestIdList) {
+        memberInterestRepository.deleteByMemberId(memberId);
+        create(memberId, interestIdList);
     }
 }
