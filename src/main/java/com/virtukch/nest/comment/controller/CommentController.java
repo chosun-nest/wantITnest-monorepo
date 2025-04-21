@@ -7,6 +7,7 @@ import com.virtukch.nest.comment.service.CommentService;
 import com.virtukch.nest.comment.swagger.CommentCreateOperation;
 import com.virtukch.nest.comment.swagger.CommentListOperation;
 import com.virtukch.nest.comment.swagger.CommentReactionOperation;
+import com.virtukch.nest.comment.swagger.CommentDeleteOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +27,7 @@ import java.net.URI;
 @RequestMapping("/api/v1/{boardType}/{postId}/comments")
 @Tag(
         name = "[모든 게시판 공통] 댓글 API",
-        description = "게시판 모든 게시글 상세 페이지에서 공통으로 사용되는 댓글 관련 API입니다."
+        description = "게시판 모든 게시글 상세 페이지에서 공통으로 사용되는 댓글 관련 API"
 )
 @RequiredArgsConstructor
 public class CommentController {
@@ -72,19 +73,7 @@ public class CommentController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(
-            summary = "댓글&대댓글 삭제",
-            description = """
-                    특정 댓글을 삭제합니다.
-                    - 본인이 작성한 댓글만 삭제할 수 있습니다.
-                    - 삭제 후 commentId와 메시지를 응답합니다.
-                    """,
-            security = {@SecurityRequirement(name = "bearer-key")}
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "댓글 삭제 성공",
-                    content = @Content(schema = @Schema(implementation = CommentDeleteResponseDto.class)))
-    })
+    @CommentDeleteOperation
     @DeleteMapping("/{commentId}")
     public ResponseEntity<CommentDeleteResponseDto> deleteComment(
             @PathVariable Long commentId,

@@ -21,9 +21,9 @@ import java.lang.annotation.Target;
         summary = "댓글 목록 조회",
         description = """
                 특정 게시판 타입(`boardType`)과 게시글 ID(`postId`)에 해당하는 모든 댓글을 계층 구조(대댓글 포함)로 조회합니다.
-                
-                📌 댓글은 작성 시간 기준으로 정렬되며, soft-delete된 댓글은 '삭제된 댓글입니다' 형태로 반환됩니다.
-                📌 대댓글이 없는 댓글은 hard-delete 되어 DB에서 삭제됩니다.
+                <br>
+                📌 댓글은 작성 시간 기준으로 정렬되며, soft-delete된 댓글은 '삭제된 댓글입니다' 형태로 반환됩니다.<br>
+                📌 대댓글이 없는 댓글은 hard-delete 되어 DB에서 삭제됩니다.<br>
                 """,
         security = {@SecurityRequirement(name = "bearer-key")},
         parameters = {
