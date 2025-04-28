@@ -4,15 +4,33 @@ import * as S from "../../assets/styles/navbar.styles";
 import useResponsive from "../../hooks/responsive";
 import { useNavigate } from "react-router-dom";
 import { useNavbarHeight } from "../../context/NavbarHeightContext";
+import { getMemberProfile, MemberProfile } from "../../api/profile/api";
 
 function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const isMobile = useResponsive();
   const { setShowBackdrop } = useBackdrop();
   const { setNavbarHeight } = useNavbarHeight();
   const navigate = useNavigate();
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(
+    null
+  );
+
+  // api/profile/api의 API 호출
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profile = await getMemberProfile();
+        setMemberProfile(profile);
+      } catch (error) {
+        console.error("프로필 불러오기 실패:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   // ResizeObserver로 Navbar 높이 자동 감지
   useEffect(() => {
@@ -90,9 +108,15 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
           {localStorage.getItem("accesstoken") ? (
             <S.ProfileWrapper ref={menuRef}>
               <S.ProfileIcon
-                src="/assets/images/user.png"
+                src={memberProfile?.memberImageUrl || "/assets/images/user.png"}
                 onClick={() => setIsMenuOpen((prev) => !prev)}
-              />
+              />{" "}
+              {memberProfile != null ? (
+                <div className="text-[12px]">
+                  {memberProfile.memberName} 님 <br />
+                  환영합니다!
+                </div>
+              ) : null}
               <S.ProfileMenu $visible={isMenuOpen}>
                 <S.ProfileMenuItem onClick={() => navigate("/profile")}>
                   내 프로필
