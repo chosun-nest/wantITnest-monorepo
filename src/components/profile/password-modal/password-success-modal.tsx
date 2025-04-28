@@ -10,7 +10,7 @@ export default function PasswordSuccessModal({ onClose }: Props) {
 
   const handleConfirm = () => {
     onClose();
-    navigate("/login"); // 예시: 로그인 페이지로 이동 (필요시 수정)
+    navigate("/src/routes/login.tsx");
   };
 
   return (

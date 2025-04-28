@@ -15,21 +15,20 @@ export const uploadProfileImage = async (base64: string) => {
 };
 
 // 비밀번호 확인 (POST)
-export interface CheckPasswordPayload {
-  password: string;
-}
+export interface CheckPasswordPayload { password: string; }
 
-export const checkPassword = async (payload: CheckPasswordPayload): Promise<{ success: boolean }> => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
-
+// validateStatus: status < 500 >> 401도 성공으로 처리
+export const checkPassword = async (payload: CheckPasswordPayload) => {
   const res = await API.post(
     "/api/v1/members/check-password",
     payload,
-    { headers: { Authorization: `Bearer ${token}` } }
+    {
+      headers: { /* skipAuth 없이 토큰 포함 */ },
+      validateStatus: (status) => status < 500,
+    }
   );
-
-  return res.data;
+  // 이제 status 200 > success, 401 > failure 으로 직접 구분
+  return res;
 };
 
 // 회원 정보 조회 (GET)
@@ -81,11 +80,11 @@ export const withdrawMember = async (): Promise<{ message: string }> => {
   if (!token) throw new Error("No access token");
 
   const res = await API.delete("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   return res.data;
-}
+};
 
 // 회원 정보 수정 (PATCH)
 export interface UpdateMemberProfilePayload {

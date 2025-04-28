@@ -1,5 +1,9 @@
+// src/components/profile/withdraw-modal/WithdrawModal.tsx
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { checkPassword } from "../../../api/profile/api";
+import LoadingDots from "../password-modal/loading-dots";
+import CheckIcon from "../password-modal/check-icon";
 
 interface Props {
   onClose: () => void;
@@ -9,18 +13,32 @@ interface Props {
 export default function WithdrawModal({ onClose, onConfirm }: Props) {
   const [agreed, setAgreed] = useState(false);
   const [password, setPassword] = useState("");
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [isVerified, setIsVerified] = useState<boolean | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const isFormValid = agreed && isPasswordValid;
+  // 안내사항 + 비밀번호 검증이 모두 통과해야 버튼 활성화 됨
+  const isFormValid = agreed && isVerified === true;
 
-  const mockVerifyPassword = (pw: string) => {
-    // 실제 API 연동 전까지 임시 검증 로직 (나중에 서버 검증으로 대체 가능)
-    setIsPasswordValid(pw === "test1234");
-  };
+  const handleVerify = async () => {
+    setError(null);
+    if (!password) return;
+    setIsChecking(true);
 
-  const handlePasswordChange = (val: string) => {
-    setPassword(val);
-    mockVerifyPassword(val);
+    try {
+      const res = await checkPassword({ password });
+      if (res.status === 200) {
+        setIsVerified(true);
+      } else {
+        setIsVerified(false);
+        setError("비밀번호가 일치하지 않습니다.");
+      }
+    } catch {
+      setError("서버 오류가 발생했습니다.");
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   return (
@@ -42,7 +60,7 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
             <input
               type="checkbox"
               checked={agreed}
-              onChange={() => setAgreed(!agreed)}
+              onChange={() => setAgreed((prev) => !prev)}
               className="mr-2"
             />
             안내사항을 모두 확인했습니다.
@@ -62,17 +80,39 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 비밀번호 확인
               </label>
-              <input
-                type="password"
-                placeholder="현재 비밀번호를 입력하세요"
-                value={password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                className="w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
-              />
-              {password.length > 0 && (
-                <p className={`mt-2 text-sm ${isPasswordValid ? "text-green-600" : "text-red-500"}`}>
-                  {isPasswordValid ? "비밀번호가 일치합니다" : "비밀번호가 일치하지 않습니다"}
-                </p>
+
+              <div className="relative">
+                <input
+                  type={showPwd ? "text" : "password"}
+                  placeholder="현재 비밀번호를 입력하세요"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onBlur={handleVerify}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-800 pr-10"
+                  disabled={isChecking || isVerified === true}
+                />
+
+                {/* 숨기기/보기 토글 */}
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  onClick={() => setShowPwd((prev) => !prev)}
+                >
+                  {showPwd ? "🔒" : "👁️"}
+                </button>
+
+                {/* 로딩, 체크 아이콘 */}
+                <div className="absolute inset-y-0 right-10 flex items-center pr-2">
+                  {isChecking
+                    ? <LoadingDots />
+                    : isVerified
+                      ? <CheckIcon />
+                      : null}
+                </div>
+              </div>
+
+              {error && (
+                <p className="mt-2 text-sm text-red-500">{error}</p>
               )}
             </motion.div>
           )}
@@ -81,7 +121,7 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
         <div className="text-right">
           <button
             onClick={onClose}
-            className="px-4 py-2 mr-2 border rounded"
+            className="px-4 py-2 mr-2 border rounded hover:bg-gray-100"
           >
             닫기
           </button>
@@ -89,7 +129,7 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
             onClick={() => onConfirm(password)}
             disabled={!isFormValid}
             className={`px-4 py-2 rounded text-white ${
-              isFormValid ? "bg-blue-900 hover:bg-blue-950" : "bg-gray-300 cursor-not-allowed"
+              isFormValid ? "bg-red-700 hover:bg-red-800" : "bg-gray-300 cursor-not-allowed"
             }`}
           >
             탈퇴하기
