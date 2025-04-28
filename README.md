@@ -1,60 +1,98 @@
-# **==WantIt-Nest-FE==**
+# 공지사항 게시판 Notice: FastAPI + Selenium + BeautifulSoup + React 프랜턴드 연동
 
-- 여기는 WantIt-Nest의 Front-End 개인 개발 허브입니다.
-- 인증 관련 로직과 메인 화면의 대시보드, 레이아웃 등을 개발합니다.
+## 허용 환경
+- **Python FastAPI** 사용
+- **Selenium + BeautifulSoup4**로 현재 페이지에서 공지사항 통합 프리 클롤링
+- **React (axios)** 호출로 자동으로 JSON 검색 결과 가져오기
+- **Spring Boot** 버튼에 맞춰 프로젝트 게시판화
 
-# 04/06
+---
 
-## 인증 로직
+## 가장 가장 기준 건해서 실행할 것:
 
-### 회원 가입
+### ☑️ FastAPI + Selenium + BeautifulSoup 컨스트롤
 
-- 회원 가입시 인증 메일 보내는 것 까진 완료 했습니다.
-- 이젠 이메일 인증 받고, 그 다음에 다음 버튼을 누를 수 있도록 수정 할 계획입니다.
-- 학과, 기술, 관심 분야에 datalist를 추가해 연관 검색어를 찾을 수 있도록 만들었습니다.
-- 만약 각 list에 없는 단어면 추가할 수 없도록 수정할 계획입니다.
-- 현재는 입력 후 엔터를 치면 추가하는 방식이나 검색까지만 허용하고 list에 나타난 data를 클릭해야 추가될 수 있도록 수정 할 계획입니다.
+1. **venv 활성화**
 
-## 레이아웃
+```bash
+.\venv\Scripts\activate
+```
 
-- 간단한 수정입니다. Sign In -> Sign Up으로 수정했습니다.
+2. **필요한 패키지 설치 (1회 만 하면 되어함)**
 
-## 병합
+```bash
+pip install fastapi uvicorn selenium beautifulsoup4 webdriver-manager apscheduler requests
+```
 
-- 현재 프로필 카드 개발과 병합했습니다.
-- 용케도 충돌이 안일어나다니... 살짝 기쁘네요
+3. **FastAPI 서버 실행**
 
-## 여담
+```bash
+cd src/components/notice
+uvicorn notice_crawler:app --host 0.0.0.0 --port 8000 --reload
+```
+- `notice_crawler`: Python 파일 이름 (.py 제외)
+- `app`: FastAPI 인스턴스 객체 이름
+- `--reload`: 자동 간격 검색 시 서버 자동 갱신 (개발용)
 
-- 아 진짜 귀찮네요. 자고 싶습니다.
-- firebase로 개인 개발 할 때는 진짜 쉽고, 직관적이었는데 BE가 API를 만들어준걸 이용하다 보니 서로 피곤하네요
-- BE도 데베 뿌수고 새로 만들고, API 수정하고... 고생이 참 많아요...
+---
 
-# 03/31
+### 클롤링 + Spring API 연결
 
-## 인증 로직
+- `/crawl`  호출:  클롤링만 하고 결과\uub9cc JSON으로 보기
+- `/crawl-and-post` 호출:  클롤링 + Spring API (localhost:6030) POST 전송
 
-### 로그인
+---
 
-- 백엔드 API를 따와 acc토큰, ref토큰을 locastorage에 저장하여 로그인을 하거나, 자동 로그인되어있게 만들었습니다.
-- 추 후 acc 토큰이 valid한지를 검사하여 일정 시간이 지나면 자동 로그인이 풀리도록 만들 계획입니다.
+## 해상 경로
 
-### 회원 가입
+| 가능 | 설명 |
+|:---|:---|
+| 클롤링 수행 | Selenium 가상 브라우저(호용메뉴)가 들어어서 페이지 검색 |
+| HTML 파싱 | BeautifulSoup으로 해당 |
+| React 연동 | axios 검색 호출 (http://localhost:8000/crawl) |
+| Spring 연동 | crawl-and-post로 POST 전송 |
+| 자동화 | apscheduler 사용해 매일 새벽 3시 자동 실행 |
 
-- 현재는 회원가입을 개발중이며 백엔드와 API 협의를 하고 있습니다.
-- 회원 가입 시에 기술 스택 및 관심 분야 데이터 베이스를 가져와 #태그를 달고 검색을 할 경우 드롭다운으로 연관 검색어가 나오도록 개발할 계획입니다.
 
-## 대시보드
+---
 
-- 팀원들의 컴포넌트를 가져와 대시보드에 띄울 계획입니다.
-- 아직 팀원들이 덜 완성해 완벽하지 않은 상태입니다.
+## 팝업 - FastAPI 서버 Dockerfile 작성 방법
 
-## 레이아웃
+**Dockerfile-crawler** 예제:
 
-- 현재 팀원의 요청을 받아 간단한 수정을 마쳤습니다.
-- nabvar.tsx를 forwardRef로 감싼 뒤 context를 하나 만들어 전역 변수로 navbar의 높이를 가져올 수 있도록 수정했습니다.
+```Dockerfile
+FROM python:3.10-slim
 
-# 여담
+WORKDIR /app
 
-- 팀원이랑 같이 협업하려니깐 소통이 가장 중요하단걸 알았네요.
-- 혼자 개발할 땐 대충 암거나 막 지어서 편했지만 지금은 불편하더라도 틀이 잡혀있으니 개발 방향이 명확해 보입니다.
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["uvicorn", "notice_crawler:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+```
+- selenium과 전역 chromedriver에 대한 차포파일이 있어야 해요.
+- 반드시 Dockerfile을 조정 해서 chrome와 chromedriver을 설치해야 합니다.
+
+
+
+---
+
+## 결론
+
+- FastAPI + Selenium + BeautifulSoup 프랜턴에서  **가능한 자동적 클롤링**
+- **React** 에서 구현한 /crawl 호출으로 결과가 시간이 간격하고
+- 내보고 **Spring API** 로 전송까지 가능\uud83d�
+- 파일가 없을 경우, 검색을 해야 하며
+- **apscheduler**를 통해 하루 한 번 자동적으로 수행
+
+---
+
+# ☑️  클릭하면 확인 할 것!
+- [x] `http://localhost:8000/crawl` (클롤링 검색)
+- [x] `http://localhost:8000/crawl-and-post` (클롤링 + Spring 전송)
+
+---
+
+**⭐️ Tip: Spring 서버(localhost:6030)가 켜져 있어야 crawl-and-post가 정상 동작합니다!**
+
