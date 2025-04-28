@@ -92,7 +92,7 @@ CMD ["uvicorn", "notice_crawler:app", "--host", "0.0.0.0", "--port", "8000", "--
 
 ---
 
-**venv 정상 해제**
+**venv 정상 해제(Windows cmd)**
 ```
 .\venv\Scripts\deactivate.bat
 ```
