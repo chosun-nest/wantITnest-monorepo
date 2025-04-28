@@ -8,8 +8,8 @@ import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import CreateProfile from "./routes/create-profile";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
-import NoticeBoard from "./routes/notice-board"; //yu-gyeom
-import Notice from "./routes/notice"; //yu-gyeom
+// import NoticeBoard from "./routes/notice-board"; //yu-gyeom 
+import NoticeBoard from './components/notice/NoticeBoard'; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
@@ -38,12 +38,8 @@ const router = createBrowserRouter([
         element: <ProjectBoard />,
       },
       {
-        path: "notice-board/",
+        path: "notice-board/", // ｈｙｅ－ｒｉｎ 
         element: <NoticeBoard />,
-      },
-      {
-        path: "notice/:id",
-        element: <Notice />,
       },
       {
         path: "interests-board/",
@@ -89,6 +85,8 @@ function App() {
         <RouterProvider router={router} />
       </BackdropContext.Provider>
     </>
+
+  
   );
 }
 
