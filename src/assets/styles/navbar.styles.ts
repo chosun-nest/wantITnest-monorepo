@@ -75,7 +75,7 @@ export const NavRight = styled.div`
 
 export const ProfileWrapper = styled.div`
   position: relative;
-  display: inline-block;
+  display: flex;
 `;
 
 export const ProfileIcon = styled.img`

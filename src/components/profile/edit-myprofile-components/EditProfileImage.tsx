@@ -14,9 +14,9 @@ export default function EditProfileImage({ image, isEditing, onChange, fileInput
       <label className="w-28 text-sm font-semibold">이미지</label>
       <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
         <img
-          src={image}
+          src={image || "assets/images/user.png"}
           alt="프로필"
-          className="w-24 h-24 rounded-lg object-cover group-hover:opacity-80 transition"
+          className="w-24 h-24 rounded object-cover group-hover:opacity-80 transition"
         />
         {isEditing && (
           <input

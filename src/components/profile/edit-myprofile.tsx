@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getMemberProfile, getTech, getInterests, getDepartments } from "../../api/profile/api";
-import { updateMemberProfile } from "../../api/profile/api";
+import { uploadProfileImage, updateMemberProfile } from "../../api/profile/api";
 
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
@@ -169,13 +169,33 @@ export default function MyProfile() {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfile((prev) => ({ ...prev, image: imageUrl }));
+    if (!file) return;
+  
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);  // base64 변환
+      reader.onloadend = async () => {
+        const base64 = reader.result;
+        if (!base64 || typeof base64 !== "string") return;
+  
+        // 수정된 uploadProfileImage 호출
+        const uploadRes = await uploadProfileImage(base64);
+        const uploadedImageUrl = uploadRes.url;  // 서버가 반환한 url
+  
+        setProfile((prev) => ({
+          ...prev,
+          image: uploadedImageUrl,  // profile.image에 저장
+        }));
+      };
+    } catch (err) {
+      console.error("이미지 업로드 실패", err);
+      alert("이미지 업로드 실패!");
     }
   };
+  
+  
 
   const handleSave = async () => {
     const token = localStorage.getItem("accesstoken");
@@ -192,7 +212,7 @@ export default function MyProfile() {
 
         await updateMemberProfile({
           memberIntroduce: profile.introduce,
-          memberImageUrl: profile.image, // 서버 저장용 이미지 URL이 실제로 필요할 경우
+          memberImageUrl: profile.image, // 서버 url로 저장됨.
           memberSnsUrl1: profile.sns[0] || "",
           memberSnsUrl2: profile.sns[1] || "",
           memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],

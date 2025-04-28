@@ -1,9 +1,30 @@
 import { API } from "../index_c";
 
+// 프로필 이미지 업로드 (POST)
+export const uploadProfileImage = async (base64: string) => {
+  const res = await API.post("/api/v1/members/me/image", { file: base64 });
+  return res.data;
+};
+
+// 비밀번호 확인 (POST)
+export interface CheckPasswordPayload { password: string; }
+
+// validateStatus: status < 500 >> 401도 성공으로 처리
+export const checkPassword = async (payload: CheckPasswordPayload) => {
+  const res = await API.post(
+    "/api/v1/members/check-password",
+    payload,
+    {
+      headers: { /* skipAuth 없이 토큰 포함 */ },
+      validateStatus: (status) => status < 500,
+    }
+  );
+  // 이제 status 200 > success, 401 > failure 으로 직접 구분
+  return res;
+};
+
 // 회원 정보 조회 (GET)
 export interface MemberProfile {
-  //memberPasswordLength: number; // BE에 비밀번호 길이 추가 요청하기
-  //memberPasswordDate: number; // BE에 비밀번호 변경 날짜 추가 요청하기
   memberId: number;
   memberEmail: string;
   memberRole: string;
@@ -15,15 +36,25 @@ export interface MemberProfile {
   memberIsStudent: boolean;
   memberIntroduce: string;
   memberImageUrl: string;
+  memberPasswordLength: number;
+
   memberDepartmentResponseDtoList: {
+    memberDepartmentId: number;
+    memberId: number;
     departmentId: number;
     departmentName: string;
   }[];
+
   memberInterestResponseDtoList: {
+    memberInterestId: number;
+    memberId: number;
     interestId: number;
     interestName: string;
   }[];
+
   memberTechStackResponseDtoList: {
+    memberTechStackId: number;
+    memberId: number;
     techStackId: number;
     techStackName: string;
   }[];
@@ -31,6 +62,19 @@ export interface MemberProfile {
 
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
+  return res.data;
+};
+
+
+// 회원 탈퇴 (DELETE)
+export const withdrawMember = async (): Promise<{ message: string }> => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.delete("/api/v1/members/me", {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+  });
+
   return res.data;
 };
 
@@ -55,13 +99,12 @@ export const updateMemberProfile = async (
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
-  const res = await API.patch (
-    "/api/v1/members/me", payload, { 
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+  const res = await API.patch("/api/v1/members/me", payload, {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
   });
 
   return res.data;
-}
+};
 
 // 비밀번호 변경 (PATCH)
 export interface UpdateMemberPasswordPayload {
@@ -71,30 +114,18 @@ export interface UpdateMemberPasswordPayload {
 }
 
 export const updateMemberPassword = async (
-  payload: UpdateMemberPasswordPayload  
-): Promise<{ message: string }> => {                // Promise<{ message: string }> 단순 메시지 리턴
+  payload: UpdateMemberPasswordPayload
+): Promise<{ message: string }> => {
+  // Promise<{ message: string }> 단순 메시지 리턴
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
-  const res = await API.patch (
-    "/api/v1/members/me/password", payload, {
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+  const res = await API.patch("/api/v1/members/me/password", payload, {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
   });
 
   return res.data;
-}
-
-// 회원 탈퇴 (DELETE)
-export const withdrawMember = async (): Promise<{ message: string }> => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
-
-  const res = await API.delete("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
-  });
-
-  return res.data;
-}
+};
 
 // 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)
