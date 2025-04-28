@@ -1,5 +1,22 @@
 import { API } from "../index_c";
 
+// 프로필 이미지 업로드 (POST)
+export const uploadProfileImage = async (base64: string) => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.post(
+    "/api/v1/members/me/image",
+    { file: base64 },   // POST body는 { file: "base64 string" }
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  return res.data;
+};
+
+// 비밀번호 확인 (POST)
+
+
 // 회원 정보 조회 (GET)
 export interface MemberProfile {
   //memberPasswordLength: number; // BE에 비밀번호 길이 추가 요청하기
@@ -33,6 +50,18 @@ export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
   return res.data;
 };
+
+// 회원 탈퇴 (DELETE)
+export const withdrawMember = async (): Promise<{ message: string }> => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.delete("/api/v1/members/me", {
+    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+  });
+
+  return res.data;
+}
 
 // 회원 정보 수정 (PATCH)
 export interface UpdateMemberProfilePayload {
@@ -78,18 +107,6 @@ export const updateMemberPassword = async (
 
   const res = await API.patch (
     "/api/v1/members/me/password", payload, {
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
-  });
-
-  return res.data;
-}
-
-// 회원 탈퇴 (DELETE)
-export const withdrawMember = async (): Promise<{ message: string }> => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
-
-  const res = await API.delete("/api/v1/members/me", {
     headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
   });
 

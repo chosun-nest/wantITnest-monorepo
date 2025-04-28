@@ -16,7 +16,7 @@ export default function EditProfileImage({ image, isEditing, onChange, fileInput
         <img
           src={image}
           alt="프로필"
-          className="w-24 h-24 rounded-lg object-cover group-hover:opacity-80 transition"
+          className="w-24 h-24 rounded object-cover group-hover:opacity-80 transition"
         />
         {isEditing && (
           <input
