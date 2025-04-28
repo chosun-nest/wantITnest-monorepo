@@ -1,10 +1,20 @@
 import { API } from "../index_c";
 
 // 프로필 이미지 업로드 (POST)
+// export const uploadProfileImage = async (base64: string): Promise<string> => {
+//   const { data } = await API.post("/api/v1/members/me/image", { file: base64 });
+//   return data.url;
+// };
 export const uploadProfileImage = async (base64: string) => {
-  const res = await API.post("/api/v1/members/me/image", { file: base64 });
-  return res.data;
+  try {
+    const res = await API.post("/api/v1/members/me/image", { file: base64 });
+    return res.data;
+  } catch (error) {
+    console.error("프로필 이미지 업로드 실패", error);
+    throw error;
+  }
 };
+
 
 // 비밀번호 확인 (POST)
 export interface CheckPasswordPayload { password: string; }

@@ -180,22 +180,20 @@ export default function MyProfile() {
         const base64 = reader.result;
         if (!base64 || typeof base64 !== "string") return;
   
-        // 수정된 uploadProfileImage 호출
-        const uploadRes = await uploadProfileImage(base64);
-        const uploadedImageUrl = uploadRes.url;  // 서버가 반환한 url
+        // uploadProfileImage가 string(이미지 URL)만 반환하므로
+        const uploadedImageUrl = await uploadProfileImage(base64);
+        console.log("서버가 준 이미지 URL:", uploadedImageUrl); // ✅ 추가!!
   
         setProfile((prev) => ({
           ...prev,
-          image: uploadedImageUrl,  // profile.image에 저장
+          image: uploadedImageUrl,  // 곧바로 문자열 URL을 사용
         }));
       };
     } catch (err) {
       console.error("이미지 업로드 실패", err);
       alert("이미지 업로드 실패!");
     }
-  };
-  
-  
+  };  
 
   const handleSave = async () => {
     const token = localStorage.getItem("accesstoken");
