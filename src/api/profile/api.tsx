@@ -15,12 +15,25 @@ export const uploadProfileImage = async (base64: string) => {
 };
 
 // 비밀번호 확인 (POST)
+export interface CheckPasswordPayload {
+  password: string;
+}
 
+export const checkPassword = async (payload: CheckPasswordPayload): Promise<{ success: boolean }> => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.post(
+    "/api/v1/members/check-password",
+    payload,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  return res.data;
+};
 
 // 회원 정보 조회 (GET)
 export interface MemberProfile {
-  //memberPasswordLength: number; // BE에 비밀번호 길이 추가 요청하기
-  //memberPasswordDate: number; // BE에 비밀번호 변경 날짜 추가 요청하기
   memberId: number;
   memberEmail: string;
   memberRole: string;
@@ -32,15 +45,25 @@ export interface MemberProfile {
   memberIsStudent: boolean;
   memberIntroduce: string;
   memberImageUrl: string;
+  memberPasswordLength: number;
+
   memberDepartmentResponseDtoList: {
+    memberDepartmentId: number;
+    memberId: number;
     departmentId: number;
     departmentName: string;
   }[];
+
   memberInterestResponseDtoList: {
+    memberInterestId: number;
+    memberId: number;
     interestId: number;
     interestName: string;
   }[];
+
   memberTechStackResponseDtoList: {
+    memberTechStackId: number;
+    memberId: number;
     techStackId: number;
     techStackName: string;
   }[];
@@ -50,6 +73,7 @@ export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
   return res.data;
 };
+
 
 // 회원 탈퇴 (DELETE)
 export const withdrawMember = async (): Promise<{ message: string }> => {
