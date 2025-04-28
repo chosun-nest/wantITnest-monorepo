@@ -9,8 +9,9 @@ export default function PasswordSuccessModal({ onClose }: Props) {
   const navigate = useNavigate();
 
   const handleConfirm = () => {
+    localStorage.removeItem("accesstoken");
     onClose();
-    navigate("/src/routes/login.tsx");
+    navigate("/login");
   };
 
   return (

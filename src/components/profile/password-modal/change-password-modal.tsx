@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { checkPassword, updateMemberPassword } from "../../../api/profile/api";
 import LoadingDots from "./loading-dots";
@@ -11,6 +11,7 @@ interface Props {
 
 export default function ChangePasswordModal({ onClose }: Props) {
   const [step, setStep] = useState<1 | 2>(1);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,18 +32,50 @@ export default function ChangePasswordModal({ onClose }: Props) {
   const isConfirmMatch = confirmPassword !== "" && newPassword === confirmPassword;
   const isPasswordValid = hasTwoCharTypes && isLengthValid && hasNoRepeatedChars && isConfirmMatch;
 
+  // 디바운스를 위한 타이머 id 저장
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+
+  // currentPassword 바뀔 때마다 자동 검증 (디바운스 적용)
+  useEffect(() => {
+    if (!currentPassword) {
+      setIsPasswordVerified(null);
+      return;
+    }
+
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    const timer = setTimeout(() => {
+      verifyPassword();
+    }, 500);
+
+    setDebounceTimer(timer);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [currentPassword]);
+
   const verifyPassword = async () => {
-    if (!currentPassword) return;
     setIsChecking(true);
     try {
-      await checkPassword({ password: currentPassword });
-      setIsPasswordVerified(true);
+      const response = await checkPassword({ password: currentPassword });
+  
+      // 200이면 맞음 (비밀번호 일치)
+      // 403이면 틀림 (비밀번호 불일치)
+      if (response.status === 200) {
+        setIsPasswordVerified(true);
+      } else {
+        setIsPasswordVerified(false);
+      }
     } catch {
       setIsPasswordVerified(false);
     } finally {
       setIsChecking(false);
     }
   };
+  
 
   const handleSave = async () => {
     try {
@@ -51,14 +84,14 @@ export default function ChangePasswordModal({ onClose }: Props) {
         newPassword,
         newPasswordConfirm: confirmPassword,
       });
-      setShowPasswordModal(true); // 비밀번호 변경 시 성공 모달 띄우기
+      setShowPasswordModal(true);
     } catch {
       alert("비밀번호 변경 실패");
     }
   };
 
   const isNextEnabled = isPasswordVerified === true;
-  const isSaveEnabled = isPasswordValid;
+  const isSaveEnabled = isPasswordVerified === true && isPasswordValid;
 
   if (showPasswordModal) {
     return <PasswordSuccessModal onClose={onClose} />;
@@ -83,12 +116,11 @@ export default function ChangePasswordModal({ onClose }: Props) {
                   type={showCurrentPassword ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  onBlur={verifyPassword}
                   className="w-full p-2 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800 pr-10"
                   placeholder="현재 비밀번호 입력"
                 />
                 <div className="absolute inset-y-0 right-3 flex items-center">
-                  {isChecking ? <LoadingDots /> : isPasswordVerified ? <CheckIcon /> : null}
+                  {isChecking ? <LoadingDots /> : isPasswordVerified === true ? <CheckIcon /> : null}
                 </div>
               </div>
 
@@ -143,7 +175,6 @@ export default function ChangePasswordModal({ onClose }: Props) {
                 </button>
               </div>
 
-              {/* 비밀번호 조건 */}
               <div className="mb-3 text-sm">
                 <p className={hasTwoCharTypes ? "text-green-600" : "text-gray-500"}>✓ 영문/숫자/특수문자 2종 이상</p>
                 <p className={isLengthValid ? "text-green-600" : "text-gray-500"}>✓ 8자 이상 32자 이하</p>
@@ -167,7 +198,6 @@ export default function ChangePasswordModal({ onClose }: Props) {
                 </button>
               </div>
 
-              {/* 확인 일치 여부 */}
               {confirmPassword && (
                 <p className={`text-sm ${isConfirmMatch ? "text-green-600" : "text-red-500"}`}>
                   {isConfirmMatch ? "비밀번호가 일치합니다" : "비밀번호가 일치하지 않습니다"}
