@@ -1,16 +1,15 @@
-# 04/28 공지사항 게시판 Notice: FastAPI + Selenium + BeautifulSoup + React 프랜턴드 연동
 
-## 허용 환경
-- **Python FastAPI** 사용
-- **Selenium + BeautifulSoup4**로 현재 페이지에서 공지사항 통합 프리 클롤링
-- **React (axios)** 호출로 자동으로 JSON 검색 결과 가져오기
-- **Spring Boot** 버튼에 맞춰 프로젝트 게시판화
+# 04/28 공지사항 게시판 Notice: FastAPI + Selenium + BeautifulSoup + React 연동
+
+## ✅ 허용 환경
+- **Python FastAPI** 서버 사용
+- **Selenium + BeautifulSoup4**로 공지사항 페이지 크롤링
+- **React (axios)** 호출로 JSON 형태 데이터 가져오기
+- **Spring Boot**로 데이터 저장 (POST 전송)
 
 ---
 
-## 가장 가장 기준 건해서 실행할 것:
-
-### ☑️ FastAPI + Selenium + BeautifulSoup 컨스트롤
+## ☑️ FastAPI + Selenium + BeautifulSoup 서버 작동 흐름
 
 1. **venv 활성화**
 
@@ -18,7 +17,7 @@
 .\venv\Scripts\activate
 ```
 
-2. **필요한 패키지 설치 (1회 만 하면 되어함)**
+2. **필요한 패키지 설치 (최초 1회만 설치)**
 
 ```bash
 pip install fastapi uvicorn selenium beautifulsoup4 webdriver-manager apscheduler requests
@@ -30,35 +29,36 @@ pip install fastapi uvicorn selenium beautifulsoup4 webdriver-manager apschedule
 cd src/components/notice
 uvicorn notice_crawler:app --host 0.0.0.0 --port 8000 --reload
 ```
-- `notice_crawler`: Python 파일 이름 (.py 제외)
-- `app`: FastAPI 인스턴스 객체 이름
-- `--reload`: 자동 간격 검색 시 서버 자동 갱신 (개발용)
+- `notice_crawler`: Python 파일명 (`.py` 확장자 제외)
+- `app`: FastAPI 인스턴스 객체명
+- `--reload`: 코드 변경 시 서버 자동 재시작 (개발용 옵션)
 
 ---
 
-### 클롤링 + Spring API 연결
+## 🔵 크롤링 + Spring API 연결 흐름
 
-- `/crawl`  호출:  클롤링만 하고 결과\uub9cc JSON으로 보기
-- `/crawl-and-post` 호출:  클롤링 + Spring API (localhost:6030) POST 전송
-
----
-
-## 해상 경로
-
-| 가능 | 설명 |
+| 경로 | 기능 |
 |:---|:---|
-| 클롤링 수행 | Selenium 가상 브라우저(호용메뉴)가 들어어서 페이지 검색 |
-| HTML 파싱 | BeautifulSoup으로 해당 |
-| React 연동 | axios 검색 호출 (http://localhost:8000/crawl) |
-| Spring 연동 | crawl-and-post로 POST 전송 |
-| 자동화 | apscheduler 사용해 매일 새벽 3시 자동 실행 |
-
+| `/crawl` | 공지사항만 크롤링하여 JSON 데이터 반환 |
+| `/crawl-and-post` | 크롤링 후 Spring 서버(`localhost:6030`)로 데이터 POST 전송 |
 
 ---
 
-## 팝업 - FastAPI 서버 Dockerfile 작성 방법
+## 경로별 세부 설명
 
-**Dockerfile-crawler** 예제:
+| 단계 | 설명 |
+|:---|:---|
+| 크롤링 수행 | Selenium 가상 브라우저로 페이지 로딩 및 HTML 수집 |
+| HTML 파싱 | BeautifulSoup으로 공지사항 데이터 추출 |
+| React 연동 | React 프론트엔드에서 axios로 FastAPI 서버 호출 |
+| Spring 연동 | 크롤링된 공지사항을 Spring API로 POST 전송 |
+| 자동화 | apscheduler를 통해 매일 새벽 3시에 자동 크롤링 및 전송 |
+
+---
+
+## 🔵 FastAPI 서버용 Dockerfile 작성 예시
+
+**Dockerfile**
 
 ```Dockerfile
 FROM python:3.10-slim
@@ -71,28 +71,27 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["uvicorn", "notice_crawler:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 ```
-- selenium과 전역 chromedriver에 대한 차포파일이 있어야 해요.
-- 반드시 Dockerfile을 조정 해서 chrome와 chromedriver을 설치해야 합니다.
-
-
+**주의:**  
+- Selenium용 Chrome 브라우저와 Chromedriver를 Docker 컨테이너에 설치해야 합니다.
 
 ---
 
-## 결론
+## 🏁 최종 목표
 
-- FastAPI + Selenium + BeautifulSoup 프랜턴에서  **가능한 자동적 클롤링**
-- **React** 에서 구현한 /crawl 호출으로 결과가 시간이 간격하고
-- 내보고 **Spring API** 로 전송까지 가능\uud83d�
-- 파일가 없을 경우, 검색을 해야 하며
-- **apscheduler**를 통해 하루 한 번 자동적으로 수행
-
----
-
-# ☑️  클릭하면 확인 할 것!
-- [x] `http://localhost:8000/crawl` (클롤링 검색)
-- [x] `http://localhost:8000/crawl-and-post` (클롤링 + Spring 전송)
+- FastAPI + Selenium + BeautifulSoup 조합으로 **자동 크롤링** 구현
+- React 프론트엔드에서 `/crawl` 호출 시 **실시간 공지사항 표시**
+- `/crawl-and-post` 호출 시 **Spring 서버로 자동 전송**
+- apscheduler를 이용해 **매일 새벽 3시** 자동 업데이트 가능
 
 ---
 
-**⭐️ Tip: Spring 서버(localhost:6030)가 켜져 있어야 crawl-and-post가 정상 동작합니다!**
+## ☑️ 실행 후 반드시 확인할 것!
 
+- [x] `http://localhost:8000/crawl` (공지사항 크롤링 결과 확인)
+- [x] `http://localhost:8000/crawl-and-post` (공지사항 크롤링 + Spring POST 전송 결과 확인)
+
+---
+
+⭐️ **TIP**  
+- Spring 서버(`localhost:6030`)가 실행 중이어야 `/crawl-and-post`가 정상 동작합니다.
+- 크롤링만 할 경우 `/crawl`만 호출해도 됩니다.
