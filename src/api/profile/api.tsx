@@ -9,18 +9,12 @@ export const uploadProfileImage = async (base64: string) => {
 // 비밀번호 확인 (POST)
 export interface CheckPasswordPayload { password: string; }
 
-// validateStatus: status < 500 >> 401도 성공으로 처리
 export const checkPassword = async (payload: CheckPasswordPayload) => {
-  const res = await API.post(
+  return API.post(
     "/api/v1/members/check-password",
     payload,
-    {
-      headers: { /* skipAuth 없이 토큰 포함 */ },
-      validateStatus: (status) => status < 500,
-    }
+    { validateStatus: status => status < 500 }
   );
-  // 이제 status 200 > success, 401 > failure 으로 직접 구분
-  return res;
 };
 
 // 회원 정보 조회 (GET)
