@@ -35,14 +35,21 @@ export default function ChangePasswordModal({ onClose }: Props) {
     if (!currentPassword) return;
     setIsChecking(true);
     try {
-      await checkPassword({ password: currentPassword });
-      setIsPasswordVerified(true);
+      const response = await checkPassword({ password: currentPassword });
+      const isCorrect = response.data.success;  // 또는 response.data.isCorrect, 서버에 따라 다름
+  
+      if (isCorrect) {
+        setIsPasswordVerified(true);
+      } else {
+        setIsPasswordVerified(false);
+      }
     } catch {
       setIsPasswordVerified(false);
     } finally {
       setIsChecking(false);
     }
   };
+  
 
   const handleSave = async () => {
     try {
@@ -58,7 +65,7 @@ export default function ChangePasswordModal({ onClose }: Props) {
   };
 
   const isNextEnabled = isPasswordVerified === true;
-  const isSaveEnabled = isPasswordValid;
+  const isSaveEnabled = isPasswordVerified === true && isPasswordValid;
 
   if (showPasswordModal) {
     return <PasswordSuccessModal onClose={onClose} />;
