@@ -35,6 +35,7 @@ export const verifycode = async (email: string, code: string) => {
   return res.data;
 };
 
+// acctoken 재발급
 export async function refreshAccessToken() {
   try {
     const refreshToken = localStorage.getItem("refreshToken");
