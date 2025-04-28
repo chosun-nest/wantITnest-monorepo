@@ -92,6 +92,13 @@ CMD ["uvicorn", "notice_crawler:app", "--host", "0.0.0.0", "--port", "8000", "--
 
 ---
 
+**venv 정상 해제**
+```
+.\venv\Scripts\deactivate.bat
+```
+
+---
+
 ⭐️ **TIP**  
 - Spring 서버(`localhost:6030`)가 실행 중이어야 `/crawl-and-post`가 정상 동작합니다.
 - 크롤링만 할 경우 `/crawl`만 호출해도 됩니다.
