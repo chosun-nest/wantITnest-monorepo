@@ -2,20 +2,11 @@ import { API } from "../index_c";
 
 // 프로필 이미지 업로드 (POST)
 export const uploadProfileImage = async (base64: string) => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
-
-  const res = await API.post(
-    "/api/v1/members/me/image",
-    { file: base64 },   // POST body는 { file: "base64 string" }
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-
+  const res = await API.post("/api/v1/members/me/image", { file: base64 });
   return res.data;
 };
 
 // 비밀번호 확인 (POST)
-
 
 // 회원 정보 조회 (GET)
 export interface MemberProfile {
@@ -57,11 +48,11 @@ export const withdrawMember = async (): Promise<{ message: string }> => {
   if (!token) throw new Error("No access token");
 
   const res = await API.delete("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
   });
 
   return res.data;
-}
+};
 
 // 회원 정보 수정 (PATCH)
 export interface UpdateMemberProfilePayload {
@@ -84,13 +75,12 @@ export const updateMemberProfile = async (
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
-  const res = await API.patch (
-    "/api/v1/members/me", payload, { 
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+  const res = await API.patch("/api/v1/members/me", payload, {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
   });
 
   return res.data;
-}
+};
 
 // 비밀번호 변경 (PATCH)
 export interface UpdateMemberPasswordPayload {
@@ -100,18 +90,18 @@ export interface UpdateMemberPasswordPayload {
 }
 
 export const updateMemberPassword = async (
-  payload: UpdateMemberPasswordPayload  
-): Promise<{ message: string }> => {                // Promise<{ message: string }> 단순 메시지 리턴
+  payload: UpdateMemberPasswordPayload
+): Promise<{ message: string }> => {
+  // Promise<{ message: string }> 단순 메시지 리턴
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
-  const res = await API.patch (
-    "/api/v1/members/me/password", payload, {
-    headers: { Authorization: `Bearer ${token}` },  // 인증이 필요하므로 skipAuth: true 사용 x
+  const res = await API.patch("/api/v1/members/me/password", payload, {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
   });
 
   return res.data;
-}
+};
 
 // 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)
