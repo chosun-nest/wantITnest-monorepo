@@ -1,4 +1,4 @@
-# 공지사항 게시판 Notice: FastAPI + Selenium + BeautifulSoup + React 프랜턴드 연동
+# 04/28 공지사항 게시판 Notice: FastAPI + Selenium + BeautifulSoup + React 프랜턴드 연동
 
 ## 허용 환경
 - **Python FastAPI** 사용
