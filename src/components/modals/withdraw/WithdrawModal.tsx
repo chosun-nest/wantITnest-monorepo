@@ -1,9 +1,8 @@
-// src/components/profile/withdraw-modal/WithdrawModal.tsx
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { checkPassword } from "../../../api/profile/api";
-import LoadingDots from "../password-modal/LoadingDots";
-import CheckIcon from "../password-modal/CheckIcon";
+import LoadingDots from "../../ui/LoadingDots";
+import CheckIcon from "../../ui/CheckIcon";
 
 interface Props {
   onClose: () => void;
