@@ -155,9 +155,6 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
         {/* 데스크탑용 하단바 */}
         {!isMobile && (
           <S.WebBar>
-            <S.NavbarLink to="/">
-              <S.WebBarItem>Nest-FE 소개</S.WebBarItem>
-            </S.NavbarLink>
             <S.NavbarLink to="/notice-board">
               <S.WebBarItem>학사공지</S.WebBarItem>
             </S.NavbarLink>

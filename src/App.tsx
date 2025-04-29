@@ -15,6 +15,7 @@ import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
 import Chat from "./routes/chat";
+import NotFound from "./routes/notfound";
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
   {
     path: "/find-id",
     element: <PasswdReset />,
+  },
+  {
+    path: "/*",
+    element: <NotFound />,
   },
 ]);
 
