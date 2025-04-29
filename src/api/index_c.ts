@@ -24,6 +24,8 @@ API.interceptors.request.use(
   (config) => {
     const skipAuth = config.headers?.skipAuth;
 
+    // 헤더에 { headers: { skipAuth: true } }를 추가하면 토근 검사를 안함
+    // 그렇지 않으면 자동으로 헤더에 accesstoken을 추가함
     if (!skipAuth) {
       const token = localStorage.getItem("accesstoken");
       if (token) {
@@ -82,7 +84,7 @@ API.interceptors.response.use(
       }
     }
 
-    // ❗ 403 또는 기타 에러를 무조건 로그아웃시키지 말자
+    // 403 또는 기타 에러를 무조건 로그아웃시키지 말자
     if (status === 403) {
       // 진짜 "토큰 관련" 에러만 로그아웃
       if (errorMessage.includes("Token") || errorMessage.includes("권한")) {
