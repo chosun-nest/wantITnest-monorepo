@@ -43,6 +43,7 @@ uvicorn notice_crawler:app --host 0.0.0.0 --port 8000 --reload
 - `--reload`: 코드 변경 시 서버 자동 재시작 (개발용 옵션)
 
 5. **새로운 터미널에서 venv 해제하고 npm run dev 실행**
+
 5-1) 추가로 새로운 터미널(cmd, PowerShell, Git Bash 등) 띄우기
    위치 :  .\Nest-FE
 
