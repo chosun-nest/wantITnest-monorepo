@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/navbar";
-import ProfileCard from "../components/profile/profile-card";
+import ProfileCard from "../components/profile/ProfileCard";
 
 export default function Profile() {
   const navbarRef = useRef<HTMLDivElement>(null);

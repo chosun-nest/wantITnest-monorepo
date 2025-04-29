@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { withdrawMember } from "../../api/profile/api";
-import WithdrawModal from "./withdraw-modal/withdraw-modal";
-import WithdrawCompleteModal from "./withdraw-modal/withdraw-complete-modal";
+import WithdrawModal from "./withdraw-modal/WithdrawModal";
+import WithdrawCompleteModal from "./withdraw-modal/WithdrawCompleteModal";
 
 
 export default function Withdraw(){
