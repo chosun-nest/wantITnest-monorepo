@@ -22,10 +22,14 @@ docker rmi $IMAGE_NAME || true
 echo "📦 Docker 이미지 빌드 시작!"
 docker build -t $IMAGE_NAME .
 
+ # 🗂️ 호스트 이미지 폴더 생성
+mkdir -p ~/docker-volumes/nest/images
+
 echo "🚀 컨테이너 실행 중!"
 docker run -d \
   --name $CONTAINER_NAME \
   -p $PORT:6030 \
+  -v ~/docker-volumes/nest/images:/app/src/main/resources/static/images \
   $IMAGE_NAME
 
 echo "✅ 완료! http://119.219.30.209:$PORT 에서 백엔드 확인 가능!"
