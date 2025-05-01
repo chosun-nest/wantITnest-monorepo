@@ -1,10 +1,8 @@
 package com.virtukch.nest.project_member.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.project.model.Project;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +13,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectMember {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long projectMemberId;
-    private Long projectId;
-    private Long memberId2;
+    @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    private Project project;
+
+    @ManyToOne
+    private Member member;
+
+    private boolean isApproved;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public enum Role {
+        LEADER, MEMBER
+    }
+
+    public ProjectMember(Member member, Project project, Role role) {
+        this.member = member;
+        this.project = project;
+        this.role = role;
+        this.isApproved = true;
+    }
 }

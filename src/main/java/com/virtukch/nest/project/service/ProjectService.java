@@ -29,13 +29,13 @@ public class ProjectService {
                     .orElseThrow(() -> new IllegalArgumentException("팀장을 찾을 수 없습니다."));
         }
 
-        Project project = new Project(
-                leader,
+        Project project = Project.createProject(
                 dto.getProjectTitle(),
                 dto.getProjectDescription(),
+                leader,
+                dto.getMaxMember(),
                 dto.getProjectStartDate(),
-                dto.getProjectEndDate(),
-                dto.getMaxMember()
+                dto.getProjectEndDate()
         );
 
         return projectRepository.save(project).getProjectId();
@@ -50,11 +50,17 @@ public class ProjectService {
                         .projectDescription(project.getProjectDescription())
                         .projectStartDate(project.getProjectStartDate())
                         .projectEndDate(project.getProjectEndDate())
-                        .isClosed(project.isClosed())
+                        .isClosed(project.isRecruiting())
                         .maxMember(project.getMaxMember())
-                        .projectLeaderId(Optional.ofNullable(project.getProjectLeader()).map((Member::getMemberId)).orElse(null)) //NULL 허용을 위해 수정함
+                        .projectLeaderId(getProjectLeaderId(project))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private Long getProjectLeaderId(Project project) {
+        return Optional.ofNullable(project.getProjectLeader())
+                       .map(Member::getMemberId)
+                       .orElse(null);
     }
 
     @Transactional
