@@ -1,5 +1,5 @@
 import AccountPassword from "./edit-myaccount-components/password";
-import AccountEmailVerification from "./edit-myaccount-components/email-verification";
+import AccountEmailVerification from "./edit-myaccount-components/EmailVerification";
 import Withdraw from "./withdraw";
 
 export default function EditMyAccount() {

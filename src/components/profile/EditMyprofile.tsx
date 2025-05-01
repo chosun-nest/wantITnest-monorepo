@@ -30,6 +30,7 @@ interface TechStackResponse {
   techStackName: string;
 }
 
+
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
@@ -55,7 +56,7 @@ export default function MyProfile() {
   const [filteredTechs, setFilteredTechs] = useState<Item[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+ 
   useEffect(() => {
     fetchData();
     getItems();
@@ -182,7 +183,7 @@ export default function MyProfile() {
   
         // uploadProfileImage가 string(이미지 URL)만 반환하므로
         const uploadedImageUrl = await uploadProfileImage(base64);
-        console.log("서버가 준 이미지 URL:", uploadedImageUrl); // ✅ 추가!!
+        console.log("서버가 준 이미지 URL:", uploadedImageUrl); // 확인 필요!
   
         setProfile((prev) => ({
           ...prev,
@@ -217,9 +218,7 @@ export default function MyProfile() {
           memberInterestUpdateRequestIdList: interestIdList,
           memberTechStackUpdateRequestIdList: techStackIdList,
         });
-
       alert("프로필이 저장되었습니다.");
-      setIsEditing(false);
     } catch (e) {
       alert("저장 중 오류가 발생했습니다.");
       console.error(e);
@@ -281,10 +280,11 @@ export default function MyProfile() {
 
       <EditProfileButtons
         isEditing={isEditing}
-        onEdit={() => setIsEditing(true)}
         onCancel={() => setIsEditing(false)}
         onSave={handleSave}
+        onEdit={() => setIsEditing(true)}
       />
+
     </div>
   );
 }

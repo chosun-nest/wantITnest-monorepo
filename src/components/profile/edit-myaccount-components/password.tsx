@@ -1,7 +1,8 @@
+// password 수정 전체 컴포넌트
 import React, { useState, useEffect } from "react";
-import PasswordSummary from "../edit-myaccount-components/password-summary";
-import ChangePasswordModal from "../password-modal/change-password-modal";
-import { getMemberProfile } from "../../../api/profile/api"; // ← 비밀번호 길이 가져오는 API
+import PasswordSummary from "./PasswordSummary";
+import ChangePasswordModal from "../../modals/password/ChangePasswordModal";
+import { getMemberProfile } from "../../../api/profile/api"; // 비밀번호 길이 가져오는 API
 
 export default function AccountPassword() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -22,13 +23,13 @@ export default function AccountPassword() {
   return (
     <div className="mb-8">
       {passwordLength !== null && (
-        <PasswordSummary
+        <PasswordSummary    // 비밀번호 summary 컴포넌트
           onEdit={() => setShowPasswordModal(true)}
           passwordLength={passwordLength}
         />
       )}
 
-      {showPasswordModal && (
+      {showPasswordModal && (   // 설정 버튼 누른 후, password 변경 컴포넌트
         <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
     </div>

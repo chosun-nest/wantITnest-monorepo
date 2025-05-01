@@ -1,20 +1,15 @@
 import { API } from "../index_c";
 
 // 프로필 이미지 업로드 (POST)
-// export const uploadProfileImage = async (base64: string): Promise<string> => {
-//   const { data } = await API.post("/api/v1/members/me/image", { file: base64 });
-//   return data.url;
-// };
-export const uploadProfileImage = async (base64: string) => {
+export const uploadProfileImage = async (base64: string) => {   // FileReader로 base64로 변환
   try {
-    const res = await API.post("/api/v1/members/me/image", { file: base64 });
-    return res.data;
+    const res = await API.post("/api/v1/members/me/image", { file: base64 });   // 업로드 요청
+    return res.data;        // 응답은 res.data // setProfile({ ..., image: 업로드된 URL })로 상태 변경됨
   } catch (error) {
     console.error("프로필 이미지 업로드 실패", error);
     throw error;
   }
 };
-
 
 // 비밀번호 확인 (POST)
 export interface CheckPasswordPayload { password: string; }
@@ -103,11 +98,13 @@ export const updateMemberProfile = async (
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
-  const res = await API.patch("/api/v1/members/me", payload, {
+  // const res = await API.patch("/api/v1/members/me", payload, {
+  //   headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+  // });
+  
+  return await API.patch("/api/v1/members/me", payload, {
     headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
-  });
-
-  return res.data;
+  }); // 전체 AxiosResponse<T> 반환
 };
 
 // 비밀번호 변경 (PATCH)
@@ -130,6 +127,50 @@ export const updateMemberPassword = async (
 
   return res.data;
 };
+
+// =============
+// 인증 관련 API
+// 토큰 유효성 검사 (GET)
+export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
+  const res = await API.get("/api/v1/auth/me");
+  return res.data; // 토큰이 유효하면 memberId를 반환. DB 접근 없이 토큰 기반으로 동작함.
+};
+
+// =============
+
+// =============
+// email-verification
+
+// 이메일 인증 코드 전송 (POST)
+export const sendcode = async (email: string) => {
+  const res = await API.post("/api/v1/auth/send-code", { email });
+  return res.data;
+}
+
+// 인증 코드 검증 (POST)
+export const verifycode = async (email: string, code: string) => {
+  const res = await API.post("api/v1/auth/verify-code", {
+    email,
+    code,
+  });
+  return res.data;
+}
+
+// (추가 요청하기) 이메일 저장 api (PATCH)
+export const updateStudentEmail = async (email: string) => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.patch(
+    "/api/v1/members/student-email",
+    { studentEmail: email },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  return res.data;
+};
+
+// =============
 
 // 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)

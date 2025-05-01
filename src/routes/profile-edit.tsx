@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import Navbar from "../components/layout/navbar";
-import EditMyProfile from "../components/profile/edit-myprofile";
-import EditMyAccount from "../components/profile/edit-myaccount";
+import EditMyProfile from "../components/profile/EditMyprofile";
+import EditMyAccount from "../components/profile/EditMyaccount";
 
 export default function ProfileEdit() {
     const navbarRef = useRef<HTMLDivElement>(null);

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import * as S from "../assets/styles/home.styles";
-import ProfileComponent from "../components/profile/profile-card";
+import ProfileComponent from "../components/profile/ProfileCard";
 import useResponsive from "../hooks/responsive";
 import { useEffect, useState } from "react";
-import GuestCard from "../components/profile/profile-card-guest";
+import GuestCard from "../components/profile/ProfileCardGuest";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
 
 export default function Home() {

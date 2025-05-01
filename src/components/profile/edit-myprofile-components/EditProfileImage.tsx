@@ -10,7 +10,6 @@ interface Props {
 
 export default function EditProfileImage({
   image,
-  isEditing,
   onChange,
   fileInputRef,
 }: Props) {
@@ -28,15 +27,13 @@ export default function EditProfileImage({
           className="w-full h-full object-cover group-hover:opacity-80 transition"
         />
 
-        {isEditing && (
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={onChange}
-          />
-        )}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={onChange}
+        />
       </div>
     </div>
   );

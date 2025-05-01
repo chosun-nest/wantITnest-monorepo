@@ -1,3 +1,4 @@
+// 비밀번호 변경 버튼 누르기 전, * 표시로 비밀번호 summary 나타내는 컴포넌트
 import React from "react";
 
 interface Props {
