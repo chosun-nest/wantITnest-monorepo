@@ -57,4 +57,9 @@ public class TagService {
             return new TagNotFoundException(tagName);
         });
     }
+
+    @Transactional(readOnly = true)
+    public Tag findByIdOrThrow(Long tagId) {
+        return tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
+    }
 }
