@@ -26,10 +26,11 @@ docker build -t $IMAGE_NAME .
 mkdir -p ~/docker-volumes/nest/images
 
 echo "🚀 컨테이너 실행 중!"
+# 호스트의 이미지 디렉터리를 컨테이너 내부 /app/uploaded-images 경로에 마운트
 docker run -d \
   --name $CONTAINER_NAME \
   -p $PORT:6030 \
-  -v ~/docker-volumes/nest/images:/app/src/main/resources/static/images \
+  -v ~/docker-volumes/nest/images:/app/uploaded-images \
   $IMAGE_NAME
 
 echo "✅ 완료! http://119.219.30.209:$PORT 에서 백엔드 확인 가능!"

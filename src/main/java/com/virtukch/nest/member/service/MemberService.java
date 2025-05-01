@@ -210,7 +210,7 @@ public class MemberService {
             .orElseThrow(() -> new MemberNotFoundException("Member not found."));
 
         // 1. 사용자별 디렉토리 생성
-        String baseDir = new File("src/main/resources/static/images").getAbsolutePath();
+        String baseDir = new File("uploaded-images").getAbsolutePath();
         File userDir = new File(baseDir, "member_" + memberId);
         if (!userDir.exists() && !userDir.mkdirs()) {
             throw new ImageDirectoryCreationException(userDir.getPath());
