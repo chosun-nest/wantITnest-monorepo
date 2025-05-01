@@ -59,7 +59,26 @@ public class MemberController {
     }
 
     @PostMapping("/me/image")
-    @Operation(summary = "프로필 이미지 업로드", description = "이미지를 업로드하고 이미지 URL을 반환합니다.")
+    @Operation(
+        summary = "프로필 이미지 업로드",
+        description = """
+        사용자의 프로필 이미지를 업로드합니다. 업로드 방식은 다음과 같습니다:
+
+        1. 요청 URL: `POST /api/v1/members/me/image`
+        2. 헤더에 Authorization Bearer 토큰 포함 (예: `Authorization: Bearer {access_token}`)
+        3. Body는 `form-data` 형식
+           - key: `file`
+           - value: 이미지 파일 (예: PNG, JPEG 등)
+
+        예시 응답:
+        {
+          "imageUrl": "/uploaded-images/member_1/f66f14c3-13eb-4298-a294-308cb1faee45.jpeg"
+        }
+
+        이 응답에서 제공된 `imageUrl`은 프론트엔드에서 사용자 프로필 사진으로 렌더링할 때 사용할 수 있습니다.
+        업로드된 파일은 서버 내부의 `uploaded-images/` 디렉터리에 저장됩니다.
+    """
+    )
     public ResponseEntity<MemberImageUploadResponseDto> uploadProfileImage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails,
         @RequestPart("file") MultipartFile file
@@ -67,7 +86,6 @@ public class MemberController {
         String imageUrl = memberService.uploadProfileImage(customUserDetails, file);
         return ResponseEntity.ok(MemberImageUploadResponseDto.builder().imageUrl(imageUrl).build());
     }
-
     @DeleteMapping("/me")
     @Operation(summary = "회원 탈퇴", description = "로그인된 사용자가 자신의 계정을 삭제합니다.")
     public ResponseEntity<Void> deleteMember(
