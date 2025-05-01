@@ -1,3 +1,4 @@
+// password 수정 전체 컴포넌트
 import React, { useState, useEffect } from "react";
 import PasswordSummary from "./PasswordSummary";
 import ChangePasswordModal from "../../modals/password/ChangePasswordModal";
@@ -22,13 +23,13 @@ export default function AccountPassword() {
   return (
     <div className="mb-8">
       {passwordLength !== null && (
-        <PasswordSummary
+        <PasswordSummary    // 비밀번호 summary 컴포넌트
           onEdit={() => setShowPasswordModal(true)}
           passwordLength={passwordLength}
         />
       )}
 
-      {showPasswordModal && (
+      {showPasswordModal && (   // 설정 버튼 누른 후, password 변경 컴포넌트
         <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
     </div>

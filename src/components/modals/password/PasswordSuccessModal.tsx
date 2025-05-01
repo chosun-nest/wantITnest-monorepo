@@ -9,9 +9,9 @@ export default function PasswordSuccessModal({ onClose }: Props) {
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-    localStorage.removeItem("accesstoken");
+    localStorage.removeItem("accesstoken"); // 로그아웃 : accesstoken 반납
     onClose();
-    navigate("/login");
+    navigate("/login");   // 닫기 누르면 로그인 페이지로 이동
   };
 
   return (
