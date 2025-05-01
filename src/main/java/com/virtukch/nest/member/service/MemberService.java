@@ -218,8 +218,9 @@ public class MemberService {
 
         // 2. 기존 이미지 삭제 (같은 폴더 내)
         String prevImageUrl = member.getMemberImageUrl();
-        if (prevImageUrl != null && prevImageUrl.startsWith("/images/")) {
-            File prevFile = new File(baseDir + File.separator + prevImageUrl.substring("/images/".length()));
+        if (prevImageUrl != null && prevImageUrl.startsWith("/uploaded-images/")) {
+            String cleanedPath = prevImageUrl.substring("/uploaded-images/".length());
+            File prevFile = new File(baseDir + File.separator + cleanedPath);
             try {
                 Files.delete(prevFile.toPath());
             } catch (IOException e) {
@@ -243,7 +244,7 @@ public class MemberService {
         }
 
         // 4. 이미지 URL 저장
-        String imageUrl = "/images/member_" + memberId + "/" + filename;
+        String imageUrl = "/uploaded-images/member_" + memberId + "/" + filename;
         member.updateImageUrl(imageUrl);
         memberRepository.save(member);
         return imageUrl;
