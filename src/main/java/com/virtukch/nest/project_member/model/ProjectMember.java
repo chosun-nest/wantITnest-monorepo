@@ -3,40 +3,31 @@ package com.virtukch.nest.project_member.model;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.model.Project;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "project_member")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class ProjectMember {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_member_seq")
     private Long id;
 
-    @ManyToOne
-    private Project project;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    private boolean isApproved;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Project project;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private boolean isApproved;
+
     public enum Role {
         LEADER, MEMBER
-    }
-
-    public ProjectMember(Member member, Project project, Role role) {
-        this.member = member;
-        this.project = project;
-        this.role = role;
-        this.isApproved = true;
     }
 }

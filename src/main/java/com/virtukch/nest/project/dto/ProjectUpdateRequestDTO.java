@@ -3,12 +3,13 @@ package com.virtukch.nest.project.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectRequestDTO {
+public class ProjectUpdateRequestDTO {
     private String projectTitle;
     private String projectDescription;
     private int maxMember;

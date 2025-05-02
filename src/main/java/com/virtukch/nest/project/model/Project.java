@@ -2,6 +2,7 @@ package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.project.dto.ProjectUpdateRequestDTO;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -72,11 +73,21 @@ public class Project extends BaseTimeEntity {
         this.likeCount = 0;
         this.isRecruiting = false;
         this.members = new ArrayList<>();
-        ProjectMember leaderMember = new ProjectMember(leader, this, ProjectMember.Role.LEADER);
+        ProjectMember leaderMember = ProjectMember.builder()
+                .member(leader)
+                .project(this)
+                .role(ProjectMember.Role.LEADER)
+                .isApproved(true)
+                .build();
         this.members.add(leaderMember);
     }
 
-    public static Project createProject(String projectTitle, String projectDescription, Member leader, int maxMember, LocalDate projectStartDate, LocalDate projectEndDate) {
+    public static Project createProject(String projectTitle,
+                                        String projectDescription,
+                                        Member leader,
+                                        int maxMember,
+                                        LocalDate projectStartDate,
+                                        LocalDate projectEndDate) {
         return Project.builder()
                 .projectTitle(projectTitle)
                 .projectDescription(projectDescription)
@@ -119,5 +130,15 @@ public class Project extends BaseTimeEntity {
                 .map(ProjectMember::getMember)
                 .findFirst()
                 .orElse(null); // orElseThrow 로 바꿔도 됨
+    }
+
+    //프로젝트 업데이트 메서드
+    public void updateProject(ProjectUpdateRequestDTO dto) {
+        this.projectTitle = dto.getProjectTitle();
+        this.projectDescription = dto.getProjectDescription();
+        this.maxMember = dto.getMaxMember();
+        this.projectStartDate = dto.getProjectStartDate();
+        this.projectEndDate = dto.getProjectEndDate();
+        this.isRecruiting = dto.isRecruiting();
     }
 }
