@@ -52,4 +52,3 @@ export default function EditInterests({ isEditing, interests, newInterest, filte
     </div>
   );
 }
-

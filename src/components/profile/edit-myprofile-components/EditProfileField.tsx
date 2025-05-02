@@ -33,4 +33,3 @@ export default function EditProfileField({ name, email }: Props) {
     </>
   );
 }
-
