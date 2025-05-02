@@ -1,96 +1,125 @@
-// src/assets/styles/project.styles.tsx
 import styled from "styled-components";
 
-export const SearchInput = styled.input`
-  margin-top: 10px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-left: auto;
-`;
-
 export const Container = styled.div`
-  max-width: 1000px;
+  max-width: 800px;
   margin: 120px auto 40px;
   padding: 0 20px;
 `;
 
-export const TitleSection = styled.div`
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-export const PageTitle = styled.h2`
+export const Title = styled.h2`
   font-size: 1.8rem;
   font-weight: bold;
   color: #00256c;
+  margin-bottom: 15px;
 `;
 
-export const SubText = styled.p`
-  font-size: 0.9rem;
-  color: #333;
-`;
-
-export const TableHeader = styled.div`
-  display: grid;
-  grid-template-columns: 60px 2fr 1fr 1fr 0.8fr 1fr 0.5fr;
-  padding: 12px 20px;
-  background-color: #f2f4f6;
-  border-radius: 8px;
-  font-weight: bold;
+export const MetaInfo = styled.div`
   font-size: 0.95rem;
-  color: #00256c;
+  margin-bottom: 15px;
+  color: #555;
 `;
 
-export const TableBody = styled.div`
-  display: flex;
-  flex-direction: column;
+export const ContentCard = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
 `;
 
-export const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 60px 2fr 1fr 1fr 0.8fr 1fr 0.5fr;
-  padding: 14px 20px;
-  border-bottom: 1px solid #eee;
-  align-items: center;
-  font-size: 0.9rem;
-
-  &:hover {
-    background-color: #f8f9fa;
-  }
+export const Info = styled.div`
+  font-size: 0.95rem;
+  margin-bottom: 5px;
 `;
 
-export const ProjectTitle = styled.span`
-  color: #00256c;
-  font-weight: 500;
+export const BodyContent = styled.p`
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-top: 15px;
+  color: #222;
+  white-space: pre-line;
+`;
+
+export const BackButton = styled.button`
+  margin-top: 25px;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  background-color: white;
+  border-radius: 4px;
   cursor: pointer;
 
   &:hover {
-    text-decoration: underline;
+    background-color: #eaeaea;
   }
 `;
 
-export const Pagination = styled.div`
+export const CommentSection = styled.div`
+  margin-top: 40px;
+`;
+
+export const CommentTitle = styled.h3`
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+`;
+
+export const CommentList = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
+
+export const CommentItem = styled.li`
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+`;
+
+export const CommentForm = styled.form`
   display: flex;
-  gap: 8px;
-  margin-top: 30px;
-  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+`;
 
-  button {
-    padding: 6px 10px;
-    font-size: 0.9rem;
-    border: 1px solid #ccc;
-    background-color: white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+export const CommentInput = styled.input`
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
 
-  .active {
-    background-color: #00256c;
-    color: white;
-    font-weight: bold;
+export const CommentButton = styled.button`
+  padding: 8px 14px;
+  background-color: #00256c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+export const InputField = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+`;
+
+export const SubmitButton = styled.button`
+  padding: 10px 20px;
+  background-color: #00256c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #001a4d;
   }
 `;

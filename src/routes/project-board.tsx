@@ -1,22 +1,37 @@
-import { useContext, useState } from "react";
-import { NavbarHeightContext } from "../context/NavbarHeightContext";
-import { mockProjects } from "../constants/mock-projects";
-import * as S from "../assets/styles/project.styles";
+import { useState } from "react";
+import * as S from "../assets/styles/project-board.styles";
+
+interface ProjectBoardProps {
+  projects: {
+    id: number;
+    title: string;
+    date: string;
+    author: string;
+    views: number;
+    participants: string;
+    hasAttachment: boolean;
+    content?: string;
+  }[];
+}
 
 const ITEMS_PER_PAGE = 7;
 
-export default function ProjectBoard() {
-  const { navbarHeight } = useContext(NavbarHeightContext);
+export default function ProjectBoard({ projects }: ProjectBoardProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredProjects = mockProjects.filter((project) =>
-    project.title.includes(searchTerm) || project.author.includes(searchTerm)
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.title.includes(searchTerm) ||
+      project.author.includes(searchTerm)
   );
 
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentProjects = filteredProjects.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+  const currentProjects = filteredProjects.slice(
+    startIdx,
+    startIdx + ITEMS_PER_PAGE
+  );
 
   const handlePageClick = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -25,7 +40,7 @@ export default function ProjectBoard() {
   };
 
   return (
-    <S.Container style={{ paddingTop: `${navbarHeight}px` }}>
+    <S.Container>
       <S.TitleSection>
         <div>
           <S.PageTitle>프로젝트 모집 게시판</S.PageTitle>
@@ -58,7 +73,9 @@ export default function ProjectBoard() {
         {currentProjects.map((project) => (
           <S.TableRow key={project.id}>
             <span>{project.id}</span>
-            <S.ProjectTitle>{project.title}</S.ProjectTitle>
+            <S.ProjectTitle to={`/project/${project.id}`}>
+              {project.title}
+            </S.ProjectTitle>
             <span>{project.date}</span>
             <span>{project.author}</span>
             <span>{project.views}</span>
@@ -79,6 +96,9 @@ export default function ProjectBoard() {
           </button>
         ))}
       </S.Pagination>
+
+      {/* ✅ 글쓰기 버튼 추가 */}
+      <S.WriteButton to="/project-write">글쓰기</S.WriteButton>
     </S.Container>
   );
 }
