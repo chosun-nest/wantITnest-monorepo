@@ -2,9 +2,8 @@
 import { useState } from "react";
 import * as S from "../assets/styles/notice.styles";
 import NoticeRow from "../components/notice/NoticeRow";
-import { mockNotices } from "../constants/mock-notices"; // ✅ 수정된 mock 데이터 10개
+import { mockNotices } from "../constants/mock-notices";
 import SearchInput from "../components/common/SearchInput";
-
 
 const ITEMS_PER_PAGE = 7;
 
@@ -12,13 +11,11 @@ export default function NoticeBoard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 🔍 검색어 기준으로 제목 또는 작성자 필터링
   const filteredNotices = mockNotices.filter((notice) =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     notice.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 🔢 페이지네이션 계산
   const totalPages = Math.ceil(filteredNotices.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentNotices = filteredNotices.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -32,18 +29,20 @@ export default function NoticeBoard() {
   return (
     <S.Container>
       {/* 타이틀 + 게시물 수 + 검색창 */}
-      <S.TitleSection>
-        <S.PageTitle>학사공지</S.PageTitle>
-        <S.SubText>
-          총 <strong>{filteredNotices.length}</strong>개의 게시물이 있습니다.
-        </S.SubText>
+      <S.TitleSection style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <S.PageTitle>학사공지</S.PageTitle>
+          <S.SubText>
+            총 <strong>{filteredNotices.length}</strong>개의 게시물이 있습니다.
+          </S.SubText>
+        </div>
         <S.SearchInput
           type="text"
           placeholder="제목 또는 작성자 검색"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
-            setCurrentPage(1); // 검색 시 페이지 초기화
+            setCurrentPage(1);
           }}
         />
       </S.TitleSection>
