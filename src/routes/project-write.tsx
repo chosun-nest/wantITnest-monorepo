@@ -57,9 +57,9 @@ export default function ProjectWrite() {
       </div>
 
       <div>
-        <label>본문</label><br />
         <S.ContentTextArea
           value={content}
+          placeholder="본문 내용을 작성하세요."
           onChange={(e) => setContent(e.target.value)}
         />
       </div>
