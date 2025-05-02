@@ -12,6 +12,7 @@ interface ProjectBoardProps {
     participants: string;
     hasAttachment: boolean;
     content?: string;
+    status: "모집중" | "모집완료";
   }[];
 }
 
@@ -21,12 +22,19 @@ export default function ProjectBoard({ projects }: ProjectBoardProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredProjects = projects.filter(
+  // 1️⃣ 날짜 기준 최신순 정렬 (내림차순: 최신 날짜가 위)
+  const sortedProjects = [...projects].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  // 2️⃣ 검색어 포함하는 항목 필터링
+  const filteredProjects = sortedProjects.filter(
     (project) =>
       project.title.includes(searchTerm) ||
       project.author.includes(searchTerm)
   );
 
+  // 3️⃣ 페이지네이션 처리
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentProjects = filteredProjects.slice(
@@ -68,13 +76,15 @@ export default function ProjectBoard({ projects }: ProjectBoardProps) {
         <span>작성자</span>
         <span>조회수</span>
         <span>참여인원/정원</span>
+        <span>모집상태</span>
         <span>첨부</span>
       </S.TableHeader>
 
       <S.TableBody>
-        {currentProjects.map((project) => (
+        {currentProjects.map((project, index) => (
           <S.TableRow key={project.id}>
-            <span>{project.id}</span>
+            {/* 최신순 번호 (전체 게시물 개수 - 현재 인덱스) */}
+            <span>{filteredProjects.length - (startIdx + index)}</span>
             <S.ProjectTitle to={`/project/${project.id}`}>
               {project.title}
             </S.ProjectTitle>
@@ -82,6 +92,9 @@ export default function ProjectBoard({ projects }: ProjectBoardProps) {
             <span>{project.author}</span>
             <span>{project.views}</span>
             <span>{project.participants}</span>
+            <S.StatusText status={project.status}>
+              {project.status}
+            </S.StatusText>
             <span>{project.hasAttachment ? "📎" : ""}</span>
           </S.TableRow>
         ))}

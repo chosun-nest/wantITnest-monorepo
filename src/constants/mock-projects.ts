@@ -10,6 +10,7 @@ export const mockProjects = [
     views: 20,
     participants: "3/6",
     hasAttachment: true,
+    status: "모집중"
   },
   {
     id: 27,
@@ -21,6 +22,7 @@ export const mockProjects = [
     views: 51,
     participants: "1/5",
     hasAttachment: false,
+    status: "모집완료"
   },
   {
     id: 26,
@@ -32,6 +34,7 @@ export const mockProjects = [
     views: 38,
     participants: "7/10",
     hasAttachment: true,
+    status: "모집중"
   },
   {
     id: 25,
@@ -43,6 +46,7 @@ export const mockProjects = [
     views: 43,
     participants: "8/8",
     hasAttachment: false,
+    status: "모집완료"
   },
   {
     id: 24,
@@ -54,6 +58,7 @@ export const mockProjects = [
     views: 55,
     participants: "1/5",
     hasAttachment: false,
+    status: "모집중"
   },
   {
     id: 23,
@@ -65,6 +70,7 @@ export const mockProjects = [
     views: 100,
     participants: "2/5",
     hasAttachment: true,
+    status: "모집완료"
   },
   {
     id: 22,
@@ -76,6 +82,7 @@ export const mockProjects = [
     views: 100,
     participants: "4/5",
     hasAttachment: false,
+    status: "모집중"
   },
   {
     id: 21,
@@ -87,5 +94,6 @@ export const mockProjects = [
     views: 89,
     participants: "5/6",
     hasAttachment: true,
-  },
+    status: "모집중"
+  }
 ];

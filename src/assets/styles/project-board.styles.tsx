@@ -119,3 +119,8 @@ export const WriteButton = styled(Link)`
     background-color: #001a4d;
   }
 `;
+
+export const StatusText = styled.span<{ status: string }>`
+  color: ${({ status }) => (status === "모집중" ? "blue" : "gray")};
+  font-weight: bold;
+`;
