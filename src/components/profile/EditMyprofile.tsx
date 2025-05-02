@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { getMemberProfile, getTech, getInterests, getDepartments } from "../../api/profile/api";
-import { uploadProfileImage, updateMemberProfile } from "../../api/profile/api";
+import { 
+  getMemberProfile, 
+  getTech, getInterests, getDepartments, 
+  uploadProfileImage, 
+  updateMemberProfile } from "../../api/profile/api";
 
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
@@ -16,7 +19,6 @@ interface Item {
   id: number;
   name: string;
 }
-
 interface DepartmentResponse {
   departmentId: number;
   departmentName: string;
@@ -41,6 +43,7 @@ export default function MyProfile() {
     interests: [] as string[],
     sns: ["", ""],
     image: "",
+    uploadedImagePath: "",
     techStacks: [] as string[],
   });
 
@@ -66,6 +69,7 @@ export default function MyProfile() {
     const data = await getMemberProfile();
     setProfile({
       image: data.memberImageUrl || "/assets/images/user.png",
+      uploadedImagePath: data.memberImageUrl || "",
       name: data.memberName,
       email: data.memberEmail,
       major: data.memberDepartmentResponseDtoList?.[0]?.departmentName || "",
@@ -169,27 +173,22 @@ export default function MyProfile() {
       [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
-
+  // 이미지 변경 함수
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
   
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);  // base64 변환
-      reader.onloadend = async () => {
-        const base64 = reader.result;
-        if (!base64 || typeof base64 !== "string") return;
+      const uploaded = await uploadProfileImage(file); // POST /members/me/image
+      console.log("서버가 준 이미지 URL:", uploaded.imageUrl);
   
-        // uploadProfileImage가 string(이미지 URL)만 반환하므로
-        const uploadedImageUrl = await uploadProfileImage(base64);
-        console.log("서버가 준 이미지 URL:", uploadedImageUrl); // 확인 필요!
+      const absoluteUrl = `http://119.219.30.209:6030${uploaded.imageUrl}`; // UI용 절대 경로
   
-        setProfile((prev) => ({
-          ...prev,
-          image: uploadedImageUrl,  // 곧바로 문자열 URL을 사용
-        }));
-      };
+      setProfile((prev) => ({
+        ...prev,
+        image: absoluteUrl,               // UI 표시용
+        uploadedImagePath: uploaded.imageUrl, // PATCH용 상대 경로
+      }));
     } catch (err) {
       console.error("이미지 업로드 실패", err);
       alert("이미지 업로드 실패!");
@@ -211,7 +210,7 @@ export default function MyProfile() {
 
         await updateMemberProfile({
           memberIntroduce: profile.introduce,
-          memberImageUrl: profile.image, // 서버 url로 저장됨.
+          memberImageUrl: profile.uploadedImagePath || profile.image,
           memberSnsUrl1: profile.sns[0] || "",
           memberSnsUrl2: profile.sns[1] || "",
           memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
@@ -226,8 +225,8 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-10 bg-white rounded-xl shadow">
-      <h2 className="text-xl font-bold text-blue-900 mb-4">내 프로필 변경</h2>
+    <div className="max-w-2xl p-10 mx-auto bg-white shadow rounded-xl">
+      <h2 className="mb-4 text-xl font-bold text-blue-900">내 프로필 변경</h2>
 
       <EditProfileImage
       image={profile.image}
