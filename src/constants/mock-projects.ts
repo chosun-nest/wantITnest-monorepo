@@ -72,8 +72,4 @@ export const mockProjects = [
     participants: "5/6",
     hasAttachment: true,
   },
-<<<<<<< HEAD
 ];
-=======
-];
->>>>>>> 949bf599a164ac0ccc259681a2aec0715c578f61
