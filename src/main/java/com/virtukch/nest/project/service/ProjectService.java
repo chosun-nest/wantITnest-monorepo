@@ -67,11 +67,11 @@ public class ProjectService {
     @Transactional
     public void updateProject(Long projectId, Long memberId, ProjectUpdateRequestDTO requestDTO) throws AccessDeniedException {
         Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(projectId));
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         ProjectMember projectMember = projectMemberRepository
-            .findByProject_ProjectIdAndMember_MemberId(projectId, memberId)
-            .orElseThrow(() -> new AccessDeniedException("프로젝트에 속하지 않은 사용자입니다."));
+                .findByProject_ProjectIdAndMember_MemberId(projectId, memberId)
+                .orElseThrow(() -> new AccessDeniedException("프로젝트에 속하지 않은 사용자입니다."));
 
         if (projectMember.getRole() != ProjectMember.Role.LEADER) {
             throw new AccessDeniedException("프로젝트 리더만 수정할 수 있습니다.");

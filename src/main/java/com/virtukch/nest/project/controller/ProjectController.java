@@ -38,14 +38,12 @@ public class ProjectController {
     }
 
     //프로젝트 업데이트
-    @PutMapping("/api/projects/{projectId}")
+    @PutMapping("/{projectId}")
     public ResponseEntity<Void> updateProject(
             @PathVariable Long projectId,
             @RequestBody ProjectUpdateRequestDTO dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
-
-        Long memberId = userDetails.getMember().getMemberId();
-        projectService.updateProject(projectId, memberId, dto);
+            @AuthenticationPrincipal CustomUserDetails user) throws AccessDeniedException {
+        projectService.updateProject(projectId, user.getMember().getMemberId(), dto);
         return ResponseEntity.ok().build();
     }
 
