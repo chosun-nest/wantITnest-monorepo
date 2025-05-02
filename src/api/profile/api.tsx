@@ -1,70 +1,151 @@
-import API from "../index";
+import { API } from "../index_c";
 
-export const getMemberProfile = async () => {
-  const token = localStorage.getItem("accesstoken");
-  const res = await API.get("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
+// 프로필 이미지 업로드 (POST)
+// export const uploadProfileImage = async (base64: string): Promise<string> => {
+//   const { data } = await API.post("/api/v1/members/me/image", { file: base64 });
+//   return data.url;
+// };
+export const uploadProfileImage = async (base64: string) => {
+  try {
+    const res = await API.post("/api/v1/members/me/image", { file: base64 });
+    return res.data;
+  } catch (error) {
+    console.error("프로필 이미지 업로드 실패", error);
+    throw error;
+  }
 };
 
-export const getTech = async () => {
-  const res = API.get("/api/v1/tech-stacks");
-  return (await res).data;
+
+// 비밀번호 확인 (POST)
+export interface CheckPasswordPayload { password: string; }
+
+export const checkPassword = async (payload: CheckPasswordPayload) => {
+  return API.post(
+    "/api/v1/members/check-password",
+    payload,
+    { validateStatus: status => status < 500 }
+  );
 };
 
-export const getInterests = async () => {
-  const res = API.get("/api/v1/interests");
-  return (await res).data;
-};
-
-// 프로필 수정 요청 (patch)
-export const updateMemberProfile = async ({
-  memberImage,
-  departmentId,
-  bio,
-  interestIdList,
-  techStackIdList,
-  memberSnsUrl1,
-  memberSnsUrl2,
-}: {
-  memberImage?: string; // base64나 URL 가능
-  departmentId?: number;
-  bio: string;
-  interestIdList: number[];
-  techStackIdList: number[];
+// 회원 정보 조회 (GET)
+export interface MemberProfile {
+  memberId: number;
+  memberEmail: string;
+  memberRole: string;
+  memberName: string;
   memberSnsUrl1: string;
   memberSnsUrl2: string;
-}) => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
+  memberSnsUrl3: string;
+  memberSnsUrl4: string;
+  memberIsStudent: boolean;
+  memberIntroduce: string;
+  memberImageUrl: string;
+  memberPasswordLength: number;
 
-  const res = await API.patch(
-    "/api/v1/members/me",
-    {
-      memberImage, // 전송
-      departmentId,
-      bio,
-      interestIdList,
-      techStackIdList,
-      memberSnsUrl1,
-      memberSnsUrl2,
-    },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return res.data;
+  memberDepartmentResponseDtoList: {
+    memberDepartmentId: number;
+    memberId: number;
+    departmentId: number;
+    departmentName: string;
+  }[];
+
+  memberInterestResponseDtoList: {
+    memberInterestId: number;
+    memberId: number;
+    interestId: number;
+    interestName: string;
+  }[];
+
+  memberTechStackResponseDtoList: {
+    memberTechStackId: number;
+    memberId: number;
+    techStackId: number;
+    techStackName: string;
+  }[];
 }
 
-// 회원 탈퇴 요청
-export const withdrawMember = async () => {
+export const getMemberProfile = async (): Promise<MemberProfile> => {
+  const res = await API.get("/api/v1/members/me");
+  return res.data;
+};
+
+
+// 회원 탈퇴 (DELETE)
+export const withdrawMember = async (): Promise<{ message: string }> => {
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
   const res = await API.delete("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
   });
 
   return res.data;
+};
+
+// 회원 정보 수정 (PATCH)
+export interface UpdateMemberProfilePayload {
+  memberName?: string;
+  memberImageUrl?: string;
+  memberIsStudent?: boolean;
+  memberIntroduce?: string;
+  memberSnsUrl1?: string;
+  memberSnsUrl2?: string;
+  memberSnsUrl3?: string;
+  memberSnsUrl4?: string;
+  memberDepartmentUpdateRequestIdList?: number[];
+  memberInterestUpdateRequestIdList?: number[];
+  memberTechStackUpdateRequestIdList?: number[];
 }
+
+export const updateMemberProfile = async (
+  payload: UpdateMemberProfilePayload
+) => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.patch("/api/v1/members/me", payload, {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+  });
+
+  return res.data;
+};
+
+// 비밀번호 변경 (PATCH)
+export interface UpdateMemberPasswordPayload {
+  currentPassword?: string;
+  newPassword?: string;
+  newPasswordConfirm?: string;
+}
+
+export const updateMemberPassword = async (
+  payload: UpdateMemberPasswordPayload
+): Promise<{ message: string }> => {
+  // Promise<{ message: string }> 단순 메시지 리턴
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const res = await API.patch("/api/v1/members/me/password", payload, {
+    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+  });
+
+  return res.data;
+};
+
+// 인증이 필요 없는 API 호출들
+// 기술 스택 목록 조회 (GET)
+export const getTech = async () => {
+  const res = API.get("/api/v1/tech-stacks", { headers: { skipAuth: true } });
+  return (await res).data;
+};
+
+// 관심 기술 전체 조회 (GET)
+export const getInterests = async () => {
+  const res = API.get("/api/v1/interests", { headers: { skipAuth: true } });
+  return (await res).data;
+};
+
+// 학과 전체 조회 (GET)
+export const getDepartments = async () => {
+  const res = API.get("/api/v1/departments", { headers: { skipAuth: true } });
+  return (await res).data;
+};

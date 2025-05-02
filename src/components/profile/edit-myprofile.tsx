@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { getMemberProfile, getTech, getInterests } from "../../api/profile/api";
-import { getDepartments } from "../../api/common/common";
-import { updateMemberProfile } from "../../api/profile/api";
+import { getMemberProfile, getTech, getInterests, getDepartments } from "../../api/profile/api";
+import { uploadProfileImage, updateMemberProfile } from "../../api/profile/api";
 
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
 import EditProfileField from "./edit-myprofile-components/EditProfileField";
 import EditDepartment from "./edit-myprofile-components/EditDepartment";
-import EditBio from "./edit-myprofile-components/EditBio";
+import EditIntroduce from "./edit-myprofile-components/EditIntroduce";
 import EditInterests from "./edit-myprofile-components/EditInterests";
 import EditTechStacks from "./edit-myprofile-components/EditTechStacks";
 import EditSNS from "./edit-myprofile-components/EditSNS";
@@ -18,13 +17,26 @@ interface Item {
   name: string;
 }
 
+interface DepartmentResponse {
+  departmentId: number;
+  departmentName: string;
+}
+interface InterestResponse {
+  interestId: number;
+  interestName: string;
+}
+interface TechStackResponse {
+  techStackId: number;
+  techStackName: string;
+}
+
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     name: "",
     email: "",
     major: "",
-    bio: "",
+    introduce: "",
     interests: [] as string[],
     sns: ["", ""],
     image: "",
@@ -52,14 +64,22 @@ export default function MyProfile() {
   const fetchData = async () => {
     const data = await getMemberProfile();
     setProfile({
+      image: data.memberImageUrl || "/assets/images/user.png",
       name: data.memberName,
       email: data.memberEmail,
       major: data.memberDepartmentResponseDtoList?.[0]?.departmentName || "",
-      bio: data.bio || "",
-      interests: data.memberInterestResponseDtoList?.map((i: any) => i.interestName) || [],
-      techStacks: data.memberTechStackResponseDtoList?.map((t: any) => t.techStackName) || [],
-      sns: [data.memberSnsUrl1 || "", data.memberSnsUrl2 || ""],
-      image: data.memberImage || "/assets/images/user.png",
+      introduce: data.memberIntroduce || "",
+      interests: data.memberInterestResponseDtoList.map(
+        (i: { interestId: number; interestName: string }) => i.interestName),
+      techStacks: data.memberTechStackResponseDtoList.map(
+        (t: { techStackId: number; techStackName: string } ) => t.techStackName
+      ),
+      sns: [
+        data.memberSnsUrl1,
+        data.memberSnsUrl2,
+        data.memberSnsUrl3,
+        data.memberSnsUrl4,
+      ].filter(Boolean),
     });
     setDepartmentInput(data.memberDepartmentResponseDtoList?.[0]?.departmentName || "");
   };
@@ -70,9 +90,23 @@ export default function MyProfile() {
       getInterests(),
       getTech(),
     ]);
-    setDepartmentsList(deps.map((d: any) => ({ id: d.departmentId, name: d.departmentName })));
-    setInterestsList(ints.map((i: any) => ({ id: i.interestId, name: i.interestName })));
-    setTechList(techs.map((t: any) => ({ id: t.techStackId, name: t.techStackName })));
+  
+    const formattedDepartments = deps.map((d: DepartmentResponse) => ({
+      id: d.departmentId,
+      name: d.departmentName,
+    }));
+    const formattedInterests = ints.map((i: InterestResponse) => ({
+      id: i.interestId,
+      name: i.interestName,
+    }));
+    const formattedTechs = techs.map((t: TechStackResponse) => ({
+      id: t.techStackId,
+      name: t.techStackName,
+    }));
+  
+    setDepartmentsList(formattedDepartments);
+    setInterestsList(formattedInterests);
+    setTechList(formattedTechs);
   };
 
   const handleChange = (field: string, value: string) => {
@@ -135,13 +169,31 @@ export default function MyProfile() {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfile((prev) => ({ ...prev, image: imageUrl }));
+    if (!file) return;
+  
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);  // base64 변환
+      reader.onloadend = async () => {
+        const base64 = reader.result;
+        if (!base64 || typeof base64 !== "string") return;
+  
+        // uploadProfileImage가 string(이미지 URL)만 반환하므로
+        const uploadedImageUrl = await uploadProfileImage(base64);
+        console.log("서버가 준 이미지 URL:", uploadedImageUrl); // ✅ 추가!!
+  
+        setProfile((prev) => ({
+          ...prev,
+          image: uploadedImageUrl,  // 곧바로 문자열 URL을 사용
+        }));
+      };
+    } catch (err) {
+      console.error("이미지 업로드 실패", err);
+      alert("이미지 업로드 실패!");
     }
-  };
+  };  
 
   const handleSave = async () => {
     const token = localStorage.getItem("accesstoken");
@@ -156,14 +208,15 @@ export default function MyProfile() {
         .filter((t) => profile.techStacks.includes(t.name))
         .map((t) => t.id);
 
-      await updateMemberProfile({
-          departmentId,
-          bio: profile.bio,
-          interestIdList,
-          techStackIdList,
-          memberSnsUrl1: profile.sns[0],
-          memberSnsUrl2: profile.sns[1],
-      });
+        await updateMemberProfile({
+          memberIntroduce: profile.introduce,
+          memberImageUrl: profile.image, // 서버 url로 저장됨.
+          memberSnsUrl1: profile.sns[0] || "",
+          memberSnsUrl2: profile.sns[1] || "",
+          memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
+          memberInterestUpdateRequestIdList: interestIdList,
+          memberTechStackUpdateRequestIdList: techStackIdList,
+        });
 
       alert("프로필이 저장되었습니다.");
       setIsEditing(false);
@@ -194,10 +247,10 @@ export default function MyProfile() {
         onSelect={handleSelectDepartment}
       />
 
-      <EditBio
-        value={profile.bio}
+      <EditIntroduce
+        value={profile.introduce}
         isEditing={isEditing}
-        onChange={(val) => handleChange("bio", val)}
+        onChange={(val) => handleChange("introduce", val)}
       />
 
       <EditInterests

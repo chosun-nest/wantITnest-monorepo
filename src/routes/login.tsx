@@ -4,6 +4,7 @@ import useResponsive from "../hooks/responsive";
 import { useState } from "react";
 import { login } from "../api/auth/auth";
 import { AxiosError } from "axios"; // 꼭 위에 import 해줘야 해!
+import Modal from "../components/common/modal";
 
 export default function Login() {
   const isMobile = useResponsive();
@@ -12,6 +13,9 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+
+  const [showModal, setShowModal] = useState(false); // 모달 표시 여부
+  const [modalMessage, setModalMessage] = useState(""); // 모달 메시지
 
   const handleLogin = async () => {
     try {
@@ -26,19 +30,28 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       const err = error as AxiosError;
-      setErr("에러 발생");
-      if (err.response) {
-        console.error("❌ 서버 응답 상태:", err.response.status);
-        console.error("❌ 서버 메시지:", err.response.data); // 여기에 상세 메시지가 있을 수도 있음
+
+      if (err.response?.data && typeof err.response.data === "object") {
+        const msg = (err.response.data as any).message;
+        setModalMessage(msg || "로그인에 실패했습니다.");
       } else {
-        console.error("❌ 네트워크 에러 또는 기타:", err.message);
+        setModalMessage("아이디 혹은 비밀번호가 틀렸습니다.");
       }
+      setShowModal(true); // 모달 표시
     }
   };
 
   return (
     <S.Container>
       {/* 로고 위치를 동적으로 조절 */}
+      {showModal && (
+        <Modal
+          title="로그인 실패"
+          message={modalMessage}
+          type="error"
+          onClose={() => setShowModal(false)}
+        />
+      )}
       <S.Header $isMobile={isMobile}>
         <Link to="/">
           <S.LogoText>WantIT-Nest</S.LogoText>

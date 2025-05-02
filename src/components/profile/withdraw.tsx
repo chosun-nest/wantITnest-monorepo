@@ -1,12 +1,14 @@
 import React, {useState} from "react";
-import WithdrawModal from "./modal/withdraw-modal";
-import WithdrawCompleteModal from "./modal/withdraw-complete-modal";
 import { withdrawMember } from "../../api/profile/api";
+import WithdrawModal from "./withdraw-modal/withdraw-modal";
+import WithdrawCompleteModal from "./withdraw-modal/withdraw-complete-modal";
+
 
 export default function Withdraw(){
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);  // 탈퇴하기 버튼 누른 후 모달
   const [showCompleteModal, setShowCompleteModal] = useState(false);  // 탈퇴 완료 모달
-  
+
+
   const handleWithdraw = async () => {
     try {
       await withdrawMember(); // 탈퇴 API 호출

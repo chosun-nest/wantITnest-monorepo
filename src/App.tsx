@@ -1,26 +1,30 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/home";
-import Profile from "./routes/profile";
-import ProfileEdit from "./routes/profile-edit";
+import Profile from "./routes/profile"; //yeong-eun
+import ProfileEdit from "./routes/profile-edit"; //yeong-eun
 import Login from "./routes/login";
 import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import CreateProfile from "./routes/create-profile";
-import ProjectBoard from "./routes/project-board";
-import NoticeBoard from "./routes/notice-board";
-import Notice from "./routes/notice";
-import InterestsBorad from "./routes/interests-borad";
+import ProjectBoard from "./routes/project-board"; //yu-gyeom
+
+// 공지사항 게시판 (혜린)
+import NoticeBoard from './components/notice/NoticeBoard'; //hye-rin
+
+import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
 import Chat from "./routes/chat";
-import ProjectDetail from "./routes/project-detail";  // 파일 이름 수정 확인!
-import ProjectWrite from "./routes/project-write";
+
+// 프로젝트 상세, 글쓰기 (yu-gyeom)
+import ProjectDetail from "./routes/project-detail";  //yu-gyeom
+import ProjectWrite from "./routes/project-write"; //yu-gyeom
 
 import { mockProjects } from "./constants/mock-projects";
 
-// 댓글 상태 (유겸 - project detail 댓글용)
+// ✅ 댓글 상태 초기값 (yu-gyeom)
 const initialComments: { [key: number]: { name: string; text: string; date: string }[] } = {
   23: [
     { name: "금상", text: "좋은 프로젝트네요!", date: "2025.05.02" },
@@ -31,10 +35,10 @@ const initialComments: { [key: number]: { name: string; text: string; date: stri
 function App() {
   const [showBackdrop, setShowBackdrop] = useState(false);
 
-  // 프로젝트 상태 - useState로 관리 (yu-gyeom)
+  // ✅ 프로젝트 상태 - useState로 관리 (yu-gyeom)
   const [projects, setProjects] = useState(mockProjects);
 
-  // 새 글 추가하는 함수 (yu-gyeom)
+  // ✅ 새 글 추가 함수 (yu-gyeom)
   const handleAddProject = (newProject: any) => {
     setProjects((prev) => [
       { ...newProject, id: prev.length ? prev[0].id + 1 : 1, views: 0 },
@@ -42,7 +46,7 @@ function App() {
     ]);
   };
 
-  // 댓글 상태도 같이 관리 (yu-gyeom)
+  // ✅ 댓글 상태 관리 (yu-gyeom)
   const [comments, setComments] = useState(initialComments);
 
   const handleAddComment = (projectId: number, name: string, text: string) => {
@@ -55,6 +59,7 @@ function App() {
     }));
   };
 
+  // ✅ 라우터 설정
   const router = createBrowserRouter([
     {
       path: "/",
@@ -64,7 +69,7 @@ function App() {
         { path: "profile/", element: <Profile /> },
         { path: "profile-edit/", element: <ProfileEdit /> },
 
-        // 프로젝트 게시판 (yu-gyeom)
+        // ✅ 프로젝트 게시판 (yu-gyeom)
         { path: "project-board/", element: <ProjectBoard projects={projects} /> },
         {
           path: "project/:id",
@@ -81,13 +86,13 @@ function App() {
           element: <ProjectWrite onAdd={handleAddProject} />,
         },
 
-        // 공지사항 게시판 (yu-gyeom)
+        // ✅ 공지사항 게시판 (혜린)
         { path: "notice-board/", element: <NoticeBoard /> },
-        { path: "notice/:id", element: <Notice /> },
 
-        // 관심사 게시판 (yeong-eun)
+        // ✅ 관심사 게시판 (yeong-eun)
         { path: "interests-board/", element: <InterestsBorad /> },
 
+        // ✅ 채팅 (공통)
         { path: "chat/", element: <Chat /> },
       ],
     },
@@ -99,12 +104,10 @@ function App() {
   ]);
 
   return (
-    <>
-      <BackdropContext.Provider value={{ showBackdrop, setShowBackdrop }}>
-        <GlobalBackdrop visible={showBackdrop} />
-        <RouterProvider router={router} />
-      </BackdropContext.Provider>
-    </>
+    <BackdropContext.Provider value={{ showBackdrop, setShowBackdrop }}>
+      <GlobalBackdrop visible={showBackdrop} />
+      <RouterProvider router={router} />
+    </BackdropContext.Provider>
   );
 }
 

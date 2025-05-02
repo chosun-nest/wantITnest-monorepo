@@ -1,11 +1,17 @@
 import { useState, useEffect } from "react";
 
 /**
- * 브라우저 width가 화면 해상도의 1/3 이하일 경우 모바일로 간주
- * @returns {boolean} true: 모바일, false: 데스크탑
+ * 모바일 기기 + width 768px 이하 + 또는 해상도 2/3 이하 → 모바일로 판단
  */
 export default function useResponsive(): boolean {
-  const getIsMobile = () => window.innerWidth / window.screen.width <= 1 / 2;
+  const isMobileDevice = () =>
+    /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  const getIsMobile = () => {
+    const isSmallWidth = window.innerWidth <= 768;
+    const isNarrowScreen = window.innerWidth / window.screen.width <= 2 / 3;
+    return isMobileDevice() || isSmallWidth || isNarrowScreen;
+  };
 
   const [isMobile, setIsMobile] = useState(getIsMobile);
 
@@ -15,7 +21,12 @@ export default function useResponsive(): boolean {
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize); // 회전 감지 추가
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
   }, []);
 
   return isMobile;
