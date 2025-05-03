@@ -170,20 +170,6 @@ export const verifycode = async (email: string, code: string) => {
   return res.data;
 }
 
-// (추가 요청하기) 이메일 저장 api (PATCH)
-export const updateStudentEmail = async (email: string) => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
-
-  const res = await API.patch(
-    "/api/v1/members/student-email",
-    { studentEmail: email },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-
-  return res.data;
-};
-
 // =============
 
 // 인증이 필요 없는 API 호출들
