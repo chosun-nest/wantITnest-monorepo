@@ -2,10 +2,7 @@ package com.virtukch.nest.comment.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -31,11 +28,13 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean isDeleted = false;
 
-    @Column(nullable = false)
-    private int likeCount = 0;
+    @Setter
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long likeCount = 0L;
 
-    @Column(nullable = false)
-    private int dislikeCount = 0;
+    @Setter
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long dislikeCount = 0L;
 
     // 생성 편의 메서드
     public static Comment createComment(BoardType boardType, Long postId, Long memberId, String content) {
@@ -45,6 +44,8 @@ public class Comment extends BaseTimeEntity {
                 .memberId(memberId)
                 .commentContent(content)
                 .parentId(null)
+                .likeCount(0L)
+                .dislikeCount(0L)
                 .build();
     }
 
@@ -55,6 +56,8 @@ public class Comment extends BaseTimeEntity {
                 .memberId(memberId)
                 .commentContent(content)
                 .parentId(parentId)
+                .likeCount(0L)
+                .dislikeCount(0L)
                 .build();
     }
 

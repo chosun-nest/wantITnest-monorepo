@@ -1,6 +1,9 @@
 package com.virtukch.nest.comment.service;
 
-import com.virtukch.nest.comment.dto.*;
+import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
+import com.virtukch.nest.comment.dto.CommentListResponseDto;
+import com.virtukch.nest.comment.dto.CommentRequestDto;
+import com.virtukch.nest.comment.dto.CommentResponseDto;
 import com.virtukch.nest.comment.dto.converter.CommentDtoConverter;
 import com.virtukch.nest.comment.exception.CommentNotFoundException;
 import com.virtukch.nest.comment.exception.NoCommentAuthorityException;
@@ -13,7 +16,6 @@ import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -181,18 +183,6 @@ public class CommentService {
         }
 
         return CommentDtoConverter.toDeleteResponseDto(comment);
-    }
-
-    @Transactional
-    public CommentReactionResponseDto reactToComment(Long commentId, Long memberId, @NotNull ReactionType reactionType) {
-        Comment comment = findByIdOrThrow(commentId);
-
-        switch (reactionType) {
-            case LIKE -> comment.increaseLikeCount();
-            case DISLIKE -> comment.increaseDislikeCount();
-        }
-
-        return CommentDtoConverter.toReactionResponseDto(comment, reactionType);
     }
 
     private Comment validateCommentOwnershipAndGet(Long commentId, Long memberId) {

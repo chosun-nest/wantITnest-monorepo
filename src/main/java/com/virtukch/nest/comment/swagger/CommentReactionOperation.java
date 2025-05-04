@@ -1,6 +1,6 @@
 package com.virtukch.nest.comment.swagger;
 
-import com.virtukch.nest.comment.dto.CommentReactionRequestDto;
+import com.virtukch.nest.comment_reaction.dto.CommentReactionRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,4 +1,4 @@
-package com.virtukch.nest.comment.dto;
+package com.virtukch.nest.comment_reaction.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class CommentReactionResponseDto {
     private Long commentId;
-    private int likeCount;
-    private int dislikeCount;
+    private Long likeCount;
+    private Long dislikeCount;
     private String message;
 }

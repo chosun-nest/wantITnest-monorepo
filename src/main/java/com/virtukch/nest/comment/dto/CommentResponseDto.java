@@ -18,6 +18,9 @@ public class CommentResponseDto {
     private String updatedAt;
     private Long parentId;
 
+    private Long likeCount;
+    private Long dislikeCount;
+
     private Boolean isDeleted;
 
     @Builder.Default
