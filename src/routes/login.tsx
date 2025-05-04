@@ -3,7 +3,7 @@ import * as S from "../assets/styles/auth.styles";
 import useResponsive from "../hooks/responsive";
 import { useState } from "react";
 import { login } from "../api/auth/auth";
-import { AxiosError } from "axios"; // 꼭 위에 import 해줘야 해!
+import { AxiosError } from "axios";
 import Modal from "../components/common/modal";
 
 export default function Login() {
@@ -12,7 +12,7 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
+  const [err] = useState("");
 
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [modalMessage, setModalMessage] = useState(""); // 모달 메시지
@@ -32,6 +32,7 @@ export default function Login() {
       const err = error as AxiosError;
 
       if (err.response?.data && typeof err.response.data === "object") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const msg = (err.response.data as any).message;
         setModalMessage(msg || "로그인에 실패했습니다.");
       } else {

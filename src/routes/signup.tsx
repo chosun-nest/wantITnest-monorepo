@@ -13,7 +13,7 @@ export default function SignUp() {
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [selected, setSelected] = useState<"재학생" | "일반">("재학생");
+  const [selected, setSelected] = useState<"재학생" | "일반">("일반");
 
   const [email, setEmail] = useState("");
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -117,6 +117,14 @@ export default function SignUp() {
       if (res === "Email verified successfully") {
         alert("이메일 인증 성공!");
         setIsEmailVerified(true);
+
+        // 이메일 도메인에 따라 자동 설정
+        const domain = email.split("@")[1];
+        if (domain === "chosun.ac.kr") {
+          setSelected("재학생");
+        } else {
+          setSelected("일반");
+        }
       } else {
         alert("이메일 인증 실패!");
         setIsEmailVerified(false);
