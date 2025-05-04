@@ -1,14 +1,21 @@
 import { API } from "../index_c";
 
 // 프로필 이미지 업로드 (POST)
-export const uploadProfileImage = async (base64: string) => {   // FileReader로 base64로 변환
-  try {
-    const res = await API.post("/api/v1/members/me/image", { file: base64 });   // 업로드 요청
-    return res.data;        // 응답은 res.data // setProfile({ ..., image: 업로드된 URL })로 상태 변경됨
-  } catch (error) {
-    console.error("프로필 이미지 업로드 실패", error);
-    throw error;
-  }
+export const uploadProfileImage = async (file: File) => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) throw new Error("No access token");
+
+  const formData = new FormData();
+  formData.append("file", file);    // key = "file"
+
+  const res = await API.post("/api/v1/members/me/image", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      //"Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data; // { imageUrl: "/업로드된 이미지/..." }
 };
 
 // 비밀번호 확인 (POST)
@@ -59,11 +66,18 @@ export interface MemberProfile {
   }[];
 }
 
+// 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
-  return res.data;
-};
+  const BASE_URL = "http://119.219.30.209:6030";
 
+  return {
+    ...res.data,
+    memberImageUrl: res.data.memberImageUrl
+      ? `${BASE_URL}${res.data.memberImageUrl}`
+      : "",
+  };
+};
 
 // 회원 탈퇴 (DELETE)
 export const withdrawMember = async (): Promise<{ message: string }> => {
