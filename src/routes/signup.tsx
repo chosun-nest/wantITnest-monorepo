@@ -6,6 +6,8 @@ import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
 import { getDepartments, getInterests, getTech } from "../api/common/common";
 import { Item } from "../types/signup";
+import Modal from "../components/common/modal";
+import type { ModalContent } from "../types/modal";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -34,6 +36,12 @@ export default function SignUp() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const [modalContent, setModalContent] = useState<ModalContent>({
+    title: "",
+    message: "",
+    type: "info",
+  });
 
   useEffect(() => {
     getItems();
@@ -76,7 +84,12 @@ export default function SignUp() {
 
   const handleSendCode = async () => {
     if (!isEmailValid) {
-      alert("이메일 형식이 올바르지 않습니다.");
+      setModalContent({
+        title: "이메일 형식 오류",
+        message: "이메일 형식이 올바르지 않습니다.",
+        type: "error",
+      });
+      setShowModal(true);
       return;
     }
     if (isDebugMode) {
@@ -167,6 +180,8 @@ export default function SignUp() {
     }
   };
 
+  const [showModal, setShowModal] = useState(false); // 모달 표시 여부
+
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
   useEffect(() => {
@@ -180,6 +195,15 @@ export default function SignUp() {
   }, [isDebugMode]);
   return (
     <S.Container>
+      {showModal && (
+        <Modal
+          title={modalContent.title}
+          message={modalContent.message}
+          type={modalContent.type}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
       <S.ButtonRow>
         <S.LoginButton
           onClick={() => setIsDebugMode((prev) => !prev)}
