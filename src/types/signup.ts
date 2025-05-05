@@ -53,6 +53,8 @@ type SignupPayload = {
   techStackIdList: number[];
 };
 
+
+
 export type {
   SignupPayload,
   UserType,
