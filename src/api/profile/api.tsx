@@ -1,7 +1,7 @@
 import { API } from "../index_c";
 
 // 프로필 이미지 업로드 (POST)
-export const uploadProfileImage = async (file: File) => {
+export const uploadProfileImage = async (file: File): Promise<string> => {
   const token = localStorage.getItem("accesstoken");
   if (!token) throw new Error("No access token");
 
@@ -11,11 +11,11 @@ export const uploadProfileImage = async (file: File) => {
   const res = await API.post("/api/v1/members/me/image", formData, {
     headers: {
       Authorization: `Bearer ${token}`,
-      //"Content-Type": "multipart/form-data",
+      "Content-Type": "multipart/form-data",
     },
   });
 
-  return res.data; // { imageUrl: "/업로드된 이미지/..." }
+  return res.data.imageUrl;
 };
 
 // 비밀번호 확인 (POST)

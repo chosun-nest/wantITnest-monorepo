@@ -179,21 +179,16 @@ export default function MyProfile() {
     if (!file) return;
   
     try {
-      const uploaded = await uploadProfileImage(file); // POST /members/me/image
-      console.log("서버가 준 이미지 URL:", uploaded.imageUrl);
-  
-      const absoluteUrl = `http://119.219.30.209:6030${uploaded.imageUrl}`; // UI용 절대 경로
-  
+      const uploadedImageUrl = await uploadProfileImage(file);
       setProfile((prev) => ({
         ...prev,
-        image: absoluteUrl,               // UI 표시용
-        uploadedImagePath: uploaded.imageUrl, // PATCH용 상대 경로
+        image: uploadedImageUrl,
       }));
     } catch (err) {
       console.error("이미지 업로드 실패", err);
       alert("이미지 업로드 실패!");
     }
-  };  
+  };
 
   const handleSave = async () => {
     const token = localStorage.getItem("accesstoken");
