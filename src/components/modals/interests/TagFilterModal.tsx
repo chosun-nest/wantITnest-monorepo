@@ -128,9 +128,21 @@ export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps
               </div>
             ))}
           </div>
-
-          {/* 하단 고정 버튼 */}
-          
+          {/* 하단 고정 버튼 영역 */}
+          <div className="sticky bottom-0 left-0 flex justify-between pt-4 mt-4 bg-white border-t">
+            <button
+              className="w-full px-4 py-3 mr-2 text-gray-700 border rounded hover:bg-gray-100"
+              onClick={() => setSelectedTags([])}
+            >
+              ⟳ 초기화
+            </button>
+            <button
+              className="w-full px-4 py-3 ml-2 text-white bg-[#002F6C] rounded hover:bg-[#001f4d]"
+              onClick={() => onApply(selectedTags)}
+            >
+              적용
+            </button>
+          </div>
         </div>
       </div>
     </>
