@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "..";
 
 interface AuthState {
   accessToken: string | null;
@@ -25,5 +26,17 @@ const authSlice = createSlice({
   },
 });
 
+export const selectAccessToken = (state: RootState): string | null =>
+  state.auth.accessToken;
+
+export const selectRefreshToken = (state: RootState): string | null =>
+  state.auth.refreshToken;
+
+export const logoutuser = (state: RootState): void => {
+  state.auth.accessToken = null;
+  state.auth.refreshToken = null;
+  localStorage.removeItem("persist:root");
+  sessionStorage.removeItem("persist:root");
+};
 export const { setTokens, clearTokens } = authSlice.actions;
 export default authSlice.reducer;
