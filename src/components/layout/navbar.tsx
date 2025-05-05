@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useNavbarHeight } from "../../context/NavbarHeightContext";
 import { getMemberProfile, MemberProfile } from "../../api/profile/api";
 import Sidebar from "./sidebar";
+import { useDispatch } from "react-redux";
+import { clearTokens } from "../../store/slices/authSlice";
 
 function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const isMobile = useResponsive();
@@ -19,6 +21,14 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(
     null
   );
+
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(clearTokens());
+    setIsMenuOpen(false);
+    navigate("/login");
+  };
 
   // api/profile/api의 API 호출
   useEffect(() => {
@@ -130,15 +140,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
                   <S.ProfileMenuItem onClick={() => navigate("/profile")}>
                     내 프로필
                   </S.ProfileMenuItem>
-                  <S.ProfileMenuItem
-                    onClick={() => {
-                      localStorage.removeItem("accesstoken");
-                      localStorage.removeItem("refreshToken");
-                      localStorage.removeItem("user");
-                      setIsMenuOpen(false);
-                      navigate("/login");
-                    }}
-                  >
+                  <S.ProfileMenuItem onClick={handleLogout}>
                     로그아웃
                   </S.ProfileMenuItem>
                 </S.ProfileMenu>
