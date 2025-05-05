@@ -3,8 +3,6 @@ import * as S from "../../assets/styles/auth.styles";
 import { SignUpComponentProps } from "../../types/signup";
 
 export default function SignUpComponent({
-  selected,
-  onChangeSelected,
   email,
   onChangeEmail,
   authCode,
@@ -58,31 +56,6 @@ export default function SignUpComponent({
         <S.Title>Welcome to WantIT-NEST</S.Title>
         <S.SigninTitle>회원가입</S.SigninTitle>
       </S.HeaderBox>
-      <S.DivisionContainer>
-        <S.SigninText>구분</S.SigninText>
-        <S.RadioGroup>
-          <S.RadioLabel>
-            <S.RadioInput
-              type="radio"
-              name="userType"
-              value="재학생"
-              checked={selected === "재학생"}
-              onChange={() => onChangeSelected("재학생")}
-            />
-            재학생
-          </S.RadioLabel>
-          <S.RadioLabel>
-            <S.RadioInput
-              type="radio"
-              name="userType"
-              value="일반"
-              checked={selected === "일반"}
-              onChange={() => onChangeSelected("일반")}
-            />
-            일반
-          </S.RadioLabel>
-        </S.RadioGroup>
-      </S.DivisionContainer>
       <S.SigninText>이메일 인증</S.SigninText>
       <S.EmailRow></S.EmailRow>
       <S.EmailRow>
@@ -124,7 +97,7 @@ export default function SignUpComponent({
         <div
           style={{ marginTop: "10px", color: "#4CAF50", fontWeight: "bold" }}
         >
-          ✅ 이메일 인증 완료
+          이메일 인증 완료
         </div>
       )}
 

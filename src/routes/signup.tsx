@@ -6,6 +6,8 @@ import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
 import { getDepartments, getInterests, getTech } from "../api/common/common";
 import { Item } from "../types/signup";
+import Modal from "../components/common/modal";
+import type { ModalContent } from "../types/modal";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ export default function SignUp() {
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [selected, setSelected] = useState<"재학생" | "일반">("재학생");
+  const [selected, setSelected] = useState<"재학생" | "일반">("일반");
 
   const [email, setEmail] = useState("");
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -34,6 +36,12 @@ export default function SignUp() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const [modalContent, setModalContent] = useState<ModalContent>({
+    title: "",
+    message: "",
+    type: "info",
+  });
 
   useEffect(() => {
     getItems();
@@ -76,7 +84,12 @@ export default function SignUp() {
 
   const handleSendCode = async () => {
     if (!isEmailValid) {
-      alert("이메일 형식이 올바르지 않습니다.");
+      setModalContent({
+        title: "이메일 형식 오류",
+        message: "이메일 형식이 올바르지 않습니다.",
+        type: "error",
+      });
+      setShowModal(true);
       return;
     }
     if (isDebugMode) {
@@ -117,6 +130,14 @@ export default function SignUp() {
       if (res === "Email verified successfully") {
         alert("이메일 인증 성공!");
         setIsEmailVerified(true);
+
+        // 이메일 도메인에 따라 자동 설정
+        const domain = email.split("@")[1];
+        if (domain === "chosun.ac.kr") {
+          setSelected("재학생");
+        } else {
+          setSelected("일반");
+        }
       } else {
         alert("이메일 인증 실패!");
         setIsEmailVerified(false);
@@ -159,6 +180,8 @@ export default function SignUp() {
     }
   };
 
+  const [showModal, setShowModal] = useState(false); // 모달 표시 여부
+
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
   useEffect(() => {
@@ -172,6 +195,15 @@ export default function SignUp() {
   }, [isDebugMode]);
   return (
     <S.Container>
+      {showModal && (
+        <Modal
+          title={modalContent.title}
+          message={modalContent.message}
+          type={modalContent.type}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
       <S.ButtonRow>
         <S.LoginButton
           onClick={() => setIsDebugMode((prev) => !prev)}
