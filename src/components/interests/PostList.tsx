@@ -16,6 +16,7 @@ interface Post {
 interface PostListProps {
   selectedTags: string[];       // 태그
   searchKeyword: string;        // 제목
+  sortType: "latest" | "likes";
   onCountChange: (count: number) => void;   // post 개수 counting
 }
 
@@ -68,18 +69,6 @@ export default function PostList({ selectedTags, searchKeyword }: PostListProps)
 
   return (
     <div>
-      {/* 정렬 선택 */}
-      <div className="flex justify-end mb-4">
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as any)}
-          className="p-2 text-sm border rounded"
-        >
-          <option value="latest">최신순</option>
-          <option value="likes">좋아요순</option>
-        </select>
-      </div>
-
       {/* 게시글 카드 목록 */}
       <div className="space-y-4">
         {filteredPosts.map((post) => (

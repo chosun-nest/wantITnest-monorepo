@@ -50,7 +50,7 @@ export default function InterestBoard() {
           onOpenFilter={() => setShowFilterModal(true)}
         />
 
-        {/* 모달 */}
+        {/* 관심분야 검색 모달 */}
         {showFilterModal && (
           <TagFilterModal
             onClose={() => setShowFilterModal(false)}

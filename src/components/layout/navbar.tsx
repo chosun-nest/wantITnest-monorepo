@@ -4,7 +4,7 @@ import * as S from "../../assets/styles/navbar.styles";
 import useResponsive from "../../hooks/responsive";
 import { useNavigate } from "react-router-dom";
 import { useNavbarHeight } from "../../context/NavbarHeightContext";
-import { getMemberProfile, MemberProfile } from "../../api/profile/api";
+import { getMemberProfile, MemberProfile } from "../../api/profile/profileApi";
 import Sidebar from "./sidebar";
 
 function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
