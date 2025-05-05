@@ -1,4 +1,5 @@
 // src/constants/mock-projects.ts
+
 export const mockProjects = [
   {
     id: 28,

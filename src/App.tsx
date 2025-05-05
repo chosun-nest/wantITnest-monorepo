@@ -7,6 +7,7 @@ import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
+import ProjectDetail from "./routes/project-detail";
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "profile-edit/",
         element: <ProfileEdit />,
+      },
+      {
+        path: "project/:id",
+        element: <ProjectDetail />
       },
       {
         path: "project-board/",
