@@ -1,15 +1,15 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import * as S from "../assets/styles/project-detail.styles";  // 파일명 정확!
-import { Project } from "../api/project/api";
+import { useParams, useNavigate } from "react-router-dom";
+import * as S from "../assets/styles/project-detail.styles";  // 스타일 파일 그대로 사용
+import { mockProjects } from "../constants/mock-projects";    // mock 데이터 불러오기
 
 export default function ProjectDetail() {
+  const { id } = useParams();         // URL 파라미터에서 id 가져오기
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // 게시판에서 넘겨준 프로젝트 데이터 받기
-  const project = location.state?.project as Project | null;
+  // mockProjects 에서 id 일치하는 프로젝트 찾기
+  const project = mockProjects.find(p => p.id === Number(id));
 
-  // 만약 project가 없으면 에러 메시지
+  // project 못 찾으면 에러 메시지 출력
   if (!project) {
     return (
       <S.Container>
@@ -24,12 +24,13 @@ export default function ProjectDetail() {
     <S.Container>
       <S.Title>프로젝트 상세보기</S.Title>
       <S.ContentCard>
-        <p><strong>제목:</strong> {project.projectTitle}</p>
-        <p><strong>설명:</strong> {project.projectDescription}</p>
-        <p><strong>시작일:</strong> {project.projectStartDate}</p>
-        <p><strong>종료일:</strong> {project.projectEndDate}</p>
-        <p><strong>최대 인원:</strong> {project.maxMember}</p>
-        <p><strong>상태:</strong> {project.closed ? "마감" : "모집중"}</p>
+        <p><strong>제목:</strong> {project.title}</p>
+        <p><strong>설명:</strong> {project.content}</p>
+        <p><strong>작성일:</strong> {project.date}</p>
+        <p><strong>작성자:</strong> {project.author}</p>
+        <p><strong>조회수:</strong> {project.views}</p>
+        <p><strong>참여인원:</strong> {project.participants}</p>
+        <p><strong>상태:</strong> {project.status}</p>
       </S.ContentCard>
       <button onClick={() => navigate(-1)}>뒤로 가기</button>
     </S.Container>
