@@ -1,11 +1,10 @@
-// /src/components/common/Modal.tsx
 import { useRef, useEffect } from "react";
 
 interface ModalProps {
   title: string;
   message: string;
   type?: "error" | "info";
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function Modal({
@@ -20,7 +19,7 @@ export default function Modal({
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        onClose();
+        onClose?.();
       }
     };
     document.addEventListener("mousedown", handleOutsideClick);
@@ -48,7 +47,7 @@ export default function Modal({
                 : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
-            닫기
+            확인
           </button>
         </div>
       </div>
