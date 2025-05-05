@@ -1,4 +1,4 @@
-// 관심분야 필터링 모달 개선
+// 관심분야 필터링 모달
 import React, { useEffect, useState } from "react";
 
 interface TagFilterModalProps {
@@ -18,7 +18,7 @@ const categories = [
   },
   {
     title: "🤖 인공지능",
-    tags: ["AI활용", "머신러닝•딥러닝", "컴퓨터 비전", "자연어 처리", "인공지능 기타"]
+    tags: ["AI활용", "머신러닝•딥러닝", "컴퓨터 비전", "자연어 처리", "영상 처리", "음성 처리", "인공지능 기타"]
   },
   {
     title: "🥼 데이터 사이언스",
