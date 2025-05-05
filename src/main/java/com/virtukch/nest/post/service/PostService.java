@@ -16,6 +16,8 @@ import com.virtukch.nest.tag.repository.TagRepository;
 import com.virtukch.nest.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,34 +60,23 @@ public class PostService {
         return PostDtoConverter.toDetailResponseDto(post, member, tagNames);
     }
 
-
     // 게시글 목록 조회
     @Transactional(readOnly = true)
-    public PostListResponseDto getPostList() {
-        List<Post> posts = postRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
-                .toList();
-
-        return buildPostListResponse(posts);
+    public PostListResponseDto getPostList(Pageable pageable) {
+        Page<Post> postPage = postRepository.findAll(pageable);
+        return buildPostListResponse(postPage);
     }
 
     // 게시글 목록 조회 (태그 필터링 포함)
     @Transactional(readOnly = true)
-    public PostListResponseDto getPostList(List<String> tags) {
-        Set<Long> postIdSet = tags.stream()
+    public PostListResponseDto getPostList(List<String> tags, Pageable pageable) {
+        List<Long> tagIds = tags.stream()
                 .map(tagService::findByNameOrThrow)
                 .map(Tag::getId)
-                .flatMap(tagId -> postTagRepository.findAllByTagId(tagId).stream())
-                .map(PostTag::getPostId)
-                .collect(Collectors.toSet()); // 중복 제거
-
-        List<Post> posts = postRepository.findAllById(postIdSet)
-                .stream()
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed()) // 최신순
                 .toList();
 
-        return buildPostListResponse(posts);
+        Page<Post> postPage = postRepository.findByTagIds(tagIds, pageable);
+        return buildPostListResponse(postPage);
     }
 
     // 게시글 수정
@@ -162,37 +153,60 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    private PostListResponseDto buildPostListResponse(List<Post> posts) {
-        // 1. memberId → MemberName
-        Map<Long, String> memberNameMap = memberRepository.findAllById(
-                posts.stream().map(Post::getMemberId).distinct().toList()
-        ).stream().collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
+    private PostListResponseDto buildPostListResponse(Page<Post> postPage) {
+        List<Post> posts = postPage.getContent();
 
-        // 2. postId → List<tagId>
-        List<Long> postIds = posts.stream().map(Post::getId).toList();
-        Map<Long, List<Long>> postTagMap = postTagRepository.findByPostIdIn(postIds).stream()
-                .collect(Collectors.groupingBy(
-                        PostTag::getPostId,
-                        Collectors.mapping(PostTag::getTagId, Collectors.toList())
-                ));
+        Map<Long, String> memberNameMap = fetchMemberNameMap(posts);
+        Map<Long, List<Long>> postTagMap = fetchPostTagMap(posts);
+        Map<Long, String> tagNameMap = fetchTagNameMap(postTagMap);
 
-        // 3. tagId → tagName
-        List<Long> tagIds = postTagMap.values().stream().flatMap(List::stream).distinct().toList();
-        Map<Long, String> tagNameMap = tagRepository.findAllById(tagIds).stream()
-                .collect(Collectors.toMap(Tag::getId, Tag::getName));
-
-        // 4. 변환
         List<PostSummaryDto> summaries = posts.stream()
-                .map(post -> {
-                    String memberName = memberNameMap.get(post.getMemberId());
-                    List<String> tagNames = postTagMap.getOrDefault(post.getId(), List.of()).stream()
-                            .map(tagNameMap::get)
-                            .filter(Objects::nonNull)
-                            .toList();
-                    return PostDtoConverter.toSummaryDto(post, memberName, tagNames);
-                })
+                .map(post -> buildPostSummaryDto(post, memberNameMap, postTagMap, tagNameMap))
                 .toList();
 
-        return PostDtoConverter.toListResponseDto(summaries);
+        return PostDtoConverter.toListResponseDto(summaries, postPage);
+    }
+
+    private Map<Long, String> fetchMemberNameMap(List<Post> posts) {
+        List<Long> memberIds = posts.stream()
+                                .map(Post::getMemberId)
+                                .distinct()
+                                .toList();
+        return memberRepository.findAllById(memberIds).stream()
+            .collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
+    }
+
+    private Map<Long, List<Long>> fetchPostTagMap(List<Post> posts) {
+        List<Long> postIds = posts.stream()
+                              .map(Post::getId)
+                              .toList();
+        return postTagRepository.findByPostIdIn(postIds).stream()
+            .collect(Collectors.groupingBy(
+                    PostTag::getPostId,
+                    Collectors.mapping(PostTag::getTagId, Collectors.toList())
+            ));
+    }
+
+    private Map<Long, String> fetchTagNameMap(Map<Long, List<Long>> postTagMap) {
+        List<Long> tagIds = postTagMap.values().stream()
+                                  .flatMap(Collection::stream)
+                                  .distinct()
+                                  .toList();
+        return tagRepository.findAllById(tagIds).stream()
+            .collect(Collectors.toMap(Tag::getId, Tag::getName));
+    }
+
+    private PostSummaryDto buildPostSummaryDto(
+            Post post,
+            Map<Long, String> memberNameMap,
+            Map<Long, List<Long>> postTagMap,
+            Map<Long, String> tagNameMap
+    ){
+        String memberName = memberNameMap.get(post.getMemberId());
+        List<String> tagNames = postTagMap.getOrDefault(post.getId(), Collections.emptyList()).stream()
+                                      .map(tagNameMap::get)
+                                      .filter(Objects::nonNull)
+                                      .toList();
+        return PostDtoConverter.toSummaryDto(post, memberName, tagNames);
     }
 }

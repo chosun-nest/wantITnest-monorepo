@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -62,16 +65,37 @@ public class PostController {
     @Operation(
             summary = "게시글 목록 조회",
             description = """
-                    게시글 목록을 조회합니다.
+                    게시글 목록을 조회합니다. (이 기능은 Postman을 이용하여 테스트하는 것을 추천)
+                    
+                    ## 태그 필터링
                     - 태그 필터링을 하지 않으면 전체 게시글을 반환합니다.
                     - 태그를 필터링하려면 `?tags=JAVA&tags=SPRING`과 같이 쿼리 파라미터로 전달하세요.
+                    
+                    ## 페이지네이션
+                    - 페이지 번호: `?page=0` (기본값: 0, 첫 페이지)
+                    - 페이지 크기: `?size=10` (기본값: 10, 페이지당 10개 항목)
+                    - 전체 예시: `?page=0&size=10`
+                    
+                    ## 정렬
+                    - 단일 필드 정렬: `?sort=createdAt,desc` (기본값: createdAt,desc)
+                    - 다중 필드 정렬: `?sort=viewCount,desc&sort=createdAt,desc`
+                    - 사용 가능한 정렬 필드: createdAt, viewCount, title
+                    
+                    ## 전체 사용 예시
+                    - `/api/v1/posts?page=0&size=10&sort=createdAt,desc&tags=JAVA&tags=SPRING`
                     """
     )
     @GetMapping
-    public ResponseEntity<PostListResponseDto> getPostList(@RequestParam(required = false) List<String> tags) {
+    public ResponseEntity<PostListResponseDto> getPostList(
+            @RequestParam(required = false) List<String> tags,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
         PostListResponseDto responseDto;
-        if (tags == null || tags.isEmpty()) responseDto = postService.getPostList();
-        else responseDto = postService.getPostList(tags);
+        if (tags == null || tags.isEmpty()) {
+            responseDto = postService.getPostList(pageable);
+        } else {
+            responseDto = postService.getPostList(tags, pageable);
+        }
 
         return ResponseEntity.ok(responseDto);
     }

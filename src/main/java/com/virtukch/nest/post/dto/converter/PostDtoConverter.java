@@ -3,6 +3,7 @@ package com.virtukch.nest.post.dto.converter;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.model.Post;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,14 +42,6 @@ public class PostDtoConverter {
                 .build();
     }
 
-
-    public static PostListResponseDto toListResponseDto(List<PostSummaryDto> summaries) {
-        return PostListResponseDto.builder()
-                .posts(summaries)
-                .totalCount(summaries.size())
-                .build();
-    }
-
     public static PostDetailResponseDto toDetailResponseDto(Post post, Member member, List<String> tagNames) {
         return PostDetailResponseDto.builder()
                 .postId(post.getId())
@@ -62,6 +55,27 @@ public class PostDtoConverter {
                 .viewCount(post.getViewCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .updatedAt(timeFormat(post.getUpdatedAt()))
+                .build();
+    }
+
+    public static PostListResponseDto toListResponseDto(List<PostSummaryDto> summaries, Page<?> page) {
+        return PostListResponseDto.builder()
+                .posts(summaries)
+                .totalCount((int) page.getTotalElements())
+                .pageInfo(toPageInfoDto(page))
+                .build();
+    }
+
+    public static PageInfoDto toPageInfoDto(Page<?> page) {
+        return PageInfoDto.builder()
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
                 .build();
     }
 
