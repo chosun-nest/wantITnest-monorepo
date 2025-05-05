@@ -24,11 +24,7 @@
     "react-icon": "^1.0.0",
     "react-icons": "^5.5.0",
     "react-modal": "^3.16.3",
-<<<<<<< HEAD
-    "react-quill": "^2.0.0",
-=======
     "react-redux": "^9.2.0",
->>>>>>> 9108e7b0055f7f48c0e1d9576efc081f7d328c13
     "react-router-dom": "^7.3.0",
     "redux-persist": "^6.0.0",
     "styled-components": "^6.1.17",
