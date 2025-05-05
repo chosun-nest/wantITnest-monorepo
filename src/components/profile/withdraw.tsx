@@ -23,10 +23,10 @@ export default function Withdraw(){
 
   return (
     <>
-      <div className="text-right mb-4">
+      <div className="mb-4 text-right">
         <button
           onClick={() => setShowWithdrawModal(true)}
-          className="px-4 py-2 bg-gray-500 text-white rounded"
+          className="px-4 py-2 text-white bg-gray-500 rounded"
         >
           계정 탈퇴하기 &gt;
         </button>

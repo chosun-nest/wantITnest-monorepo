@@ -98,7 +98,7 @@ export default function ChangePasswordModal({ onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-xl w-[90%] max-w-md shadow-lg">
         <AnimatePresence mode="wait">
           {step === 1 && (
@@ -108,31 +108,31 @@ export default function ChangePasswordModal({ onClose }: Props) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <h3 className="text-lg font-bold text-gray-800 mb-4">비밀번호 변경</h3>
+              <h3 className="mb-4 text-lg font-bold text-gray-800">비밀번호 변경</h3>
 
               <div className="relative">
-                <label className="block text-sm font-semibold mb-1">현재 비밀번호</label>
+                <label className="block mb-1 text-sm font-semibold">현재 비밀번호</label>
                 <input
                   type={showCurrentPassword ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full p-2 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800 pr-10"
+                  className="w-full p-2 pr-10 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
                   placeholder="현재 비밀번호 입력"
                 />
-                <div className="absolute inset-y-0 right-3 flex items-center">
+                <div className="absolute inset-y-0 flex items-center right-3">
                   {isChecking ? <LoadingDots /> : isPasswordVerified === true ? <CheckIcon /> : null}
                 </div>
               </div>
 
               <button
                 type="button"
-                className="text-xs text-gray-500 mb-2"
+                className="mb-2 text-xs text-gray-500"
                 onClick={() => setShowCurrentPassword((prev) => !prev)}
               >
                 {showCurrentPassword ? "🔒 숨기기" : "👁️ 보기"}
               </button>
 
-              <div className="flex justify-end mt-6 gap-2">
+              <div className="flex justify-end gap-2 mt-6">
                 <button onClick={onClose} className="px-4 py-2 border rounded">
                   닫기
                 </button>
@@ -156,19 +156,19 @@ export default function ChangePasswordModal({ onClose }: Props) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <h3 className="text-lg font-bold text-gray-800 mb-4">새 비밀번호 설정</h3>
+              <h3 className="mb-4 text-lg font-bold text-gray-800">새 비밀번호 설정</h3>
 
               <div className="relative">
                 <input
                   type={showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-2 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800 pr-10"
+                  className="w-full p-2 pr-10 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
                   placeholder="새 비밀번호 입력"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-2 text-sm text-gray-400"
+                  className="absolute text-sm text-gray-400 right-3 top-2"
                   onClick={() => setShowNewPassword((prev) => !prev)}
                 >
                   {showNewPassword ? "🔒" : "👁️"}
@@ -186,12 +186,12 @@ export default function ChangePasswordModal({ onClose }: Props) {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-2 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800 pr-10"
+                  className="w-full p-2 pr-10 mb-3 border rounded focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
                   placeholder="새 비밀번호 재입력"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-2 text-sm text-gray-400"
+                  className="absolute text-sm text-gray-400 right-3 top-2"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                 >
                   {showConfirmPassword ? "🔒" : "👁️"}
@@ -204,7 +204,7 @@ export default function ChangePasswordModal({ onClose }: Props) {
                 </p>
               )}
 
-              <div className="flex justify-end mt-6 gap-2">
+              <div className="flex justify-end gap-2 mt-6">
                 <button onClick={() => setStep(1)} className="px-4 py-2 border rounded">
                   뒤로
                 </button>
