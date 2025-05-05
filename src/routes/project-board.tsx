@@ -1,40 +1,32 @@
 import { useState } from "react";
 import * as S from "../assets/styles/project-board.styles";
-import { Link } from "react-router-dom";
-
-interface ProjectBoardProps {
-  projects: {
-    id: number;
-    title: string;
-    date: string;
-    author: string;
-    views: number;
-    participants: string;
-    hasAttachment: boolean;
-    content?: string;
-    status: "모집중" | "모집완료";
-  }[];
-}
+import { mockProjects } from "../constants/mock-projects"; // mock 데이터 가져오기
+import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 7;
 
-export default function ProjectBoard({ projects }: ProjectBoardProps) {
+export default function ProjectBoard() {
+  const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 1️⃣ 날짜 기준 최신순 정렬 (내림차순: 최신 날짜가 위)
-  const sortedProjects = [...projects].sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
+  // mock 데이터
+  const projects = mockProjects;
 
-  // 2️⃣ 검색어 포함하는 항목 필터링
-  const filteredProjects = sortedProjects.filter(
-    (project) =>
-      project.title.includes(searchTerm) ||
-      project.author.includes(searchTerm)
+  // 최신순 (날짜 기준 내림차순)
+  const sortedProjects = [...projects].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  // 3️⃣ 페이지네이션 처리
+  // 검색 필터
+  const filteredProjects = sortedProjects.filter(
+    (p) =>
+      p.title.includes(searchTerm) ||
+      p.content.includes(searchTerm)
+  );
+
+  // 페이징
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentProjects = filteredProjects.slice(
@@ -59,7 +51,7 @@ export default function ProjectBoard({ projects }: ProjectBoardProps) {
         </div>
         <S.SearchInput
           type="text"
-          placeholder="제목 또는 작성자 검색"
+          placeholder="제목 또는 내용 검색"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -75,17 +67,21 @@ export default function ProjectBoard({ projects }: ProjectBoardProps) {
         <span>작성일</span>
         <span>작성자</span>
         <span>조회수</span>
-        <span>참여인원/정원</span>
-        <span>모집상태</span>
+        <span>참여인원</span>
+        <span>상태</span>
         <span>첨부</span>
       </S.TableHeader>
 
       <S.TableBody>
         {currentProjects.map((project, index) => (
           <S.TableRow key={project.id}>
-            {/* 최신순 번호 (전체 게시물 개수 - 현재 인덱스) */}
             <span>{filteredProjects.length - (startIdx + index)}</span>
-            <S.ProjectTitle to={`/project/${project.id}`}>
+            <S.ProjectTitle
+              onClick={() =>
+                navigate(`/project/${project.id}`, { state: { project } })
+              }
+              style={{ cursor: "pointer" }}
+            >
               {project.title}
             </S.ProjectTitle>
             <span>{project.date}</span>
