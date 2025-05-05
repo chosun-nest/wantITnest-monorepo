@@ -6,6 +6,9 @@ import { login } from "../api/auth/auth";
 import { AxiosError } from "axios";
 import Modal from "../components/common/modal";
 
+import { useDispatch } from "react-redux";
+import { setTokens } from "../store/slices/authSlice";
+
 export default function Login() {
   const isMobile = useResponsive();
   const navigate = useNavigate();
@@ -17,15 +20,17 @@ export default function Login() {
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [modalMessage, setModalMessage] = useState(""); // 모달 메시지
 
+  // dispatch 초기화
+  const dispatch = useDispatch();
+
   const handleLogin = async () => {
     try {
       const res = await login(email, password);
-      const { accessToken, refreshToken, memberId, email: userEmail } = res;
-      localStorage.setItem("accesstoken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ memberId, email: userEmail })
+      dispatch(
+        setTokens({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        })
       );
       navigate("/");
     } catch (error) {
