@@ -2,24 +2,20 @@ import { Link } from "react-router-dom";
 import * as S from "../assets/styles/home.styles";
 import ProfileComponent from "../components/profile/ProfileCard";
 import useResponsive from "../hooks/responsive";
-import { useEffect, useState } from "react";
 import GuestCard from "../components/profile/ProfileCardGuest";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
+import { useSelector } from "react-redux";
+import { selectIsLoggedIn } from "../store/slices/authSlice";
 
 export default function Home() {
   const isMobile = useResponsive();
-  const [isLogin, setIsLogin] = useState(false);
   const { navbarHeight } = useNavbarHeight();
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accesstoken");
-    setIsLogin(!!accessToken);
-  }, []);
+  const isLoggedIn = useSelector(selectIsLoggedIn);
 
   return (
     <S.GridContainer $navbarHeight={navbarHeight} $isMobile={isMobile}>
       <S.GridItem $row="1" $isMobile={isMobile} $col="1">
-        {!isLogin ? <GuestCard /> : <ProfileComponent />}
+        {!isLoggedIn ? <GuestCard /> : <ProfileComponent />}
       </S.GridItem>
       <S.GridItem $row="1" $isMobile={isMobile} $col="2">
         <S.ItemTitle>
