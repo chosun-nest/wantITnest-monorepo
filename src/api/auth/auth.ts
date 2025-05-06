@@ -1,5 +1,7 @@
 import { SignupPayload } from "../../types/signup";
 import { API } from "../index_c";
+import { setTokens, clearTokens } from "../../store/slices/authSlice";
+import { store } from "../../store";
 
 export const login = async (email: string, password: string) => {
   const res = await API.post(
@@ -35,10 +37,9 @@ export const verifycode = async (email: string, code: string) => {
   return res.data;
 };
 
-// acctoken 재발급
 export async function refreshAccessToken() {
   try {
-    const refreshToken = localStorage.getItem("refreshToken");
+    const refreshToken = store.getState().auth.refreshToken;
 
     if (!refreshToken) {
       throw new Error("리프레시 토큰이 없습니다.");
@@ -58,16 +59,22 @@ export async function refreshAccessToken() {
     const { accessToken, refreshToken: newRefreshToken } = res.data;
 
     if (accessToken && newRefreshToken) {
-      localStorage.setItem("accesstoken", accessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-      console.log("토큰 재발급 성공");
+      store.dispatch(setTokens({ accessToken, refreshToken: newRefreshToken }));
+
+      console.log(" 토큰 재발급 성공");
     } else {
       throw new Error("재발급된 토큰이 없습니다.");
     }
   } catch (error) {
-    console.error("❌ 토큰 재발급 실패:", error);
+    console.error(" 토큰 재발급 실패:", error);
+
+    store.dispatch(clearTokens());
+
     localStorage.clear();
-    window.location.href = "/login"; // 실패시 강제 로그아웃
+    sessionStorage.clear();
+
+    // 로그인 페이지로 이동
+    window.location.href = "/login";
     throw error;
   }
 }

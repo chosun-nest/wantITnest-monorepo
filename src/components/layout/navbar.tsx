@@ -6,9 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useNavbarHeight } from "../../context/NavbarHeightContext";
 import { getMemberProfile, MemberProfile } from "../../api/profile/api";
 import Sidebar from "./sidebar";
-import { useDispatch, useSelector } from "react-redux"; // useSelector 임포트
-import { clearTokens, selectAccessToken } from "../../store/slices/authSlice"; // selectAccessToken 임포트
-// import { logoutUser } from "../../store/slices/authSlice"; // logoutUser Thunk 사용 시 임포트
+import { useDispatch, useSelector } from "react-redux";
+import { clearTokens, selectAccessToken } from "../../store/slices/authSlice";
 
 function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const isMobile = useResponsive();
