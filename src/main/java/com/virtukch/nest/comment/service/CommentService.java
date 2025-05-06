@@ -178,8 +178,16 @@ public class CommentService {
             // 대댓글이 달린 댓글 → soft delete
             comment.delete(); // isDeleted = true, content = "삭제된 댓글입니다."
         } else {
-            // 대댓글이 없는 경우 → 물리 삭제
+            Long parentId = comment.getParentId();
             commentRepository.delete(comment);
+
+            if(parentId != null) {
+                Comment parentComment = findByIdOrThrow(parentId);
+                // 부모 댓글이 이미 삭제 되었고, 하위 대댓글이 존재하지 않으면 부모 댓글도 hard-delete
+                if(parentComment.isDeleted() && !commentRepository.existsByParentId(parentId)) {
+                    commentRepository.delete(parentComment);
+                }
+            }
         }
 
         return CommentDtoConverter.toDeleteResponseDto(comment);
