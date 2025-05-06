@@ -40,7 +40,7 @@ public class PostController {
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @PostMapping("/new")
+    @PostMapping
     public ResponseEntity<PostResponseDto> createPost(@AuthenticationPrincipal CustomUserDetails user,
                                                       @Valid @RequestBody PostRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
@@ -122,7 +122,7 @@ public class PostController {
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @PatchMapping("/update/{postId}")
+    @PatchMapping("/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(@AuthenticationPrincipal CustomUserDetails user,
                                                       @PathVariable Long postId,
                                                       @Valid @RequestBody PostRequestDto requestDto) {
@@ -140,7 +140,7 @@ public class PostController {
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @DeleteMapping("/delete/{postId}")
+    @DeleteMapping("/{postId}")
     public ResponseEntity<PostResponseDto> deletePost(@AuthenticationPrincipal CustomUserDetails user,
                                                       @PathVariable Long postId) {
         Long memberId = user.getMember().getMemberId();
