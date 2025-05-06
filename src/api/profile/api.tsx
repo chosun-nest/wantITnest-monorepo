@@ -1,12 +1,12 @@
 import { API } from "../index_c";
+import { getAccessToken } from "../../utils/auth";
 
 // 프로필 이미지 업로드 (POST)
 export const uploadProfileImage = async (file: File): Promise<string> => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
+  const token = getAccessToken();
 
   const formData = new FormData();
-  formData.append("file", file);    // key = "file"
+  formData.append("file", file);
 
   const res = await API.post("/api/v1/members/me/image", formData, {
     headers: {
@@ -19,14 +19,14 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
 };
 
 // 비밀번호 확인 (POST)
-export interface CheckPasswordPayload { password: string; }
+export interface CheckPasswordPayload {
+  password: string;
+}
 
 export const checkPassword = async (payload: CheckPasswordPayload) => {
-  return API.post(
-    "/api/v1/members/check-password",
-    payload,
-    { validateStatus: status => status < 500 }
-  );
+  return API.post("/api/v1/members/check-password", payload, {
+    validateStatus: (status) => status < 500,
+  });
 };
 
 // 회원 정보 조회 (GET)
@@ -43,21 +43,18 @@ export interface MemberProfile {
   memberIntroduce: string;
   memberImageUrl: string;
   memberPasswordLength: number;
-
   memberDepartmentResponseDtoList: {
     memberDepartmentId: number;
     memberId: number;
     departmentId: number;
     departmentName: string;
   }[];
-
   memberInterestResponseDtoList: {
     memberInterestId: number;
     memberId: number;
     interestId: number;
     interestName: string;
   }[];
-
   memberTechStackResponseDtoList: {
     memberTechStackId: number;
     memberId: number;
@@ -81,11 +78,10 @@ export const getMemberProfile = async (): Promise<MemberProfile> => {
 
 // 회원 탈퇴 (DELETE)
 export const withdrawMember = async (): Promise<{ message: string }> => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
+  const token = getAccessToken();
 
   const res = await API.delete("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   return res.data;
@@ -109,15 +105,10 @@ export interface UpdateMemberProfilePayload {
 export const updateMemberProfile = async (
   payload: UpdateMemberProfilePayload
 ) => {
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
+  const token = getAccessToken();
 
-  // const res = await API.patch("/api/v1/members/me", payload, {
-  //   headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
-  // });
-  
   return await API.patch("/api/v1/members/me", payload, {
-    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+    headers: { Authorization: `Bearer ${token}` },
   }); // 전체 AxiosResponse<T> 반환
 };
 
@@ -132,11 +123,10 @@ export const updateMemberPassword = async (
   payload: UpdateMemberPasswordPayload
 ): Promise<{ message: string }> => {
   // Promise<{ message: string }> 단순 메시지 리턴
-  const token = localStorage.getItem("accesstoken");
-  if (!token) throw new Error("No access token");
+  const token = getAccessToken();
 
   const res = await API.patch("/api/v1/members/me/password", payload, {
-    headers: { Authorization: `Bearer ${token}` }, // 인증이 필요하므로 skipAuth: true 사용 x
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   return res.data;
@@ -147,7 +137,7 @@ export const updateMemberPassword = async (
 // 토큰 유효성 검사 (GET)
 export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
   const res = await API.get("/api/v1/auth/me");
-  return res.data; // 토큰이 유효하면 memberId를 반환. DB 접근 없이 토큰 기반으로 동작함.
+  return res.data;
 };
 
 // =============
@@ -159,34 +149,37 @@ export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
 export const sendcode = async (email: string) => {
   const res = await API.post("/api/v1/auth/send-code", { email });
   return res.data;
-}
+};
 
 // 인증 코드 검증 (POST)
 export const verifycode = async (email: string, code: string) => {
-  const res = await API.post("api/v1/auth/verify-code", {
-    email,
-    code,
-  });
+  const res = await API.post("/api/v1/auth/verify-code", { email, code });
   return res.data;
-}
+};
 
 // =============
 
 // 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)
 export const getTech = async () => {
-  const res = API.get("/api/v1/tech-stacks", { headers: { skipAuth: true } });
-  return (await res).data;
+  const res = await API.get("/api/v1/tech-stacks", {
+    headers: { skipAuth: true },
+  });
+  return res.data;
 };
 
 // 관심 기술 전체 조회 (GET)
 export const getInterests = async () => {
-  const res = API.get("/api/v1/interests", { headers: { skipAuth: true } });
-  return (await res).data;
+  const res = await API.get("/api/v1/interests", {
+    headers: { skipAuth: true },
+  });
+  return res.data;
 };
 
 // 학과 전체 조회 (GET)
 export const getDepartments = async () => {
-  const res = API.get("/api/v1/departments", { headers: { skipAuth: true } });
-  return (await res).data;
+  const res = await API.get("/api/v1/departments", {
+    headers: { skipAuth: true },
+  });
+  return res.data;
 };
