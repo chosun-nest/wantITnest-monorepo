@@ -7,7 +7,8 @@ import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
-import ProjectDetail from "./routes/project-detail";
+import ProjectDetail from "./routes/project-detail"; //yu-gyeom
+import ProjectWrite from "./routes/project-write"; //yu-gyeom
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad";    //yeong-eun
@@ -18,6 +19,7 @@ import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
 import Chat from "./routes/chat";
 import NotFound from "./routes/notfound";
+import ProtectedRoute from "./components/auth/protected-route";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +28,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "profile/",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "",
@@ -34,15 +40,23 @@ const router = createBrowserRouter([
       },
       {
         path: "profile-edit/",
-        element: <ProfileEdit />,
+        element: (
+          <ProtectedRoute>
+            <ProfileEdit />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "project/:id",
-        element: <ProjectDetail />
+        element: <ProjectDetail />,
       },
       {
         path: "project-board/",
         element: <ProjectBoard />,
+      },
+      {
+        path: "project-write",
+        element: <ProjectWrite />,
       },
       {
         path: "notice-board/", // ｈｙｅ－ｒｉｎ

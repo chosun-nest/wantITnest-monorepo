@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  getMemberProfile, 
-  getTech, getInterests, getDepartments, 
-  uploadProfileImage, 
-  updateMemberProfile } from "../../api/profile/api";
+import {
+  getMemberProfile,
+  getTech,
+  getInterests,
+  getDepartments,
+  uploadProfileImage,
+  updateMemberProfile,
+} from "../../api/profile/api";
 
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
@@ -14,6 +17,10 @@ import EditInterests from "./edit-myprofile-components/EditInterests";
 import EditTechStacks from "./edit-myprofile-components/EditTechStacks";
 import EditSNS from "./edit-myprofile-components/EditSNS";
 import EditProfileButtons from "./edit-myprofile-components/EditProfileButtons";
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../../store/slices/authSlice";
+import { ModalContent } from "../../types/modal";
+import Modal from "../common/modal";
 
 interface Item {
   id: number;
@@ -31,7 +38,6 @@ interface TechStackResponse {
   techStackId: number;
   techStackName: string;
 }
-
 
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -59,7 +65,18 @@ export default function MyProfile() {
   const [filteredTechs, setFilteredTechs] = useState<Item[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
- 
+
+  // 토큰 관리 변수는 전역 변수로 선언해야 함함
+  // selector를 사용해 내 토큰 가져오는 slice인 selectAccessToken을 인자로 넣음음
+  const accessToken = useSelector(selectAccessToken);
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState<ModalContent>({
+    title: "",
+    message: "",
+    type: "info",
+  });
+
   useEffect(() => {
     fetchData();
     getItems();
@@ -75,9 +92,10 @@ export default function MyProfile() {
       major: data.memberDepartmentResponseDtoList?.[0]?.departmentName || "",
       introduce: data.memberIntroduce || "",
       interests: data.memberInterestResponseDtoList.map(
-        (i: { interestId: number; interestName: string }) => i.interestName),
+        (i: { interestId: number; interestName: string }) => i.interestName
+      ),
       techStacks: data.memberTechStackResponseDtoList.map(
-        (t: { techStackId: number; techStackName: string } ) => t.techStackName
+        (t: { techStackId: number; techStackName: string }) => t.techStackName
       ),
       sns: [
         data.memberSnsUrl1,
@@ -86,7 +104,9 @@ export default function MyProfile() {
         data.memberSnsUrl4,
       ].filter(Boolean),
     });
-    setDepartmentInput(data.memberDepartmentResponseDtoList?.[0]?.departmentName || "");
+    setDepartmentInput(
+      data.memberDepartmentResponseDtoList?.[0]?.departmentName || ""
+    );
   };
 
   const getItems = async () => {
@@ -95,7 +115,7 @@ export default function MyProfile() {
       getInterests(),
       getTech(),
     ]);
-  
+
     const formattedDepartments = deps.map((d: DepartmentResponse) => ({
       id: d.departmentId,
       name: d.departmentName,
@@ -108,7 +128,7 @@ export default function MyProfile() {
       id: t.techStackId,
       name: t.techStackName,
     }));
-  
+
     setDepartmentsList(formattedDepartments);
     setInterestsList(formattedInterests);
     setTechList(formattedTechs);
@@ -144,7 +164,10 @@ export default function MyProfile() {
 
   const handleSelectInterest = (item: Item) => {
     if (!profile.interests.includes(item.name)) {
-      setProfile((prev) => ({ ...prev, interests: [...prev.interests, item.name] }));
+      setProfile((prev) => ({
+        ...prev,
+        interests: [...prev.interests, item.name],
+      }));
     }
     setNewInterest("");
     setFilteredInterests([]);
@@ -161,13 +184,19 @@ export default function MyProfile() {
 
   const handleSelectTech = (item: Item) => {
     if (!profile.techStacks.includes(item.name)) {
-      setProfile((prev) => ({ ...prev, techStacks: [...prev.techStacks, item.name] }));
+      setProfile((prev) => ({
+        ...prev,
+        techStacks: [...prev.techStacks, item.name],
+      }));
     }
     setNewTech("");
     setFilteredTechs([]);
   };
 
-  const handleDeleteItem = (field: "interests" | "techStacks", index: number) => {
+  const handleDeleteItem = (
+    field: "interests" | "techStacks",
+    index: number
+  ) => {
     setProfile((prev) => ({
       ...prev,
       [field]: prev[field].filter((_, i) => i !== index),
@@ -177,7 +206,7 @@ export default function MyProfile() {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-  
+
     try {
       const uploadedImageUrl = await uploadProfileImage(file);
       setProfile((prev) => ({
@@ -191,11 +220,12 @@ export default function MyProfile() {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("accesstoken");
-    if (!token) return;
+    if (!accessToken) return;
 
     try {
-      const departmentId = departmentsList.find((d) => d.name === profile.major)?.id;
+      const departmentId = departmentsList.find(
+        (d) => d.name === profile.major
+      )?.id;
       const interestIdList = interestsList
         .filter((i) => profile.interests.includes(i.name))
         .map((i) => i.id);
@@ -203,32 +233,57 @@ export default function MyProfile() {
         .filter((t) => profile.techStacks.includes(t.name))
         .map((t) => t.id);
 
-        await updateMemberProfile({
-          memberIntroduce: profile.introduce,
-          memberImageUrl: profile.uploadedImagePath || profile.image,
-          memberSnsUrl1: profile.sns[0] || "",
-          memberSnsUrl2: profile.sns[1] || "",
-          memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
-          memberInterestUpdateRequestIdList: interestIdList,
-          memberTechStackUpdateRequestIdList: techStackIdList,
-        });
-      alert("프로필이 저장되었습니다.");
+      await updateMemberProfile({
+        memberIntroduce: profile.introduce,
+        memberImageUrl: profile.uploadedImagePath || profile.image,
+        memberSnsUrl1: profile.sns[0] || "",
+        memberSnsUrl2: profile.sns[1] || "",
+        memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
+        memberInterestUpdateRequestIdList: interestIdList,
+        memberTechStackUpdateRequestIdList: techStackIdList,
+      });
+      setShowModal(true);
+      setModalContent({
+        title: "프로필 수정 완료",
+        message: "프로필 수정을 완료했습니다.",
+        type: "info",
+        onClose: () => {
+          setShowModal(false);
+          window.location.reload();
+        },
+      });
     } catch (e) {
-      alert("저장 중 오류가 발생했습니다.");
+      setShowModal(true);
+      setModalContent({
+        title: "프로필 수정 오류",
+        message: "프로필 수정중 오류가 발생했습니다.",
+        type: "error",
+      });
       console.error(e);
     }
   };
 
   return (
     <div className="max-w-2xl p-10 mx-auto bg-white shadow rounded-xl">
+      {showModal ? (
+        <Modal
+          title={modalContent.title}
+          message={modalContent.message}
+          type={modalContent.type}
+          onClose={() => {
+            setShowModal(false);
+            modalContent.onClose?.();
+          }}
+        />
+      ) : null}
       <h2 className="mb-4 text-xl font-bold text-blue-900">내 프로필 변경</h2>
 
       <EditProfileImage
-      image={profile.image}
-      isEditing={isEditing}
-      onChange={handleImageChange}
-      fileInputRef={fileInputRef}
-    />
+        image={profile.image}
+        isEditing={isEditing}
+        onChange={handleImageChange}
+        fileInputRef={fileInputRef}
+      />
 
       <EditProfileField name={profile.name} email={profile.email} />
 
@@ -278,7 +333,6 @@ export default function MyProfile() {
         onSave={handleSave}
         onEdit={() => setIsEditing(true)}
       />
-
     </div>
   );
 }

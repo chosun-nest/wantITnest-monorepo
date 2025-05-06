@@ -9,6 +9,8 @@ import { Item } from "../types/signup";
 import Modal from "../components/common/modal";
 import type { ModalContent } from "../types/modal";
 import { AxiosError } from "axios";
+import { useDispatch } from "react-redux";
+import { setTokens } from "../store/slices/authSlice";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -37,6 +39,8 @@ export default function SignUp() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const dispatch = useDispatch();
 
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -187,12 +191,11 @@ export default function SignUp() {
       };
       const res = await signup(payload);
 
-      const { accessToken, refreshToken, memberId, email: userEmail } = res;
-      localStorage.setItem("accesstoken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ memberId, email: userEmail })
+      dispatch(
+        setTokens({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        })
       );
 
       setModalContent({

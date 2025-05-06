@@ -2,13 +2,25 @@ import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/navbar";
 import ProfileCard from "../components/profile/ProfileCard";
+import { useSelector } from "react-redux";
+import { selectIsLoggedIn } from "../store/slices/authSlice";
+import Modal from "../components/common/modal";
+import { ModalContent } from "../types/modal";
 
 export default function Profile() {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [navHeight, setNavHeight] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const isLoggedIn = useSelector(selectIsLoggedIn);
+
+  const [modalContent, setModalContent] = useState<ModalContent>({
+    title: "",
+    message: "",
+    type: "info",
+  });
   // Navbar 높이 계산
   useEffect(() => {
     const handleResize = () => {
@@ -24,19 +36,34 @@ export default function Profile() {
 
   // 로그인 여부 확인
   useEffect(() => {
-    const token = localStorage.getItem("accesstoken");
-    if (!token) {
-      alert("로그인이 필요한 페이지입니다.");
-      navigate("/login");
+    if (!isLoggedIn) {
+      setModalContent({
+        title: "로그인 필요",
+        message: "로그인이 필요한 페이지 입니다",
+        type: "error",
+        onClose: () => navigate("/login"),
+      });
+      setShowModal(true);
     } else {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [isLoggedIn, navigate]);
 
   return (
     <>
+      {" "}
+      {showModal && (
+        <Modal
+          title={modalContent.title}
+          message={modalContent.message}
+          type={modalContent.type}
+          onClose={() => {
+            setShowModal(false);
+            modalContent.onClose?.();
+          }}
+        />
+      )}
       <Navbar ref={navbarRef} />
-
       <div
         className="flex min-h-screen px-20 bg-white"
         style={{ paddingTop: navHeight + 40 }}

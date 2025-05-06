@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useNavbarHeight } from "../../context/NavbarHeightContext";
 import { getMemberProfile, MemberProfile } from "../../api/profile/api";
 import Sidebar from "./sidebar";
+import { useDispatch, useSelector } from "react-redux";
+import { clearTokens, selectAccessToken } from "../../store/slices/authSlice";
 
 function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
   const isMobile = useResponsive();
@@ -20,7 +22,16 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
     null
   );
 
-  // api/profile/api의 API 호출
+  const dispatch = useDispatch();
+  const accessToken = useSelector(selectAccessToken);
+
+  const handleLogout = () => {
+    dispatch(clearTokens());
+
+    setIsMenuOpen(false);
+    navigate("/login");
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -31,21 +42,25 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
       }
     };
 
-    fetchProfile();
-  }, []);
+    // accessToken이 있을 때 (로그인 상태일 때) 프로필 정보를 가져옴
+    if (accessToken) {
+      fetchProfile();
+    } else {
+      // 로그아웃 상태이면 프로필 정보 초기화
+      setMemberProfile(null);
+    }
+    // accessToken 값이 변경될 때마다 이 useEffect가 다시 실행됨
+  }, [accessToken]); // accessToken을 의존성 배열에 추가
 
   // ResizeObserver로 Navbar 높이 자동 감지
   useEffect(() => {
     if (!ref || !("current" in ref) || !ref.current) return;
-
     const observer = new ResizeObserver(() => {
       if (ref.current) {
         setNavbarHeight(ref.current.offsetHeight);
       }
     });
-
     observer.observe(ref.current);
-
     return () => observer.disconnect();
   }, [ref, setNavbarHeight]);
 
@@ -56,11 +71,9 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
         setIsMenuOpen(false);
       }
     };
-
     if (isMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -68,11 +81,9 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
 
   return (
     <>
-      {" "}
       {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
       <S.NavbarContainer ref={ref}>
         <S.NavbarContent>
-          {/* 메뉴 토글 버튼 */}
           <S.NavMenu>
             {!isMobile ? (
               <div
@@ -90,8 +101,8 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
-                onClick={() => setIsSidebarOpen(true)} // 사이드바 열기
-                style={{ cursor: "pointer" }} // 클릭 가능해 보이게 커서 추가
+                onClick={() => setIsSidebarOpen(true)}
+                style={{ cursor: "pointer" }}
               >
                 <path
                   strokeLinecap="round"
@@ -102,24 +113,23 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
             )}
           </S.NavMenu>
 
-          {/* 로고 */}
           <S.Logo to="/">
-            <img src="assets/images/logo.png" />
+            <img src="assets/images/logo.png" alt="Logo" />
             WantIT-NEST
           </S.Logo>
 
-          {/* 우측 버튼 */}
           <S.NavRight>
             <S.SearchIcon />
 
-            {localStorage.getItem("accesstoken") ? (
+            {accessToken ? (
               <S.ProfileWrapper ref={menuRef}>
                 <S.ProfileIcon
                   src={
                     memberProfile?.memberImageUrl || "/assets/images/user.png"
                   }
                   onClick={() => setIsMenuOpen((prev) => !prev)}
-                />{" "}
+                  alt="Profile"
+                />
                 {memberProfile != null ? (
                   <div className="text-[12px]">
                     {memberProfile.memberName} 님 <br />
@@ -130,15 +140,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
                   <S.ProfileMenuItem onClick={() => navigate("/profile")}>
                     내 프로필
                   </S.ProfileMenuItem>
-                  <S.ProfileMenuItem
-                    onClick={() => {
-                      localStorage.removeItem("accesstoken");
-                      localStorage.removeItem("refreshToken");
-                      localStorage.removeItem("user");
-                      setIsMenuOpen(false);
-                      navigate("/login");
-                    }}
-                  >
+                  <S.ProfileMenuItem onClick={handleLogout}>
                     로그아웃
                   </S.ProfileMenuItem>
                 </S.ProfileMenu>
@@ -152,7 +154,6 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
           </S.NavRight>
         </S.NavbarContent>
 
-        {/* 데스크탑용 하단바 */}
         {!isMobile && (
           <S.WebBar>
             <S.NavbarLink to="/notice-board">
