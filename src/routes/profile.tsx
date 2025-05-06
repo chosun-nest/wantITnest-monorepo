@@ -38,13 +38,13 @@ export default function Profile() {
       <Navbar ref={navbarRef} />
 
       <div
-        className="px-15 min-h-screen bg-white flex"
-        style={{ paddingTop: navHeight + 20 }}
+        className="flex min-h-screen px-20 bg-white"
+        style={{ paddingTop: navHeight + 40 }}
       >
-        <div className="w-1/4">
+        <div className="w-1/4 pr-6">
           {loading ? (
-            <div className="w-80 p-4 border rounded-xl shadow-md bg-white z-10 relative">
-              <p className="text-gray-500 text-sm"> 불러오는 중...</p>
+            <div className="relative p-4 bg-white border shadow-md w-80 rounded-xl">
+              <p className="text-sm text-gray-500"> 불러오는 중...</p>
             </div>
           ) : (
             <ProfileCard />

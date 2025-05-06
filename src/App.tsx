@@ -11,8 +11,8 @@ import ProjectDetail from "./routes/project-detail";
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad";    //yeong-eun
-// import InterestsWrite from "./routes/interests-write";    //yeong-eun
-// import InterestsDetail from "./routes/interests-detail";  //yeong-eun
+import InterestsWrite from "./routes/interests-write";    //yeong-eun
+import InterestsDetail from "./routes/interests-detail";  //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
@@ -53,12 +53,12 @@ const router = createBrowserRouter([
         element: <InterestsBorad />,
       },
       {
-        // path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
-        // element: <InterestsWrite />,
+        path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsWrite />,
       },
       {
-        // path: "interests-detail/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
-        // element: <InterestsDetail />,
+        path: "interests-detail/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsDetail />,
       },
       {
         path: "chat/",

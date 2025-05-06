@@ -67,17 +67,40 @@ export interface MemberProfile {
 }
 
 // 회원 정보 조회 (GET)
-export const getMemberProfile = async (): Promise<MemberProfile> => {
-  const res = await API.get("/api/v1/members/me");
-  const BASE_URL = "http://119.219.30.209:6030";
+// export const getMemberProfile = async (): Promise<MemberProfile> => {
+//   const res = await API.get("/api/v1/members/me");
+//   const BASE_URL = "http://119.219.30.209:6030";
 
-  return {
-    ...res.data,
-    memberImageUrl: res.data.memberImageUrl
-      ? `${BASE_URL}${res.data.memberImageUrl}`
-      : "",
-  };
+//   return {
+//     ...res.data,
+//     memberImageUrl: res.data.memberImageUrl
+//       ? `${BASE_URL}${res.data.memberImageUrl}`
+//       : "",
+//   };
+// };
+export const getMemberProfile = async (): Promise<MemberProfile> => {
+  const token = localStorage.getItem("accesstoken");
+  if (!token) {
+    console.error("❌ 토큰 없음! 로그인 상태 확인 필요");
+    throw new Error("No access token");
+  }
+
+  try {
+    const res = await API.get("/api/v1/members/me");
+    const BASE_URL = "http://119.219.30.209:6030";
+
+    return {
+      ...res.data,
+      memberImageUrl: res.data.memberImageUrl
+        ? `${BASE_URL}${res.data.memberImageUrl}`
+        : "",
+    };
+  } catch (err) {
+    console.error("❌ 프로필 정보 조회 실패", err);
+    throw err;
+  }
 };
+
 
 // 회원 탈퇴 (DELETE)
 export const withdrawMember = async (): Promise<{ message: string }> => {
