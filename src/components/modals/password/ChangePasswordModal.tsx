@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { checkPassword, updateMemberPassword } from "../../../api/profile/profileApi";
+import { checkPassword, updateMemberPassword } from "../../../api/profile/api";
 import LoadingDots from "../../ui/LoadingDots";
 import CheckIcon from "../../ui/CheckIcon";
 import PasswordSuccessModal from "./PasswordSuccessModal";

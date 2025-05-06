@@ -3,7 +3,7 @@ import {
   getMemberProfile, 
   getTech, getInterests, getDepartments, 
   uploadProfileImage, 
-  updateMemberProfile } from "../../api/profile/profileApi";
+  updateMemberProfile } from "../../api/profile/api";
 
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile-components/EditProfileImage";

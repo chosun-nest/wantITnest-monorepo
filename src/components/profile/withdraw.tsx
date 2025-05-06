@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { withdrawMember } from "../../api/profile/profileApi";
+import { withdrawMember } from "../../api/profile/api";
 import WithdrawModal from "../modals/withdraw/WithdrawModal";
 import WithdrawCompleteModal from "../modals/withdraw/WithdrawCompleteModal";
 

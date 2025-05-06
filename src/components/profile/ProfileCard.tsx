@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMemberProfile } from "../../api/profile/profileApi";
+import { getMemberProfile } from "../../api/profile/api";
 
 interface ProfileType {
   image: string;

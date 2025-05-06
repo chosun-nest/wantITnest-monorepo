@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postsWrite } from "../api/interests/interestsApi";
+import { postsWrite } from "../api/interests/api";
 
 export default function PostWrite() {
   const navigate = useNavigate();
