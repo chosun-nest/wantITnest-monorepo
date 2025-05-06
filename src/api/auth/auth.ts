@@ -37,6 +37,11 @@ export const verifycode = async (email: string, code: string) => {
   return res.data;
 };
 
+export const checkTokenValidity = async (): Promise<{ memberId: string }> => {
+  const res = await API.get("/api/v1/auth/me");
+  return res.data;
+};
+
 export async function refreshAccessToken() {
   try {
     const refreshToken = store.getState().auth.refreshToken;
@@ -46,7 +51,7 @@ export async function refreshAccessToken() {
     }
 
     const res = await API.post(
-      "/api/v1/auth/refresh-token",
+      "/api/v1/auth/refresh",
       {},
       {
         headers: {

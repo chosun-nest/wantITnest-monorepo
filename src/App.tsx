@@ -17,6 +17,7 @@ import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
 import Chat from "./routes/chat";
 import NotFound from "./routes/notfound";
+import ProtectedRoute from "./components/auth/protected-route";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +26,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "profile/",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "",
@@ -33,11 +38,15 @@ const router = createBrowserRouter([
       },
       {
         path: "profile-edit/",
-        element: <ProfileEdit />,
+        element: (
+          <ProtectedRoute>
+            <ProfileEdit />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "project/:id",
-        element: <ProjectDetail />
+        element: <ProjectDetail />,
       },
       {
         path: "project-board/",
@@ -45,7 +54,7 @@ const router = createBrowserRouter([
       },
       {
         path: "project-write",
-        element: <ProjectWrite />
+        element: <ProjectWrite />,
       },
       {
         path: "notice-board/", // ｈｙｅ－ｒｉｎ
