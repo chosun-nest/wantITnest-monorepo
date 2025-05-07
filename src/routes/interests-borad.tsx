@@ -33,7 +33,7 @@ export default function InterestBoard() {
       <Navbar ref={navbarRef} />
       <div
         className="max-w-5xl min-h-screen p-4 mx-auto bg-white"
-        style={{ paddingTop: navHeight + 20 }}
+        style={{ paddingTop: navHeight }}
       >
         {/* 제목 + 게시글 개수 */}
         <InterestBoardHeader postCount={postCount} />
