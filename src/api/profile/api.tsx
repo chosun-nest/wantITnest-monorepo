@@ -1,7 +1,7 @@
 import { API } from "../index_c";
 import { getAccessToken } from "../../utils/auth";
 
-// 프로필 이미지 업로드 (POST)
+// 프로필 이미지 업로드 (POST) 
 export const uploadProfileImage = async (file: File): Promise<string> => {
   const token = getAccessToken();
 

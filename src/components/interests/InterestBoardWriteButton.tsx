@@ -8,7 +8,7 @@ export default function InterestBoardWriteButton() {
   return (
     <button
         className="fixed bottom-8 left-8 px-5 py-3 bg-[#002F6C] text-white rounded-full shadow-lg hover:bg-[#001f4d]"
-        onClick={() => navigate("/interests-write.tsx")}
+        onClick={() => navigate("/interests-write")}
       >
         ✏️ 글쓰기
     </button>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";     // Link로 바꾸기
 import { postsWrite } from "../api/interests/api";
 
 export default function PostWrite() {
