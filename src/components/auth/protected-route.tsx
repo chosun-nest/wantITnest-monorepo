@@ -29,6 +29,7 @@ export default function ProtectedRoute({
     };
 
     verify();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken, navigate]);
 
   if (loading) return null; // 또는 <Spinner />
