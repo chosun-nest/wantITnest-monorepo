@@ -45,16 +45,28 @@ const categories = [
 export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps) {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
+  
   const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
+    setSelectedTags((prev) => {
+      if (prev.includes(tag)) {
+        setErrorMessage(""); // 기존 에러 제거
+        return prev.filter((t) => t !== tag);
+      } else {
+        if (prev.length >= 10) {
+          setErrorMessage("⚠️ 최대 10개의 관심분야만 선택할 수 있습니다.");
+          return prev;
+        }
+        setErrorMessage(""); // 정상 선택 시 에러 제거
+        return [...prev, tag];
+      }
+    });
   };
 
   const removeTag = (tag: string) => {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
+  
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -129,6 +141,10 @@ export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps
             ))}
           </div>
           {/* 하단 고정 버튼 영역 */}
+          {errorMessage && (
+            <p className="mt-4 text-sm text-center text-red-600">{errorMessage}</p>
+          )}
+          
           <div className="sticky bottom-0 left-0 flex justify-between pt-4 mt-4 bg-white border-t">
             <button
               className="w-full px-4 py-3 mr-2 text-gray-700 border rounded hover:bg-gray-100"

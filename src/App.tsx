@@ -1,7 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/home";
-import Profile from "./routes/profile"; //yeong-eun
-import ProfileEdit from "./routes/profile-edit"; //yeong-eun
+import Profile from "./routes/profile";           //yeong-eun
+import ProfileEdit from "./routes/profile-edit";  //yeong-eun
 import Login from "./routes/login";
 import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
@@ -11,7 +11,9 @@ import ProjectDetail from "./routes/project-detail"; //yu-gyeom
 import ProjectWrite from "./routes/project-write"; //yu-gyeom
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
-import InterestsBorad from "./routes/interests-borad"; //yeong-eun
+import InterestsBorad from "./routes/interests-borad";    //yeong-eun
+import InterestsWrite from "./routes/interests-write";    //yeong-eun
+import InterestsDetail from "./routes/interests-detail";  //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
@@ -61,8 +63,16 @@ const router = createBrowserRouter([
         element: <NoticeBoard />,
       },
       {
-        path: "interests-board/",
+        path: "interests-board/",   // yeong-eun : 관심사 정보 게시판 페이지
         element: <InterestsBorad />,
+      },
+      {
+        path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsWrite />,
+      },
+      {
+        path: "interests-detail/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsDetail />,
       },
       {
         path: "chat/",

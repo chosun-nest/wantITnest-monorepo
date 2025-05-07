@@ -41,12 +41,12 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-xl w-[90%] max-w-md shadow-lg">
-        <h3 className="text-lg font-bold text-gray-800 mb-3">둥지를 떠난다니 아쉽네요.</h3>
+        <h3 className="mb-3 text-lg font-bold text-gray-800">둥지를 떠난다니 아쉽네요.</h3>
 
-        <p className="text-sm text-red-500 mb-4">회원탈퇴 전 안내사항을 읽어보세요:</p>
-        <ul className="list-disc pl-5 text-sm text-gray-700 mb-4 space-y-1">
+        <p className="mb-4 text-sm text-red-500">회원탈퇴 전 안내사항을 읽어보세요:</p>
+        <ul className="pl-5 mb-4 space-y-1 text-sm text-gray-700 list-disc">
           <li>회원 탈퇴 시, 더 이상 해당 계정으로 WantIT-Nest 사용이 불가능합니다.</li>
           <li>
             직접 작성한 콘텐츠(사진, 게시물, 댓글 등)는 자동으로 삭제되지 않으며,
@@ -76,7 +76,7 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
               transition={{ duration: 0.3 }}
               className="mb-4"
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block mb-1 text-sm font-semibold text-gray-700">
                 비밀번호 확인
               </label>
 
@@ -87,21 +87,21 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onBlur={handleVerify}
-                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-800 pr-10"
+                  className="w-full p-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-800"
                   disabled={isChecking || isVerified === true}
                 />
 
                 {/* 숨기기/보기 토글 */}
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  className="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2"
                   onClick={() => setShowPwd((prev) => !prev)}
                 >
                   {showPwd ? "🔒" : "👁️"}
                 </button>
 
                 {/* 로딩, 체크 아이콘 */}
-                <div className="absolute inset-y-0 right-10 flex items-center pr-2">
+                <div className="absolute inset-y-0 flex items-center pr-2 right-10">
                   {isChecking
                     ? <LoadingDots />
                     : isVerified

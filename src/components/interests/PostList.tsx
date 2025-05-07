@@ -1,5 +1,5 @@
 // 게시글 리스트 컴포넌트
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
 interface Post {
   id: number;
@@ -16,6 +16,7 @@ interface Post {
 interface PostListProps {
   selectedTags: string[];       // 태그
   searchKeyword: string;        // 제목
+  sortType: "latest" | "likes";
   onCountChange: (count: number) => void;   // post 개수 counting
 }
 
@@ -23,6 +24,17 @@ interface PostListProps {
 const postCards: Post[] = [
   {
     id: 1,
+    title: "관심분야 정보 게시판 출시!",
+    summary: "관심분야 정보 게시판 기능 정리",
+    tags: ["개발•프로그래밍", "MacOS"],
+    author: "지금 IT야",
+    date: "4일 전",
+    likes: 40,
+    views: 1,
+    comments: 1,
+  },
+  {
+    id: 2,
     title: "android 최신 버전 업데이트 소식",
     summary: "19일 저녁 해커에 의한 악성코드로 정보 유출 정황 발생...",
     tags: ["모바일 앱 개발", "보안"],
@@ -32,22 +44,9 @@ const postCards: Post[] = [
     views: 38,
     comments: 4,
   },
-  {
-    id: 2,
-    title: "관심분야 정보 게시판 출시!",
-    summary: "관심분야 정보 게시판 기능 정리",
-    tags: ["개발•프로그래밍", "MacOS"],
-    author: "지금 IT야",
-    date: "4일 전",
-    likes: 400,
-    views: 1,
-    comments: 1,
-  },
 ];
 
-export default function PostList({ selectedTags, searchKeyword }: PostListProps) {
-  const [sort, setSort] = useState<"latest" | "likes">("latest");
-
+export default function PostList({ selectedTags, searchKeyword, sortType }: PostListProps) {
   const filteredPosts = useMemo(() => {
     return postCards
       .filter((post) =>
@@ -56,30 +55,18 @@ export default function PostList({ selectedTags, searchKeyword }: PostListProps)
           : true
       )
       .filter((post) =>
-        searchKeyword.trim() !== ""
+        searchKeyword.trim()
           ? post.title.toLowerCase().includes(searchKeyword.toLowerCase())
           : true
       )
       .sort((a, b) => {
-        if (sort === "likes") return b.likes - a.likes;
-        return 0;
+        if (sortType === "likes") return b.likes - a.likes;
+        return b.id - a.id; //최신순 > 나중에 서버 연동 시 createdAt 기준 정렬로 교체 가능
       });
-  }, [selectedTags, searchKeyword, sort]);
+  }, [selectedTags, searchKeyword, sortType]);
 
   return (
     <div>
-      {/* 정렬 선택 */}
-      <div className="flex justify-end mb-4">
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as any)}
-          className="p-2 text-sm border rounded"
-        >
-          <option value="latest">최신순</option>
-          <option value="likes">좋아요순</option>
-        </select>
-      </div>
-
       {/* 게시글 카드 목록 */}
       <div className="space-y-4">
         {filteredPosts.map((post) => (

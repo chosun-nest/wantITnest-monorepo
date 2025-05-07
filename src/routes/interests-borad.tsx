@@ -5,6 +5,7 @@ import InterestBoardHeader from "../components/interests/InterestBoardHeader"   
 import InterestBoardSearch from "../components/interests/InterestBoardSearch"    // 상단 검색 바
 import InterestBoardTagFilter from "../components/interests/InterestBoardTagFilter" // 기술 필터 & 선택 태그
 import TagFilterModal from "../components/modals/interests/TagFilterModal";   // 필터 모달
+import InterestBoardSortDropdown from "../components/interests/InterestBoardSortDropdown";  // 최신순, 좋아요순 드롭다운
 import PostList from "../components/interests/PostList";                    // 게시글 리스트
 import InterestBoardWriteButton from "../components/interests/InterestBoardWriteButton"    // 글 쓰기 버튼
 
@@ -50,7 +51,7 @@ export default function InterestBoard() {
           onOpenFilter={() => setShowFilterModal(true)}
         />
 
-        {/* 모달 */}
+        {/* 관심분야 검색 모달 */}
         {showFilterModal && (
           <TagFilterModal
             onClose={() => setShowFilterModal(false)}
@@ -60,7 +61,13 @@ export default function InterestBoard() {
             }}
           />
         )}
-
+        
+        {/* 정렬 드롭다운 */}
+        <InterestBoardSortDropdown
+          sortType={sortType}
+          onChange={(value) => setSortType(value)}
+        />
+                
         {/* 게시글 목록 */}
         <PostList
           selectedTags={selectedTags}
