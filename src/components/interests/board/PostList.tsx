@@ -91,7 +91,7 @@ export default function PostList({ selectedTags, searchKeyword, sortType }: Post
               </p>
             </div>
             <div className="flex flex-row justify-end items-end gap-2 text-sm text-gray-500 min-w-[70px]">
-              <span>♡ {post.likes}</span>
+              <span>👍🏻 {post.likes}</span>
               <span>👀 {post.views}</span>
               <span>💬 {post.comments}</span>
             </div>
