@@ -1,16 +1,33 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { fetchPostDetail } from "../api/interests/api.tsx";
 import PostAuthorCard from "../components/interests/detail/PostAuthorCard.tsx";
 import Navbar from "../components/layout/navbar";
 
 export default function InterestsDetail() {
+  const { id } = useParams(); // 게시글 ID 추출
   const navbarRef = useRef<HTMLDivElement>(null);
   const [navHeight, setNavHeight] = useState(0);
+  const [post, setPost] = useState<any>(null);
 
   useEffect(() => {
     if (navbarRef.current) {
       setNavHeight(navbarRef.current.offsetHeight);
     }
   }, []);
+  
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!id) return;
+      try {
+        const data = await fetchPostDetail(Number(id));
+        setPost(data);
+      } catch (err) {
+        console.error("게시글 조회 실패", err);
+      }
+    };
+    fetchPost();
+  }, [id]);
 
   return (
     <>
@@ -131,3 +148,4 @@ export default function InterestsDetail() {
     </>
   );
 }
+

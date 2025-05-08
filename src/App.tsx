@@ -71,7 +71,7 @@ const router = createBrowserRouter([
         element: <InterestsWrite />,
       },
       {
-        path: "interests-detail/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        path: "interests-detail/:id", // yeong-eun : 관심 분야 정보 글쓰기 페이지
         element: <InterestsDetail />,
       },
       {

@@ -1,5 +1,6 @@
 // 게시글 리스트 컴포넌트
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Post {
   id: number;
@@ -14,12 +15,11 @@ interface Post {
 }
 
 interface PostListProps {
-  selectedTags: string[];       // 태그
-  searchKeyword: string;        // 제목
+  selectedTags: string[];
+  searchKeyword: string;
   sortType: "latest" | "likes";
-  onCountChange: (count: number) => void;   // post 개수 counting
+  onCountChange: (count: number) => void;
 }
-
 
 const postCards: Post[] = [
   {
@@ -46,9 +46,16 @@ const postCards: Post[] = [
   },
 ];
 
-export default function PostList({ selectedTags, searchKeyword, sortType }: PostListProps) {
+export default function PostList({
+  selectedTags,
+  searchKeyword,
+  sortType,
+  onCountChange,
+}: PostListProps) {
+  const navigate = useNavigate();
+
   const filteredPosts = useMemo(() => {
-    return postCards
+    const filtered = postCards
       .filter((post) =>
         selectedTags.length > 0
           ? selectedTags.every((tag) => post.tags.includes(tag))
@@ -61,18 +68,26 @@ export default function PostList({ selectedTags, searchKeyword, sortType }: Post
       )
       .sort((a, b) => {
         if (sortType === "likes") return b.likes - a.likes;
-        return b.id - a.id; //최신순 > 나중에 서버 연동 시 createdAt 기준 정렬로 교체 가능
+        return b.id - a.id;
       });
-  }, [selectedTags, searchKeyword, sortType]);
+
+    onCountChange(filtered.length);
+    return filtered;
+  }, [selectedTags, searchKeyword, sortType, onCountChange]);
 
   return (
     <div>
-      {/* 게시글 카드 목록 */}
       <div className="space-y-4">
         {filteredPosts.map((post) => (
-          <div key={post.id} className="flex gap-4 p-4 bg-white border rounded-lg shadow-sm">
+          <div
+            key={post.id}
+            className="flex gap-4 p-4 bg-white border rounded-lg shadow-sm"
+          >
             <div className="flex-1">
-              <h3 className="mb-1 text-lg font-semibold text-gray-800 cursor-pointer hover:underline">
+              <h3
+                className="mb-1 text-lg font-semibold text-gray-800 cursor-pointer hover:underline"
+                onClick={() => navigate(`/interests-detail/${post.id}`)} // <-- 이동 경로
+              >
                 {post.title}
               </h3>
               <p className="mb-2 text-sm text-gray-600">{post.summary}</p>
