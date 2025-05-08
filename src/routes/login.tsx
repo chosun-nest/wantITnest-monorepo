@@ -19,11 +19,17 @@ export default function Login() {
 
   const [showModal, setShowModal] = useState(false); // 모달 표시 여부
   const [modalMessage, setModalMessage] = useState(""); // 모달 메시지
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   // dispatch 초기화
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
+    if (!isEmailValid) {
+      setModalMessage("이메일 형식이 올바르지 않습니다.");
+      setShowModal(true); // 모달 표시
+      return;
+    }
     try {
       const res = await login(email, password);
       dispatch(
