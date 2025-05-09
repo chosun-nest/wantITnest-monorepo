@@ -148,4 +148,50 @@ public class PostController {
         PostResponseDto responseDto = postService.deletePost(memberId, postId);
         return ResponseEntity.ok(responseDto);
     }
+
+    @Operation(
+            summary = "게시글 검색",
+            description = """
+                    키워드를 사용하여 게시글을 검색합니다.
+                    
+                    ## 검색 키워드
+                    - `keyword`: 검색할 키워드
+                    
+                    ## 검색 타입
+                    - `searchType`: 검색 타입 (ALL, TITLE, CONTENT)
+                    - ALL: 제목과 내용에서 검색 (기본값)
+                    - TITLE: 제목에서만 검색
+                    - CONTENT: 내용에서만 검색
+                    
+                    ## 태그 필터링
+                    - 태그 필터링을 추가하려면 `?tags=JAVA&tags=SPRING`과 같이 전달하세요.
+                    
+                    ## 페이지네이션 
+                    - 페이지 번호: `?page=0` (기본값: 0, 첫 페이지)
+                    - 페이지 크기: `?size=10` (기본값: 10, 페이지당 10개 항목)
+                    
+                    ## 정렬
+                    - 단일 필드 정렬: `?sort=createdAt,desc` (기본값: createdAt,desc)
+                    - 다중 필드 정렬: `?sort=viewCount,desc&sort=createdAt,desc`
+                    
+                    ## 전체 사용 예시
+                    - `/api/v1/posts/search?keyword=스프링&searchType=TITLE&page=0&size=10&sort=createdAt,desc&tags=JAVA`
+                    """
+    )
+    @GetMapping("/search")
+    public ResponseEntity<PostListResponseDto> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam(required = false, defaultValue = "ALL") String searchType,
+            @RequestParam(required = false) List<String> tags,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        PostListResponseDto responseDto;
+        if (tags == null || tags.isEmpty()) {
+            responseDto = postService.searchPosts(keyword, searchType, pageable);
+        } else {
+            responseDto = postService.searchPostsWithTags(keyword, tags, searchType, pageable);
+        }
+
+        return ResponseEntity.ok(responseDto);
+    }
 }
