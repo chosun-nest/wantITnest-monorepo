@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 // 전체 컨테이너
 export const Container = styled.div`
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   display: flex;

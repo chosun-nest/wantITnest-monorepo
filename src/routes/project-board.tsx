@@ -42,26 +42,30 @@ export default function ProjectBoard() {
 
   return (
     <S.Container>
-      {/* 제목 + 검색창 + 글쓰기 + 태그 필터 */}
       <S.TitleSection>
+        {/* 왼쪽 - 제목 + 서브텍스트 */}
         <div>
           <S.PageTitle>프로젝트 모집 게시판</S.PageTitle>
           <S.SubText>
             총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
-          </S.SubText>
+            </S.SubText>
         </div>
-        <S.SearchInput
-          type="text"
-          placeholder="제목 또는 내용 검색"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
-        <S.FilterButton onClick={() => setIsModalOpen(true)}>
-          🔍 태그 필터
-        </S.FilterButton>
+        
+        {/* 오른쪽 - 검색창 + 필터 */}
+        <div className="flex gap-2 items-center">
+          <S.SearchInput
+            type="text"
+            placeholder="제목 또는 내용 검색"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+          />
+          <S.FilterButton onClick={() => setIsModalOpen(true)}>
+            🔍 태그 필터
+          </S.FilterButton>
+        </div>
       </S.TitleSection>
 
       {/* 선택된 태그 보기 */}

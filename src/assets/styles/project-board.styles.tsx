@@ -9,9 +9,9 @@ export const Container = styled.div`
 
 export const TitleSection = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
 `;
 
@@ -27,11 +27,11 @@ export const SubText = styled.p`
 `;
 
 export const SearchInput = styled.input`
+  width: 300px;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0.375rem;
-  flex: 1;
-  min-width: 200px;
+  margin-right: 0.5rem;
 `;
 
 export const FilterButton = styled.button`
