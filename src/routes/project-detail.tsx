@@ -24,18 +24,22 @@ export default function ProjectDetail() {
       {/* 제목 */}
       <S.Title>{project.title}</S.Title>
 
-      {/* 작성자 & 작성일 */}
+      {/* 작성자, 작성일, 조회수 */}
       <S.SubInfo>
-        작성자: {project.author} | 작성일: {project.date}
+        <S.Author>{project.author}</S.Author> | 작성일: {project.date} | 조회수: {project.views}
       </S.SubInfo>
 
-      {/* 상세정보 박스 */}
-      <S.ContentCard>
-        <p><strong>설명:</strong> {project.content}</p>
-        <p><strong>조회수:</strong> {project.views}</p>
+      {/* 설명 */}
+      <S.Description>{project.content}</S.Description>
+
+      {/* 구분선 */}
+      <S.Divider />
+
+      {/* 메타 정보 */}
+      <S.MetaBox>
         <p><strong>참여인원:</strong> {project.participants}</p>
         <p><strong>상태:</strong> {project.status}</p>
-      </S.ContentCard>
+      </S.MetaBox>
 
       {/* 댓글 */}
       <CommentSection />

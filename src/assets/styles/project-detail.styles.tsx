@@ -47,3 +47,33 @@ export const BackButton = styled.button`
     background-color: #16325c;
   }
 `;
+export const Divider = styled.hr`
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+`;
+
+export const Description = styled.p`
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  margin-top: 10px;
+`;
+
+export const MetaBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #444;
+`;
+
+export const AuthorRow = styled.div`
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+`;
+
+export const Author = styled.span`
+  font-weight: bold;
+  color: #000000;
+`;
