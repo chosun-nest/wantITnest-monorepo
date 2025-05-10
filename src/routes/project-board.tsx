@@ -3,6 +3,7 @@ import * as S from "../assets/styles/project-board.styles";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
 import TagFilterModal from "../components/modals/interests/TagFilterModal";
+import ProjectWriteButton from "../components/project/ProjectWriteButton";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -61,7 +62,6 @@ export default function ProjectBoard() {
         <S.FilterButton onClick={() => setIsModalOpen(true)}>
           🔍 태그 필터
         </S.FilterButton>
-        <S.WriteButton to="/project-write">글쓰기</S.WriteButton>
       </S.TitleSection>
 
       {/* 선택된 태그 보기 */}
@@ -146,6 +146,7 @@ export default function ProjectBoard() {
           }}
         />
       )}
+    <ProjectWriteButton />
     </S.Container>
   );
 }

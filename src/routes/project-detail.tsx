@@ -21,8 +21,13 @@ export default function ProjectDetail() {
 
   return (
     <S.Container>
-      {/* 제목 */}
-      <S.Title>{project.title}</S.Title>
+      {/* 상태 뱃지 + 제목 */}
+      <S.TitleRow>
+        <S.StatusBadge status={project.status}>
+          {project.status}
+        </S.StatusBadge>
+        <S.Title>{project.title}</S.Title>
+      </S.TitleRow>
 
       {/* 작성자, 작성일, 조회수 */}
       <S.SubInfo>
@@ -38,11 +43,12 @@ export default function ProjectDetail() {
       {/* 메타 정보 */}
       <S.MetaBox>
         <p><strong>참여인원:</strong> {project.participants}</p>
-        <p><strong>상태:</strong> {project.status}</p>
       </S.MetaBox>
 
       {/* 댓글 */}
-      <CommentSection />
+      <S.ContentCard>
+        <CommentSection />
+      </S.ContentCard>
 
       {/* 뒤로 가기 버튼 */}
       <S.BackButton onClick={() => navigate(-1)}>뒤로 가기</S.BackButton>

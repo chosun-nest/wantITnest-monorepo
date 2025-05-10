@@ -1,13 +1,17 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { mockProjects } from "../constants/mock-projects";
 import * as S from "../assets/styles/project-write.styles";
+import { mockProjects } from "../constants/mock-projects";
 
 export default function ProjectWrite() {
   const navigate = useNavigate();
-
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(`[개발 프로젝트 모집 예시]
+
+- 프로젝트 주제: 
+- 프로젝트 목표: 
+- 예상 프로젝트 일정(횟수): 
+`);
   const [participants, setParticipants] = useState("");
   const [hasAttachment, setHasAttachment] = useState(false);
 
@@ -22,11 +26,12 @@ export default function ProjectWrite() {
       title: title,
       content: content,
       date: new Date().toISOString().slice(0, 10).replace(/-/g, "."),
-      author: "유겸",  // 로그인 기능 붙으면 교체 예정
+      author: "유겸",
       views: 0,
       participants: participants,
       hasAttachment: hasAttachment,
-      status: "모집중"
+      status: "모집중",
+      tags: [],
     };
 
     mockProjects.push(newProject);
@@ -35,53 +40,60 @@ export default function ProjectWrite() {
   };
 
   return (
-    <S.Container>
-      <h2>프로젝트 모집 글쓰기</h2>
+    <div className="max-w-5xl mx-auto pt-[120px] px-4 mb-6">
+      <h2 className="text-2xl font-bold text-[#00256c] p-3">프로젝트 모집 글쓰기</h2>
 
-      <div>
-        <S.TitleInput
-          type="text"
-          value={title}
-          placeholder="제목에 핵심 내용을 요약해보세요."
-          onChange={(e) => setTitle(e.target.value)}
+      <S.InfoBanner>
+        <strong>프로젝트 모집 예시를 참고해 작성해주세요.</strong>
+        <br />
+        꼼꼼히 작성하면 멋진 프로젝트 팀원을 만날 수 있을 거예요.
+      </S.InfoBanner>
+
+      <input
+        type="text"
+        className="w-full p-3 mb-4 border rounded"
+        placeholder="제목에 핵심 내용을 요약해보세요."
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <input
+        type="text"
+        className="w-full p-3 mb-4 border rounded"
+        placeholder="참여인원/정원 (예: 3/6)"
+        value={participants}
+        onChange={(e) => setParticipants(e.target.value)}
+      />
+
+      <textarea
+        className="w-full p-4 mb-6 border rounded h-60"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      />
+
+      <div className="flex items-center gap-2 mb-6">
+        <input
+          type="checkbox"
+          checked={hasAttachment}
+          onChange={(e) => setHasAttachment(e.target.checked)}
         />
+        <span className="text-sm">첨부파일 있음</span>
       </div>
 
-      <div>
-        <S.ParticipantsInput
-          type="text"
-          value={participants}
-          placeholder="참여인원/정원 (예: 3/6)"
-          onChange={(e) => setParticipants(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <S.ContentTextArea
-          value={content}
-          placeholder="본문 내용을 작성하세요."
-          onChange={(e) => setContent(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={hasAttachment}
-            onChange={(e) => setHasAttachment(e.target.checked)}
-          /> 첨부파일 있음
-        </label>
-      </div>
-
-      <S.ButtonGroup>
-        <S.CancelButton onClick={() => navigate("/project-board")}>
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => navigate("/project-board")}
+          className="px-5 py-2 border border-gray-300 rounded hover:bg-gray-100"
+        >
           취소
-        </S.CancelButton>
-        <S.SubmitButton onClick={handleSubmit}>
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-5 py-2 text-white bg-[#002F6C] rounded hover:bg-[#001f4d]"
+        >
           등록
-          </S.SubmitButton>
-        </S.ButtonGroup>
-    </S.Container>
+        </button>
+      </div>
+    </div>
   );
 }

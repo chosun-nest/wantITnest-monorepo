@@ -1,8 +1,7 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 
 export const Container = styled.div`
-  padding-top: 140px; // 상단 여백 확보
+  padding-top: 140px;
   max-width: 900px;
   margin: 0 auto;
   background-color: white;
@@ -47,26 +46,6 @@ export const FilterButton = styled.button`
   }
 `;
 
-export const WriteButton = styled(Link)`
-  padding: 0.5rem 1rem;
-  background-color: #002f6c;
-  color: white;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  text-align: center;
-  display: inline-block;
-
-  &:hover {
-    background-color: #001f4d;
-  }
-
-  &:focus {
-    outline: 2px solid #001f4d;
-    outline-offset: 2px;
-  }
-`;
-
 export const SelectedTags = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -79,7 +58,7 @@ export const Tag = styled.span`
   color: #1f2937;
   padding: 4px 8px;
   font-size: 13px;
-  border-radius: 6px; // ✅ 둥근 네모
+  border-radius: 6px;
   border: 1px solid #d1d5db;
   font-weight: 500;
 `;

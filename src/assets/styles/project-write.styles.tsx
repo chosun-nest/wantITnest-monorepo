@@ -5,6 +5,17 @@ export const Container = styled.div`
   text-align: center;
 `;
 
+export const InfoBanner = styled.div`
+  background-color: #e0ecff;
+  color: #1b3c74;
+  border-left: 4px solid #1b3c74;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+`;
+
+
 export const TitleInput = styled.input`
   width: 50%;
   padding: 10px;
