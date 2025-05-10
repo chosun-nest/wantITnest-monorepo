@@ -1,5 +1,3 @@
-// src/constants/mock-projects.ts
-
 export const mockProjects = [
   {
     id: 28,
@@ -11,7 +9,8 @@ export const mockProjects = [
     views: 20,
     participants: "3/6",
     hasAttachment: true,
-    status: "모집중"
+    status: "모집중",
+    tags: ["AI활용", "프론트엔드", "백엔드", "공모전"]
   },
   {
     id: 27,
@@ -23,7 +22,8 @@ export const mockProjects = [
     views: 51,
     participants: "1/5",
     hasAttachment: false,
-    status: "모집완료"
+    status: "모집완료",
+    tags: ["프로그래밍 언어", "웹 개발", "개발•프로그래밍 기타"]
   },
   {
     id: 26,
@@ -35,7 +35,8 @@ export const mockProjects = [
     views: 38,
     participants: "7/10",
     hasAttachment: true,
-    status: "모집중"
+    status: "모집중",
+    tags: ["게임 프로그래밍", "Unity", "VR/AR"]
   },
   {
     id: 25,
@@ -47,7 +48,8 @@ export const mockProjects = [
     views: 43,
     participants: "8/8",
     hasAttachment: false,
-    status: "모집완료"
+    status: "모집완료",
+    tags: ["기획", "UI/UX", "서비스 기획"]
   },
   {
     id: 24,
@@ -59,7 +61,8 @@ export const mockProjects = [
     views: 55,
     participants: "1/5",
     hasAttachment: false,
-    status: "모집중"
+    status: "모집중",
+    tags: ["정보처리기사", "자격증", "프로그래밍 언어"]
   },
   {
     id: 23,
@@ -71,7 +74,8 @@ export const mockProjects = [
     views: 100,
     participants: "2/5",
     hasAttachment: true,
-    status: "모집완료"
+    status: "모집완료",
+    tags: ["백엔드", "Spring", "데이터베이스"]
   },
   {
     id: 22,
@@ -83,7 +87,8 @@ export const mockProjects = [
     views: 100,
     participants: "4/5",
     hasAttachment: false,
-    status: "모집중"
+    status: "모집중",
+    tags: ["프론트엔드", "React", "UX/UI"]
   },
   {
     id: 21,
@@ -95,6 +100,7 @@ export const mockProjects = [
     views: 89,
     participants: "5/6",
     hasAttachment: true,
-    status: "모집중"
+    status: "모집중",
+    tags: ["데이터 분석", "디자인", "앱 개발"]
   }
 ];

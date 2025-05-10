@@ -2,30 +2,26 @@ import { useState } from "react";
 import * as S from "../assets/styles/project-board.styles";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
+import TagFilterModal from "../components/modals/interests/TagFilterModal";
 
 const ITEMS_PER_PAGE = 7;
 
 export default function ProjectBoard() {
   const navigate = useNavigate();
-
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const projects = mockProjects;
+  const filteredProjects = mockProjects
+    .filter(
+      (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
+    )
+    .filter((p) => {
+      if (selectedTags.length === 0) return true;
+      return p.tags?.some((tag) => selectedTags.includes(tag));
+    });
 
-  // 최신순 정렬
-  const sortedProjects = [...projects].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-
-  // 검색 필터링
-  const filteredProjects = sortedProjects.filter(
-    (p) =>
-      p.title.includes(searchTerm) ||
-      p.content.includes(searchTerm)
-  );
-
-  // 페이징 처리
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentProjects = filteredProjects.slice(
@@ -45,7 +41,7 @@ export default function ProjectBoard() {
 
   return (
     <S.Container>
-      {/* 제목 + 검색창 + 글쓰기 */}
+      {/* 제목 + 검색창 + 글쓰기 + 태그 필터 */}
       <S.TitleSection>
         <div>
           <S.PageTitle>프로젝트 모집 게시판</S.PageTitle>
@@ -62,33 +58,70 @@ export default function ProjectBoard() {
             setCurrentPage(1);
           }}
         />
+        <S.FilterButton onClick={() => setIsModalOpen(true)}>
+          🔍 태그 필터
+        </S.FilterButton>
         <S.WriteButton to="/project-write">글쓰기</S.WriteButton>
       </S.TitleSection>
 
-      {/* 헤더 라벨 */}
-      <S.TableHeader>
-        <div>제목</div>
-        <div>작성일</div>
-        <div>참여인원</div>
-      </S.TableHeader>
+      {/* 선택된 태그 보기 */}
+      {selectedTags.length > 0 && (
+        <S.SelectedTags>
+          {selectedTags.map((tag) => (
+            <S.Tag
+              key={tag}
+              onClick={() =>
+                setSelectedTags(selectedTags.filter((t) => t !== tag))
+              }
+            >
+              {tag} ×
+            </S.Tag>
+          ))}
+        </S.SelectedTags>
+      )}
 
-      {/* 리스트 출력 */}
-      {currentProjects.map((project) => (
-        <S.ProjectRow key={project.id} onClick={() => handleRowClick(project)}>
-          <div>
-            <S.TitleWithBadge>
-              <S.StatusBadge status={project.status}>{project.status}</S.StatusBadge>
-              <S.ProjectTitle>{project.title}</S.ProjectTitle>
-            </S.TitleWithBadge>
-            <S.ProjectMeta>
-              {project.author} ・ 조회수 {project.views}
-            </S.ProjectMeta>
-          </div>
-          
-          <div style={{ textAlign: "center" }}>{project.date}</div>
-          <div style={{ textAlign: "center" }}>참여 {project.participants}</div>
-        </S.ProjectRow>
-      ))}
+      {/* 카드 리스트 */}
+      <S.CardList>
+        {currentProjects.map((project) => (
+          <S.Card key={project.id} onClick={() => handleRowClick(project)}>
+            <div className="flex flex-col gap-2 h-full justify-between">
+              {/* 상태 뱃지 + 제목 */}
+              <div className="flex items-center gap-2">
+                <S.StatusBadge status={project.status}>
+                  {project.status}
+                </S.StatusBadge>
+                <S.ProjectTitle>{project.title}</S.ProjectTitle>
+              </div>
+
+              {/* 본문 미리보기 */}
+              <S.ProjectPreview>
+                {project.content.length > 100
+                  ? `${project.content.slice(0, 100)}...`
+                  : project.content}
+              </S.ProjectPreview>
+
+              {/* 태그들 */}
+              {project.tags && (
+                <S.TagContainer>
+                  {project.tags.map((tag) => (
+                    <S.Tag key={tag}>{tag}</S.Tag>
+                  ))}
+                </S.TagContainer>
+              )}
+
+              {/* 하단 정보: 왼쪽 작성자 + 날짜 / 오른쪽 조회수 + 참여 */}
+              <div className="flex justify-between items-end mt-2">
+                <S.ProjectMetaLeft>
+                  {project.author} ・ {project.date}
+                </S.ProjectMetaLeft>
+                <S.ProjectMetaRight>
+                  조회수 {project.views} ・ 참여 {project.participants}
+                </S.ProjectMetaRight>
+              </div>
+            </div>
+          </S.Card>
+        ))}
+      </S.CardList>
 
       {/* 페이지네이션 */}
       <S.Pagination>
@@ -102,6 +135,17 @@ export default function ProjectBoard() {
           </button>
         ))}
       </S.Pagination>
+
+      {/* 태그 모달 */}
+      {isModalOpen && (
+        <TagFilterModal
+          onClose={() => setIsModalOpen(false)}
+          onApply={(tags) => {
+            setSelectedTags(tags);
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </S.Container>
   );
 }

@@ -1,169 +1,165 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-// 검색창
-export const SearchInput = styled.input`
-  margin-top: 10px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-left: auto;
-`;
-
-// 전체 감싸는 컨테이너
 export const Container = styled.div`
-  max-width: 1000px;
-  margin: 120px auto 40px;
-  padding: 0 20px;
+  padding-top: 140px; // 상단 여백 확보
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: white;
 `;
 
-// 제목 섹션
 export const TitleSection = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+`;
+
+export const PageTitle = styled.h1`
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: auto;
+`;
+
+export const SubText = styled.p`
+  color: #6b7280;
+  font-size: 0.9rem;
+`;
+
+export const SearchInput = styled.input`
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  flex: 1;
+  min-width: 200px;
+`;
+
+export const FilterButton = styled.button`
+  padding: 0.5rem 0.75rem;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  &:hover {
+    background-color: #e5e7eb;
+  }
+`;
+
+export const WriteButton = styled(Link)`
+  padding: 0.5rem 1rem;
+  background-color: #002f6c;
+  color: white;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: center;
+  display: inline-block;
+
+  &:hover {
+    background-color: #001f4d;
+  }
+
+  &:focus {
+    outline: 2px solid #001f4d;
+    outline-offset: 2px;
+  }
+`;
+
+export const SelectedTags = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 1rem;
 `;
 
-// 페이지 제목
-export const PageTitle = styled.h2`
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #00256c;
-`;
-
-// 서브 텍스트
-export const SubText = styled.p`
-  font-size: 0.9rem;
-  color: #333;
-`;
-
-// 상단 헤더 (제목 / 작성일 / 참여인원)
-export const TableHeader = styled.div`
-  display: grid;
-  grid-template-columns: 6fr 1.6fr 1.6fr;
-  padding: 12px 20px;
-  background-color: #f2f4f6;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  color: #00256c;
-
-  div:nth-child(1) {
-    text-align: left;
-  }
-  div:nth-child(2),
-  div:nth-child(3) {
-    text-align: center;
-  }
-`;
-
-// 프로젝트 카드 한 줄 (3열)
-export const ProjectRow = styled.div`
-  display: grid;
-  grid-template-columns: 6fr 1.6fr 1.6fr;  // 적당히 줄여서 간격 조절
-  padding: 16px 20px;
-  border-bottom: 1px solid #eee;
-  font-size: 0.9rem;
-  align-items: center;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #f8f9fa;
-  }
-`;
-
-// 제목 + 뱃지를 감싸는 div
-export const TitleWithBadge = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-
-  span {
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-`;
-
-// 제목
-export const ProjectTitle = styled.span`
-  color: #00256c;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-// 작성자 + 조회수
-export const ProjectMeta = styled.div`
-  font-size: 14px;
-  color: #777;
-  margin-top: 6px;
-`;
-
-// 상태 뱃지
-export const StatusBadge = styled.div<{ status: string }>`
-  display: inline-block;
-  white-space: nowrap;
-  padding: 4px 10px;
-  border-radius: 20px;
+export const Tag = styled.span`
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 4px 8px;
   font-size: 13px;
-  font-weight: 600;
-  color: white;
-  background-color: ${({ status }) =>
-    status === "모집중" ? "#2E77D0" : "#9E9E9E"};
-  flex-shrink: 0;
+  border-radius: 6px; // ✅ 둥근 네모
+  border: 1px solid #d1d5db;
+  font-weight: 500;
 `;
 
-// 페이지네이션
-export const Pagination = styled.div`
+export const CardList = styled.div`
   display: flex;
-  gap: 8px;
-  margin-top: 30px;
-  justify-content: center;
-
-  button {
-    padding: 6px 10px;
-    font-size: 0.9rem;
-    border: 1px solid #ccc;
-    background-color: white;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #f2f2f2;
-    }
-  }
-
-  .active {
-    background-color: #00256c;
-    color: white;
-    font-weight: bold;
-  }
+  flex-direction: column;
+  gap: 1rem;
 `;
 
-// 글쓰기 버튼
-export const WriteButton = styled(Link)`
-  display: inline-block;
-  margin-top: 20px;
-  padding: 10px 16px;
-  background-color: #00256c;
-  color: white;
-  border-radius: 6px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
+export const Card = styled.div`
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  cursor: pointer;
+  position: relative;
+`;
 
-  &:hover {
-    background-color: #001a4d;
+export const StatusBadge = styled.div<{ status: string }>`
+  background-color: ${({ status }) =>
+    status === "모집중" ? "#dbeafe" : "#fef3c7"};
+  color: ${({ status }) =>
+    status === "모집중" ? "#1e3a8a" : "#92400e"};
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+`;
+
+export const ProjectTitle = styled.h3`
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+`;
+
+export const ProjectPreview = styled.p`
+  font-size: 14px;
+  color: #555;
+  margin-top: 4px;
+  margin-bottom: 4px;
+`;
+
+export const ProjectMetaLeft = styled.div`
+  font-size: 12px;
+  color: #888;
+`;
+
+export const ProjectMetaRight = styled.div`
+  font-size: 12px;
+  color: #888;
+  text-align: right;
+`;
+
+export const TagContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+export const Pagination = styled.div`
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  & > button {
+    padding: 0.5rem 0.75rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    &.active {
+      background-color: #1d4ed8;
+      color: white;
+      font-weight: bold;
+    }
   }
 `;
