@@ -140,7 +140,7 @@ export default function InterestsProjectWrite() {
             onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 mb-2 text-sm text-white bg-[#00256c] rounded"
           >
-            태그 선택
+            🔎 태그 선택
           </button>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (

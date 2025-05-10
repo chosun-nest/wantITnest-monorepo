@@ -14,7 +14,7 @@ export default function InterestBoardTagFilter({ selectedTags, onRemoveTag, onOp
         onClick={onOpenFilter}
         className="px-4 py-2 mb-2 text-sm text-white bg-[#00256c] rounded hover:bg-[#001F4D]"
       >
-        🔎 태그 필터
+        🔎 태그 선택
       </button>
       {selectedTags.map((tag) => (
         <div
