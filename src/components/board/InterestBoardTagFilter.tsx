@@ -12,9 +12,9 @@ export default function InterestBoardTagFilter({ selectedTags, onRemoveTag, onOp
     <div className="flex flex-wrap items-center gap-2 mb-6">
       <button
         onClick={onOpenFilter}
-        className="px-4 py-1 text-gray-700 border border-gray-700 rounded-md hover:bg-gray-100"
+        className="px-4 py-2 mb-2 text-sm text-white bg-[#00256c] rounded hover:bg-[#001F4D]"
       >
-        🔎 관심분야 검색
+        🔎 태그 필터
       </button>
       {selectedTags.map((tag) => (
         <div
