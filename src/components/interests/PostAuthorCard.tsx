@@ -1,4 +1,4 @@
-// 게시글 detail 오른쪽 사용자 정보 컴포넌트
+// 게시글 detail 오른쪽 사용자 정보 컴포넌트 > 다시 새롭게 만들 것임
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
