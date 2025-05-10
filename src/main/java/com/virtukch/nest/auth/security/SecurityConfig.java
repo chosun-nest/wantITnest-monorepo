@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -57,7 +58,12 @@ public class SecurityConfig {
                     "/api/v1/interests",
                     "/api/v1/departments",
                     "/api/v1/tags/**",
-                    "/api/v1/posts"
+                    "/api/v1/posts/search"
+                ).permitAll()
+
+                // GET 메서드만 허용하는 경로
+                .requestMatchers(HttpMethod.GET,
+                        "/api/v1/posts"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
