@@ -2,16 +2,16 @@ package com.virtukch.nest.project.service;
 
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
-import com.virtukch.nest.project.dto.ProjectRequestDTO;
-import com.virtukch.nest.project.dto.ProjectResponseDTO;
+import com.virtukch.nest.project.dto.ProjectCreateRequestDTO;
+import com.virtukch.nest.project.dto.ProjectCreateResponseDTO;
 import com.virtukch.nest.project.dto.ProjectUpdateRequestDTO;
+import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
 import com.virtukch.nest.project.exception.ProjectNotFoundException;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
 
     @Transactional
-    public Long createProject(ProjectRequestDTO dto, Long memberId) {
+    public Long createProject(ProjectCreateRequestDTO dto, Long memberId) {
         Member leader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("리더 멤버가 존재하지 않습니다"));
 
@@ -45,21 +45,15 @@ public class ProjectService {
         );
 
         // builder 내부에서 LEADER 자동 등록됨
-        return projectRepository.save(project).getProjectId();
+        return ProjectDtoConverter.toCreateResponseDTO(project)
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectResponseDTO> getAllProjects() {
+    public List<ProjectCreateResponseDTO> getAllProjects() {
         return projectRepository.findAll().stream()
-                .map(project -> ProjectResponseDTO.builder()
+                .map(project -> ProjectCreateResponseDTO.builder()
                         .projectId(project.getProjectId())
-                        .projectTitle(project.getProjectTitle())
-                        .projectDescription(project.getProjectDescription())
-                        .projectStartDate(project.getProjectStartDate())
-                        .projectEndDate(project.getProjectEndDate())
-                        .isClosed(project.isRecruiting())
-                        .maxMember(project.getMaxMember())
-                        .projectLeaderId(getProjectLeaderId(project))
+                        .message("Complete Create Project")
                         .build())
                 .collect(Collectors.toList());
     }

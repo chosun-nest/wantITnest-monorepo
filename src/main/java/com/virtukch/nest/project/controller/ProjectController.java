@@ -1,14 +1,12 @@
 package com.virtukch.nest.project.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.project.dto.ProjectRequestDTO;
-import com.virtukch.nest.project.dto.ProjectResponseDTO;
+import com.virtukch.nest.project.dto.ProjectCreateRequestDTO;
+import com.virtukch.nest.project.dto.ProjectCreateResponseDTO;
 import com.virtukch.nest.project.dto.ProjectUpdateRequestDTO;
 import com.virtukch.nest.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +24,14 @@ public class ProjectController {
     @PostMapping("/new")
     public ResponseEntity<Long> createProject(
             @AuthenticationPrincipal CustomUserDetails user,
-            @RequestBody ProjectRequestDTO dto) {
+            @RequestBody ProjectCreateRequestDTO dto) {
         Long projectId = projectService.createProject(dto, user.getMember().getMemberId());
         return ResponseEntity.ok(projectId);
     }
 
     // 전체 프로젝트 조회
     @GetMapping
-    public ResponseEntity<List<ProjectResponseDTO>> getProjects() {
+    public ResponseEntity<List<ProjectCreateResponseDTO>> getProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
     }
 
