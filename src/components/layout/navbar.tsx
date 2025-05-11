@@ -84,38 +84,41 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
       {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
       <S.NavbarContainer ref={ref}>
         <S.NavbarContent>
-          <S.Logo to="/">
-            <img src="assets/images/logo.png" alt="Logo" />
-            WantIT-NEST
-            {/*이스터에그*/}
-            <div
-              onClick={() => setShowBackdrop((prev) => !prev)}
-              style={{ cursor: "pointer" }}
-            >
-              ㅤ
-            </div>
-          </S.Logo>
-          {!isMobile ? (
-            <>
-              {" "}
-              <S.NavbarLink to="/notice-board">
-                <S.WebBarItem>학사공지</S.WebBarItem>
-              </S.NavbarLink>
-              <S.NavbarLink to="/project-board">
-                <S.WebBarItem>프로젝트 모집</S.WebBarItem>
-              </S.NavbarLink>
-              <S.NavbarLink to="/interests-board">
-                <S.WebBarItem>관심분야 정보</S.WebBarItem>
-              </S.NavbarLink>
-              <S.NavbarLink to="/chat">
-                <S.WebBarItem>채팅방</S.WebBarItem>
-              </S.NavbarLink>
-              <S.NavbarLink to="/events">
-                <S.WebBarItem>행사</S.WebBarItem>
-              </S.NavbarLink>
-            </>
-          ) : null}
-
+          <S.NavLeft>
+            <S.Logo to="/">
+              <img src="assets/images/logo.png" alt="Logo" />
+              WantIT-NEST
+              {/*이스터에그*/}
+              <div
+                onClick={() => setShowBackdrop((prev) => !prev)}
+                style={{ cursor: "pointer" }}
+              >
+                ㅤ
+              </div>
+            </S.Logo>
+          </S.NavLeft>
+          <S.NavCenter>
+            {!isMobile ? (
+              <>
+                {" "}
+                <S.NavbarLink to="/notice-board">
+                  <S.WebBarItem>학사공지</S.WebBarItem>
+                </S.NavbarLink>
+                <S.NavbarLink to="/project-board">
+                  <S.WebBarItem>프로젝트 모집</S.WebBarItem>
+                </S.NavbarLink>
+                <S.NavbarLink to="/interests-board">
+                  <S.WebBarItem>관심분야 정보</S.WebBarItem>
+                </S.NavbarLink>
+                <S.NavbarLink to="/chat">
+                  <S.WebBarItem>채팅방</S.WebBarItem>
+                </S.NavbarLink>
+                <S.NavbarLink to="/events">
+                  <S.WebBarItem>행사</S.WebBarItem>
+                </S.NavbarLink>
+              </>
+            ) : null}
+          </S.NavCenter>
           <S.NavRight>
             {/*토큰이 있으면 = 로그인 되어 있으면면*/}
             {accessToken && !isMobile ? (

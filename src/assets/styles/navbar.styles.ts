@@ -15,18 +15,6 @@ export const NavbarContainer = styled.nav`
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
-export const NavbarContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-
-  justify-content: space-between;
-  padding: 1rem;
-`;
-
 export const Logo = styled(Link)`
   display: flex;
   align-items: center;
@@ -66,16 +54,42 @@ export const NavItem = styled.a`
   }
 `;
 
+export const NavbarContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+`;
+
+export const NavLeft = styled.div`
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+`;
+
+export const NavCenter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  gap: 3rem; /* 메뉴 간격 조정 */
+`;
+
 export const NavRight = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  min-width: 0;
+  justify-content: flex-end;
+  flex-shrink: 0;
 `;
 
 export const ProfileWrapper = styled.div`
-  position: relative;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  margin-left: auto;
+  gap: 0.5rem;
 `;
 
 export const ProfileIcon = styled.img`
