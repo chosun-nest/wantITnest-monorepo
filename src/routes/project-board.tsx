@@ -13,15 +13,23 @@ export default function ProjectBoard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState<"전체" | "모집중" | "모집완료">("전체");
 
   const filteredProjects = [...mockProjects]
-    .sort((a, b) => new Date(b.date.replace(/\./g, "-")).getTime() - new Date(a.date.replace(/\./g, "-")).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.date.replace(/\./g, "-")).getTime() -
+        new Date(a.date.replace(/\./g, "-")).getTime()
+    )
     .filter(
-      (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
+      (p) =>
+        p.title.includes(searchTerm) || p.content.includes(searchTerm)
     )
     .filter((p) => {
-      if (selectedTags.length === 0) return true;
-      return p.tags?.some((tag) => selectedTags.includes(tag));
+      if (selectedTags.length > 0 && !p.tags?.some((tag) => selectedTags.includes(tag)))
+        return false;
+      if (filter !== "전체" && p.status !== filter) return false;
+      return true;
     });
 
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
@@ -43,15 +51,33 @@ export default function ProjectBoard() {
 
   return (
     <S.Container>
+      {/* 상단 필터와 제목 라인 */}
+      <S.FilterRow>
+        <S.PageTitle>프로젝트 모집 게시판</S.PageTitle>
+        <S.FilterList>
+          {["전체", "모집중", "모집완료"].map((label) => (
+            <S.FilterItem
+              key={label}
+              $selected={filter === label}
+              onClick={() => setFilter(label as typeof filter)}
+            >
+              {label}
+            </S.FilterItem>
+          ))}
+        </S.FilterList>
+      </S.FilterRow>
+
+      <S.Divider />
+
+      {/* 제목 아래 통계 + 검색창 */}
       <S.TitleSection>
-        {/* 왼쪽 - 제목 + 서브텍스트 */}
+        {/* 왼쪽 - 개수 */}
         <div>
-          <S.PageTitle>프로젝트 모집 게시판</S.PageTitle>
           <S.SubText>
             총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
-            </S.SubText>
+          </S.SubText>
         </div>
-        
+
         {/* 오른쪽 - 검색창 + 필터 */}
         <div className="flex gap-2 items-center">
           <S.SearchInput
@@ -90,22 +116,17 @@ export default function ProjectBoard() {
         {currentProjects.map((project) => (
           <S.Card key={project.id} onClick={() => handleRowClick(project)}>
             <div className="flex flex-col gap-2 h-full justify-between">
-              {/* 상태 뱃지 + 제목 */}
               <div className="flex items-center gap-2">
                 <S.StatusBadge status={project.status}>
                   {project.status}
                 </S.StatusBadge>
                 <S.ProjectTitle>{project.title}</S.ProjectTitle>
               </div>
-
-              {/* 본문 미리보기 */}
               <S.ProjectPreview>
                 {project.content.length > 100
                   ? `${project.content.slice(0, 100)}...`
                   : project.content}
               </S.ProjectPreview>
-
-              {/* 태그들 */}
               {project.tags && (
                 <S.TagContainer>
                   {project.tags.map((tag) => (
@@ -113,8 +134,6 @@ export default function ProjectBoard() {
                   ))}
                 </S.TagContainer>
               )}
-
-              {/* 하단 정보: 왼쪽 작성자 + 날짜 / 오른쪽 조회수 + 참여 */}
               <div className="flex justify-between items-end mt-2">
                 <S.ProjectMetaLeft>
                   {project.author} ・ {project.date}
@@ -151,7 +170,7 @@ export default function ProjectBoard() {
           }}
         />
       )}
-    <ProjectWriteButton />
+      <ProjectWriteButton />
     </S.Container>
   );
 }
