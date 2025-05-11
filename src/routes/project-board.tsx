@@ -3,7 +3,7 @@ import * as S from "../assets/styles/project-board.styles";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
 import TagFilterModal from "../components/modals/interests/TagFilterModal";
-import ProjectWriteButton from "../components/project/ProjectWriteButton";
+import BoardWriteButton from "../components/board/BoardWriteButton";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -151,7 +151,7 @@ export default function ProjectBoard() {
           }}
         />
       )}
-    <ProjectWriteButton />
+    <BoardWriteButton />
     </S.Container>
   );
 }
