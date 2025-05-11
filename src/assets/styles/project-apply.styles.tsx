@@ -36,8 +36,7 @@ export const TextArea = styled.textarea`
 
 export const ButtonRow = styled.div`
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between;
   width: 100%;
   margin-top: 20px;
 `;
@@ -49,6 +48,7 @@ export const SubmitButton = styled.button`
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
+  margin-left: auto;
 
   &:hover {
     background-color: #1e40af;
@@ -61,6 +61,7 @@ export const CancelButton = styled.button`
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
+  margin-right: auto;
 
   &:hover {
     background-color: #f1f5f9;
