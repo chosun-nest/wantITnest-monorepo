@@ -4,7 +4,7 @@ import Navbar from "../components/layout/navbar";
 import InterestBoardHeader from "../components/board/InterestBoardHeader"    // 제목 및 게시글 개수
 import InterestBoardSearch from "../components/board/InterestBoardSearch"    // 상단 검색 바
 import InterestBoardTagFilter from "../components/board/InterestBoardTagFilter" // 기술 필터 & 선택 태그
-import TagFilterModal from "../components/modals/interests/TagFilterModal";   // 필터 모달
+import TagFilterModal from "../components/interests/TagFilterModal";   // 필터 모달
 import InterestBoardSortDropdown from "../components/board/InterestBoardSortDropdown";  // 최신순, 좋아요순 드롭다운
 import PostList from "../components/board/PostList";                    // 게시글 리스트
 import InterestBoardWriteButton from "../components/board/BoardWriteButton"    // 글 쓰기 버튼

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/navbar";
-import ProfileCard from "../components/profile/ProfileCard";
+import ProfileCard from "../components/profile/card/ProfileCard";
 import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
 import Modal from "../components/common/modal";
