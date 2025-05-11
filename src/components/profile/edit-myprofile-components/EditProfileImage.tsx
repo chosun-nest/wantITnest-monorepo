@@ -10,33 +10,30 @@ interface Props {
 
 export default function EditProfileImage({
   image,
-  isEditing,
   onChange,
   fileInputRef,
 }: Props) {
   return (
     <div className="flex items-start gap-4 mb-4">
-      <label className="w-28 text-sm font-semibold">이미지</label>
+      <label className="text-sm font-semibold w-28">이미지</label>
 
       <div
-        className="w-24 h-24 rounded-full overflow-hidden cursor-pointer relative group"
+        className="relative w-24 h-24 overflow-hidden rounded-full cursor-pointer group"
         onClick={() => fileInputRef.current?.click()}
       >
         <img
           src={image || "/assets/images/user.png"}
           alt="프로필"
-          className="w-full h-full object-cover group-hover:opacity-80 transition"
+          className="object-cover w-full h-full transition group-hover:opacity-80"
         />
 
-        {isEditing && (
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={onChange}
-          />
-        )}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={onChange}
+        />
       </div>
     </div>
   );

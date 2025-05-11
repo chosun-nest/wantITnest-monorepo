@@ -1,21 +1,27 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./routes/home";
-import Profile from "./routes/profile"; //yeong-eun
-import ProfileEdit from "./routes/profile-edit"; //yeong-eun
+import Profile from "./routes/profile";           //yeong-eun
+import ProfileEdit from "./routes/profile-edit";  //yeong-eun
 import Login from "./routes/login";
 import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
-import CreateProfile from "./routes/create-profile";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
-// import NoticeBoard from "./routes/notice-board"; //yu-gyeom 
-import NoticeBoard from './components/notice/NoticeBoard'; //hye-rin
-import InterestsBorad from "./routes/interests-borad"; //yeong-eun
+import ProjectDetail from "./routes/project-detail"; //yu-gyeom
+import ProjectWrite from "./routes/project-write"; //yu-gyeom
+import ProjectApply from "./routes/project-apply"; // yu-gyeom
+// import NoticeBoard from "./routes/notice-board"; //yu-gyeom
+import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
+import InterestsBorad from "./routes/interests-borad";    //yeong-eun
+import InterestsWrite from "./routes/interests-write";    //yeong-eun
+import InterestsDetail from "./routes/interests-detail";  //yeong-eun
+import BoardWrite from "./routes/board-write";            //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
 import Chat from "./routes/chat";
 import NotFound from "./routes/notfound";
+import ProtectedRoute from "./components/auth/protected-route";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +30,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "profile/",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "",
@@ -32,19 +42,47 @@ const router = createBrowserRouter([
       },
       {
         path: "profile-edit/",
-        element: <ProfileEdit />,
+        element: (
+          <ProtectedRoute>
+            <ProfileEdit />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "project/:id",
+        element: <ProjectDetail />,
       },
       {
         path: "project-board/",
         element: <ProjectBoard />,
       },
       {
-        path: "notice-board/", // ｈｙｅ－ｒｉｎ 
+        path: "project-write",
+        element: <ProjectWrite />,
+      },
+      {
+        path: "project-apply",
+        element: <ProjectApply />,
+      },
+      {
+        path: "notice-board/", // ｈｙｅ－ｒｉｎ
         element: <NoticeBoard />,
       },
       {
-        path: "interests-board/",
+        path: "interests-board/",   // yeong-eun : 관심사 정보 게시판 페이지
         element: <InterestsBorad />,
+      },
+      {
+        path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsWrite />,
+      },
+      {
+        path: "interests-detail/:id", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsDetail />,
+      },
+      {
+        path: "board-write/",
+        element: <BoardWrite />
       },
       {
         path: "chat/",
@@ -63,10 +101,6 @@ const router = createBrowserRouter([
     element: <SignUp />,
   },
 
-  {
-    path: "/create-profile",
-    element: <CreateProfile />,
-  },
   {
     path: "/password-reset",
     element: <PasswdReset />,
@@ -90,8 +124,6 @@ function App() {
         <RouterProvider router={router} />
       </BackdropContext.Provider>
     </>
-
-  
   );
 }
 

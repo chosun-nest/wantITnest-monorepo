@@ -128,24 +128,24 @@ export default function ProfileCard() {
   if (loading || !profile) {
     return (
       <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">
-        <p className="text-gray-500 text-sm">🛜 불러오는 중...</p>
+        <p className="text-sm text-gray-500">🛜 불러오는 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-80 p-4 border rounded-xl shadow-md bg-white">
+    <div className="p-4 bg-white border shadow-md w-80 rounded-xl">
       {/* 프로필 이미지 */}
       <div className="flex justify-center mb-7">
         <img
           src={profile.image || "/assets/images/user.png"}
           alt="Profile"
-          className="w-30 h-30 rounded-full border"
+          className="w-20 h-20 border rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28"
         />
       </div>
 
       {/* 이름 및 전공 정보, 재학생 인증 배찌 */}
-      <div className="flex items-center justify-left mt-2 gap-2">
+      <div className="flex items-center gap-2 mt-2 justify-left">
         <h2 className="text-lg font-bold">{profile.name}</h2>
         <div className="flex items-center gap-1">
           <p className="text-gray-500">{profile.major}</p>
@@ -161,32 +161,32 @@ export default function ProfileCard() {
       </div>
       
       {/* 한 줄 소개 */}
-      <p className="text-sm text-left mt-2">{profile.introduce}</p>
+      <p className="mt-2 text-sm text-left">{profile.introduce}</p>
       
       {/* 관심사 태그 */}
-      <div className="flex flex-wrap justify-left gap-2 mt-5">
+      <div className="flex flex-wrap gap-2 mt-5 justify-left">
         {profile.interests?.map((tag, i) => (
-          <span key={i} className="bg-gray-200 text-xs px-2 py-1 rounded-full">
+          <span key={i} className="px-2 py-1 text-xs bg-gray-200 rounded-full">
             #{tag}
           </span>
         ))}
       </div>
 
       {/* SNS 아이콘 */}
-      <div className="flex justify-center items-center gap-10 mt-10">
+      <div className="flex items-center justify-center gap-10 mt-10">
         {profile.sns?.[0] ? (
           <a href={profile.sns[0]} target="_blank" rel="noreferrer">
             <img
               src="/assets/images/github-logo.png"
               alt="GitHub"
-              className="w-12 h-12 hover:opacity-80 cursor-pointer"
+              className="w-12 h-12 cursor-pointer hover:opacity-80"
             />
           </a>
         ) : (
           <img
             src="/assets/images/github-logo.png"
             alt="Github"
-            className="w-12 h-12 hover:opacity-80 cursor-pointer"
+            className="w-12 h-12 cursor-pointer hover:opacity-80"
             onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
           />
         )}
@@ -195,21 +195,21 @@ export default function ProfileCard() {
             <img
               src="/assets/images/LinkedIn-logo.png"
               alt="LinkedIn"
-              className="w-12 h-12 hover:opacity-80 cursor-pointer"
+              className="w-12 h-12 cursor-pointer hover:opacity-80"
             />
           </a>
         ) : (
           <img
             src="/assets/images/LinkedIn-logo.png"
             alt="LinkedIn"
-            className="w-12 h-12 hover:opacity-80 cursor-pointer"
+            className="w-12 h-12 cursor-pointer hover:opacity-80"
             onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
           />
         )}
       </div>
       
       {/* 기술 스택 */}
-      <div className="flex flex-wrap justify-left gap-2 mt-10">
+      <div className="flex flex-wrap gap-2 mt-10 justify-left">
         {profile.techStacks?.map((stack, i) => {
           const colorClass = techColorMap[stack] || "bg-blue-200 text-white";
           return (
@@ -227,7 +227,7 @@ export default function ProfileCard() {
       <div className="flex justify-end gap-2 mt-5">
         <button
           onClick={() => navigate("/profile-edit")}
-          className="px-4 py-2 bg-blue-900 text-white rounded-md"
+          className="px-4 py-2 text-white bg-blue-900 rounded-md"
         >
           수정
         </button>

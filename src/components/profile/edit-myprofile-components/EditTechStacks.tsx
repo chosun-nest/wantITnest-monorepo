@@ -52,4 +52,3 @@ export default function EditTechStacks({ isEditing, techStacks, newTech, filtere
     </div>
   );
 }
-

@@ -71,4 +71,3 @@ export default function EditSNS({ sns, isEditing, onChange }: EditSNSProps) {
     </div>
   );
 }
-

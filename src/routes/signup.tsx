@@ -6,6 +6,11 @@ import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
 import { getDepartments, getInterests, getTech } from "../api/common/common";
 import { Item } from "../types/signup";
+import Modal from "../components/common/modal";
+import type { ModalContent } from "../types/modal";
+import { AxiosError } from "axios";
+import { useDispatch } from "react-redux";
+import { setTokens } from "../store/slices/authSlice";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -13,7 +18,7 @@ export default function SignUp() {
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [selected, setSelected] = useState<"재학생" | "일반">("재학생");
+  const [selected, setSelected] = useState<"재학생" | "일반">("일반");
 
   const [email, setEmail] = useState("");
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -34,6 +39,14 @@ export default function SignUp() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const [modalContent, setModalContent] = useState<ModalContent>({
+    title: "",
+    message: "",
+    type: "info",
+  });
 
   useEffect(() => {
     getItems();
@@ -76,7 +89,12 @@ export default function SignUp() {
 
   const handleSendCode = async () => {
     if (!isEmailValid) {
-      alert("이메일 형식이 올바르지 않습니다.");
+      setModalContent({
+        title: "이메일 형식 오류",
+        message: "이메일 형식이 올바르지 않습니다.",
+        type: "error",
+      });
+      setShowModal(true);
       return;
     }
     if (isDebugMode) {
@@ -102,10 +120,20 @@ export default function SignUp() {
       }, 1000);
 
       setIntervalId(newInterval);
-      alert("인증코드가 전송되었습니다!");
+      setModalContent({
+        title: "코드 전송",
+        message: "인증 코드가 전송되었습니다.",
+        type: "info",
+      });
+      setShowModal(true);
     } catch (error) {
       console.error("인증코드 전송 실패:", error);
-      alert("인증코드 전송에 실패했습니다. 다시 시도해주세요.");
+      setModalContent({
+        title: "코드 전송 실패",
+        message: "인증코드 전송에 실패했습니다. 다시 시도해주세요.",
+        type: "error",
+      });
+      setShowModal(true);
     }
   };
 
@@ -115,15 +143,38 @@ export default function SignUp() {
       console.log("응답 데이터:", res);
 
       if (res === "Email verified successfully") {
-        alert("이메일 인증 성공!");
+        setModalContent({
+          title: "인증 완료",
+          message: "이메일 인증이 완료되었습니다.",
+          type: "info",
+        });
+        setShowModal(true);
         setIsEmailVerified(true);
+
+        // 이메일 도메인에 따라 자동 설정
+        const domain = email.split("@")[1];
+        if (domain === "chosun.ac.kr") {
+          setSelected("재학생");
+        } else {
+          setSelected("일반");
+        }
       } else {
-        alert("이메일 인증 실패!");
+        setModalContent({
+          title: "인증 실패",
+          message: "이메일 인증에 실패했습니다.",
+          type: "error",
+        });
+        setShowModal(true);
         setIsEmailVerified(false);
       }
     } catch (e) {
       console.error("이메일 인증 실패:", e);
-      alert("이메일 인증 중 오류가 발생했습니다.");
+      setModalContent({
+        title: "인증 오류",
+        message: "이메일 인증 시도에 오류가 발생했습니다.",
+        type: "error",
+      });
+      setShowModal(true);
     }
   };
 
@@ -138,40 +189,70 @@ export default function SignUp() {
         interestIdList: interest.length > 0 ? interest.map((i) => i.id) : [],
         techStackIdList: skills.length > 0 ? skills.map((i) => i.id) : [],
       };
-      if (isDebugMode) {
-        console.log("[디버그] 회원가입 payload:", payload);
-      }
       const res = await signup(payload);
 
-      const { accessToken, refreshToken, memberId, email: userEmail } = res;
-      localStorage.setItem("accesstoken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ memberId, email: userEmail })
+      dispatch(
+        setTokens({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        })
       );
 
-      alert("회원가입이 완료되었습니다!");
-      navigate("/login");
+      setModalContent({
+        title: "가입 완료",
+        message: "회원가입이 완료되었습니다!",
+        type: "info",
+        onClose: () => navigate("/login"),
+      });
+      setShowModal(true);
     } catch (error) {
+      const err = error as AxiosError;
+      if (err.response?.status === 409) {
+        setModalContent({
+          title: "중복된 이메일",
+          message: "이미 가입된 이메일입니다.",
+          type: "error",
+        });
+        setShowModal(true);
+        return;
+      }
+
+      setModalContent({
+        title: "회원가입 실패",
+        message: "회원가입에 실패했습니다. 다시 시도해주세요.",
+        type: "error",
+      });
+      setShowModal(true);
       console.error("회원가입 실패:", error);
-      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
     }
   };
+
+  const [showModal, setShowModal] = useState(false); // 모달 표시 여부
 
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
   useEffect(() => {
     if (isDebugMode) {
-      console.log("[디버그] 기본 입력 세팅 중");
-      setEmail("debug@example.com");
-      setPassword("Debug1234!");
-      setConfirmPassword("Debug1234!");
-      setName("디버그유저");
+      setEmail("minsu@best.com");
+      setPassword("minsu1234!");
+      setConfirmPassword("minsu1234!");
+      setName("최고민수");
     }
   }, [isDebugMode]);
   return (
     <S.Container>
+      {showModal && (
+        <Modal
+          title={modalContent.title}
+          message={modalContent.message}
+          type={modalContent.type}
+          onClose={() => {
+            setShowModal(false);
+            modalContent.onClose?.();
+          }}
+        />
+      )}
+
       <S.ButtonRow>
         <S.LoginButton
           onClick={() => setIsDebugMode((prev) => !prev)}
