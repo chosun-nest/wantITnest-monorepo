@@ -26,7 +26,7 @@ export default function Home() {
       <S.GridItem $row="1" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
           {" "}
-          참여중인 채팅방<Link to="/chat">+</Link>
+          참여중인 채팅방<Link to="/chat">×</Link>
         </S.ItemTitle>
       </S.GridItem>
       <S.GridItem $row="2" $isMobile={isMobile} $col="2">

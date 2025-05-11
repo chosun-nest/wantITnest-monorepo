@@ -84,44 +84,41 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
       {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
       <S.NavbarContainer ref={ref}>
         <S.NavbarContent>
-          <S.NavMenu>
-            {!isMobile ? (
-              <div
-                onClick={() => setShowBackdrop((prev) => !prev)}
-                style={{ cursor: "pointer" }}
-              >
-                ....
-              </div>
-            ) : (
-              <svg
-                data-slot="icon"
-                fill="none"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                onClick={() => setIsSidebarOpen(true)}
-                style={{ cursor: "pointer" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                />
-              </svg>
-            )}
-          </S.NavMenu>
-
           <S.Logo to="/">
             <img src="assets/images/logo.png" alt="Logo" />
             WantIT-NEST
+            {/*이스터에그*/}
+            <div
+              onClick={() => setShowBackdrop((prev) => !prev)}
+              style={{ cursor: "pointer" }}
+            >
+              ㅤ
+            </div>
           </S.Logo>
+          {!isMobile ? (
+            <>
+              {" "}
+              <S.NavbarLink to="/notice-board">
+                <S.WebBarItem>학사공지</S.WebBarItem>
+              </S.NavbarLink>
+              <S.NavbarLink to="/project-board">
+                <S.WebBarItem>프로젝트 모집</S.WebBarItem>
+              </S.NavbarLink>
+              <S.NavbarLink to="/interests-board">
+                <S.WebBarItem>관심분야 정보</S.WebBarItem>
+              </S.NavbarLink>
+              <S.NavbarLink to="/chat">
+                <S.WebBarItem>채팅방</S.WebBarItem>
+              </S.NavbarLink>
+              <S.NavbarLink to="/events">
+                <S.WebBarItem>행사</S.WebBarItem>
+              </S.NavbarLink>
+            </>
+          ) : null}
 
           <S.NavRight>
-            <S.SearchIcon />
-
-            {accessToken ? (
+            {/*토큰이 있으면 = 로그인 되어 있으면면*/}
+            {accessToken && !isMobile ? (
               <S.ProfileWrapper ref={menuRef}>
                 <S.ProfileIcon
                   src={
@@ -147,32 +144,37 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
               </S.ProfileWrapper>
             ) : (
               <>
-                <S.LoginLink to="/login">Login</S.LoginLink>
-                <S.SignUpLink to="/signup">Sign Up</S.SignUpLink>
+                {isMobile ? null : (
+                  <>
+                    <S.LoginLink to="/login">Login</S.LoginLink>
+                    <S.SignUpLink to="/signup">Sign Up</S.SignUpLink>
+                  </>
+                )}
               </>
             )}
           </S.NavRight>
+          <S.NavMenu>
+            {!isMobile ? null : (
+              <svg
+                data-slot="icon"
+                fill="none"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                onClick={() => setIsSidebarOpen(true)}
+                style={{ cursor: "pointer" }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            )}
+          </S.NavMenu>
         </S.NavbarContent>
-
-        {!isMobile && (
-          <S.WebBar>
-            <S.NavbarLink to="/notice-board">
-              <S.WebBarItem>학사공지</S.WebBarItem>
-            </S.NavbarLink>
-            <S.NavbarLink to="/project-board">
-              <S.WebBarItem>프로젝트 모집</S.WebBarItem>
-            </S.NavbarLink>
-            <S.NavbarLink to="/interests-board">
-              <S.WebBarItem>관심분야 정보</S.WebBarItem>
-            </S.NavbarLink>
-            <S.NavbarLink to="/chat">
-              <S.WebBarItem>채팅방</S.WebBarItem>
-            </S.NavbarLink>
-            <S.NavbarLink to="/events">
-              <S.WebBarItem>행사</S.WebBarItem>
-            </S.NavbarLink>
-          </S.WebBar>
-        )}
       </S.NavbarContainer>
     </>
   );

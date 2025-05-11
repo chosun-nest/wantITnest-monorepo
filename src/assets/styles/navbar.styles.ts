@@ -177,7 +177,10 @@ export const WebBarItem = styled.div`
   cursor: pointer;
 
   &:hover {
-    font-weight: 700;
+    color: #002f6c;
+    font-weight: 600;
+    transform: translateX(4px);
+    transition: all 0.2s ease;
   }
 
   &.active {
