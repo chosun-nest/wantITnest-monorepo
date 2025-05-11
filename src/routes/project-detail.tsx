@@ -51,8 +51,8 @@ export default function ProjectDetail() {
       </S.ContentCard>
 
       <S.ButtonRow>
-        <S.ApplyButton onClick={() => navigate("/project-apply")}>
-          ✍️ 지원하기
+        <S.ApplyButton onClick={() => navigate("/project-apply", { state: { project } })}>
+          지원하기
         </S.ApplyButton>
       </S.ButtonRow>
 
