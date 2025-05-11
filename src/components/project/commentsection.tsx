@@ -40,38 +40,38 @@ export default function CommentSection() {
   );
 }
 
-// ⭐ 스타일 컴포넌트
+// 스타일 컴포넌트
 
 const Container = styled.div`
-  margin-top: 30px;
-  padding: 20px;
-  border-top: 1px solid #ddd;
+  margin-top: 20px;
+  padding: 16px;
   background-color: #f9fafb;
   border-radius: 8px;
 `;
 
 const Title = styled.h3`
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 17px;
+  margin-bottom: 8px;
+  font-weight: 600;
 `;
 
 const InputWrapper = styled.div`
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 8px;
+  margin-bottom: 12px;
 `;
 
 const CommentInput = styled.input`
   flex: 1;
-  padding: 10px;
+  padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
 `;
 
 const SubmitButton = styled.button`
-  padding: 10px 16px;
-  background-color: #1d4ed8;  // 남색 계열 (#2563eb 도 비슷)
+  padding: 8px 14px;
+  background-color: #1d4ed8;
   color: white;
   border: none;
   border-radius: 6px;
@@ -83,11 +83,11 @@ const SubmitButton = styled.button`
 `;
 
 const CommentList = styled.div`
-  margin-top: 10px;
+  margin-top: 8px;
 `;
 
 const CommentItem = styled.div`
-  padding: 10px 0;
+  padding: 6px 0;
   border-bottom: 1px solid #eee;
 `;
 
@@ -102,4 +102,6 @@ const CommentText = styled.span`
 
 const NoComment = styled.p`
   color: #777;
+  font-size: 14px;
+  margin: 0;
 `;

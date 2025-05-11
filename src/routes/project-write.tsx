@@ -12,26 +12,38 @@ export default function ProjectWrite() {
 - 프로젝트 목표: 
 - 예상 프로젝트 일정(횟수): 
 `);
-  const [participants, setParticipants] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const [hasAttachment, setHasAttachment] = useState(false);
 
+  const handleAddTag = () => {
+    if (newTag.trim() && !tags.includes(newTag) && tags.length < 6) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
+
   const handleSubmit = () => {
-    if (!title || !content || !participants) {
-      alert("제목, 본문, 참여인원/정원은 필수입니다!");
+    if (!title || !content) {
+      alert("제목과 본문은 필수입니다!");
       return;
     }
 
     const newProject = {
       id: mockProjects.length + 1,
-      title: title,
-      content: content,
+      title,
+      content,
       date: new Date().toISOString().slice(0, 10).replace(/-/g, "."),
       author: "유겸",
       views: 0,
-      participants: participants,
-      hasAttachment: hasAttachment,
+      participants: "0/0", // 참여인원 필드 임시 유지
+      hasAttachment,
       status: "모집중",
-      tags: [],
+      tags,
     };
 
     mockProjects.push(newProject);
@@ -51,19 +63,47 @@ export default function ProjectWrite() {
 
       <input
         type="text"
-        className="w-full p-3 mb-4 border rounded"
+        className="w-full p-4 mb-4 border text-xl rounded"
         placeholder="제목에 핵심 내용을 요약해보세요."
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
 
-      <input
-        type="text"
-        className="w-full p-3 mb-4 border rounded"
-        placeholder="참여인원/정원 (예: 3/6)"
-        value={participants}
-        onChange={(e) => setParticipants(e.target.value)}
-      />
+      {/* 태그 입력 영역 */}
+      <div className="mb-6">
+        <label className="block mb-1 text-sm font-semibold text-gray-700">
+          태그를 설정하세요 (최대 6개)
+        </label>
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            className="flex-grow p-2 border rounded"
+            placeholder="태그 입력 후 Enter"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
+          />
+          <button
+            onClick={handleAddTag}
+            className="px-4 py-2 bg-[#00256c] text-white rounded"
+          >
+            추가
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1 bg-blue-100 text-[#00256c] rounded-full flex items-center gap-1 text-sm"
+            >
+              {tag}
+              <button onClick={() => handleRemoveTag(tag)} className="hover:text-red-500">
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
 
       <textarea
         className="w-full p-4 mb-6 border rounded h-60"

@@ -14,7 +14,8 @@ export default function ProjectBoard() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const filteredProjects = mockProjects
+  const filteredProjects = [...mockProjects]
+    .sort((a, b) => new Date(b.date.replace(/\./g, "-")).getTime() - new Date(a.date.replace(/\./g, "-")).getTime())
     .filter(
       (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
     )
