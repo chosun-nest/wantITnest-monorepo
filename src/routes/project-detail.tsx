@@ -50,6 +50,12 @@ export default function ProjectDetail() {
         <CommentSection />
       </S.ContentCard>
 
+      <S.ButtonRow>
+        <S.ApplyButton onClick={() => navigate("/project-apply")}>
+          ✍️ 지원하기
+        </S.ApplyButton>
+      </S.ButtonRow>
+
       {/* 뒤로 가기 버튼 */}
       <S.BackButton onClick={() => navigate(-1)}>뒤로 가기</S.BackButton>
     </S.Container>

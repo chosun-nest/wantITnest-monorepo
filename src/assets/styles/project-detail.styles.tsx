@@ -99,6 +99,29 @@ export const Author = styled.span`
   color: #000000;
 `;
 
+// 지원하기 버튼
+export const ButtonRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 20px;
+`;
+
+export const ApplyButton = styled.button`
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #1e40af;
+  }
+`;
+
 // 뒤로 가기 버튼
 export const BackButton = styled.button`
   background-color: #1b3c74;

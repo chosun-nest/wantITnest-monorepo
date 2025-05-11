@@ -5,24 +5,25 @@ export const Container = styled.div`
   text-align: center;
 `;
 
+// 하늘색 배너
 export const InfoBanner = styled.div`
-  background-color: #e0ecff;
-  color: #1b3c74;
-  border-left: 4px solid #1b3c74;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
+  background-color: #e6f0ff;
+  color: #00256c;
+  font-size: 15px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  text-align: left;
 `;
 
-
+// 제목
 export const TitleInput = styled.input`
-  width: 50%;
-  padding: 10px;
-  font-size: 18px;
+  width: 100%;
+  padding: 16px;
+  font-size: 20px;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
 `;
 
 export const ParticipantsInput = styled.input`
@@ -35,17 +36,17 @@ export const ParticipantsInput = styled.input`
 `;
 
 export const ContentTextArea = styled.textarea`
-  width: 50%;
-  height: 200px;
-  padding: 10px;
+  width: 100%;
+  height: 240px;
+  padding: 14px;
   font-size: 15px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
   resize: vertical;
   margin-bottom: 15px;
 `;
 
-// 버튼 박스 (가운데 정렬)
+// 버튼 박스
 export const ButtonGroup = styled.div`
   margin-top: 20px;
 `;

@@ -9,6 +9,7 @@ import Layout from "./components/layout/layout";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
 import ProjectWrite from "./routes/project-write"; //yu-gyeom
+import ProjectApply from "./routes/project-apply"; // yu-gyeom
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad";    //yeong-eun
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
       {
         path: "project-write",
         element: <ProjectWrite />,
+      },
+      {
+        path: "project-apply",
+        element: <ProjectApply />,
       },
       {
         path: "notice-board/", // ｈｙｅ－ｒｉｎ
