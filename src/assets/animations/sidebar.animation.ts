@@ -1,4 +1,3 @@
-// src/components/sidebar/Sidebar.animation.ts
 import { keyframes } from "styled-components";
 
 export const slideIn = keyframes`
