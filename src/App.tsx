@@ -10,7 +10,6 @@ import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
 import ProjectWrite from "./routes/project-write"; //yu-gyeom
 import ProjectApply from "./routes/project-apply"; // yu-gyeom
-// import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad";    //yeong-eun
 import InterestsWrite from "./routes/interests-write";    //yeong-eun
@@ -28,16 +27,16 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
+        path: "",
+        element: <Home />,
+      },
+      {
         path: "profile/",
         element: (
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
         ),
-      },
-      {
-        path: "",
-        element: <Home />,
       },
       {
         path: "profile-edit/",
@@ -64,7 +63,7 @@ const router = createBrowserRouter([
         element: <ProjectApply />,
       },
       {
-        path: "notice-board/", // ｈｙｅ－ｒｉｎ
+        path: "notice-board/", // hye-rin
         element: <NoticeBoard />,
       },
       {
@@ -86,8 +85,8 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // 이 윗 줄 까진 Layout의 children임.
-  // 인증이 필요한 부분
+  // 바로 윗 줄까진 Layout의 children임.
+  // 바로 아래는 인증이 필요한 부분
   {
     path: "/login",
     element: <NavigateToHome />,
