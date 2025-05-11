@@ -23,7 +23,9 @@ public class PostDetailResponseDto {
 
     private AuthorDto author;
 
-    private Integer viewCount;
+    private Long viewCount;
+    private Long likeCount;
+    private Long dislikeCount;
 
     private String createdAt;
     private String updatedAt;

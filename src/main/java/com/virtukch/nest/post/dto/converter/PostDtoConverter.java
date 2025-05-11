@@ -38,6 +38,8 @@ public class PostDtoConverter {
                 .tags(tagNames)
                 .authorName(memberName)
                 .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .build();
     }
@@ -53,6 +55,8 @@ public class PostDtoConverter {
                         .name(member.getMemberName())
                         .build())
                 .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .updatedAt(timeFormat(post.getUpdatedAt()))
                 .build();
