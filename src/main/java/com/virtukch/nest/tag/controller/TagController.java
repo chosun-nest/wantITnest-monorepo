@@ -55,8 +55,6 @@ public class TagController {
         return ResponseEntity.ok(response);
     }
 
-
-
     @Operation(
             summary = "특정 태그 정보 반환",
             description = "태그 경로명을 통해 특정 태그의 정보를 반환합니다."

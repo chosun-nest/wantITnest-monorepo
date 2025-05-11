@@ -217,7 +217,7 @@ public class CommentService {
         }
     }
 
-    private Comment findByIdOrThrow(Long commentId) {
+    public Comment findByIdOrThrow(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
     }
