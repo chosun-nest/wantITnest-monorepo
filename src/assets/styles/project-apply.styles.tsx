@@ -55,7 +55,7 @@ export const SubmitButton = styled.button`
   }
 `;
 
-export const CancelButton = styled.button`
+export const BackButton = styled.button`
   background-color: transparent;
   border: 1px solid #94a3b8;
   padding: 10px 16px;

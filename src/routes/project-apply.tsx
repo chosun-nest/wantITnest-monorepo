@@ -46,7 +46,7 @@ export default function ProjectApply() {
     return (
       <S.Container>
         <S.Title>❌ 지원할 프로젝트를 찾을 수 없습니다.</S.Title>
-        <S.CancelButton onClick={() => navigate("/project-board")}>← 돌아가기</S.CancelButton>
+        <S.BackButton onClick={() => navigate("/project-board")}>← 돌아가기</S.BackButton>
       </S.Container>
     );
   }
@@ -66,7 +66,7 @@ export default function ProjectApply() {
       />
 
       <S.ButtonRow>
-        <S.CancelButton onClick={() => navigate(-1)}>← 뒤로 가기</S.CancelButton>
+        <S.BackButton onClick={() => navigate(-1)}>← 뒤로 가기</S.BackButton>
         <S.SubmitButton onClick={handleSubmit}>지원하기</S.SubmitButton>
       </S.ButtonRow>
     </S.Container>
