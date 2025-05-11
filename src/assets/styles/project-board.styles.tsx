@@ -7,6 +7,42 @@ export const Container = styled.div`
   background-color: white;
 `;
 
+export const FilterRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+export const FilterList = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+interface FilterItemProps {
+  $selected: boolean;
+}
+
+export const FilterItem = styled.span<FilterItemProps>`
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: 'Spoqa Han Sans', sans-serif;
+  font-weight: ${({ $selected }) => ($selected ? 'bold' : 'normal')};
+  text-decoration: ${({ $selected }) => ($selected ? 'underline' : 'none')};
+  color: ${({ $selected }) => ($selected ? '#1f2937' : '#9ca3af')};
+
+  &:hover {
+    color: ${({ $selected }) => ($selected ? '#1f2937' : '#374151')};
+    text-decoration: underline;
+  }
+`;
+
+export const Divider = styled.hr`
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1rem 0;
+`;
+
 export const TitleSection = styled.div`
   display: flex;
   justify-content: space-between;
@@ -27,7 +63,7 @@ export const SubText = styled.p`
 `;
 
 export const SearchInput = styled.input`
-  width: 300px;
+  width: 320px;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0.375rem;

@@ -99,14 +99,27 @@ export const Author = styled.span`
   color: #000000;
 `;
 
-// 지원하기 버튼
+// 버튼 행 (양쪽 정렬)
 export const ButtonRow = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   width: 100%;
   margin-top: 20px;
 `;
 
+// 왼쪽 버튼 감싸는 박스
+export const LeftButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+`;
+
+// 오른쪽 버튼 감싸는 박스
+export const RightButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+// 지원하기 버튼
 export const ApplyButton = styled.button`
   background-color: #2563eb;
   color: white;
@@ -126,11 +139,12 @@ export const ApplyButton = styled.button`
 export const BackButton = styled.button`
   background-color: #1b3c74;
   color: white;
-  padding: 8px 16px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 500;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-top: 1rem;
 
   &:hover {
     background-color: #16325c;
