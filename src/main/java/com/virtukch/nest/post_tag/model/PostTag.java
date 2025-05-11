@@ -1,12 +1,12 @@
 package com.virtukch.nest.post_tag.model;
 
-import com.virtukch.nest.post.model.Post;
-import com.virtukch.nest.tag.model.Tag;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
@@ -16,17 +16,13 @@ public class PostTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Setter
-    private Post post;
+    private Long postId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Tag tag;
+    private Long tagId;
 
-    // ✅ 생성 편의 메서드
     @Builder
-    public PostTag(Post post, Tag tag) {
-        this.post = post;
-        this.tag = tag;
+    public PostTag(Long postId, Long tagId) {
+        this.postId = postId;
+        this.tagId = tagId;
     }
 }

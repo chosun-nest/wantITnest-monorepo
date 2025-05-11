@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
+import java.util.List;
+
 @AllArgsConstructor
 @Builder
-public class CommentCreateResponseDto {
-    private Long commentId;
-    private String message;
-} 
+@Getter
+public class CommentListResponseDto {
+    private List<CommentResponseDto> comments;
+    private int totalCount;
+}
+

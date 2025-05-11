@@ -5,7 +5,6 @@ import com.virtukch.nest.tag.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +22,7 @@ public class TagController {
 
     @Operation(
             summary = "태그 리스트 반환",
-            description = "현재까지 생성된 모든 태그 목록을 반환합니다.",
-            security = {@SecurityRequirement(name = "bearer-key")}
+            description = "현재까지 생성된 모든 태그 목록을 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
