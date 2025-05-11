@@ -2,8 +2,8 @@ import { useState } from "react";
 import * as S from "../assets/styles/project-board.styles";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
-import TagFilterModal from "../components/modals/interests/TagFilterModal";
-import BoardWriteButton from "../components/board/BoardWriteButton";
+import TagFilterModal from "../components/interests/TagFilterModal";
+import ProjectWriteButton from "../components/project/ProjectWriteButton";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -151,7 +151,7 @@ export default function ProjectBoard() {
           }}
         />
       )}
-    <BoardWriteButton />
+    <ProjectWriteButton />
     </S.Container>
   );
 }

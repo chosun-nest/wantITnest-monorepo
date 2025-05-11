@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { checkPassword } from "../../../api/profile/api";
-import LoadingDots from "../../ui/LoadingDots";
-import CheckIcon from "../../ui/CheckIcon";
+import { checkPassword } from "../../../../api/profile/api";
+import LoadingDots from "../../../ui/LoadingDots";
+import CheckIcon from "../../../ui/CheckIcon";
 
 interface Props {
   onClose: () => void;
