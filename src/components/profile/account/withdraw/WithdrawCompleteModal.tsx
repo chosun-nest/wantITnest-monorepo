@@ -15,13 +15,13 @@ export default function WithdrawCompleteModal({ onClose }: { onClose: () => void
   }, []);
 
   return (
-  <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">탈퇴되었습니다</h3>
-        <p className="text-sm text-gray-600 mb-6">이용해주셔서 감사합니다.</p>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="p-6 text-center bg-white shadow-lg rounded-xl w-80">
+        <h3 className="mb-4 text-lg font-bold text-gray-800">탈퇴되었습니다</h3>
+        <p className="mb-6 text-sm text-gray-600">이용해주셔서 감사합니다.</p>
         <button
           onClick={handleConfirm}
-          className="px-4 py-2 bg-blue-900 text-white rounded"
+          className="px-4 py-2 text-white bg-blue-900 rounded"
         >
           확인
         </button>

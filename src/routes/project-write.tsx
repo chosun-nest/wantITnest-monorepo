@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postsWrite } from "../api/interests/api";
 import Navbar from "../components/layout/navbar";
-import TagFilterModal from "../components/modals/interests/TagFilterModal";
+import TagFilterModal from "../components/interests/TagFilterModal";
 import MDEditor from "@uiw/react-md-editor";
 
 export default function ProjectWrite() {

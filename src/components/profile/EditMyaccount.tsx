@@ -1,6 +1,6 @@
-import AccountPassword from "./edit-myaccount-components/password";
+import AccountPassword from "./account/password/password";
 //import AccountEmailVerification from "./edit-myaccount-components/EmailVerification"; //기능 삭제함
-import Withdraw from "./withdraw";
+import Withdraw from "./account/withdraw/withdraw";
 
 export default function EditMyAccount() {
   return (

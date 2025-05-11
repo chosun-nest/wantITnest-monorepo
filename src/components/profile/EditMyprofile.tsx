@@ -9,14 +9,14 @@ import {
 } from "../../api/profile/api";
 
 // 하위 컴포넌트 import
-import EditProfileImage from "./edit-myprofile-components/EditProfileImage";
-import EditProfileField from "./edit-myprofile-components/EditProfileField";
-import EditDepartment from "./edit-myprofile-components/EditDepartment";
-import EditIntroduce from "./edit-myprofile-components/EditIntroduce";
-import EditInterests from "./edit-myprofile-components/EditInterests";
-import EditTechStacks from "./edit-myprofile-components/EditTechStacks";
-import EditSNS from "./edit-myprofile-components/EditSNS";
-import EditProfileButtons from "./edit-myprofile-components/EditProfileButtons";
+import EditProfileImage from "./edit-myprofile/EditProfileImage";
+import EditProfileField from "./edit-myprofile/EditProfileField";
+import EditDepartment from "./edit-myprofile/EditDepartment";
+import EditIntroduce from "./edit-myprofile/EditIntroduce";
+import EditInterests from "./edit-myprofile/EditInterests";
+import EditTechStacks from "./edit-myprofile/EditTechStacks";
+import EditSNS from "./edit-myprofile/EditSNS";
+import EditProfileButtons from "./edit-myprofile/EditProfileButtons";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../store/slices/authSlice";
 import { ModalContent } from "../../types/modal";
