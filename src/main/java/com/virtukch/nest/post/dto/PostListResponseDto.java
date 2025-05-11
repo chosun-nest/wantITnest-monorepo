@@ -12,4 +12,5 @@ import java.util.List;
 public class PostListResponseDto {
     private List<PostSummaryDto> posts;
     private int totalCount;
+    private PageInfoDto pageInfo; // 페이지 정보
 }

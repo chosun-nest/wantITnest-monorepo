@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class PostDeleteResponseDto {
+public class PostResponseDto {
     private Long postId;
     private String message;
 }
