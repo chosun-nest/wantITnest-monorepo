@@ -140,7 +140,7 @@ export default function ProfileCard() {
         <img
           src={profile.image || "/assets/images/user.png"}
           alt="Profile"
-          className="border rounded-full h-30 w-30"
+          className="w-20 h-20 border rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28"
         />
       </div>
 
