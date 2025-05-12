@@ -2,10 +2,12 @@ package com.virtukch.nest.auth.controller;
 
 import com.virtukch.nest.auth.dto.LoginRequestDto;
 import com.virtukch.nest.auth.dto.LoginResponseDto;
+import com.virtukch.nest.auth.dto.PasswordResetRequestDto;
 import com.virtukch.nest.auth.dto.SignupRequestDto;
 import com.virtukch.nest.auth.dto.SignupResponseDto;
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.auth.service.AuthService;
+import com.virtukch.nest.common.dto.CommonResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,4 +61,12 @@ public class AuthController {
         log.info("customUserDetails: {}", customUserDetails);
         return ResponseEntity.ok(customUserDetails.getMember().getMemberId());
     }
+
+    // 로그인하지 않은 회원에게 이메일을 입력 받아 비밀번호 재설정 링크를 보내는 메서드
+    @PostMapping("/password-reset-request")
+    public ResponseEntity<CommonResponseDto> sendPasswordResetLink(@RequestBody PasswordResetRequestDto passwordResetRequestDto) {
+        return ResponseEntity.ok(authService.sendPasswordResetLink(passwordResetRequestDto.getEmail()));
+    }
+
+    // 비밀번호를 받아 새로운 비밀번호로 업데이트 하는 메서드
 }
