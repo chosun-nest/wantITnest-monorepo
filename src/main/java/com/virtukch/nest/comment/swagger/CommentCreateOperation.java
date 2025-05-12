@@ -24,13 +24,13 @@ import java.lang.annotation.Target;
                 
                 ✅ 인증된 사용자만 작성할 수 있으며, 댓글 본문은 최대 500자까지 입력 가능합니다.
                 🔒 JWT 인증 필요
-
+                
                 📥 요청 필드:
                 - `content` (string, required): 댓글 내용 (1자 이상, 500자 이하)
                 """,
         security = {@SecurityRequirement(name = "bearer-key")},
         parameters = {
-                @Parameter(name = "boardType", description = "게시판 종류 (예: TOPIC, PROJECT)", example = "TOPIC"),
+                @Parameter(name = "boardType", description = "게시판 종류 (예: INTEREST, PROJECT)", example = "INTEREST"),
                 @Parameter(name = "postId", description = "게시글 ID", example = "42")
         },
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
