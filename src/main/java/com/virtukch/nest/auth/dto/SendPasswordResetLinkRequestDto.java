@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PasswordResetRequestDto {
+public class SendPasswordResetLinkRequestDto {
 
-    private String token;
-    private String newPassword;
+    private String email;
 }

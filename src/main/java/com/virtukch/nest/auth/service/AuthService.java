@@ -9,6 +9,7 @@ import com.virtukch.nest.auth.exception.InvalidTokenException;
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.common.dto.CommonResponseDto;
+import com.virtukch.nest.auth.dto.PasswordResetRequestDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member.repository.MemberRepository;
@@ -124,6 +125,29 @@ public class AuthService {
 
         return CommonResponseDto.builder()
             .message("비밀번호 재설정 링크가 전송되었습니다.")
+            .build();
+    }
+
+    public CommonResponseDto resetPassword(PasswordResetRequestDto passwordResetRequestDto) {
+        String token = passwordResetRequestDto.getToken();
+        String newPassword = passwordResetRequestDto.getNewPassword();
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            log.warn("[비밀번호 재설정] 유효하지 않은 토큰 요청");
+            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+        }
+
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+
+        member.updatePassword(passwordEncoder.encode(newPassword));
+        member.updatePasswordLength(newPassword.length());
+        memberRepository.save(member);
+        log.info("[비밀번호 재설정] 사용자 ID {}의 비밀번호가 변경되었습니다.", memberId);
+
+        return CommonResponseDto.builder()
+            .message("비밀번호가 성공적으로 변경되었습니다.")
             .build();
     }
 }
