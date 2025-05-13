@@ -59,7 +59,40 @@ public class MemberController {
     }
 
     @PostMapping("/me/image")
-    @Operation(summary = "프로필 이미지 업로드", description = "이미지를 업로드하고 이미지 URL을 반환합니다.")
+    @Operation(
+        summary = "프로필 이미지 업로드",
+        description = """
+        사용자의 프로필 이미지를 업로드합니다.
+
+        ✅ 요청 방법:
+        - HTTP Method: `POST`
+        - 요청 URL: `/api/v1/members/me/image`
+        - 헤더: `Authorization: Bearer {access_token}`
+        - 바디 형식: `multipart/form-data`
+            - Key: `file`
+            - Value: 이미지 파일 (예: PNG, JPG)
+
+        ✅ 요청 예시 (Postman 등에서):
+        - Headers 탭에 토큰 추가
+        - Body 탭을 `form-data`로 설정
+            - key = `file`
+            - type = `File`
+            - value = 업로드할 이미지 파일
+
+        ✅ 응답 예시:
+        ```json
+        {
+          "imageUrl": "/uploaded-images/member_1/f66f14c3-13eb-4298-a294-308cb1faee45.jpeg"
+        }
+        ```
+
+        ✅ 이후 이미지 사용하는 법:
+        - 위에서 받은 `imageUrl`을 그대로 브라우저에서 요청하면 이미지에 접근할 수 있습니다.
+        - 예: `http://119.219.30.209:6030/uploaded-images/member_1/f66f14c3-13eb-4298-a294-308cb1faee45.jpeg`
+
+        ⚠️ 이미지 업로드 시 기존 이미지가 자동으로 삭제되며, 새 이미지로 교체됩니다.
+    """
+    )
     public ResponseEntity<MemberImageUploadResponseDto> uploadProfileImage(
         @AuthenticationPrincipal CustomUserDetails customUserDetails,
         @RequestPart("file") MultipartFile file

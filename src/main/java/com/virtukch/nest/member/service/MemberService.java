@@ -16,13 +16,18 @@ import com.virtukch.nest.member_interest.service.MemberInterestService;
 import com.virtukch.nest.member_tech_stack.dto.MemberTechStackResponseDto;
 import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -201,29 +206,45 @@ public class MemberService {
 
     public String uploadProfileImage(CustomUserDetails customUserDetails, MultipartFile file) {
         Long memberId = customUserDetails.getMember().getMemberId();
-
-        String filename = "member_" + memberId + "_" + file.getOriginalFilename();
-        String savePath = new File("src/main/resources/static/images").getAbsolutePath();
-
-        // 디렉터리 없으면 생성
-        File dir = new File(savePath);
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new ImageDirectoryCreationException(savePath);
-        }
-
-        File dest = new File(savePath + File.separator + filename);
-
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException("Member not found."));
 
-        try {
-            file.transferTo(dest); // 덮어쓰기 자동 처리
-        } catch (Exception e) {
-            throw new ImageUploadFailedException(
-                "이미지 저장 중 오류가 발생했습니다: " + e.getClass().getSimpleName(), e);
+        // 1. 사용자별 디렉토리 생성
+        String baseDir = new File("uploaded-images").getAbsolutePath();
+        File userDir = new File(baseDir, "member_" + memberId);
+        if (!userDir.exists() && !userDir.mkdirs()) {
+            throw new ImageDirectoryCreationException(userDir.getPath());
         }
 
-        String imageUrl = "/images/" + filename;
+        // 2. 기존 이미지 삭제 (같은 폴더 내)
+        String prevImageUrl = member.getMemberImageUrl();
+        if (prevImageUrl != null && prevImageUrl.startsWith("/uploaded-images/")) {
+            String cleanedPath = prevImageUrl.substring("/uploaded-images/".length());
+            File prevFile = new File(baseDir + File.separator + cleanedPath);
+            try {
+                Files.delete(prevFile.toPath());
+            } catch (IOException e) {
+                log.error("이전 프로필 이미지 삭제 실패: {}", prevFile.getAbsolutePath(), e);
+            }
+        }
+
+        // 3. 저장 파일명 구성 (UUID + 확장자)
+        String originalFilename = file.getOriginalFilename();
+        if (!originalFilename.contains(".")) {
+            throw new IllegalArgumentException("파일명이 유효하지 않습니다.");
+        }
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String filename = UUID.randomUUID() + extension;
+        File dest = new File(userDir, filename);
+
+        try {
+            file.transferTo(dest);
+        } catch (Exception e) {
+            throw new ImageUploadFailedException("이미지 저장 중 오류 발생", e);
+        }
+
+        // 4. 이미지 URL 저장
+        String imageUrl = "/uploaded-images/member_" + memberId + "/" + filename;
         member.updateImageUrl(imageUrl);
         memberRepository.save(member);
         return imageUrl;
