@@ -25,28 +25,14 @@ import Events from "./routes/events";
 
 const router = createBrowserRouter([
   {
+    // Layout이 포함된 페이지 중중
+    // 인증이 필요하지 않은 페이지
     path: "/",
     element: <Layout />,
     children: [
       {
-        path: "profile/",
-        element: (
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: "",
         element: <Home />,
-      },
-      {
-        path: "profile-edit/",
-        element: (
-          <ProtectedRoute>
-            <ProfileEdit />
-          </ProtectedRoute>
-        ),
       },
       {
         path: "project/:id",
@@ -55,10 +41,6 @@ const router = createBrowserRouter([
       {
         path: "project-board/",
         element: <ProjectBoard />,
-      },
-      {
-        path: "project-write",
-        element: <ProjectWrite />,
       },
       {
         path: "project-apply",
@@ -71,10 +53,6 @@ const router = createBrowserRouter([
       {
         path: "interests-board/", // yeong-eun : 관심사 정보 게시판 페이지
         element: <InterestsBorad />,
-      },
-      {
-        path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
-        element: <InterestsWrite />,
       },
       {
         path: "interests-detail/:id", // yeong-eun : 관심 분야 정보 글쓰기 페이지
@@ -91,8 +69,34 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // 이 윗 줄 까진 Layout의 children임.
-  // 인증이 필요한 부분
+  // Layout이 필요하지 않은 로그인, 회원가입, 404에러처리 페이지
+  {
+    // 인증이 필요한 페이지
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: "profile/",
+        element: <Profile />,
+      },
+      {
+        path: "profile-edit/",
+        element: <ProfileEdit />,
+      },
+      {
+        path: "project-write",
+        element: <ProjectWrite />,
+      },
+      {
+        path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        element: <InterestsWrite />,
+      },
+    ],
+  },
   {
     path: "/login",
     element: <NavigateToHome />,
