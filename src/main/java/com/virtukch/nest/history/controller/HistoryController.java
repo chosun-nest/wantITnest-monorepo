@@ -1,5 +1,6 @@
 package com.virtukch.nest.history.controller;
 
+import com.virtukch.nest.history.dto.HistoryUpdateRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -67,6 +68,36 @@ public class HistoryController {
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long memberId = customUserDetails.getMember().getMemberId();
         historyService.deleteHistory(memberId, historyId);
+        return ResponseEntity.noContent().build();
+    }
+    // 6. 여러 개 생성
+    @Operation(summary = "히스토리 여러 개 생성", description = "타임라인 항목 여러 개를 한 번에 생성합니다.")
+    @PostMapping("/bulk")
+    public ResponseEntity<List<HistoryResponseDto>> createHistories(
+        @RequestBody List<HistoryRequestDto> requestList,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+        return ResponseEntity.ok(historyService.createHistories(memberId, requestList));
+    }
+
+    // 7. 여러 개 수정
+    @Operation(summary = "히스토리 여러 개 수정", description = "타임라인 항목 여러 개를 한 번에 수정합니다. 각 항목에 ID가 포함되어 있어야 합니다.")
+    @PutMapping("/bulk")
+    public ResponseEntity<List<HistoryResponseDto>> updateHistories(
+        @RequestBody List<HistoryUpdateRequestDto> requestList,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+        return ResponseEntity.ok(historyService.updateHistories(memberId, requestList));
+    }
+
+    // 8. 여러 개 삭제
+    @Operation(summary = "히스토리 여러 개 삭제", description = "타임라인 항목 여러 개를 한 번에 삭제합니다. ID 목록을 JSON 배열로 전달하세요.")
+    @DeleteMapping("/bulk")
+    public ResponseEntity<Void> deleteHistories(
+        @RequestBody List<Long> historyIds,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+        historyService.deleteHistories(memberId, historyIds);
         return ResponseEntity.noContent().build();
     }
 }

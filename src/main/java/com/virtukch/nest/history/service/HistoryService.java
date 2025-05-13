@@ -2,6 +2,7 @@ package com.virtukch.nest.history.service;
 
 import com.virtukch.nest.history.dto.HistoryRequestDto;
 import com.virtukch.nest.history.dto.HistoryResponseDto;
+import com.virtukch.nest.history.dto.HistoryUpdateRequestDto;
 import com.virtukch.nest.history.model.History;
 import com.virtukch.nest.history.repository.HistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,7 @@ public class HistoryService {
     }
 
     public List<HistoryResponseDto> getHistoriesByMember(Long memberId) {
-        return historyRepository.findAll().stream()
-            .filter(h -> h.getMemberId().equals(memberId))
+        return historyRepository.findAllByMemberId(memberId).stream()
             .map(this::toDto)
             .collect(Collectors.toList());
     }
@@ -71,5 +71,57 @@ public class HistoryService {
             .endDate(history.getEndDate())
             .important(history.isImportant())
             .build();
+    }
+
+    // Bulk create
+    public List<HistoryResponseDto> createHistories(Long memberId, List<HistoryRequestDto> dtoList) {
+        List<History> histories = dtoList.stream()
+            .map(dto -> History.builder()
+                .memberId(memberId)
+                .content(dto.getContent())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .important(dto.isImportant())
+                .build())
+            .collect(Collectors.toList());
+
+        return historyRepository.saveAll(histories).stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
+    }
+
+    // Bulk update
+    public List<HistoryResponseDto> updateHistories(Long memberId, List<HistoryUpdateRequestDto> dtoList) {
+        List<History> updated = dtoList.stream()
+            .map(dto -> {
+                History original = historyRepository.findByHistoryIdAndMemberId(dto.getHistoryId(), memberId)
+                    .orElseThrow(() -> new RuntimeException("히스토리를 찾을 수 없습니다."));
+                return History.builder()
+                    .historyId(original.getHistoryId())
+                    .memberId(memberId)
+                    .content(dto.getContent())
+                    .startDate(dto.getStartDate())
+                    .endDate(dto.getEndDate())
+                    .important(dto.isImportant())
+                    .build();
+            })
+            .collect(Collectors.toList());
+
+        return historyRepository.saveAll(updated).stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
+    }
+
+    // Bulk delete
+    public void deleteHistories(Long memberId, List<Long> historyIds) {
+        List<History> toDelete = historyRepository.findAllById(historyIds).stream()
+            .filter(h -> h.getMemberId().equals(memberId))
+            .collect(Collectors.toList());
+
+        if (toDelete.size() != historyIds.size()) {
+            throw new RuntimeException("삭제할 수 없는 히스토리가 포함되어 있습니다.");
+        }
+
+        historyRepository.deleteAll(toDelete);
     }
 }
