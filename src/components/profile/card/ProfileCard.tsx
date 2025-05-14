@@ -17,6 +17,9 @@ export default function ProfileCard() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [loading, setLoading] = useState(true);
+  const goToProfilePage = () => {
+    navigate("/profile");
+  }
 
   const techColorMap: Record<string, string> = {
     Java: "bg-[#f89820] text-white",
@@ -140,13 +143,19 @@ export default function ProfileCard() {
         <img
           src={profile.image || "/assets/images/user.png"}
           alt="Profile"
-          className="w-20 h-20 border rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28"
+          className="w-20 h-20 border rounded-full cursor-pointer sm:h-24 sm:w-24 md:h-28 md:w-28"
+          onClick={goToProfilePage} // 사진 누르면 profile 페이지로 navigate
         />
       </div>
 
       {/* 이름 및 전공 정보, 재학생 인증 배찌 */}
       <div className="flex items-center gap-2 mt-2 justify-left">
-        <h2 className="text-lg font-bold">{profile.name}</h2>
+        <h2 
+          className="text-lg font-bold cursor-pointer hover:underline"
+          onClick={goToProfilePage}     // 이름 누르면 profile 페이지로 navigate
+        >  
+          {profile.name}
+        </h2>
         <div className="flex items-center gap-1">
           <p className="text-gray-500">{profile.major}</p>
           {(profile.email.endsWith("@chosun.ac.kr") || profile.email.endsWith("@chosun.kr")) && (
