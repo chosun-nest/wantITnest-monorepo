@@ -121,7 +121,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               <MdOutlineInterests /> 관심분야 게시판
             </S.MenuItem>
           </Link>
-          <Link to="/chat-room" onClick={handleClose}>
+          <Link to="/chat" onClick={handleClose}>
             <S.MenuItem>
               <MdChatBubbleOutline /> 채팅방
             </S.MenuItem>

@@ -22,6 +22,7 @@ import Chat from "./routes/chat";
 import NotFound from "./routes/notfound";
 import ProtectedRoute from "./components/auth/protected-route";
 import Events from "./routes/events";
+import PublicRoute from "./components/auth/public-route";
 
 const router = createBrowserRouter([
   {
@@ -103,16 +104,28 @@ const router = createBrowserRouter([
   },
   {
     path: "/signup",
-    element: <SignUp />,
+    element: (
+      <PublicRoute>
+        <SignUp />
+      </PublicRoute>
+    ),
   },
 
   {
     path: "/password-reset",
-    element: <PasswdReset />,
+    element: (
+      <PublicRoute>
+        <PasswdReset />
+      </PublicRoute>
+    ),
   },
   {
     path: "/find-id",
-    element: <PasswdReset />,
+    element: (
+      <PublicRoute>
+        <PasswdReset />
+      </PublicRoute>
+    ),
   },
   {
     path: "/*",
