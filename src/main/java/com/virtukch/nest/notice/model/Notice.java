@@ -1,27 +1,40 @@
 package com.virtukch.nest.notice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.virtukch.nest.common.model.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "notice")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class Notice {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+public class Notice extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long noticeId;
-    private String noticeTitle;
-    private String noticeWriter;
-    private String noticeContent;
-    private String noticeCreatedAt;
-    private String noticeSource;
-    private String noticeUpdatedAt;
+    private Long id;
+
+    @Column(name = "number", nullable = false)
+    private Long number;
+
+    @Column(name = "notice_type", nullable = false)
+    private String noticeType;  // 학사공지, 장학공지, 컴퓨터공학과 공지 등
+
+    @Column(nullable = false)
+    private String title;
+
+    private String writer;
+
+    @Column(name = "post_date")
+    private String postDate;
+
+    @Column(columnDefinition = "TEXT")
+    private String link;
+
+    private String  views;
+
+    private LocalDate deadline; // 장학공지일 때만
 }

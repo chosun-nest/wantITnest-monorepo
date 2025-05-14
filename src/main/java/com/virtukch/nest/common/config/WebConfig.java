@@ -1,5 +1,6 @@
 package com.virtukch.nest.common.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -7,6 +8,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Value("${cors.fastapi-crawler-url}")
+    private String fastApiCrawlerUrl;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -21,7 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/v1/notices/**")
-                .allowedOrigins("http://localhost:8000") // TODO FastAPI 서버 주소. 추후 변경 필요
+                .allowedOrigins(fastApiCrawlerUrl) // TODO FastAPI 서버 주소. 추후 변경 필요
                 .allowedMethods("POST")
                 .allowedHeaders("*");
     }

@@ -2,6 +2,10 @@
 server:
   port: 6030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
 
+# 공지사항 크롤링용 FastAPI 서버 주소
+cors:
+  fastapi-crawler-url: http://localhost:8000
+
 # mysql -h 119.219.30.209 -P 6040 -u VIRTUKCH -p --default-character-set=utf8 nest_db
 spring:
   datasource:
