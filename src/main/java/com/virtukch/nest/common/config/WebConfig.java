@@ -1,6 +1,7 @@
 package com.virtukch.nest.common.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -15,5 +16,13 @@ public class WebConfig implements WebMvcConfigurer {
         // 이 경로로 요청 시 → 실제 파일 경로에서 파일 제공
         registry.addResourceHandler("/uploaded-images/**")
             .addResourceLocations(uploadDir);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/v1/notices/**")
+                .allowedOrigins("http://localhost:8000") // TODO FastAPI 서버 주소. 추후 변경 필요
+                .allowedMethods("POST")
+                .allowedHeaders("*");
     }
 }
