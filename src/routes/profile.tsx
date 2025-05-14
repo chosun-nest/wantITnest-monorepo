@@ -68,7 +68,7 @@ export default function Profile() {
         className="flex min-h-screen px-20 bg-white"
         style={{ paddingTop: navHeight + 40 }}
       >
-        <div className="w-1/4 pr-6">
+        <div>
           {loading ? (
             <div className="relative p-4 bg-white border shadow-md w-80 rounded-xl">
               <p className="text-sm text-gray-500"> 불러오는 중...</p>
@@ -78,7 +78,7 @@ export default function Profile() {
           )}
         </div>
 
-        <div className="flex-1 pl-8">
+        <div>
           {/* 나중에 히스토리, 채팅방 등 들어갈 자리 */}
         </div>
       </div>
