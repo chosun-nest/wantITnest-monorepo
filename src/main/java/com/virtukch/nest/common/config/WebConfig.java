@@ -25,7 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/v1/notices/**")
-                .allowedOrigins(fastApiCrawlerUrl) // TODO FastAPI 서버 주소. 추후 변경 필요
+                .allowedOrigins(fastApiCrawlerUrl)
                 .allowedMethods("POST")
                 .allowedHeaders("*");
     }
