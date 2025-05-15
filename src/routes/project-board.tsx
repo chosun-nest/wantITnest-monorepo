@@ -2,8 +2,8 @@ import { useState } from "react";
 import * as S from "../assets/styles/project-board.styles";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
-import TagFilterModal from "../components/interests/TagFilterModal";
-import ProjectWriteButton from "../components/project/ProjectWriteButton";
+import TagFilterModal from "../components/board/TagFilterModal";
+import BoardWriteButton from "../components/board/BoardWriteButton";  // ProjectWriteButton 삭제 > 공통 부분인 BoardWriteButton으로 변경. 동일 글쓰기 버튼 컴포넌트 사용하도록 하기 위함. 
 
 const ITEMS_PER_PAGE = 7;
 
@@ -79,7 +79,7 @@ export default function ProjectBoard() {
         </div>
 
         {/* 오른쪽 - 검색창 + 필터 */}
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           <S.SearchInput
             type="text"
             placeholder="제목 또는 내용 검색"
@@ -115,7 +115,7 @@ export default function ProjectBoard() {
       <S.CardList>
         {currentProjects.map((project) => (
           <S.Card key={project.id} onClick={() => handleRowClick(project)}>
-            <div className="flex flex-col gap-2 h-full justify-between">
+            <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center gap-2">
                 <S.StatusBadge status={project.status}>
                   {project.status}
@@ -134,7 +134,7 @@ export default function ProjectBoard() {
                   ))}
                 </S.TagContainer>
               )}
-              <div className="flex justify-between items-end mt-2">
+              <div className="flex items-end justify-between mt-2">
                 <S.ProjectMetaLeft>
                   {project.author} ・ {project.date}
                 </S.ProjectMetaLeft>
@@ -170,7 +170,7 @@ export default function ProjectBoard() {
           }}
         />
       )}
-      <ProjectWriteButton />
+      <BoardWriteButton />
     </S.Container>
   );
 }

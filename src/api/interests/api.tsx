@@ -1,4 +1,5 @@
 import { API } from "../index_c";
+//import { getAccessToken } from "../../utils/auth";
 
 // 댓글 API
 // 댓글 작성 - 생성, 조회, 수정, 삭제 기능 (POST)

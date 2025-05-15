@@ -8,13 +8,13 @@ import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
-import ProjectWrite from "./routes/project-write"; //yu-gyeom
 import ProjectApply from "./routes/project-apply"; // yu-gyeom
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
-import InterestsWrite from "./routes/interests-write"; //yeong-eun
 import InterestsDetail from "./routes/interests-detail"; //yeong-eun
+import BoardWrite from "./routes/board-write";           //yeong-eun
+
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
@@ -88,13 +88,13 @@ const router = createBrowserRouter([
         path: "profile-edit/",
         element: <ProfileEdit />,
       },
+      // {
+      //   path: "interests-write",
+      //   element: <InterestsWrite />,   // 게시판 글쓰기 페이지 통합함.
+      // },
       {
-        path: "project-write",
-        element: <ProjectWrite />,
-      },
-      {
-        path: "interests-write/", // yeong-eun : 관심 분야 정보 글쓰기 페이지
-        element: <InterestsWrite />,
+        path: "board-write/", // yeong-eun : 게시판 글쓰기 페이지
+        element: <BoardWrite />,
       },
     ],
   },

@@ -238,7 +238,7 @@ export default function ProfileCard() {
               alt="Instagram"
               className="w-12 h-12 cursor-pointer hover:opacity-80"
             />
-          </a>
+          </a>  
         ) : (
           <InstagramLogo
               size={48} color="#002f6c"
