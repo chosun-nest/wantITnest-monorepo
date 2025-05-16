@@ -2,9 +2,9 @@ package com.virtukch.nest.project.service;
 
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
-import com.virtukch.nest.project.dto.ProjectCreateRequestDTO;
-import com.virtukch.nest.project.dto.ProjectCreateResponseDTO;
-import com.virtukch.nest.project.dto.ProjectUpdateRequestDTO;
+import com.virtukch.nest.project.dto.ProjectCreateRequestDto;
+import com.virtukch.nest.project.dto.ProjectCreateResponseDto;
+import com.virtukch.nest.project.dto.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
 import com.virtukch.nest.project.exception.ProjectNotFoundException;
@@ -31,8 +31,8 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
 
     @Transactional
-    public Long createProject(ProjectCreateRequestDTO dto, Long memberId) {
-        Member leader = memberRepository.findById(memberId)
+    public ProjectCreateResponseDto createProject(Member member, ProjectCreateRequestDto dto) {
+        Member leader = memberRepository.findById(member.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("리더 멤버가 존재하지 않습니다"));
 
         Project project = Project.createProject(
@@ -45,13 +45,13 @@ public class ProjectService {
         );
 
         // builder 내부에서 LEADER 자동 등록됨
-        return ProjectDtoConverter.toCreateResponseDTO(project)
+        return ProjectDtoConverter.toCreateResponseDTO(project);
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectCreateResponseDTO> getAllProjects() {
+    public List<ProjectCreateResponseDto> getAllProjects() {
         return projectRepository.findAll().stream()
-                .map(project -> ProjectCreateResponseDTO.builder()
+                .map(project -> ProjectCreateResponseDto.builder()
                         .projectId(project.getProjectId())
                         .message("Complete Create Project")
                         .build())
@@ -59,7 +59,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public void updateProject(Long projectId, Long memberId, ProjectUpdateRequestDTO requestDTO) throws AccessDeniedException {
+    public void updateProject(Long projectId, Long memberId, ProjectUpdateRequestDto requestDTO) throws AccessDeniedException {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 

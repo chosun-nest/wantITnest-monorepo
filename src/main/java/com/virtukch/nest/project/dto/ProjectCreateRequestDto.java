@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectCreateRequestDTO {
+public class ProjectCreateRequestDto {
     private String projectTitle;
     private String projectDescription;
     private int maxMember;

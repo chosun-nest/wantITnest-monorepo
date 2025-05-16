@@ -2,7 +2,7 @@ package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.project.dto.ProjectUpdateRequestDTO;
+import com.virtukch.nest.project.dto.ProjectUpdateRequestDto;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -133,7 +133,7 @@ public class Project extends BaseTimeEntity {
     }
 
     //프로젝트 업데이트 메서드
-    public void updateProject(ProjectUpdateRequestDTO dto) {
+    public void updateProject(ProjectUpdateRequestDto dto) {
         this.projectTitle = dto.getProjectTitle();
         this.projectDescription = dto.getProjectDescription();
         this.maxMember = dto.getMaxMember();
