@@ -67,20 +67,7 @@ public class PostDtoConverter {
         return PostListResponseDto.builder()
                 .posts(summaries)
                 .totalCount((int) page.getTotalElements())
-                .pageInfo(toPageInfoDto(page))
-                .build();
-    }
-
-    public static PageInfoDto toPageInfoDto(Page<?> page) {
-        return PageInfoDto.builder()
-                .pageNumber(page.getNumber())
-                .pageSize(page.getSize())
-                .totalPages(page.getTotalPages())
-                .totalElements(page.getTotalElements())
-                .first(page.isFirst())
-                .last(page.isLast())
-                .hasNext(page.hasNext())
-                .hasPrevious(page.hasPrevious())
+                .pageInfo(PageInfoDto.create(page))
                 .build();
     }
 

@@ -3,6 +3,7 @@ package com.virtukch.nest.common.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 @Getter
 @Builder
@@ -16,4 +17,17 @@ public class PageInfoDto {
     private boolean last;        // 마지막 페이지 여부
     private boolean hasNext;     // 다음 페이지 존재 여부
     private boolean hasPrevious; // 이전 페이지 존재 여부
+
+    public static PageInfoDto create(Page<?> page) {
+        return PageInfoDto.builder()
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
+                .build();
+    }
 }
