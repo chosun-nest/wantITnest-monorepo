@@ -9,8 +9,6 @@ import { Item } from "../types/signup";
 import Modal from "../components/common/modal";
 import type { ModalContent } from "../types/modal";
 import { AxiosError } from "axios";
-import { useDispatch } from "react-redux";
-import { setTokens } from "../store/slices/authSlice";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -39,8 +37,6 @@ export default function SignUp() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
-
-  const dispatch = useDispatch();
 
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -190,13 +186,7 @@ export default function SignUp() {
         techStackIdList: skills.length > 0 ? skills.map((i) => i.id) : [],
       };
       const res = await signup(payload);
-
-      dispatch(
-        setTokens({
-          accessToken: res.accessToken,
-          refreshToken: res.refreshToken,
-        })
-      );
+      console.log("회원가입 응답:", res);
 
       setModalContent({
         title: "가입 완료",
