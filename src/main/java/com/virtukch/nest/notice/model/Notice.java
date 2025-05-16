@@ -1,26 +1,29 @@
 package com.virtukch.nest.notice.model;
 
-import com.virtukch.nest.common.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notice")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 @Builder
-public class Notice extends BaseTimeEntity {
+public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "number", nullable = false)
+    @Column(nullable = false)
     private Long number;
 
-    @Column(name = "notice_type", nullable = false)
+    @Column(nullable = false)
     private String noticeType;  // 학사공지, 장학공지, 컴퓨터공학과 공지 등
 
     @Column(nullable = false)
@@ -28,13 +31,17 @@ public class Notice extends BaseTimeEntity {
 
     private String writer;
 
-    @Column(name = "post_date")
-    private String postDate;
+    @Column(nullable = false)
+    private LocalDate postDate;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String link;
 
-    private String  views;
+    private Long  views;
 
-    private LocalDate deadline; // 장학공지일 때만
+    private String deadline; // 장학공지일 때만
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    protected LocalDateTime crawledAt;
 }

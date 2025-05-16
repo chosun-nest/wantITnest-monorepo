@@ -1,14 +1,23 @@
 package com.virtukch.nest.notice.service;
 
+import com.virtukch.nest.common.dto.PageInfoDto;
+import com.virtukch.nest.notice.dto.NoticeListResponseDto;
 import com.virtukch.nest.notice.dto.NoticeRequestDto;
+import com.virtukch.nest.notice.dto.NoticeResponseDto;
 import com.virtukch.nest.notice.exception.InvalidNoticeDataException;
+import com.virtukch.nest.notice.exception.NoticeProcessingException;
 import com.virtukch.nest.notice.model.Notice;
 import com.virtukch.nest.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +34,8 @@ public class NoticeService {
      * @param requestDto 크롤링 요청 DTO
      * @param noticeType 공지사항 유형
      * @return 저장된 공지사항 수
+     * @throws InvalidNoticeDataException 유효하지 않은 데이터가 있을 경우
+     * @throws NoticeProcessingException  처리 중 오류가 발생할 경우
      */
     @Transactional
     public int saveNotices(NoticeRequestDto requestDto, String noticeType) {
@@ -74,22 +85,78 @@ public class NoticeService {
         return savedCount;
     }
 
-    private static Notice buildNotice(String noticeType, Map<String, Object> noticeData) {
+    @Transactional(readOnly = true)
+    public NoticeListResponseDto getNoticesByType(String noticeType, Pageable pageable) {
+        Page<Notice> noticePage = noticeRepository.findByNoticeTypeOrderByPostDateDesc(noticeType, pageable);
+        return buildListResponseDto(noticePage);
+    }
+
+    /**
+     * 공지사항을 검색합니다.
+     *
+     * @param noticeType 공지사항 유형
+     * @param keyword    검색 키워드
+     * @return 검색 결과 DTO 목록
+     * @throws InvalidNoticeDataException 유효하지 않은 공지 유형이나 키워드일 경우
+     */
+    @Transactional(readOnly = true)
+    public NoticeListResponseDto searchNotices(String noticeType, String keyword, Pageable pageable) {
+        if (noticeType == null || noticeType.isBlank()) {
+            throw new InvalidNoticeDataException("공지사항 유형이 지정되지 않았습니다.");
+        }
+
+        if (keyword == null || keyword.isBlank()) {
+            throw new InvalidNoticeDataException("검색 키워드가 지정되지 않았습니다.");
+        }
+
+        Page<Notice> noticePage = noticeRepository.findByNoticeTypeAndTitleContainingOrderByPostDateDesc(noticeType, keyword, pageable);
+        return buildListResponseDto(noticePage);
+    }
+
+
+
+    private NoticeListResponseDto buildListResponseDto(Page<Notice> noticePage) {
+        List<Notice> notices = noticePage.getContent();
+
+        List<NoticeResponseDto> responseDtos = notices.stream()
+                .map(NoticeResponseDto::create)
+                .toList();
+
+        return NoticeListResponseDto.builder()
+                .notices(responseDtos)
+                .totalCount((int) noticePage.getTotalElements())
+                .pageInfo(PageInfoDto.create(noticePage))
+                .build();
+    }
+
+    private Notice buildNotice(String noticeType, Map<String, Object> noticeData) {
         // Notice 객체 생성 및 저장
         Notice notice = Notice.builder()
                 .noticeType(noticeType)
                 .number(Long.parseLong(getString(noticeData, "number")))
                 .title(getString(noticeData, "title"))
                 .writer(getString(noticeData, "writer"))
-                .postDate(getString(noticeData, "postDate"))
+                .postDate(stringToLocalDate(getString(noticeData, "date")))
                 .link(getString(noticeData, "link"))
-                .views(getString(noticeData, "views"))
+                .views(Long.parseLong(getString(noticeData, "views").strip()))
                 .build();
         return notice;
     }
 
-    private static String getString(java.util.Map<String, Object> map, String key) {
+    private String getString(java.util.Map<String, Object> map, String key) {
         Object value = map.get(key);
         return value != null ? value.toString() : "";
+    }
+
+    private static LocalDate stringToLocalDate(String dateString) {
+        if (dateString == null || dateString.isEmpty()) {
+            return null;
+        }
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+            return LocalDate.parse(dateString, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다: " + dateString, e);
+        }
     }
 }

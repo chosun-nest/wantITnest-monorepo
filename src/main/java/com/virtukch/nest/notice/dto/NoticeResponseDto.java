@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,12 +19,12 @@ public class NoticeResponseDto {
     private String noticeType;
     private String title;
     private String writer;
-    private String postDate;
+    private LocalDate postDate;
     private String link;
-    private String views;
-    private LocalDateTime createdAt;
+    private Long views;
+    private LocalDateTime crawledAt;
 
-    public static NoticeResponseDto fromEntity(Notice notice) {
+    public static NoticeResponseDto create(Notice notice) {
         return NoticeResponseDto.builder()
                 .id(notice.getId())
                 .number(notice.getNumber())
@@ -33,7 +34,7 @@ public class NoticeResponseDto {
                 .postDate(notice.getPostDate())
                 .link(notice.getLink())
                 .views(notice.getViews())
-                .createdAt(notice.getCreatedAt())
+                .crawledAt(notice.getCrawledAt())
                 .build();
     }
 }
