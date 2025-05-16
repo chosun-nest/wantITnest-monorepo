@@ -1,4 +1,4 @@
-package com.virtukch.nest.post.dto;
+package com.virtukch.nest.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

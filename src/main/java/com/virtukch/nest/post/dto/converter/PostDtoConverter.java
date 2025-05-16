@@ -1,5 +1,6 @@
 package com.virtukch.nest.post.dto.converter;
 
+import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.model.Post;
