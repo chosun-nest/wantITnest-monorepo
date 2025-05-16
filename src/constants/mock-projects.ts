@@ -20,7 +20,7 @@ export const mockProjects = [
     date: "2025.01.02",
     author: "홍길동",
     views: 51,
-    participants: "1/5",
+    participants: "5/5",
     hasAttachment: false,
     status: "모집완료",
     tags: ["프로그래밍 언어", "웹 개발", "개발•프로그래밍 기타"]
@@ -72,7 +72,7 @@ export const mockProjects = [
     date: "2025.01.06",
     author: "이사람",
     views: 100,
-    participants: "2/5",
+    participants: "5/5",
     hasAttachment: true,
     status: "모집완료",
     tags: ["백엔드", "Spring", "데이터베이스"]

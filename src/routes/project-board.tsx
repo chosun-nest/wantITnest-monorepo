@@ -1,9 +1,8 @@
 import { useState } from "react";
-import * as S from "../assets/styles/project-board.styles";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
 import TagFilterModal from "../components/board/TagFilterModal";
-import BoardWriteButton from "../components/board/BoardWriteButton";  // ProjectWriteButton 삭제 > 공통 부분인 BoardWriteButton으로 변경. 동일 글쓰기 버튼 컴포넌트 사용하도록 하기 위함. 
+import BoardWriteButton from "../components/board/BoardWriteButton";
 
 const ITEMS_PER_PAGE = 7;
 
@@ -15,7 +14,17 @@ export default function ProjectBoard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<"전체" | "모집중" | "모집완료">("전체");
 
-  const filteredProjects = [...mockProjects]
+  const fixedProjects = mockProjects.map((project) => {
+    if (project.status === "모집완료") {
+      const [curr, max] = project.participants.split("/");
+      if (curr !== max) {
+        return { ...project, participants: `${max}/${max}` };
+      }
+    }
+    return project;
+  });
+
+  const filteredProjects = [...fixedProjects]
     .sort(
       (a, b) =>
         new Date(b.date.replace(/\./g, "-")).getTime() -
@@ -50,37 +59,32 @@ export default function ProjectBoard() {
   };
 
   return (
-    <S.Container>
+    <div className="max-w-4xl mx-auto p-4 pt-24">
       {/* 상단 필터와 제목 라인 */}
-      <S.FilterRow>
-        <S.PageTitle>프로젝트 모집 게시판</S.PageTitle>
-        <S.FilterList>
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-[#00256c]">프로젝트 모집 게시판</h1>
+        <div className="flex space-x-2">
           {["전체", "모집중", "모집완료"].map((label) => (
-            <S.FilterItem
+            <button
               key={label}
-              $selected={filter === label}
               onClick={() => setFilter(label as typeof filter)}
+              className={`px-3 py-1 rounded-md border ${filter === label ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
             >
               {label}
-            </S.FilterItem>
+            </button>
           ))}
-        </S.FilterList>
-      </S.FilterRow>
+        </div>
+      </div>
 
-      <S.Divider />
+      <hr className="mb-4" />
 
       {/* 제목 아래 통계 + 검색창 */}
-      <S.TitleSection>
-        {/* 왼쪽 - 개수 */}
-        <div>
-          <S.SubText>
-            총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
-          </S.SubText>
-        </div>
-
-        {/* 오른쪽 - 검색창 + 필터 */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+        <p className="text-sm text-gray-600 mb-2 md:mb-0">
+          총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
+        </p>
         <div className="flex items-center gap-2">
-          <S.SearchInput
+          <input
             type="text"
             placeholder="제목 또는 내용 검색"
             value={searchTerm}
@@ -88,77 +92,97 @@ export default function ProjectBoard() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
+            className="border px-3 py-1 rounded-md w-72 md:w-96"
           />
-          <S.FilterButton onClick={() => setIsModalOpen(true)}>
-            🔍 태그 필터
-          </S.FilterButton>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-3 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+          >
+            🔎 태그 선택
+          </button>
         </div>
-      </S.TitleSection>
+      </div>
 
       {/* 선택된 태그 보기 */}
       {selectedTags.length > 0 && (
-        <S.SelectedTags>
+        <div className="flex flex-wrap gap-2 mb-4">
           {selectedTags.map((tag) => (
-            <S.Tag
+            <span
               key={tag}
-              onClick={() =>
-                setSelectedTags(selectedTags.filter((t) => t !== tag))
-              }
+              onClick={() => setSelectedTags(selectedTags.filter((t) => t !== tag))}
+              className="inline-flex items-center px-2 py-1 text-[13px] font-medium bg-gray-100 text-gray-800 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-200 transition"
             >
-              {tag} ×
-            </S.Tag>
+              {tag}
+              <span className="ml-1">×</span>
+            </span>
           ))}
-        </S.SelectedTags>
+        </div>
       )}
 
       {/* 카드 리스트 */}
-      <S.CardList>
-        {currentProjects.map((project) => (
-          <S.Card key={project.id} onClick={() => handleRowClick(project)}>
-            <div className="flex flex-col justify-between h-full gap-2">
-              <div className="flex items-center gap-2">
-                <S.StatusBadge status={project.status}>
+      <div className="space-y-4">
+        {currentProjects.map((project) => {
+          const [current, max] = project.participants?.split("/") || ["0", "0"];
+          return (
+            <div
+              key={project.id}
+              onClick={() => handleRowClick(project)}
+              className="border rounded-lg p-4 cursor-pointer hover:shadow"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span
+                  className={`px-2 py-1 text-xs rounded-full font-semibold ${project.status === "모집중" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}
+                >
                   {project.status}
-                </S.StatusBadge>
-                <S.ProjectTitle>{project.title}</S.ProjectTitle>
+                </span>
+
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                    project.status === "모집중"
+                      ? "text-green-700 bg-green-50 border border-green-200"
+                      : "text-gray-600 bg-gray-100 border border-gray-300"
+                  }`}
+                >
+                  참여 {current}/{max}
+                </span>
+
+                <h2 className="text-lg font-semibold">{project.title}</h2>
               </div>
-              <S.ProjectPreview>
+              <p className="text-sm text-gray-700 mb-2">
                 {project.content.length > 100
                   ? `${project.content.slice(0, 100)}...`
                   : project.content}
-              </S.ProjectPreview>
+              </p>
               {project.tags && (
-                <S.TagContainer>
+                <div className="flex flex-wrap gap-2 mb-2">
                   {project.tags.map((tag) => (
-                    <S.Tag key={tag}>{tag}</S.Tag>
+                    <span key={tag} className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded">
+                      {tag}
+                    </span>
                   ))}
-                </S.TagContainer>
+                </div>
               )}
-              <div className="flex items-end justify-between mt-2">
-                <S.ProjectMetaLeft>
-                  {project.author} ・ {project.date}
-                </S.ProjectMetaLeft>
-                <S.ProjectMetaRight>
-                  조회수 {project.views} ・ 참여 {project.participants}
-                </S.ProjectMetaRight>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>{project.author} ・ {project.date}</span>
+                <span>조회수 {project.views}</span>
               </div>
             </div>
-          </S.Card>
-        ))}
-      </S.CardList>
+          );
+        })}
+      </div>
 
       {/* 페이지네이션 */}
-      <S.Pagination>
+      <div className="flex justify-center mt-6 space-x-2">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i + 1}
             onClick={() => handlePageClick(i + 1)}
-            className={currentPage === i + 1 ? "active" : ""}
+            className={`px-3 py-1 rounded border ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-white text-gray-700"}`}
           >
             {i + 1}
           </button>
         ))}
-      </S.Pagination>
+      </div>
 
       {/* 태그 모달 */}
       {isModalOpen && (
@@ -171,6 +195,6 @@ export default function ProjectBoard() {
         />
       )}
       <BoardWriteButton />
-    </S.Container>
+    </div>
   );
 }
