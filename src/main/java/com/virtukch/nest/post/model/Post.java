@@ -1,31 +1,21 @@
 package com.virtukch.nest.post.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
-import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.exception.InvalidPostTitleException;
-import com.virtukch.nest.post_tag.model.PostTag;
-import com.virtukch.nest.tag.model.Tag;
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Post extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostTag> postTags = new ArrayList<>();
+    private Long memberId;
 
     private String title;
 
@@ -38,26 +28,19 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer likeCount = 0;
 
+
     // 생성 편의 메서드
-    @Builder
-    public Post(Member member, String title, String content) {
-        this.member = member;
-        this.title = title;
-        this.content = content;
-    }
+    public static Post createPost(Long memberId, String title, String content) {
+        if(title == null || title.isBlank()) {
+            throw new InvalidPostTitleException();
+        }
 
-    public static Post createPost(Member member, String title, String content) {
-        return Post.builder()
-                .member(member)
-                .title(title)
-                .content(content)
-                .build();
-    }
+        Post post = new Post();
+        post.memberId = memberId;
+        post.title = title;
+        post.content = content;
 
-    // 연관관계 편의 메소드
-    public void addPostTag(PostTag postTag) {
-        postTags.add(postTag);           // 리스트에 추가
-        postTag.setPost(this);           // 양방향 연관관계 설정
+        return post;
     }
 
     // 비즈니스 로직
@@ -65,19 +48,9 @@ public class Post extends BaseTimeEntity {
         this.viewCount += 1;
     }
 
-    public void updatePost(String title, String content, List<Tag> newTags) {
+    public void updatePost(String title, String content) {
         if (title != null && !title.isBlank()) this.title = title;
         else throw new InvalidPostTitleException();
-
         if (content != null) this.content = content;
-        if (newTags != null) updatePostTags(newTags);
-    }
-
-    private void updatePostTags(List<Tag> newTags) {
-        postTags.clear();  // orphanRemoval = true 이므로 DB에서도 삭제됨
-        for (Tag tag : newTags) {
-            PostTag postTag = new PostTag(this, tag);
-            this.addPostTag(postTag);
-        }
     }
 }

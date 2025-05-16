@@ -1,13 +1,13 @@
-package com.virtukch.nest.post.dto;
+package com.virtukch.nest.comment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @AllArgsConstructor
-public class PostUpdateResponseDto {
-    private Long postId;
+@Builder
+public class CommentDeleteResponseDto {
+    private Long commentId;
     private String message;
 }
