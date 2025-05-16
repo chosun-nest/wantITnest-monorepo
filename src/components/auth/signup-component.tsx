@@ -57,7 +57,6 @@ export default function SignUpComponent({
         <S.SigninTitle>회원가입</S.SigninTitle>
       </S.HeaderBox>
       <S.SigninText>이메일 인증</S.SigninText>
-      <S.EmailRow></S.EmailRow>
       <S.EmailRow>
         <S.Input
           type="email"

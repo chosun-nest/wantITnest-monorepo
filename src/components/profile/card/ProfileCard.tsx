@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GithubLogo, LinkedinLogo, InstagramLogo } from "phosphor-react";   // npm install phosphor-react
 import { getMemberProfile } from "../../../api/profile/api";
 
 interface ProfileType {
@@ -17,6 +18,9 @@ export default function ProfileCard() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [loading, setLoading] = useState(true);
+  const goToProfilePage = () => {
+    navigate("/profile");
+  }
 
   const techColorMap: Record<string, string> = {
     Java: "bg-[#f89820] text-white",
@@ -140,13 +144,19 @@ export default function ProfileCard() {
         <img
           src={profile.image || "/assets/images/user.png"}
           alt="Profile"
-          className="w-20 h-20 border rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28"
+          className="w-20 h-20 border rounded-full cursor-pointer sm:h-24 sm:w-24 md:h-28 md:w-28"
+          onClick={goToProfilePage} // 사진 누르면 profile 페이지로 navigate
         />
       </div>
 
       {/* 이름 및 전공 정보, 재학생 인증 배찌 */}
       <div className="flex items-center gap-2 mt-2 justify-left">
-        <h2 className="text-lg font-bold">{profile.name}</h2>
+        <h2 
+          className="text-lg font-bold cursor-pointer hover:underline"
+          onClick={goToProfilePage}     // 이름 누르면 profile 페이지로 navigate
+        >  
+          {profile.name}
+        </h2>
         <div className="flex items-center gap-1">
           <p className="text-gray-500">{profile.major}</p>
           {(profile.email.endsWith("@chosun.ac.kr") || profile.email.endsWith("@chosun.kr")) && (
@@ -164,52 +174,16 @@ export default function ProfileCard() {
       <p className="mt-2 text-sm text-left">{profile.introduce}</p>
       
       {/* 관심사 태그 */}
-      <div className="flex flex-wrap gap-2 mt-5 justify-left">
+      <div className="flex flex-wrap gap-2 mt-6 justify-left">
         {profile.interests?.map((tag, i) => (
           <span key={i} className="px-2 py-1 text-xs bg-gray-200 rounded-full">
             #{tag}
           </span>
         ))}
       </div>
-
-      {/* SNS 아이콘 */}
-      <div className="flex items-center justify-center gap-10 mt-10">
-        {profile.sns?.[0] ? (
-          <a href={profile.sns[0]} target="_blank" rel="noreferrer">
-            <img
-              src="/assets/images/github-logo.png"
-              alt="GitHub"
-              className="w-12 h-12 cursor-pointer hover:opacity-80"
-            />
-          </a>
-        ) : (
-          <img
-            src="/assets/images/github-logo.png"
-            alt="Github"
-            className="w-12 h-12 cursor-pointer hover:opacity-80"
-            onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
-          />
-        )}
-        {profile.sns?.[1] ? (
-          <a href={profile.sns[1]} target="_blank" rel="noreferrer">
-            <img
-              src="/assets/images/LinkedIn-logo.png"
-              alt="LinkedIn"
-              className="w-12 h-12 cursor-pointer hover:opacity-80"
-            />
-          </a>
-        ) : (
-          <img
-            src="/assets/images/LinkedIn-logo.png"
-            alt="LinkedIn"
-            className="w-12 h-12 cursor-pointer hover:opacity-80"
-            onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
-          />
-        )}
-      </div>
       
       {/* 기술 스택 */}
-      <div className="flex flex-wrap gap-2 mt-10 justify-left">
+      <div className="flex flex-wrap gap-2 mt-5 justify-left">
         {profile.techStacks?.map((stack, i) => {
           const colorClass = techColorMap[stack] || "bg-blue-200 text-white";
           return (
@@ -222,14 +196,66 @@ export default function ProfileCard() {
           );
         })}
       </div>
+
+      {/* SNS 아이콘 */}
+      <div className="flex items-center justify-center gap-3 mt-10">
+        {profile.sns?.[0] ? (
+          <a href={profile.sns[0]} target="_blank" rel="noreferrer">
+            <GithubLogo
+              size={48} color="#002f6c"
+              alt="GitHub"
+              className="w-12 h-12 cursor-pointer hover:opacity-80"
+            />
+          </a>
+        ) : (
+          <GithubLogo
+              size={48} color="#002f6c"
+              alt="GitHub"
+            className="w-12 h-12 cursor-pointer hover:opacity-80"
+            onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
+          />
+        )}
+        {profile.sns?.[1] ? (
+          <a href={profile.sns[1]} target="_blank" rel="noreferrer">
+            <LinkedinLogo 
+              size={48} color="#002f6c"
+              alt="LinkedIn"
+              className="w-12 h-12 cursor-pointer hover:opacity-80"
+            />
+          </a>
+        ) : (
+          <LinkedinLogo 
+              size={48} color="#002f6c"
+              alt="LinkedIn"
+            className="w-12 h-12 cursor-pointer hover:opacity-80"
+            onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
+          />
+        )}
+        {profile.sns?.[2] ? (
+          <a href={profile.sns[2]} target="_blank" rel="noreferrer">
+            <InstagramLogo
+              size={48} color="#002f6c"
+              alt="Instagram"
+              className="w-12 h-12 cursor-pointer hover:opacity-80"
+            />
+          </a>  
+        ) : (
+          <InstagramLogo
+              size={48} color="#002f6c"
+              alt="Instagram"
+            className="w-12 h-12 cursor-pointer hover:opacity-80"
+            onClick={() => alert("아직 등록되지 않은 링크입니다.\n수정 버튼을 눌러 프로필을 수정하세요.")}
+          />
+        )}
+      </div>
       
       {/* 수정 버튼 */}
-      <div className="flex justify-end gap-2 mt-5">
+      <div className="flex justify-center gap-2 mt-10">
         <button
           onClick={() => navigate("/profile-edit")}
-          className="px-4 py-2 text-white bg-blue-900 rounded-md"
+          className="px-20 py-2 text-white bg-blue-900 rounded-md whitespace-nowrap" // whitespace-nowrap 줄바꿈(글자 깨짐 방지)
         >
-          수정
+          프로필 수정
         </button>
       </div>
     </div>

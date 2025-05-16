@@ -24,6 +24,11 @@ export const GridContainer = styled.div<GridContainerProps>`
   grid-template-rows: repeat(auto-fit, auto);
 `;
 
+export const ProfileContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
 export const GridItem = styled.div<GridItemProps>`
   display: flex;
   flex-direction: column;
