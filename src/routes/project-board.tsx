@@ -9,7 +9,6 @@ const ITEMS_PER_PAGE = 7;
 
 export default function ProjectBoard() {
   const navigate = useNavigate();
-  const isClient = typeof window !== "undefined";
   const isMobile = useResponsive();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,11 +33,13 @@ export default function ProjectBoard() {
         new Date(a.date.replace(/\./g, "-")).getTime()
     )
     .filter(
-      (p) =>
-        p.title.includes(searchTerm) || p.content.includes(searchTerm)
+      (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
     )
     .filter((p) => {
-      if (selectedTags.length > 0 && !p.tags?.some((tag) => selectedTags.includes(tag)))
+      if (
+        selectedTags.length > 0 &&
+        !p.tags?.some((tag) => selectedTags.includes(tag))
+      )
         return false;
       if (filter !== "전체" && p.status !== filter) return false;
       return true;
@@ -65,7 +66,9 @@ export default function ProjectBoard() {
     <div className="max-w-4xl mx-auto p-4 pt-24">
       {/* 상단 필터와 제목 라인 */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-[#00256c]">프로젝트 모집 게시판</h1>
+        <h1 className="text-2xl font-bold text-[#00256c]">
+          프로젝트 모집 게시판
+        </h1>
         <div className="flex space-x-2">
           {["전체", "모집중", "모집완료"].map((label) => (
             <button
@@ -112,7 +115,9 @@ export default function ProjectBoard() {
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              onClick={() => setSelectedTags(selectedTags.filter((t) => t !== tag))}
+              onClick={() =>
+                setSelectedTags(selectedTags.filter((t) => t !== tag))
+              }
               className="inline-flex items-center px-2 py-1 text-[13px] font-medium bg-gray-100 text-gray-800 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-200 transition"
             >
               {tag}
@@ -137,11 +142,19 @@ export default function ProjectBoard() {
               onClick={() => handleRowClick(project)}
               className="border rounded-lg p-4 cursor-pointer hover:shadow"
             >
-              <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>
-                <div className={`px-2 py-1 text-xs rounded-full font-semibold ${statusStyle}`}>
+              <div
+                className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}
+              >
+                <div
+                  className={`px-2 py-1 text-xs rounded-full font-semibold ${statusStyle}`}
+                >
                   {project.status} ・ 참여 {current}/{max}
                 </div>
-                <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>{project.title}</h2>
+                <h2
+                  className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}
+                >
+                  {project.title}
+                </h2>
               </div>
               <p className="text-sm text-gray-700 mb-2">
                 {project.content.length > 100
@@ -151,14 +164,19 @@ export default function ProjectBoard() {
               {project.tags && (
                 <div className="flex flex-wrap gap-2 mb-2">
                   {project.tags.map((tag) => (
-                    <span key={tag} className=" bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
+                    <span
+                      key={tag}
+                      className=" bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded"
+                    >
                       {tag}
                     </span>
                   ))}
                 </div>
               )}
               <div className="flex justify-between text-xs text-gray-500">
-                <span>{project.author.name} ・ {project.date}</span>
+                <span>
+                  {project.author.name} ・ {project.date}
+                </span>
                 <span>조회수 {project.views}</span>
               </div>
             </div>

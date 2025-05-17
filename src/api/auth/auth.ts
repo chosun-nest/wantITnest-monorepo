@@ -42,6 +42,13 @@ export const checkTokenValidity = async (): Promise<{ memberId: string }> => {
   return res.data;
 };
 
+export const sendResetPasswordLink = async (email: string) => {
+  const res = await API.post("/api/v1/auth/password-reset-link-request", {
+    email,
+  });
+  return res.data;
+};
+
 export async function refreshAccessToken() {
   try {
     const refreshToken = store.getState().auth.refreshToken;
