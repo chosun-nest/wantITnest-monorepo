@@ -13,7 +13,6 @@ import { AxiosError } from "axios";
 export default function SignUp() {
   const navigate = useNavigate();
   // 디버그 모드 추가
-  const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [selected, setSelected] = useState<"재학생" | "일반">("일반");
@@ -93,11 +92,7 @@ export default function SignUp() {
       setShowModal(true);
       return;
     }
-    if (isDebugMode) {
-      console.log("[디버그] 인증 스킵");
-      setIsEmailVerified(true);
-      return;
-    }
+
     try {
       await sendcode(email);
       setIsEmailVerified(false);
@@ -221,14 +216,7 @@ export default function SignUp() {
 
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
-  useEffect(() => {
-    if (isDebugMode) {
-      setEmail("minsu@best.com");
-      setPassword("minsu1234!");
-      setConfirmPassword("minsu1234!");
-      setName("최고민수");
-    }
-  }, [isDebugMode]);
+
   return (
     <S.Container>
       {showModal && (
@@ -243,17 +231,6 @@ export default function SignUp() {
         />
       )}
 
-      <S.ButtonRow>
-        <S.LoginButton
-          onClick={() => setIsDebugMode((prev) => !prev)}
-          style={{
-            background: isDebugMode ? "#4CAF50" : "#ccc",
-            color: "#fff",
-          }}
-        >
-          디버그 모드 {isDebugMode ? "ON" : "OFF"}
-        </S.LoginButton>
-      </S.ButtonRow>
       {step === 1 ? (
         <SignUpComponent
           selected={selected}
