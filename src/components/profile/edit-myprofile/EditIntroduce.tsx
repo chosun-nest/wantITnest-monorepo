@@ -1,5 +1,4 @@
-import React from "react";
-
+// 한 줄 소개란
 interface Props {
   value: string;
   isEditing: boolean;
@@ -9,7 +8,7 @@ interface Props {
 export default function EditIntroduce({ value, isEditing, onChange }: Props) {
   return (
     <div className="flex items-start mb-4">
-      <label className="w-28 text-sm font-semibold mt-2">자기소개</label>
+      <label className="mt-2 text-sm font-semibold w-28">자기소개</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}

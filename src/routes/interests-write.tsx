@@ -1,6 +1,6 @@
 // 관심분야 정보 게시글 쓰기 (InterestWrite.tsx)
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postsWrite } from "../api/interests/api";
 import Navbar from "../components/layout/navbar";

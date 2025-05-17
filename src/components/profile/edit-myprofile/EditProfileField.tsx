@@ -1,6 +1,4 @@
-{/* 이름/이메일 등 readonly 필드 */}
-import React from "react";
-
+// 이름/이메일 등 readonly 필드
 interface Props {
   name: string;
   email: string;

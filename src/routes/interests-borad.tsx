@@ -1,5 +1,5 @@
 // 관심분야 정보 게시판 메인 페이지
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Navbar from "../components/layout/navbar";
 import InterestBoardHeader from "../components/interests/InterestBoardHeader"    // 제목 및 게시글 개수
 import InterestBoardSearch from "../components/interests/InterestBoardSearch"    // 상단 검색 바

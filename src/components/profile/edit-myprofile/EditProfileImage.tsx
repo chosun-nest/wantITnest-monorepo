@@ -1,6 +1,5 @@
-{ /* 프로필 이미지 업로드 및 미리보기 */}
+// 프로필 이미지 업로드 및 미리보기
 import React from "react";
-
 interface Props {
   image: string;
   isEditing: boolean;

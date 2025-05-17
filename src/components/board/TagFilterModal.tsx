@@ -1,5 +1,5 @@
 // 관심분야 필터링 모달
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TagFilterModalProps {
   onClose: () => void;

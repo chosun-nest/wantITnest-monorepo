@@ -1,4 +1,4 @@
-import React from "react";
+// 체크 아이콘 
 
 export default function CheckIcon() {
   return (

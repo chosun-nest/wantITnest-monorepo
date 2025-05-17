@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+// 계정 탈퇴 페이지
+import {useState} from "react";
 import { withdrawMember } from "../../../../api/profile/api";
 import WithdrawModal from "./WithdrawModal";
 import WithdrawCompleteModal from "./WithdrawCompleteModal";

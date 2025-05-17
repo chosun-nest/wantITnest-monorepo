@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// 비밀번호 변경 모달
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { checkPassword, updateMemberPassword } from "../../../../api/profile/api";
 import LoadingDots from "../../../ui/LoadingDots";

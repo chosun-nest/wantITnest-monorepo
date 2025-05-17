@@ -1,3 +1,4 @@
+// 프로필 카드 컴포넌트
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GithubLogo, LinkedinLogo, InstagramLogo } from "phosphor-react";   // npm install phosphor-react

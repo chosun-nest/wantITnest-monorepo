@@ -1,6 +1,4 @@
 // 기술 필터 & 선택 태그
-import React from "react";
-
 interface Props {
   selectedTags: string[];
   onRemoveTag: (tag: string) => void;

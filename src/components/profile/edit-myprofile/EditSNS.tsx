@@ -1,4 +1,4 @@
-{/* SNS 링크 입력 필드 */}
+// SNS 링크 입력 필드
 import { GithubLogo, LinkedinLogo, InstagramLogo } from "phosphor-react";
 
 interface EditSNSProps {

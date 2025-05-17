@@ -1,6 +1,4 @@
 {/* 학과 검색 + 선택 */}
-import React from "react";
-
 export interface Item {
   id: number;
   name: string;
@@ -22,7 +20,7 @@ export default function EditDepartment({
 }: EditDepartmentProps) {
   return (
     <div className="flex items-start mb-4">
-      <label className="w-28 text-sm font-semibold mt-2">학과</label>
+      <label className="mt-2 text-sm font-semibold w-28">학과</label>
       <div className="flex-1">
         <input
           value={departmentInput}
@@ -31,11 +29,11 @@ export default function EditDepartment({
           className="block w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-blue-700 focus:border-blue-800"
         />
         {isEditing && filteredDepartments.length > 0 && (
-          <ul className="border mt-1 rounded max-h-40 overflow-y-auto">
+          <ul className="mt-1 overflow-y-auto border rounded max-h-40">
             {filteredDepartments.map((item) => (
               <li
                 key={item.id}
-                className="p-2 hover:bg-gray-100 cursor-pointer"
+                className="p-2 cursor-pointer hover:bg-gray-100"
                 onClick={() => onSelect(item)}
               >
                 {item.name}
