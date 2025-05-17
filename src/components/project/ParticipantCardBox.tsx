@@ -1,5 +1,3 @@
-// ✅ components/project/ParticipantCardBox.tsx
-import React from "react";
 import { Participant } from "../../types/participant";
 
 interface Props {
@@ -36,7 +34,9 @@ export default function ParticipantCardBox({
           </button>
         ) : (
           <button
-            onClick={() => alert("지원하기 기능은 작성자만 제외하고 사용 가능합니다.")}
+            onClick={() =>
+              alert("지원하기 기능은 작성자만 제외하고 사용 가능합니다.")
+            }
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
           >
             지원하기
@@ -44,7 +44,8 @@ export default function ParticipantCardBox({
         )}
       </div>
 
-      <div className="flex flex-col gap-3">
+      {/* 모바일(기본): 2열, md 이상: 1열 */}
+      <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
         {participants.map((user) => (
           <div
             key={user.id}
