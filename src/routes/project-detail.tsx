@@ -37,7 +37,7 @@ export default function ProjectDetail() {
           <span
             className={`text-sm font-semibold px-3 py-1 rounded-full ${
               project.status === "모집중"
-                ? "bg-green-100 text-green-700"
+                ? "bg-blue-100 text-blue-700"
                 : "bg-gray-200 text-gray-600"
             }`}
           >

@@ -128,7 +128,7 @@ export default function ProjectBoard() {
           const [current, max] = project.participants?.split("/") || ["0", "0"];
           const statusStyle =
             project.status === "모집중"
-              ? "bg-green-100 text-green-700"
+              ? "bg-blue-100 text-blue-700"
               : "bg-gray-200 text-gray-600";
 
           return (
@@ -151,7 +151,7 @@ export default function ProjectBoard() {
               {project.tags && (
                 <div className="flex flex-wrap gap-2 mb-2">
                   {project.tags.map((tag) => (
-                    <span key={tag} className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded">
+                    <span key={tag} className=" bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
                       {tag}
                     </span>
                   ))}
