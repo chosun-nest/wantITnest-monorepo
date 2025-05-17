@@ -10,7 +10,7 @@ const ITEMS_PER_PAGE = 7;
 export default function ProjectBoard() {
   const navigate = useNavigate();
   const isClient = typeof window !== "undefined";
-  const isMobile = isClient ? useResponsive() : false;
+  const isMobile = useResponsive();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -158,7 +158,7 @@ export default function ProjectBoard() {
                 </div>
               )}
               <div className="flex justify-between text-xs text-gray-500">
-                <span>{project.author} ・ {project.date}</span>
+                <span>{project.author.name} ・ {project.date}</span>
                 <span>조회수 {project.views}</span>
               </div>
             </div>

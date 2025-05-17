@@ -1,5 +1,3 @@
-// src/routes/project-detail.tsx
-
 import { useParams, useNavigate } from "react-router-dom";
 import { mockProjects } from "../constants/mock-projects";
 import CommentSection from "../components/project/commentsection";
@@ -57,7 +55,7 @@ export default function ProjectDetail() {
               className="w-8 h-8 rounded-full"
             />
             <span className="font-semibold text-[16px] text-gray-900">
-              {project.author}
+              {project.author.name}
             </span>
           </div>
           <button className="text-sm border px-3 py-1 rounded hover:bg-gray-100">
@@ -83,25 +81,20 @@ export default function ProjectDetail() {
           <CommentSection />
         </div>
 
-        {/* 버튼 */}
-        <div className="flex justify-between mt-4">
+        {/* 뒤로 가기 버튼만 유지 */}
+        <div className="mt-4">
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-slate-800 text-white text-sm rounded"
           >
             ← 뒤로 가기
           </button>
-          <button
-            onClick={() => navigate("/project-apply", { state: { project } })}
-            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-          >
-            지원하기
-          </button>
         </div>
       </div>
 
       {/* 오른쪽 참여자 카드 영역 */}
       <div className="w-full lg:w-[280px] shrink-0">
+        {/* 상단 버튼 + 제목 */}
         <ParticipantCardBox />
       </div>
     </div>
