@@ -23,6 +23,7 @@ import NotFound from "./routes/notfound";
 import ProtectedRoute from "./components/auth/protected-route";
 import Events from "./routes/events";
 import PublicRoute from "./components/auth/public-route";
+import ResetPassword from "./routes/reset-password";
 
 const router = createBrowserRouter([
   {
@@ -100,7 +101,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <NavigateToHome />,
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
   },
   {
     path: "/signup",
@@ -120,10 +125,10 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/reset-password/:token",
+    path: "/reset-password/",
     element: (
       <PublicRoute>
-        <PasswdReset />
+        <ResetPassword />
       </PublicRoute>
     ),
   },
@@ -143,14 +148,6 @@ function App() {
       </BackdropContext.Provider>
     </>
   );
-}
-
-function NavigateToHome() {
-  try {
-    return <Login />;
-  } catch (e) {
-    console.log(e);
-  }
 }
 
 export default App;

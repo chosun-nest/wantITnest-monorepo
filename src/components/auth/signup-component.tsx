@@ -102,8 +102,7 @@ export default function SignUpComponent({
 
       <S.SigninText>비밀번호</S.SigninText>
       <S.PasswordInputWrapper
-        onMouseEnter={() => setIsPasswordVisible(true)}
-        onMouseLeave={() => setIsPasswordVisible(false)}
+        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
       >
         <S.Input
           type={isPasswordVisible ? "text" : "password"}
