@@ -13,7 +13,7 @@ import ProjectApply from "./routes/project-apply"; // yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import InterestsDetail from "./routes/interests-detail"; //yeong-eun
-import BoardWrite from "./routes/board-write";           //yeong-eun
+import BoardWrite from "./routes/board-write"; //yeong-eun
 
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
@@ -120,7 +120,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/find-id",
+    path: "/reset-password/:token",
     element: (
       <PublicRoute>
         <PasswdReset />
