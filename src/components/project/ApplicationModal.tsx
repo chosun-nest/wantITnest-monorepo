@@ -7,7 +7,7 @@ interface Props {
   onAccept: (user: {
     id: number;
     name: string;
-    role: string;
+    role: "Frontend" | "Backend" | "PM";
     followers: number;
   }) => void;
 }
@@ -17,7 +17,7 @@ interface Application {
   name: string;
   major: string;
   message: string;
-  role: string;
+  role: string; // 그대로 둬도 됨 (문제 없음)
   status: "pending" | "accepted" | "rejected";
 }
 
@@ -28,17 +28,15 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
 
   const handleAccept = (app: Application) => {
     setApplications((prev) =>
-      prev.map((a) =>
-        a.id === app.id ? { ...a, status: "accepted" } : a
-      )
+      prev.map((a) => (a.id === app.id ? { ...a, status: "accepted" } : a))
     );
 
-    // 수락 시 참여자 목록에 추가
+    // ✅ 타입 단언: role을 "Frontend" | "Backend" | "PM" 중 하나로 강제
     onAccept({
       id: app.id,
       name: app.name,
-      role: app.role,
-      followers: 0, // 기본값으로 설정 (혹은 필요에 따라 수정 가능)
+      role: app.role as "Frontend" | "Backend" | "PM",
+      followers: 0,
     });
   };
 
