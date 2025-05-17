@@ -82,7 +82,7 @@ export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-16 bg-black/40">
         <div className="w-full max-w-xl bg-white rounded-xl shadow-lg p-8 relative max-h-[70vh] flex flex-col">
           {/* 닫기 버튼 */}
-          <button onClick={onClose} className="absolute text-xl text-gray-400 top-4 right-4 hover:text-black">
+          <button onClick={onClose} className="relative text-gray-400 ext-xl top-4 right-4 hover:text-black">
             ×
           </button>
 
