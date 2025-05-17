@@ -121,10 +121,6 @@ def crawl_notices(category: str):
                 "link": link
             }
         
-        # # 장학공지의 접수 마감일 추가
-        # if deadline:
-        #     notice["deadline"] = deadline
-        
         notices.append(notice)
 
     # 모든 notice를 한 번에 Spring 서버로 전송
