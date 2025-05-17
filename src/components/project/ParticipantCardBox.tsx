@@ -1,31 +1,42 @@
-import React, { useState } from "react";
-import { mockParticipants } from "../../constants/mock-project-participants";
-import { useLocation, useNavigate } from "react-router-dom";
-import ApplicationModal from "./ApplicationModal";
+// ✅ components/project/ParticipantCardBox.tsx
+import React from "react";
+import { Participant } from "../../types/participant";
 
-export default function ParticipantCardBox() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const project = location.state?.project;
+interface Props {
+  project: {
+    id: number;
+    title: string;
+    author: { id: number; name: string };
+    status: string;
+    participants: string;
+    [key: string]: any;
+  };
+  participants: Participant[];
+  onOpenModal: () => void;
+  onAccept: (user: Participant) => void;
+}
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+export default function ParticipantCardBox({
+  project,
+  participants,
+  onOpenModal,
+  onAccept,
+}: Props) {
   return (
     <div className="bg-gray-50 p-4 rounded-md shadow-md w-full">
-      {/* 제목 + 조건부 버튼 */}
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-[17px] font-semibold text-gray-800">참여인원 현황</h2>
 
-        {project?.author?.name === "박유진" ? (
+        {project?.author?.name === "이지혁" ? (
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={onOpenModal}
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
           >
             지원서 확인
           </button>
         ) : (
           <button
-            onClick={() => navigate("/project-apply", { state: { project } })}
+            onClick={() => alert("지원하기 기능은 작성자만 제외하고 사용 가능합니다.")}
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
           >
             지원하기
@@ -33,11 +44,8 @@ export default function ParticipantCardBox() {
         )}
       </div>
 
-      {isModalOpen && <ApplicationModal onClose={() => setIsModalOpen(false)} />}
-
-      {/* 참여자 리스트 */}
       <div className="flex flex-col gap-3">
-        {mockParticipants.map((user) => (
+        {participants.map((user) => (
           <div
             key={user.id}
             className="relative flex items-center justify-between p-3 bg-white rounded-lg border shadow-sm"
@@ -54,7 +62,7 @@ export default function ParticipantCardBox() {
               <p className="text-xs text-gray-500">{user.role}</p>
             </div>
             <p className="absolute top-3 right-3 text-xs text-gray-500">
-              팔로워 {user.followers}
+              팔로워 {user.followers ?? 0}
             </p>
           </div>
         ))}

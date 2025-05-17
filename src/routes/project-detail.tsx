@@ -1,8 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { mockProjects } from "../constants/mock-projects";
+import { mockParticipants } from "../constants/mock-project-participants";
 import CommentSection from "../components/project/commentsection";
 import ParticipantCardBox from "../components/project/ParticipantCardBox";
+import ApplicationModal from "../components/project/ApplicationModal";
 import useResponsive from "../hooks/responsive";
+import { Participant } from "../types/participant";
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -10,6 +14,10 @@ export default function ProjectDetail() {
   const isMobile = useResponsive();
 
   const project = mockProjects.find((p) => p.id === Number(id));
+  const [participants, setParticipants] = useState<Participant[]>(mockParticipants);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [projectStatus, setProjectStatus] = useState(project?.status || "모집중");
+  const [participantCount, setParticipantCount] = useState(project?.participants || "0/6");
 
   if (!project) {
     return (
@@ -26,27 +34,39 @@ export default function ProjectDetail() {
     );
   }
 
+  const handleAccept = (user: Participant) => {
+    const updated = [...participants, user];
+    setParticipants(updated);
+
+    const [curr, max] = participantCount.split("/").map(Number);
+    const newCount = curr + 1;
+    const updatedCount = `${newCount}/${max}`;
+    setParticipantCount(updatedCount);
+
+    if (newCount >= max) {
+      setProjectStatus("모집완료");
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 pt-36 pb-10 flex flex-col lg:flex-row gap-8">
-      {/* 왼쪽 본문 영역 */}
+      {/* 왼쪽 영역 */}
       <div className="flex-1">
-        {/* 제목과 상태 뱃지 */}
         <div className="flex items-center gap-3 mb-2">
           <span
             className={`text-sm font-semibold px-3 py-1 rounded-full ${
-              project.status === "모집중"
+              projectStatus === "모집중"
                 ? "bg-blue-100 text-blue-700"
                 : "bg-gray-200 text-gray-600"
             }`}
           >
-            {project.status} · 참여 {project.participants}
+            {projectStatus} · 참여 {participantCount}
           </span>
           <h1 className="text-xl md:text-2xl font-bold text-blue-900">
             {project.title}
           </h1>
         </div>
 
-        {/* 작성자 프로필 라인 */}
         <div className="flex justify-between items-center mt-1">
           <div className="flex items-center gap-2">
             <img
@@ -63,7 +83,6 @@ export default function ProjectDetail() {
           </button>
         </div>
 
-        {/* 작성일 & 조회수 */}
         <div className="mt-1 text-[15px] text-gray-600 flex gap-2">
           <span>작성일: {project.date}</span>
           <span>· 조회수: {project.views}</span>
@@ -71,17 +90,14 @@ export default function ProjectDetail() {
 
         <hr className="my-4 border-gray-300" />
 
-        {/* 본문 */}
         <p className="text-gray-700 leading-relaxed mb-6">
           {project.content}
         </p>
 
-        {/* 댓글 */}
         <div className="border rounded px-5 py-4 bg-gray-50 mb-6">
           <CommentSection />
         </div>
 
-        {/* 뒤로 가기 버튼만 유지 */}
         <div className="mt-4">
           <button
             onClick={() => navigate(-1)}
@@ -92,11 +108,23 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* 오른쪽 참여자 카드 영역 */}
+      {/* 오른쪽 참여자 영역 */}
       <div className="w-full lg:w-[280px] shrink-0">
-        {/* 상단 버튼 + 제목 */}
-        <ParticipantCardBox />
+        <ParticipantCardBox
+          project={project}
+          participants={participants}
+          onOpenModal={() => setIsModalOpen(true)}
+          onAccept={handleAccept}
+        />
       </div>
+
+      {/* 모달 */}
+      {isModalOpen && (
+        <ApplicationModal
+          onClose={() => setIsModalOpen(false)}
+          onAccept={handleAccept}
+        />
+      )}
     </div>
   );
 }

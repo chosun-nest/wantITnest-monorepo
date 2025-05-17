@@ -8,16 +8,16 @@ export const mockApplications = [
   },
   {
     id: 2,
-    name: "이지은",
+    name: "송채선",
     major: "컴퓨터공학과",
-    message: "UI/UX 디자인 경험 살려 참여하고 싶습니다.",
-    role: "디자이너"
+    message: "참여하고 싶습니다 :)",
+    role: "Backend"
   },
   {
     id: 3,
-    name: "이준호",
+    name: "민혜린",
     major: "컴퓨터공학과",
     message: "데이터 분석 역량을 기여하고 싶어요!",
-    role: "데이터 분석가"
+    role: "AI"
   }
 ];

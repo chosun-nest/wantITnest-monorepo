@@ -4,6 +4,12 @@ import { X } from "lucide-react";
 
 interface Props {
   onClose: () => void;
+  onAccept: (user: {
+    id: number;
+    name: string;
+    role: string;
+    followers: number;
+  }) => void;
 }
 
 interface Application {
@@ -15,24 +21,32 @@ interface Application {
   status: "pending" | "accepted" | "rejected";
 }
 
-export default function ApplicationModal({ onClose }: Props) {
+export default function ApplicationModal({ onClose, onAccept }: Props) {
   const [applications, setApplications] = useState<Application[]>(
     mockApplications.map((app) => ({ ...app, status: "pending" }))
   );
 
-  // ✅ 수락: 상태 변경
-  const handleAccept = (id: number) => {
+  const handleAccept = (app: Application) => {
     setApplications((prev) =>
-      prev.map((app) =>
-        app.id === id ? { ...app, status: "accepted" } : app
+      prev.map((a) =>
+        a.id === app.id ? { ...a, status: "accepted" } : a
       )
     );
+
+    // 수락 시 참여자 목록에 추가
+    onAccept({
+      id: app.id,
+      name: app.name,
+      role: app.role,
+      followers: 0, // 기본값으로 설정 (혹은 필요에 따라 수정 가능)
+    });
   };
 
-  // ✅ 거절: 목록에서 제거
   const handleReject = (id: number) => {
     setApplications((prev) =>
-      prev.filter((app) => app.id !== id)
+      prev.map((app) =>
+        app.id === id ? { ...app, status: "rejected" } : app
+      )
     );
   };
 
@@ -53,7 +67,9 @@ export default function ApplicationModal({ onClose }: Props) {
               className="border rounded-md p-3 bg-gray-50 shadow-sm"
             >
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-blue-600">#{app.role}</span>
+                <span className="text-sm font-medium text-blue-600">
+                  #{app.role}
+                </span>
                 <span className="text-sm">👤 {app.name}</span>
               </div>
               <p className="text-sm text-gray-700 whitespace-pre-line mb-2">
@@ -62,7 +78,7 @@ export default function ApplicationModal({ onClose }: Props) {
               {app.status === "pending" ? (
                 <div className="flex justify-end gap-2">
                   <button
-                    onClick={() => handleAccept(app.id)}
+                    onClick={() => handleAccept(app)}
                     className="px-2 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
                   >
                     수락
@@ -75,8 +91,14 @@ export default function ApplicationModal({ onClose }: Props) {
                   </button>
                 </div>
               ) : (
-                <p className="text-sm font-semibold mt-2 text-green-600 text-right">
-                  ✅ 수락됨
+                <p
+                  className={`text-sm font-semibold mt-2 text-right ${
+                    app.status === "accepted"
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }`}
+                >
+                  {app.status === "accepted" ? "✅ 수락됨" : "❌ 거절됨"}
                 </p>
               )}
             </div>
