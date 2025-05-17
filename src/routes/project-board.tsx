@@ -3,11 +3,14 @@ import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
 import TagFilterModal from "../components/board/TagFilterModal";
 import BoardWriteButton from "../components/board/BoardWriteButton";
+import useResponsive from "../hooks/responsive";
 
 const ITEMS_PER_PAGE = 7;
 
 export default function ProjectBoard() {
   const navigate = useNavigate();
+  const isClient = typeof window !== "undefined";
+  const isMobile = isClient ? useResponsive() : false;
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -123,30 +126,22 @@ export default function ProjectBoard() {
       <div className="space-y-4">
         {currentProjects.map((project) => {
           const [current, max] = project.participants?.split("/") || ["0", "0"];
+          const statusStyle =
+            project.status === "모집중"
+              ? "bg-green-100 text-green-700"
+              : "bg-gray-200 text-gray-600";
+
           return (
             <div
               key={project.id}
               onClick={() => handleRowClick(project)}
               className="border rounded-lg p-4 cursor-pointer hover:shadow"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className={`px-2 py-1 text-xs rounded-full font-semibold ${project.status === "모집중" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}
-                >
-                  {project.status}
-                </span>
-
-                <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                    project.status === "모집중"
-                      ? "text-green-700 bg-green-50 border border-green-200"
-                      : "text-gray-600 bg-gray-100 border border-gray-300"
-                  }`}
-                >
-                  참여 {current}/{max}
-                </span>
-
-                <h2 className="text-lg font-semibold">{project.title}</h2>
+              <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>
+                <div className={`px-2 py-1 text-xs rounded-full font-semibold ${statusStyle}`}>
+                  {project.status} ・ 참여 {current}/{max}
+                </div>
+                <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>{project.title}</h2>
               </div>
               <p className="text-sm text-gray-700 mb-2">
                 {project.content.length > 100

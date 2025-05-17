@@ -1,66 +1,109 @@
+// src/routes/project-detail.tsx
+
 import { useParams, useNavigate } from "react-router-dom";
-import * as S from "../assets/styles/project-detail.styles";
 import { mockProjects } from "../constants/mock-projects";
 import CommentSection from "../components/project/commentsection";
+import ParticipantCardBox from "../components/project/ParticipantCardBox";
+import useResponsive from "../hooks/responsive";
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const isMobile = useResponsive();
 
-  const project = mockProjects.find(p => p.id === Number(id));
+  const project = mockProjects.find((p) => p.id === Number(id));
 
   if (!project) {
     return (
-      <S.Container>
-        <S.Title>프로젝트 상세보기</S.Title>
+      <div className="max-w-4xl mx-auto px-4 pt-36 pb-10">
+        <h1 className="text-2xl font-bold text-blue-900 mb-4">프로젝트 상세보기</h1>
         <p>프로젝트 정보를 불러올 수 없습니다.</p>
-        <S.BackButton onClick={() => navigate(-1)}>뒤로 가기</S.BackButton>
-      </S.Container>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-4 px-4 py-2 bg-slate-800 text-white rounded"
+        >
+          ← 뒤로 가기
+        </button>
+      </div>
     );
   }
 
   return (
-    <S.Container>
-      {/* 상태 뱃지 + 제목 */}
-      <S.TitleRow>
-        <S.StatusBadge status={project.status}>
-          {project.status}
-        </S.StatusBadge>
-        <S.Title>{project.title}</S.Title>
-      </S.TitleRow>
+    <div className="max-w-6xl mx-auto px-4 pt-36 pb-10 flex flex-col lg:flex-row gap-8">
+      {/* 왼쪽 본문 영역 */}
+      <div className="flex-1">
+        {/* 제목과 상태 뱃지 */}
+        <div className="flex items-center gap-3 mb-2">
+          <span
+            className={`text-sm font-semibold px-3 py-1 rounded-full ${
+              project.status === "모집중"
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-200 text-gray-600"
+            }`}
+          >
+            {project.status} · 참여 {project.participants}
+          </span>
+          <h1 className="text-xl md:text-2xl font-bold text-blue-900">
+            {project.title}
+          </h1>
+        </div>
 
-      {/* 작성자, 작성일, 조회수 */}
-      <S.SubInfo>
-        <S.Author>{project.author}</S.Author> | 작성일: {project.date} | 조회수: {project.views}
-      </S.SubInfo>
+        {/* 작성자 프로필 라인 */}
+        <div className="flex justify-between items-center mt-1">
+          <div className="flex items-center gap-2">
+            <img
+              src="/assets/images/manager-bird.png"
+              alt="프로필"
+              className="w-8 h-8 rounded-full"
+            />
+            <span className="font-semibold text-[16px] text-gray-900">
+              {project.author}
+            </span>
+          </div>
+          <button className="text-sm border px-3 py-1 rounded hover:bg-gray-100">
+            + 팔로우
+          </button>
+        </div>
 
-      {/* 설명 */}
-      <S.Description>{project.content}</S.Description>
+        {/* 작성일 & 조회수 */}
+        <div className="mt-1 text-[15px] text-gray-600 flex gap-2">
+          <span>작성일: {project.date}</span>
+          <span>· 조회수: {project.views}</span>
+        </div>
 
-      {/* 구분선 */}
-      <S.Divider />
+        <hr className="my-4 border-gray-300" />
 
-      {/* 메타 정보 */}
-      <S.MetaBox>
-        <p><strong>참여인원:</strong> {project.participants}</p>
-      </S.MetaBox>
+        {/* 본문 */}
+        <p className="text-gray-700 leading-relaxed mb-6">
+          {project.content}
+        </p>
 
-      {/* 댓글 */}
-      <S.ContentCard>
-        <CommentSection />
-      </S.ContentCard>
+        {/* 댓글 */}
+        <div className="border rounded px-5 py-4 bg-gray-50 mb-6">
+          <CommentSection />
+        </div>
 
-      {/* 버튼 정렬 - 좌우 끝 */}
-      <S.ButtonRow>
-        <S.LeftButtonWrapper>
-          <S.BackButton onClick={() => navigate(-1)}>← 뒤로 가기</S.BackButton>
-        </S.LeftButtonWrapper>
-        <S.RightButtonWrapper>
-          <S.ApplyButton onClick={() => navigate("/project-apply", { state: { project } })}>
+        {/* 버튼 */}
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-slate-800 text-white text-sm rounded"
+          >
+            ← 뒤로 가기
+          </button>
+          <button
+            onClick={() => navigate("/project-apply", { state: { project } })}
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+          >
             지원하기
-          </S.ApplyButton>
-        </S.RightButtonWrapper>
-      </S.ButtonRow>
-    </S.Container>
+          </button>
+        </div>
+      </div>
+
+      {/* 오른쪽 참여자 카드 영역 */}
+      <div className="w-full lg:w-[280px] shrink-0">
+        <ParticipantCardBox />
+      </div>
+    </div>
   );
 }
