@@ -21,18 +21,18 @@ export default function Home() {
         ) : (
           <S.ProfileContainer>
             <ProfileComponent />
-            <History />
           </S.ProfileContainer>
         )}
-      </S.GridItem>
+      </S.GridItem>{" "}
       <S.GridItem $row="1" $isMobile={isMobile} $col="2">
         <S.ItemTitle>
-          학사 공지<Link to="/notice-board">+</Link>
+          <History />
+          {"추후에 History Pin으로 바뀔 예정입니다."}
         </S.ItemTitle>
       </S.GridItem>
       <S.GridItem $row="1" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
-          참여중인 채팅방<Link to="/chat">×</Link>
+          학사 공지<Link to="/notice-board">+</Link>
         </S.ItemTitle>
       </S.GridItem>
       <S.GridItem $row="2" $isMobile={isMobile} $col="2">
