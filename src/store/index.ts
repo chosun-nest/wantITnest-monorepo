@@ -12,6 +12,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import authReducer from "./slices/authSlice";
+import modalReducer from "./slices/modalSlice";
 
 const persistConfig = {
   key: "root",
@@ -21,6 +22,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  modal: modalReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

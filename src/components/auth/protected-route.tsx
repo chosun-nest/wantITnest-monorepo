@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearTokens, selectAccessToken } from "../../store/slices/authSlice";
 import { checkTokenValidity } from "../../api/auth/auth"; // /auth/me API
+import { showModal } from "../../store/slices/modalSlice";
 
 export default function ProtectedRoute({
   children,
@@ -17,13 +18,30 @@ export default function ProtectedRoute({
   useEffect(() => {
     const verify = async () => {
       try {
-        if (!accessToken) throw new Error("No token");
-
+        if (!accessToken) {
+          dispatch(clearTokens());
+          dispatch(
+            showModal({
+              title: "로그인 필요",
+              message: "로그인이 필요합니다. 다시 로그인해주세요.",
+              type: "error",
+            })
+          );
+          navigate("/login");
+          return;
+        }
         await checkTokenValidity(); // /auth/me 호출
         setLoading(false);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
-        console.warn("인증 실패 → 로그인 페이지로 이동", e);
-        dispatch(clearTokens());
+        dispatch(
+          showModal({
+            title: "인증 오류",
+            message:
+              "세션이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.",
+            type: "error",
+          })
+        );
         navigate("/login");
       }
     };

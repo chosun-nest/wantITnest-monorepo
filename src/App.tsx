@@ -24,6 +24,7 @@ import ProtectedRoute from "./components/auth/protected-route";
 import Events from "./routes/events";
 import PublicRoute from "./components/auth/public-route";
 import ResetPassword from "./routes/reset-password";
+import GlobalModal from "./components/global/global-modal";
 
 const router = createBrowserRouter([
   {
@@ -143,6 +144,7 @@ function App() {
   return (
     <>
       <BackdropContext.Provider value={{ showBackdrop, setShowBackdrop }}>
+        <GlobalModal />
         <GlobalBackdrop visible={showBackdrop} />
         <RouterProvider router={router} />
       </BackdropContext.Provider>
