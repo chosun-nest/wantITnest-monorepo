@@ -38,7 +38,9 @@ export const verifycode = async (email: string, code: string) => {
 };
 
 export const checkTokenValidity = async (): Promise<{ memberId: string }> => {
-  const res = await API.get("/api/v1/auth/me");
+  const res = await API.get("/api/v1/auth/me", {
+    headers: { skipAuth: false },
+  });
   return res.data;
 };
 
