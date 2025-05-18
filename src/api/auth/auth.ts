@@ -38,7 +38,25 @@ export const verifycode = async (email: string, code: string) => {
 };
 
 export const checkTokenValidity = async (): Promise<{ memberId: string }> => {
-  const res = await API.get("/api/v1/auth/me");
+  const res = await API.get("/api/v1/auth/me", {
+    headers: { skipAuth: false },
+  });
+  return res.data;
+};
+
+export const sendResetPasswordLink = async (email: string) => {
+  const res = await API.post("/api/v1/auth/password-reset-link-request", {
+    email,
+  });
+  return res.data;
+};
+
+export const passwordReset = async (token: string, newPassword: string) => {
+  const res = await API.post(
+    "/api/v1/auth/password-reset",
+    { token, newPassword },
+    { headers: { skipAuth: true } }
+  );
   return res.data;
 };
 
@@ -90,9 +108,6 @@ export async function refreshAccessToken() {
     console.error(" 토큰 재발급 실패:", error);
 
     store.dispatch(clearTokens());
-
-    localStorage.clear();
-    sessionStorage.clear();
 
     // 로그인 페이지로 이동
     window.location.href = "/login";

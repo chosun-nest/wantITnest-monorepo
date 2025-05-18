@@ -8,7 +8,7 @@ import {
 } from "../store/slices/authSlice";
 
 export const API = axios.create({
-  baseURL: "http://119.219.30.209:6030",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
 });
 
@@ -27,7 +27,8 @@ function addSubscriber(callback: (token: string) => void) {
 API.interceptors.request.use(
   (config) => {
     const skipAuth = (config.headers as any)?.skipAuth;
-
+    // API 엔드 포인트에 ("end_point",{headers:{skipAuth:true}}) 를 추가하면
+    // Authorization 헤더를 추가하지 않음
     if (!skipAuth) {
       const token = selectAccessToken(store.getState());
       if (token) {
@@ -90,7 +91,7 @@ API.interceptors.response.use(
       } catch (refreshError) {
         console.error("토큰 재발급 실패:", refreshError);
         isRefreshing = false;
-
+        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
         store.dispatch(clearTokens());
 
         return Promise.reject(refreshError);

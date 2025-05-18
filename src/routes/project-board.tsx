@@ -166,7 +166,7 @@ export default function ProjectBoard() {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className=" bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded"
+                      className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded"
                     >
                       {tag}
                     </span>
