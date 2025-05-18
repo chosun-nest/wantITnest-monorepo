@@ -60,22 +60,6 @@ export const passwordReset = async (token: string, newPassword: string) => {
   return res.data;
 };
 
-export const sendResetPasswordLink = async (email: string) => {
-  const res = await API.post("/api/v1/auth/password-reset-link-request", {
-    email,
-  });
-  return res.data;
-};
-
-export const passwordReset = async (token: string, newPassword: string) => {
-  const res = await API.post(
-    "/api/v1/auth/password-reset",
-    { token, newPassword },
-    { headers: { skipAuth: true } }
-  );
-  return res.data;
-};
-
 export async function refreshAccessToken() {
   try {
     const refreshToken = store.getState().auth.refreshToken;
