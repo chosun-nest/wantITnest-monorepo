@@ -8,7 +8,7 @@ import {
 } from "../store/slices/authSlice";
 
 export const API = axios.create({
-  baseURL: "http://119.219.30.209:6030",
+  baseURL: process.env.REACT_APP_API_URL,
   withCredentials: true,
 });
 
