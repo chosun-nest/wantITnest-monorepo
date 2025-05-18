@@ -5,7 +5,7 @@ import { hideModal } from "../../store/slices/modalSlice";
 
 export default function GlobalModal() {
   const dispatch = useDispatch();
-  const { visible, title, message, type } = useSelector(
+  const { visible, title, message, type, onClose } = useSelector(
     (state: RootState) => state.modal
   );
 
@@ -16,7 +16,10 @@ export default function GlobalModal() {
       title={title}
       message={message}
       type={type}
-      onClose={() => dispatch(hideModal())}
+      onClose={() => {
+        dispatch(hideModal());
+        if (onClose) onClose();
+      }}
     />
   );
 }

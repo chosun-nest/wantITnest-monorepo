@@ -6,6 +6,7 @@ export interface ModalState {
   title: string;
   message: string;
   type: "info" | "error";
+  onClose?: () => void;
 }
 
 const initialState: ModalState = {
@@ -25,6 +26,7 @@ const modalSlice = createSlice({
         title: string;
         message: string;
         type?: "info" | "error";
+        onClose?: () => void;
       }>
     ) => {
       state.title = action.payload.title;
