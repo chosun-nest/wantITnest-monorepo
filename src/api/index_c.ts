@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { refreshAccessToken } from "./auth/auth";
+import { checkTokenValidity, refreshAccessToken } from "./auth/auth";
 import { store } from "../store";
 import {
   selectAccessToken,
   clearTokens /*, setTokens */,
 } from "../store/slices/authSlice";
+import { showModal } from "../store/slices/modalSlice";
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -31,6 +32,7 @@ API.interceptors.request.use(
     // Authorization 헤더를 추가하지 않음
     if (!skipAuth) {
       const token = selectAccessToken(store.getState());
+      console.log("request에 붙는 토큰:", token);
       if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
@@ -49,6 +51,8 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    console.warn("에러 상태코드:", error.response?.status);
+    console.warn("에러 메시지:", error.response?.data);
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
@@ -75,9 +79,10 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        await checkTokenValidity();
         await refreshAccessToken();
-
         const newToken = selectAccessToken(store.getState());
+        console.log("토큰 재발급 성공", newToken);
         if (!newToken)
           throw new Error("토큰 재발급 후 스토어에서 토큰을 찾을 수 없음");
 
@@ -89,9 +94,15 @@ API.interceptors.response.use(
         }
         return API(originalRequest);
       } catch (refreshError) {
-        console.error("토큰 재발급 실패:", refreshError);
+        console.log("토큰 재발급 실패:", refreshError);
         isRefreshing = false;
-        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+        store.dispatch(
+          showModal({
+            title: "세션 만료",
+            message: "세션이 만료되었습니다. 다시 로그인해주세요.",
+            type: "error",
+          })
+        );
         store.dispatch(clearTokens());
 
         return Promise.reject(refreshError);
@@ -100,13 +111,21 @@ API.interceptors.response.use(
 
     // --- 403 처리 ---
     if (status === 403) {
-      if (errorMessage.includes("Token") || errorMessage.includes("권한")) {
+      if (
+        !errorMessage ||
+        errorMessage.includes("Token") ||
+        errorMessage.includes("권한")
+      ) {
         console.warn("권한 문제(403).");
-
+        store.dispatch(
+          showModal({
+            title: "접근 권한 오류",
+            message: "로그인이 필요하거나 권한이 없습니다.",
+            type: "error",
+          })
+        );
         store.dispatch(clearTokens());
       }
-      // 그 외 403 에러는 그대로 반환
-      return Promise.reject(error);
     }
 
     // 그 외 모든 에러는 그대로 반환
