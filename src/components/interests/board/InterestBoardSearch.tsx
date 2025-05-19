@@ -17,7 +17,7 @@ export default function InterestBoardSearch({
         onChange={(e) => setSearchKeyword(e.target.value)}
         className="flex-grow p-3 border rounded"
       />
-      <button className="px-10 py-2 text-white bg-[#002F6C] rounded">
+      <button className="px-7 py-2 text-white bg-[#002F6C] rounded">
         검색
       </button>
     </div>

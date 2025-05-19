@@ -32,7 +32,7 @@ export default function BoardWrite() {
   const [content, setContent] = useState<string | undefined>("");
   const [participants, setParticipants] = useState("");
   const [showFilterModal, setShowFilterModal] = useState(false);
-
+  
   const defaultProjectContent = `[개발 프로젝트 모집 예시]
 
 - 프로젝트 주제: 
@@ -57,8 +57,8 @@ export default function BoardWrite() {
   }, []);
 
   useEffect(() => {
-    setContent(boardType === "projects" ? defaultProjectContent : defaultInterestContent);
-  }, [boardType]);
+  setContent(boardType === "projects" ? defaultProjectContent : defaultInterestContent);
+  }, [boardType, defaultProjectContent, defaultInterestContent]);
 
   const handleSubmit = async () => {
     if (!title || !content) {
