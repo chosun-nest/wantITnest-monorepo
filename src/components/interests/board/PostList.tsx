@@ -1,5 +1,5 @@
 // 게시글 리스트 컴포넌트
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface Post {

@@ -1,5 +1,4 @@
-import React from "react";
-
+// 게시글 검색
 interface InterestBoardSearchProps {
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;

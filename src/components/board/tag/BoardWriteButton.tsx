@@ -1,5 +1,4 @@
 // 게시판 글쓰기 버튼
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function BoardWriteButton() {

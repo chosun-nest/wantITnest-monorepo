@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// 계정 탈퇴 모달
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { checkPassword } from "../../../../api/profile/api";
 import LoadingDots from "../../../ui/LoadingDots";

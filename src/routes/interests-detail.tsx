@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { fetchPostDetail } from "../api/interests/api.tsx";
 import Navbar from "../components/layout/navbar";

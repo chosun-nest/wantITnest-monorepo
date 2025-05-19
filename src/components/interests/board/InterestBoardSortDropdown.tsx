@@ -1,5 +1,4 @@
 // 최신순, 좋아요순 드롭다운 컴포넌트
-import React from "react";
 
 interface Props {
   sortType: "latest" | "likes";

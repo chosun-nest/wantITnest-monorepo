@@ -1,6 +1,4 @@
 // 제목 및 게시글 개수
-import React from "react";
-
 interface Props {
   postCount: number;
 }

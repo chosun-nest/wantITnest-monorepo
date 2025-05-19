@@ -148,23 +148,6 @@ export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
 
 // =============
 
-// =============
-// email-verification > 사용 안함
-
-// 이메일 인증 코드 전송 (POST)
-// export const sendcode = async (email: string) => {
-//   const res = await API.post("/api/v1/auth/send-code", { email });
-//   return res.data;
-// };
-
-// // 인증 코드 검증 (POST)
-// export const verifycode = async (email: string, code: string) => {
-//   const res = await API.post("/api/v1/auth/verify-code", { email, code });
-//   return res.data;
-// };
-
-// =============
-
 // 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)
 export const getTech = async () => {

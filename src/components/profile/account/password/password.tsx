@@ -1,5 +1,5 @@
 // password 수정 전체 컴포넌트
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import PasswordSummary from "./PasswordSummary";
 import ChangePasswordModal from "./PasswordChangeModal";
 import { getMemberProfile } from "../../../../api/profile/api"; // 비밀번호 길이 가져오는 API
