@@ -25,6 +25,11 @@ export const postsWrite = async (payload: PostWritePayload) => {
   return response.data;
 };
 
+// export const postsWrite = async (payload: PostWritePayload) => {
+//   const response = await API.post("/api/v1/posts/new", payload);
+//   return response.data;
+// };
+
 // 게시글 수정 요청 (PATCH)
 export interface PostUpdatePayload {
   title?: string | null;

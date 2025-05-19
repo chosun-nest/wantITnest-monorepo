@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { mockProjects } from "../constants/mock-projects";
 import { useNavigate } from "react-router-dom";
-import TagFilterModal from "../components/board/TagFilterModal";
-import BoardWriteButton from "../components/board/BoardWriteButton";
+import TagFilterModal from "../components/board/tag/TagFilterModal";
+import BoardWriteButton from "../components/board/tag/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
 
 const ITEMS_PER_PAGE = 7;
