@@ -18,7 +18,7 @@ export const mockParticipants: Participant[] = [
     followers: 19,
   },
   {
-    id: 4,
+    id: 3,
     name: "김채호",
     role: "Backend",
     imageUrl: "/assets/images/profile4.png",
