@@ -1,5 +1,5 @@
 import { SignupPayload } from "../../types/signup";
-import { API } from "../index_c";
+import { API } from "..";
 import { setTokens, clearTokens } from "../../store/slices/authSlice";
 import { store } from "../../store";
 
