@@ -1,3 +1,4 @@
+// 로그인 하지 않았을 경우 띄우는 게스트 카드
 export default function GuestCard() {
   return (
     <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">

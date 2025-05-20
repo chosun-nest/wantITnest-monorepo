@@ -9,13 +9,10 @@ import { Item } from "../types/signup";
 import Modal from "../components/common/modal";
 import type { ModalContent } from "../types/modal";
 import { AxiosError } from "axios";
-import { useDispatch } from "react-redux";
-import { setTokens } from "../store/slices/authSlice";
 
 export default function SignUp() {
   const navigate = useNavigate();
   // 디버그 모드 추가
-  const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [selected, setSelected] = useState<"재학생" | "일반">("일반");
@@ -39,8 +36,6 @@ export default function SignUp() {
   const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
-
-  const dispatch = useDispatch();
 
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -97,11 +92,7 @@ export default function SignUp() {
       setShowModal(true);
       return;
     }
-    if (isDebugMode) {
-      console.log("[디버그] 인증 스킵");
-      setIsEmailVerified(true);
-      return;
-    }
+
     try {
       await sendcode(email);
       setIsEmailVerified(false);
@@ -190,13 +181,7 @@ export default function SignUp() {
         techStackIdList: skills.length > 0 ? skills.map((i) => i.id) : [],
       };
       const res = await signup(payload);
-
-      dispatch(
-        setTokens({
-          accessToken: res.accessToken,
-          refreshToken: res.refreshToken,
-        })
-      );
+      console.log("회원가입 응답:", res);
 
       setModalContent({
         title: "가입 완료",
@@ -231,14 +216,7 @@ export default function SignUp() {
 
   const handleNextStep = () => setStep(2);
   const handlePrevStep = () => setStep(1);
-  useEffect(() => {
-    if (isDebugMode) {
-      setEmail("minsu@best.com");
-      setPassword("minsu1234!");
-      setConfirmPassword("minsu1234!");
-      setName("최고민수");
-    }
-  }, [isDebugMode]);
+
   return (
     <S.Container>
       {showModal && (
@@ -253,17 +231,6 @@ export default function SignUp() {
         />
       )}
 
-      <S.ButtonRow>
-        <S.LoginButton
-          onClick={() => setIsDebugMode((prev) => !prev)}
-          style={{
-            background: isDebugMode ? "#4CAF50" : "#ccc",
-            color: "#fff",
-          }}
-        >
-          디버그 모드 {isDebugMode ? "ON" : "OFF"}
-        </S.LoginButton>
-      </S.ButtonRow>
       {step === 1 ? (
         <SignUpComponent
           selected={selected}

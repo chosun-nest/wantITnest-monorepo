@@ -94,11 +94,8 @@ export default function Login() {
         )}
         <S.LoginButton onClick={handleLogin}>로그인</S.LoginButton>
         <S.FindContainer>
-          <S.AccountLink to="/find-id">
-            <S.FindButton>아이디 찾기</S.FindButton>
-          </S.AccountLink>
           <S.AccountLink to="/password-reset">
-            <S.FindButton>비밀번호 찾기</S.FindButton>
+            <S.FindButton>비밀번호 재설정 하기</S.FindButton>
           </S.AccountLink>
         </S.FindContainer>
         <S.AccountLink to="/signup">

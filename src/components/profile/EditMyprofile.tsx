@@ -47,7 +47,7 @@ export default function MyProfile() {
     major: "",
     introduce: "",
     interests: [] as string[],
-    sns: ["", ""],
+    sns: ["", "", ""],
     image: "",
     uploadedImagePath: "",
     techStacks: [] as string[],
@@ -69,7 +69,6 @@ export default function MyProfile() {
   // 토큰 관리 변수는 전역 변수로 선언해야 함함
   // selector를 사용해 내 토큰 가져오는 slice인 selectAccessToken을 인자로 넣음음
   const accessToken = useSelector(selectAccessToken);
-
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -202,20 +201,27 @@ export default function MyProfile() {
       [field]: prev[field].filter((_, i) => i !== index),
     }));
   };
+  
   // 이미지 변경 함수
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      alert("파일이 없습니다.");
+      return;
+    }
 
     try {
       const uploadedImageUrl = await uploadProfileImage(file);
+      
       setProfile((prev) => ({
         ...prev,
         image: uploadedImageUrl,
+        uploadedImagePath: uploadedImageUrl,  // 이거 빠지면 저장 시 PATCH에도 누락됨
       }));
     } catch (err) {
       console.error("이미지 업로드 실패", err);
-      alert("이미지 업로드 실패!");
+      if (err instanceof Error) alert(err.message);
+      else alert("이미지 업로드 실패!");
     }
   };
 
@@ -235,9 +241,10 @@ export default function MyProfile() {
 
       await updateMemberProfile({
         memberIntroduce: profile.introduce,
-        memberImageUrl: profile.uploadedImagePath || profile.image,
+        memberImageUrl: profile.uploadedImagePath || profile.image, // 업로드된 URL
         memberSnsUrl1: profile.sns[0] || "",
         memberSnsUrl2: profile.sns[1] || "",
+        memberSnsUrl3: profile.sns[2] || "",
         memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
         memberInterestUpdateRequestIdList: interestIdList,
         memberTechStackUpdateRequestIdList: techStackIdList,

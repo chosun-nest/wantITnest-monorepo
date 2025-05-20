@@ -1,4 +1,4 @@
-import React from "react";
+// 로딩 ui - 비밀번호 변경 시 글자 비교 시 사용
 
 export default function LoadingDots() {
   return (

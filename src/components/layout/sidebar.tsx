@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import * as S from "../../assets/styles/sidebar.styles";
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineHome, AiOutlineProject } from "react-icons/ai";
-import { MdOutlineAnnouncement, MdOutlineInterests } from "react-icons/md";
+import {
+  MdOutlineAnnouncement,
+  MdOutlineInterests,
+  MdEventAvailable,
+  MdChatBubbleOutline,
+} from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { clearTokens, selectAccessToken } from "../../store/slices/authSlice";
 import { getMemberProfile, MemberProfile } from "../../api/profile/api";
@@ -114,6 +119,16 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <Link to="/interests-board" onClick={handleClose}>
             <S.MenuItem>
               <MdOutlineInterests /> 관심분야 게시판
+            </S.MenuItem>
+          </Link>
+          <Link to="/chat" onClick={handleClose}>
+            <S.MenuItem>
+              <MdChatBubbleOutline /> 채팅방
+            </S.MenuItem>
+          </Link>
+          <Link to="/events" onClick={handleClose}>
+            <S.MenuItem>
+              <MdEventAvailable /> 행사
             </S.MenuItem>
           </Link>
         </S.MenuList>

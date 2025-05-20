@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+// 계정 탈퇴 성공 모달
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function WithdrawCompleteModal({ onClose }: { onClose: () => void }) {

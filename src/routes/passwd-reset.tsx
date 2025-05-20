@@ -4,6 +4,7 @@ import useResponsive from "../hooks/responsive";
 import { useState } from "react";
 import { ModalContent } from "../types/modal";
 import Modal from "../components/common/modal";
+import { sendResetPasswordLink } from "../api/auth/auth";
 
 export default function PasswdReset() {
   const [email, setEmail] = useState("");
@@ -17,16 +18,33 @@ export default function PasswdReset() {
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSendEmail = async () => {
-    if (!isEmailValid) {
+    try {
+      if (!isEmailValid) {
+        setModalContent({
+          title: "이메일 형식 오류",
+          message: "이메일 형식이 올바르지 않습니다.",
+          type: "error",
+        });
+        setShowModal(true);
+        return;
+      }
+      await sendResetPasswordLink(email);
       setModalContent({
-        title: "이메일 형식 오류",
-        message: "이메일 형식이 올바르지 않습니다.",
+        title: "이메일 전송 완료",
+        message: "비밀번호 재설정 링크가 전송되었습니다.",
+        type: "info",
+      });
+      setShowModal(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      sendResetPasswordLink(email);
+      setModalContent({
+        title: "이메일 전송 오류",
+        message: "존재하지 않는 이메일입니다.",
         type: "error",
       });
       setShowModal(true);
-      return;
     }
-    console.log("이메일 전송");
   };
   return (
     <S.Container>

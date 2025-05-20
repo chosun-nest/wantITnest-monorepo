@@ -57,7 +57,6 @@ export default function SignUpComponent({
         <S.SigninTitle>회원가입</S.SigninTitle>
       </S.HeaderBox>
       <S.SigninText>이메일 인증</S.SigninText>
-      <S.EmailRow></S.EmailRow>
       <S.EmailRow>
         <S.Input
           type="email"
@@ -103,8 +102,7 @@ export default function SignUpComponent({
 
       <S.SigninText>비밀번호</S.SigninText>
       <S.PasswordInputWrapper
-        onMouseEnter={() => setIsPasswordVisible(true)}
-        onMouseLeave={() => setIsPasswordVisible(false)}
+        onClick={() => setIsPasswordVisible(!isPasswordVisible)}
       >
         <S.Input
           type={isPasswordVisible ? "text" : "password"}

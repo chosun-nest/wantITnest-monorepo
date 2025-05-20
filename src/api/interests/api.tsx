@@ -1,4 +1,5 @@
 import { API } from "../index_c";
+//import { getAccessToken } from "../../utils/auth";
 
 // 댓글 API
 // 댓글 작성 - 생성, 조회, 수정, 삭제 기능 (POST)
@@ -23,6 +24,11 @@ export const postsWrite = async (payload: PostWritePayload) => {
   const response = await API.post("/api/v1/posts/new", payload);
   return response.data;
 };
+
+// export const postsWrite = async (payload: PostWritePayload) => {
+//   const response = await API.post("/api/v1/posts/new", payload);
+//   return response.data;
+// };
 
 // 게시글 수정 요청 (PATCH)
 export interface PostUpdatePayload {
