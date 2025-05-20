@@ -13,6 +13,9 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const isMobile = useResponsive();
 
+  // 로그인 사용자 ID (나중엔 context 등에서 가져오면 됨)
+  const currentUserId = 1;
+
   const project = mockProjects.find((p) => p.id === Number(id));
   const [participants, setParticipants] = useState<Participant[]>(mockParticipants);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,10 +52,10 @@ export default function ProjectDetail() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pt-36 pb-10 flex flex-col lg:flex-row gap-8">
+    <div className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${isMobile ? "flex-col gap-4" : "flex-row gap-8"}`}>
       {/* 왼쪽 영역 */}
       <div className="flex-1">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
           <span
             className={`text-sm font-semibold px-3 py-1 rounded-full ${
               projectStatus === "모집중"
@@ -62,12 +65,12 @@ export default function ProjectDetail() {
           >
             {projectStatus} · 참여 {participantCount}
           </span>
-          <h1 className="text-xl md:text-2xl font-bold text-blue-900">
+          <h1 className={`font-bold text-blue-900 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
             {project.title}
           </h1>
         </div>
 
-        <div className="flex justify-between items-center mt-1">
+        <div className={`flex ${isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"}`}>
           <div className="flex items-center gap-2">
             <img
               src="/assets/images/manager-bird.png"
@@ -78,21 +81,23 @@ export default function ProjectDetail() {
               {project.author.name}
             </span>
           </div>
-          <button className="text-sm border px-3 py-1 rounded hover:bg-gray-100">
+          <button className="text-sm border px-3 py-1 rounded hover:bg-gray-100 w-fit">
             + 팔로우
           </button>
         </div>
 
-        <div className="mt-1 text-[15px] text-gray-600 flex gap-2">
+        <div className="mt-1 text-[15px] text-gray-600 flex gap-2 flex-wrap">
           <span>작성일: {project.date}</span>
           <span>· 조회수: {project.views}</span>
         </div>
 
         <hr className="my-4 border-gray-300" />
 
-        <p className="text-gray-700 leading-relaxed mb-6">
+        <div className="text-gray-700 leading-relaxed mb-6 whitespace-pre-line">
           {project.content}
-        </p>
+        </div>
+
+        <hr className="my-4 border-gray-300" />
 
         <div className="border rounded px-5 py-4 bg-gray-50 mb-6">
           <CommentSection />
@@ -109,12 +114,13 @@ export default function ProjectDetail() {
       </div>
 
       {/* 오른쪽 참여자 영역 */}
-      <div className="w-full lg:w-[280px] shrink-0">
+      <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
         <ParticipantCardBox
           project={project}
           participants={participants}
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={handleAccept}
+          currentUserId={currentUserId}
         />
       </div>
 

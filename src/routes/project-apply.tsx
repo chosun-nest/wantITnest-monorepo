@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProjectApply() {
   const navigate = useNavigate();
@@ -8,13 +8,21 @@ export default function ProjectApply() {
 
   const [message, setMessage] = useState("");
 
+  // ✅ project가 없으면 자동으로 뒤로가기
+  useEffect(() => {
+    if (!project) {
+      alert("잘못된 접근입니다.");
+      navigate(-1);
+    }
+  }, [project, navigate]);
+
   const handleSubmit = () => {
     if (!message.trim()) {
       alert("지원 동기를 작성해주세요!");
       return;
     }
     alert("지원이 완료되었습니다!");
-    navigate(-1);
+    navigate(-1); // 뒤로 이동
   };
 
   return (

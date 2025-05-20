@@ -17,7 +17,7 @@ interface Application {
   name: string;
   major: string;
   message: string;
-  role: string; // 그대로 둬도 됨 (문제 없음)
+  role: string;
   status: "pending" | "accepted" | "rejected";
 }
 
@@ -30,8 +30,6 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
     setApplications((prev) =>
       prev.map((a) => (a.id === app.id ? { ...a, status: "accepted" } : a))
     );
-
-    // ✅ 타입 단언: role을 "Frontend" | "Backend" | "PM" 중 하나로 강제
     onAccept({
       id: app.id,
       name: app.name,
@@ -42,15 +40,19 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
 
   const handleReject = (id: number) => {
     setApplications((prev) =>
-      prev.map((app) =>
-        app.id === id ? { ...app, status: "rejected" } : app
-      )
+      prev.map((app) => (app.id === id ? { ...app, status: "rejected" } : app))
     );
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
-      <div className="bg-white rounded-md shadow-lg w-[90%] max-w-md p-5">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-md shadow-lg w-[90%] max-w-md p-5"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">지원서 확인</h2>
           <button onClick={onClose}>
