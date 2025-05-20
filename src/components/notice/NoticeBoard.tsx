@@ -1,83 +1,91 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import NoticeBoardHeader from "./NoticeBoardHeader";
+import NoticeBoardSearch from "./NoticeBoardSearch";
 import NoticeDropdown from "./NoticeDropdown";
-import "./NoticeBoard.css";
+import NoticeCard from "./NoticeCard";
 
-// Notice 인터페이스 정의
 interface Notice {
   number: string;
   title: string;
   writer: string;
   date: string;
-  deadline?: string; // 장학공지 전용 필드
-  views: number;
+  views: string;
   link: string;
+  category?: string;
+  deadline?: string;
 }
 
+const CATEGORY_LIST = [
+  "일반공지",
+  "학사공지",
+  "장학공지",
+  "IT융합대학 공지",
+  "컴퓨터공학과 공지",
+];
+
 function NoticeBoard() {
+  const [category, setCategory] = useState("전체");
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [category, setCategory] = useState("일반공지");
 
   useEffect(() => {
-      async function fetchNotices() {
-          try {
-              const res = await axios.get(`http://localhost:8000/crawl/${category}`);
-              setNotices(res.data.notices);
-          } catch (error) {
-              console.error("Error fetching notices:", error);
-          }
-      }
-      fetchNotices();
+    if (category === "전체") {
+      Promise.all(
+        CATEGORY_LIST.map((cat) =>
+          fetch(`http://localhost:8000/crawl/${cat}`).then((res) => res.json())
+        )
+      )
+        .then((results) => {
+          const merged = results.flatMap((res, i) =>
+            res.notices ? res.notices.map((n: Notice) => ({ ...n, category: CATEGORY_LIST[i] })) : []
+          );
+          setNotices(
+            merged.sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )
+          );
+        })
+        .catch((err) => console.error("❌ 전체 공지 불러오기 실패:", err));
+      return;
+    }
+
+    fetch(`http://localhost:8000/crawl/${category}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.notices) {
+          setNotices(
+            data.notices
+              .map((n: Notice) => ({ ...n, category }))
+              .sort(
+                (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+              )
+          );
+        } else setNotices([]);
+      })
+      .catch((err) => console.error("❌ 공지 불러오기 실패:", err));
   }, [category]);
 
   return (
-      <div className="notice-board-container">
-          {/* 드롭다운 메뉴 */}
-          <NoticeDropdown selectedCategory={category} setSelectedCategory={setCategory} />
+    <div style={{ padding: "80px 24px" }}>
+      <NoticeBoardHeader />
 
-          {/* 공지사항 개수 표시 */}
-          <h3>총 {notices.length}개의 공지사항이 등록되었습니다.</h3>
-
-          {/* 공지사항 테이블 */}
-          <table className="notice-table">
-              <thead>
-                  <tr>
-                      <th>번호</th>
-                      <th>제목</th>
-                      <th>작성자</th>
-                      <th>작성일</th>
-                      {category === "장학공지" && <th className="deadline">접수 마감일</th>}
-                      <th>조회수</th>
-                      <th>첨부파일</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {notices.map((notice, idx) => (
-                      <tr key={idx}>
-                          <td>{notice.number}</td>
-                          <td>
-                              <a href={notice.link} target="_blank" rel="noopener noreferrer">
-                                  {notice.title}
-                              </a>
-                          </td>
-                          <td>{notice.writer}</td>
-                          <td>{notice.date}</td>
-                          {category === "장학공지" && <td className="deadline">{notice.deadline || "-"}</td>}
-                          <td>{notice.views}</td>
-                          <td>
-                              {notice.link ? (
-                                  <img 
-                                      src="/assets/images/clip_icon.png" 
-                                      alt="첨부파일" 
-                                      style={{ width: "20px", verticalAlign: "middle" }} 
-                                  />
-                              ) : "-"}
-                          </td>
-                      </tr>
-                  ))}
-              </tbody>
-          </table>
+      <div className="max-w-5xl mx-auto px-4">
+        <NoticeDropdown selected={category} onChange={setCategory} />
+        <hr className="mb-4" />
+        <p className="text-sm text-gray-700 mb-4">
+          총 <strong>{notices.length}</strong>개의 게시물이 있습니다.
+        </p>
       </div>
+
+      <NoticeBoardSearch />
+
+      <div className="mt-6">
+        {notices.length > 0 ? (
+          notices.map((notice, idx) => <NoticeCard key={idx} notice={notice} />)
+        ) : (
+          <p>공지사항이 없습니다.</p>
+        )}
+      </div>
+    </div>
   );
 }
 
