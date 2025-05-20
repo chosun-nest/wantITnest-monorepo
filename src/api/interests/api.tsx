@@ -1,4 +1,4 @@
-import { API } from "../index_c";
+import { API } from "..";
 //import { getAccessToken } from "../../utils/auth";
 
 // 댓글 API
@@ -8,9 +8,12 @@ export interface CommentActionPayload {
   content: string;
 }
 // 댓글 단일 API
-export const commentAction = async (postId: number, payload: CommentActionPayload) => {
+export const commentAction = async (
+  postId: number,
+  payload: CommentActionPayload
+) => {
   const res = await API.post(`/api/v1/posts/${postId}/comments/new`, payload);
-  return res.data;  // commentId, message
+  return res.data; // commentId, message
 };
 
 // 게시글 API
@@ -36,10 +39,13 @@ export interface PostUpdatePayload {
   content?: string | null;
   tags?: string[] | null;
 }
-export const updatePost = async (postId: number, payload: PostUpdatePayload) => {
+export const updatePost = async (
+  postId: number,
+  payload: PostUpdatePayload
+) => {
   const response = await API.patch(`/api/v1/posts/update/${postId}`, payload);
-  return response.data;   // postId, message
-}
+  return response.data; // postId, message
+};
 
 // 게시글 목록 조회 (GET)
 export interface PostItem {
@@ -57,7 +63,7 @@ export interface PostsResponse {
 }
 export const fetchPostList = async (tags: string[] = []) => {
   const params = new URLSearchParams();
-  tags.forEach(tag => params.append("tags", tag));
+  tags.forEach((tag) => params.append("tags", tag));
 
   const response = await API.get(`/api/v1/posts?${params.toString()}`);
   return response.data; // posts, totalCount
@@ -128,4 +134,3 @@ export const getMemberProfile = async (): Promise<MemberProfile> => {
       : "",
   };
 };
-
