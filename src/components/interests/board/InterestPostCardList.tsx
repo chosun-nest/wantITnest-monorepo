@@ -44,7 +44,7 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded"
+                  className="px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded"
                 >
                   {tag}
                 </span>
