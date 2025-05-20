@@ -1,4 +1,5 @@
 import { Participant } from "../../types/participant";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   project: {
@@ -12,6 +13,7 @@ interface Props {
   participants: Participant[];
   onOpenModal: () => void;
   onAccept: (user: Participant) => void;
+  currentUserId: number;
 }
 
 export default function ParticipantCardBox({
@@ -19,13 +21,20 @@ export default function ParticipantCardBox({
   participants,
   onOpenModal,
   onAccept,
+  currentUserId,
 }: Props) {
+  const navigate = useNavigate();
+
+  const handleApply = () => {
+    navigate("/project-apply", { state: { project } });
+  };
+
   return (
     <div className="bg-gray-50 p-4 rounded-md shadow-md w-full">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-[17px] font-semibold text-gray-800">참여인원 현황</h2>
 
-        {project?.author?.name === "이지혁" ? (
+        {project?.author?.id === currentUserId ? (
           <button
             onClick={onOpenModal}
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
@@ -34,9 +43,7 @@ export default function ParticipantCardBox({
           </button>
         ) : (
           <button
-            onClick={() =>
-              alert("지원하기 기능은 작성자만 제외하고 사용 가능합니다.")
-            }
+            onClick={handleApply}
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
           >
             지원하기

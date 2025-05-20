@@ -9,7 +9,6 @@ const ITEMS_PER_PAGE = 7;
 
 export default function ProjectBoard() {
   const navigate = useNavigate();
-  const isClient = typeof window !== "undefined";
   const isMobile = useResponsive();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,9 +61,9 @@ export default function ProjectBoard() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 pt-24">
+    <div className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}>
       {/* 상단 필터와 제목 라인 */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+      <div className={`flex ${isMobile ? "flex-col items-start gap-2" : "flex-row justify-between items-center"} mb-4`}>
         <h1 className="text-2xl font-bold text-[#00256c]">프로젝트 모집 게시판</h1>
         <div className="flex space-x-2">
           {["전체", "모집중", "모집완료"].map((label) => (
@@ -82,11 +81,11 @@ export default function ProjectBoard() {
       <hr className="mb-4" />
 
       {/* 제목 아래 통계 + 검색창 */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-        <p className="text-sm text-gray-600 mb-2 md:mb-0">
+      <div className={`flex ${isMobile ? "flex-col items-start gap-2" : "flex-row justify-between items-center"} mb-4`}>
+        <p className="text-sm text-gray-600">
           총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full md:w-auto">
           <input
             type="text"
             placeholder="제목 또는 내용 검색"
@@ -95,7 +94,7 @@ export default function ProjectBoard() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="border px-3 py-1 rounded-md w-72 md:w-96"
+            className="border px-3 py-1 rounded-md w-full md:w-96"
           />
           <button
             onClick={() => setIsModalOpen(true)}
@@ -139,7 +138,7 @@ export default function ProjectBoard() {
             >
               <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>
                 <div className={`px-2 py-1 text-xs rounded-full font-semibold ${statusStyle}`}>
-                  {project.status} ・ 참여 {current}/{max}
+                  {project.status} · 참여 {current}/{max}
                 </div>
                 <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>{project.title}</h2>
               </div>
@@ -151,14 +150,14 @@ export default function ProjectBoard() {
               {project.tags && (
                 <div className="flex flex-wrap gap-2 mb-2">
                   {project.tags.map((tag) => (
-                    <span key={tag} className=" bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
+                    <span key={tag} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
                       {tag}
                     </span>
                   ))}
                 </div>
               )}
               <div className="flex justify-between text-xs text-gray-500">
-                <span>{project.author.name} ・ {project.date}</span>
+                <span>{project.author.name} · {project.date}</span>
                 <span>조회수 {project.views}</span>
               </div>
             </div>
