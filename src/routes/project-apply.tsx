@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import useResponsive from "../hooks/responsive";
 
 export default function ProjectApply() {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function ProjectApply() {
 
   const [message, setMessage] = useState("");
   const [selectedField, setSelectedField] = useState<string | null>(null);
+  const isMobile = useResponsive();
 
   const fieldOptions = ["프론트엔드", "백엔드", "디자이너", "AI / 데이터 분석"];
 
@@ -34,7 +36,7 @@ export default function ProjectApply() {
   return (
     <div className="max-w-4xl mx-auto px-4 pt-36 pb-20">
       <div className="bg-gray-50 shadow-md rounded-lg p-10">
-        <h2 className="text-2xl font-extrabold text-center mb-6 text-blue-900">
+        <h2 className={`text-2xl font-extrabold text-center mb-6 text-blue-900 ${isMobile ? "text-xl" : "text-2xl"}`}>
           {project?.title || "프로젝트 인원 구해요"}에 지원 동기 작성
         </h2>
 
@@ -64,7 +66,7 @@ export default function ProjectApply() {
         />
         <div className="text-sm text-gray-500 text-right mt-1">{message.length} / 400</div>
 
-        <div className="flex justify-between mt-6">
+        <div className={`flex ${isMobile ? "flex-col gap-2" : "justify-between"} mt-6`}>
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-slate-800 text-white text-sm rounded hover:bg-slate-700"
