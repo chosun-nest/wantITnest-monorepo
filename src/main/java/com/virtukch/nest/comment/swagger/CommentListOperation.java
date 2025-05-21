@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
                 """,
         security = {@SecurityRequirement(name = "bearer-key")},
         parameters = {
-                @Parameter(name = "boardType", description = "게시판 종류 (예: TOPIC, PROJECT)", example = "TOPIC"),
+                @Parameter(name = "boardType", description = "게시판 종류 (예: INTEREST, PROJECT)", example = "INTEREST"),
                 @Parameter(name = "postId", description = "게시글 ID", example = "42")
         }
 )

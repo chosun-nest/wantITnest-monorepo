@@ -6,6 +6,9 @@ import com.virtukch.nest.post.dto.PostListResponseDto;
 import com.virtukch.nest.post.dto.PostRequestDto;
 import com.virtukch.nest.post.dto.PostResponseDto;
 import com.virtukch.nest.post.service.PostService;
+import com.virtukch.nest.post_reaction.dto.PostReactionRequestDto;
+import com.virtukch.nest.post_reaction.dto.PostReactionResponseDto;
+import com.virtukch.nest.post_reaction.service.PostReactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +33,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final PostReactionService postReactionService;
 
     @Operation(
             summary = "게시글 작성",
@@ -146,6 +150,87 @@ public class PostController {
         Long memberId = user.getMember().getMemberId();
         log.info("[게시글 삭제 요청] postId={}, memberId={}", postId, memberId);
         PostResponseDto responseDto = postService.deletePost(memberId, postId);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "게시글 검색",
+            description = """
+                    키워드를 사용하여 게시글을 검색합니다.
+                    
+                    ## 검색 키워드
+                    - `keyword`: 검색할 키워드
+                    
+                    ## 검색 타입
+                    - `searchType`: 검색 타입 (ALL, TITLE, CONTENT)
+                    - ALL: 제목과 내용에서 검색 (기본값)
+                    - TITLE: 제목에서만 검색
+                    - CONTENT: 내용에서만 검색
+                    
+                    ## 태그 필터링
+                    - 태그 필터링을 추가하려면 `?tags=JAVA&tags=SPRING`과 같이 전달하세요.
+                    
+                    ## 페이지네이션 
+                    - 페이지 번호: `?page=0` (기본값: 0, 첫 페이지)
+                    - 페이지 크기: `?size=10` (기본값: 10, 페이지당 10개 항목)
+                    
+                    ## 정렬
+                    - 단일 필드 정렬: `?sort=createdAt,desc` (기본값: createdAt,desc)
+                    - 다중 필드 정렬: `?sort=viewCount,desc&sort=createdAt,desc`
+                    
+                    ## 전체 사용 예시
+                    - `/api/v1/posts/search?keyword=스프링&searchType=TITLE&page=0&size=10&sort=createdAt,desc&tags=JAVA`
+                    """
+    )
+    @GetMapping("/search")
+    public ResponseEntity<PostListResponseDto> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam(required = false, defaultValue = "ALL") String searchType,
+            @RequestParam(required = false) List<String> tags,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        PostListResponseDto responseDto;
+        if (tags == null || tags.isEmpty()) {
+            responseDto = postService.searchPosts(keyword, searchType, pageable);
+        } else {
+            responseDto = postService.searchPostsWithTags(keyword, tags, searchType, pageable);
+        }
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "게시글 좋아요/싫어요 반응 관리",
+            description = """
+                게시글에 좋아요 또는 싫어요 반응을 추가, 변경 또는 취소합니다.
+                
+                ### 주요 기능
+                - 인증된 사용자만 게시글에 반응할 수 있습니다.
+                - 한 사용자는 하나의 게시글에 하나의 반응만 가질 수 있습니다.
+                - 같은 유형의 반응을 다시 보내면 반응이 취소됩니다(토글 방식).
+                - 다른 유형의 반응을 보내면 기존 반응이 새로운 반응으로 변경됩니다.
+                
+                ### 요청 가능한 반응 유형
+                - LIKE: 좋아요
+                - DISLIKE: 싫어요
+                
+                ### 응답 정보
+                - 반응 적용 후 해당 댓글의 최신 좋아요/싫어요 수가 반환됩니다.
+                - 결과 메시지는 반응이 '추가', '변경', 또는 '취소' 되었는지 안내합니다.
+                """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PostMapping("/{postId}/reaction")
+    ResponseEntity<PostReactionResponseDto> reactToPost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody @Valid PostReactionRequestDto requestDto
+    ) {
+        PostReactionResponseDto responseDto = postReactionService.reactToPost(
+                postId,
+                user.getMember().getMemberId(),
+                requestDto.getReactionType()
+        );
         return ResponseEntity.ok(responseDto);
     }
 }

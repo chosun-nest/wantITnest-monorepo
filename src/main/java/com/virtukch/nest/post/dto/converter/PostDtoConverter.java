@@ -1,5 +1,6 @@
 package com.virtukch.nest.post.dto.converter;
 
+import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.model.Post;
@@ -38,6 +39,8 @@ public class PostDtoConverter {
                 .tags(tagNames)
                 .authorName(memberName)
                 .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .build();
     }
@@ -53,6 +56,8 @@ public class PostDtoConverter {
                         .name(member.getMemberName())
                         .build())
                 .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .updatedAt(timeFormat(post.getUpdatedAt()))
                 .build();
@@ -62,20 +67,7 @@ public class PostDtoConverter {
         return PostListResponseDto.builder()
                 .posts(summaries)
                 .totalCount((int) page.getTotalElements())
-                .pageInfo(toPageInfoDto(page))
-                .build();
-    }
-
-    public static PageInfoDto toPageInfoDto(Page<?> page) {
-        return PageInfoDto.builder()
-                .pageNumber(page.getNumber())
-                .pageSize(page.getSize())
-                .totalPages(page.getTotalPages())
-                .totalElements(page.getTotalElements())
-                .first(page.isFirst())
-                .last(page.isLast())
-                .hasNext(page.hasNext())
-                .hasPrevious(page.hasPrevious())
+                .pageInfo(PageInfoDto.create(page))
                 .build();
     }
 
