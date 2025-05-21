@@ -15,6 +15,8 @@ public class PostSummaryDto {
     private String previewContent;
     private String authorName;
     private List<String> tags;
-    private int viewCount;
+    private Long viewCount;
+    private Long likeCount;
+    private Long dislikeCount;
     private String createdAt;
 }

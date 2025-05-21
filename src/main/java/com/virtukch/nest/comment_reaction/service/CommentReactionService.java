@@ -1,11 +1,10 @@
 package com.virtukch.nest.comment_reaction.service;
 
-import com.virtukch.nest.comment_reaction.model.ReactionType;
-import com.virtukch.nest.comment.exception.CommentNotFoundException;
 import com.virtukch.nest.comment.model.Comment;
-import com.virtukch.nest.comment.repository.CommentRepository;
+import com.virtukch.nest.comment.service.CommentService;
 import com.virtukch.nest.comment_reaction.dto.CommentReactionResponseDto;
 import com.virtukch.nest.comment_reaction.model.CommentReaction;
+import com.virtukch.nest.comment_reaction.model.ReactionType;
 import com.virtukch.nest.comment_reaction.repository.CommentReactionRepository;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
@@ -21,14 +20,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommentReactionService {
     private final CommentReactionRepository commentReactionRepository;
-    private final CommentRepository commentRepository;
+    private final CommentService commentService;
     private final MemberRepository memberRepository;
 
     /**
      * 댓글에 좋아요/싫어요 반응을 추가하거나 변경합니다.
-     * - 이미 같은 유형의 반응이 있으면 취소합니다.
-     * - 다른 유형의 반응이 있으면 변경합니다.
-     * - 반응이 없으면 새로 추가합니다.
+     * <p>
+     * - 이미 같은 유형의 반응이 있으면 취소합니다. <br>
+     * - 다른 유형의 반응이 있으면 변경합니다. <br>
+     * - 반응이 없으면 새로 추가합니다. <br>
+     * </p>
      *
      * @param commentId 반응할 댓글의 ID
      * @param memberId 반응하는 사용자의 ID
@@ -38,7 +39,7 @@ public class CommentReactionService {
     @Transactional
     public CommentReactionResponseDto reactToComment(Long commentId, Long memberId, ReactionType reactionType) {
         // 댓글과 사용자 존재 확인
-        Comment comment = findCommentOrThrow(commentId);
+        Comment comment = commentService.findByIdOrThrow(commentId);
         findMemberOrThrow(memberId);
 
         // 기존 반응 조회
@@ -110,18 +111,6 @@ public class CommentReactionService {
                 .dislikeCount(comment.getDislikeCount())
                 .message(message)
                 .build();
-    }
-
-    /**
-     * 댓글 ID로 댓글을 조회하고, 없으면 예외를 발생시킵니다.
-     *
-     * @param commentId 조회할 댓글 ID
-     * @return 조회된 댓글 객체
-     * @throws CommentNotFoundException 댓글이 존재하지 않는 경우
-     */
-    private Comment findCommentOrThrow(Long commentId) {
-        return commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
     }
 
     /**

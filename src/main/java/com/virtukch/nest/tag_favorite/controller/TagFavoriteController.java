@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/favorites/tags")
 @RequiredArgsConstructor
-@Tag(name = "[관심분야 정보 게시판] 태그 즐겨찾기 API", description = "회원 관심태그 추가, 확인, 삭제, 조회 API")
+@Tag(name = "태그 즐겨찾기 API", description = "회원 관심태그 추가, 확인, 삭제, 조회 API")
 public class TagFavoriteController {
 
     private final TagFavoriteService tagFavoriteService;
@@ -65,8 +65,7 @@ public class TagFavoriteController {
         log.info("[TagFavoriteController] DELETE /api/v1/favorites/tags/{} 요청 - 사용자 ID: {}",
                 tagName, userDetails.getMember().getMemberId());
 
-        tagFavoriteService.removeFavoriteTag(
-                userDetails.getMember().getMemberId(), tagName);
+        tagFavoriteService.removeFavoriteTag(userDetails.getMember().getMemberId(), tagName);
 
         return ResponseEntity.ok().build();
     }
@@ -83,8 +82,7 @@ public class TagFavoriteController {
         log.info("[TagFavoriteController] GET /api/v1/favorites/tags/{} 요청 - 사용자 ID: {}",
                 tagName, userDetails.getMember().getMemberId());
 
-        boolean isFavorite = tagFavoriteService.isFavoriteTag(
-                userDetails.getMember().getMemberId(), tagName);
+        boolean isFavorite = tagFavoriteService.isFavoriteTag(userDetails.getMember().getMemberId(), tagName);
 
         return ResponseEntity.ok(isFavorite);
     }

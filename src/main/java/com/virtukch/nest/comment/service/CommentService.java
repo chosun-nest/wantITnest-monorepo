@@ -203,7 +203,7 @@ public class CommentService {
 
     private void validatePostExistence(BoardType boardType, Long postId) {
         switch (boardType) {
-            case TOPIC -> {
+            case INTEREST -> {
                 if (!postRepository.existsById(postId)) {
                     throw new EntityNotFoundException("[관심분야 정보 게시판] 해당 게시글을 찾을 수 없습니다. postId = " + postId);
                 }
@@ -217,7 +217,7 @@ public class CommentService {
         }
     }
 
-    private Comment findByIdOrThrow(Long commentId) {
+    public Comment findByIdOrThrow(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
     }

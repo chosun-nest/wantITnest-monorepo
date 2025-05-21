@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,10 +24,15 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
-    private Integer viewCount = 0; // 조회수
+    private Long viewCount = 0L; // 조회수
 
+    @Setter
     @Column(nullable = false)
-    private Integer likeCount = 0;
+    private Long likeCount = 0L;
+
+    @Setter
+    @Column(nullable = false)
+    private Long dislikeCount = 0L;
 
 
     // 생성 편의 메서드
