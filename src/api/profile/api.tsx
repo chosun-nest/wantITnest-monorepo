@@ -1,5 +1,5 @@
 // profile/api.tsx
-import { API } from "../index_c";
+import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
 
 // 프로필 이미지 업로드 (POST)
@@ -11,10 +11,11 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
     throw new Error("No access token");
   }
 
-  const formData = new FormData();  
+  const formData = new FormData();
   formData.append("file", file);
 
-  const res = await API.post("/api/v1/members/me/image", formData, {  // Axios 요청
+  const res = await API.post("/api/v1/members/me/image", formData, {
+    // Axios 요청
     headers: {
       Authorization: `Bearer ${token}`, // Authorization 헤더, 토큰 검증
       // Content-Type 생략: Axios가 자동 설정
