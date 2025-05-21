@@ -255,18 +255,25 @@ export default function MyProfile() {
         .filter((t) => profile.techStacks.includes(t.name))
         .map((t) => t.id);
 
+      // 이미지 기본값 설정
+      const imageToUse = profile.uploadedImagePath || profile.image || "/assets/images/user.png";
+
+      // SNS는 최대 3개까지만 처리
+      const [sns1 = "", sns2 = "", sns3 = ""] = profile.sns;
+
       await updateMemberProfile({
         memberIntroduce: profile.introduce,
-        memberImageUrl: profile.uploadedImagePath || profile.image, // 업로드된 URL
-        memberSnsUrl1: profile.sns[0] || "",
-        memberSnsUrl2: profile.sns[1] || "",
-        memberSnsUrl3: profile.sns[2] || "",
-        memberSnsUrl4: profile.sns[3] || "",
+        memberImageUrl: imageToUse,
+        memberSnsUrl1: sns1,
+        memberSnsUrl2: sns2,
+        memberSnsUrl3: sns3,
         memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
         memberInterestUpdateRequestIdList: interestIdList,
         memberTechStackUpdateRequestIdList: techStackIdList,
       });
-      setShowModal(true);
+      
+      console.log("보낼 이미지 URL:", imageToUse);
+      
       setModalContent({
         title: "프로필 수정 완료",
         message: "프로필 수정을 완료했습니다.",
@@ -278,13 +285,14 @@ export default function MyProfile() {
       });
       setShowModal(true);
     } catch (e) {
+      console.error(e);
       setShowModal(true);
       setModalContent({
         title: "프로필 수정 오류",
         message: "프로필 수정중 오류가 발생했습니다.",
         type: "error",
       });
-      console.error(e);
+      setShowModal(true);
     }
   };
 

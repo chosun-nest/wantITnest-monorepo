@@ -73,13 +73,16 @@ export interface MemberProfile {
 // 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
+
   const BASE_URL = "http://119.219.30.209:6030";
+  const imagePath = res.data.memberImageUrl;
 
   return {
     ...res.data,
-    memberImageUrl: res.data.memberImageUrl
-      ? `${BASE_URL}${res.data.memberImageUrl}`
-      : "",
+    memberImageUrl:
+      imagePath && !imagePath.startsWith("http")
+        ? `${BASE_URL}${imagePath}`
+        : imagePath || "",
   };
 };
 
