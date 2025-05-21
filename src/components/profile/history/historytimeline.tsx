@@ -1,4 +1,5 @@
-// components/HistoryTimeline.tsx
+import History from "./history";
+
 export default function HistoryTimeline() {
   const years = [2020, 2021, 2022, 2023, 2024];
 
@@ -15,6 +16,7 @@ export default function HistoryTimeline() {
             </div>
           ))}
         </div>
+        <History />
       </div>
     </div>
   );

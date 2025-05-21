@@ -1,7 +1,7 @@
 // components/MyPin.tsx
 import { FaStar } from "react-icons/fa";
 
-interface MyPinProps {
+export interface MyPinProps {
   title: string;
   items: { text: string; pinned?: boolean }[];
   editable?: boolean;
