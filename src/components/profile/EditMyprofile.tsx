@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 import { selectAccessToken } from "../../store/slices/authSlice";
 import { ModalContent } from "../../types/modal";
 import Modal from "../common/modal";
+import * as S from "../../assets/styles/auth.styles";
 
 interface Item {
   id: number;
@@ -65,15 +66,17 @@ export default function MyProfile() {
   const [filteredTechs, setFilteredTechs] = useState<Item[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+    const [modalMessage, setModalMessage] = useState(""); // 모달 메시지
 
-  // 토큰 관리 변수는 전역 변수로 선언해야 함함
-  // selector를 사용해 내 토큰 가져오는 slice인 selectAccessToken을 인자로 넣음음
+  // 토큰 관리 변수는 전역 변수로 선언해야 함
+  // selector를 사용해 내 토큰 가져오는 slice인 selectAccessToken을 인자로 넣음
   const accessToken = useSelector(selectAccessToken);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);  // 모달 표시 여부
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
     message: "",
     type: "info",
+    onClose: undefined,
   });
 
   useEffect(() => {
@@ -206,7 +209,9 @@ export default function MyProfile() {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      alert("파일이 없습니다.");
+      setModalMessage("파일이 없습니다.");
+      setShowModal(true);
+      //alert("파일이 없습니다.");
       return;
     }
 
@@ -221,7 +226,11 @@ export default function MyProfile() {
     } catch (err) {
       console.error("이미지 업로드 실패", err);
       if (err instanceof Error) alert(err.message);
-      else alert("이미지 업로드 실패!");
+      else {
+        setModalMessage("이미지 업로드 실패!");
+        setShowModal(true);
+      }
+      //alert("이미지 업로드 실패!");
     }
   };
 

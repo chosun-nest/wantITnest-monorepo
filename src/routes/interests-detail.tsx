@@ -15,6 +15,7 @@ interface PostDetail {
   updatedAt: string;
   viewCount: number;
   likeCount: number;
+  hateCount: number;
   tags: string[];
 }
 
@@ -91,10 +92,10 @@ export default function InterestsDetail() {
 
           <div className="flex items-center gap-3 mb-6">
             <button className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50">
-              👍🏻 좋아요 {post?.likeCount ?? 0}
+              좋아요 {post?.likeCount ?? 0}
             </button>
             <button className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50">
-              👎🏻 싫어요 0
+              싫어요 {post?.hateCount ?? 0}
             </button>
             <button className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50">
               🔗 공유
