@@ -1,4 +1,5 @@
 // 계정 탈퇴 모달
+import React from "react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { checkPassword } from "../../../../api/profile/api";
@@ -7,7 +8,7 @@ import CheckIcon from "../../../ui/CheckIcon";
 
 interface Props {
   onClose: () => void;
-  onConfirm: (password: string) => void;
+  onConfirm: () => void;
 }
 
 export default function WithdrawModal({ onClose, onConfirm }: Props) {
@@ -39,6 +40,10 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
     } finally {
       setIsChecking(false);
     }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleVerify();
   };
 
   return (
@@ -77,43 +82,30 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
               transition={{ duration: 0.3 }}
               className="mb-4"
             >
-              <label className="block mb-1 text-sm font-semibold text-gray-700">
-                비밀번호 확인
-              </label>
-
+              <label className="block mb-1 text-sm font-semibold text-gray-700">비밀번호 확인</label>
               <div className="relative">
                 <input
                   type={showPwd ? "text" : "password"}
                   placeholder="현재 비밀번호를 입력하세요"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   onBlur={handleVerify}
                   className="w-full p-2 pr-10 border rounded focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-800"
                   disabled={isChecking || isVerified === true}
                 />
-
-                {/* 숨기기/보기 토글 */}
                 <button
                   type="button"
                   className="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2"
-                  onClick={() => setShowPwd((prev) => !prev)}
+                  onClick={() => setShowPwd(prev => !prev)}
                 >
                   {showPwd ? "🔒" : "👁️"}
                 </button>
-
-                {/* 로딩, 체크 아이콘 */}
                 <div className="absolute inset-y-0 flex items-center pr-2 right-10">
-                  {isChecking
-                    ? <LoadingDots />
-                    : isVerified
-                      ? <CheckIcon />
-                      : null}
+                  {isChecking ? <LoadingDots /> : isVerified ? <CheckIcon /> : null}
                 </div>
               </div>
-
-              {error && (
-                <p className="mt-2 text-sm text-red-500">{error}</p>
-              )}
+              {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
             </motion.div>
           )}
         </AnimatePresence>
@@ -126,7 +118,7 @@ export default function WithdrawModal({ onClose, onConfirm }: Props) {
             닫기
           </button>
           <button
-            onClick={() => onConfirm(password)}
+            onClick={onConfirm}
             disabled={!isFormValid}
             className={`px-4 py-2 rounded text-white ${
               isFormValid ? "bg-red-700 hover:bg-red-800" : "bg-gray-300 cursor-not-allowed"

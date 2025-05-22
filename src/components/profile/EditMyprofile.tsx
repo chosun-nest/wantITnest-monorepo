@@ -7,7 +7,7 @@ import {
   uploadProfileImage,
   updateMemberProfile,
 } from "../../api/profile/api";
-
+import axios from "axios";
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile/EditProfileImage";
 import EditProfileField from "./edit-myprofile/EditProfileField";
@@ -211,35 +211,40 @@ export default function MyProfile() {
         message: "파일이 없습니다.",
         type: "error",
       });
-      //alert("파일이 없습니다.");
       setShowModal(true);
       return;
     }
 
     try {
       const uploadedImageUrl = await uploadProfileImage(file);
-      
+
+      // 중복된 URL 제거 로직
+      const sanitizedUrl = uploadedImageUrl.replace(/(https?:\/\/[^/]+)+/, "$1");
+
+      console.log("서버 응답:", uploadedImageUrl);
+      console.log("정제된 URL:", sanitizedUrl);
+
       setProfile((prev) => ({
         ...prev,
-        image: uploadedImageUrl,
-        uploadedImagePath: uploadedImageUrl,  // 이거 빠지면 저장 시 PATCH에도 누락됨
+        image: sanitizedUrl,
+        uploadedImagePath: sanitizedUrl,
       }));
     } catch (err) {
       console.error("이미지 업로드 실패", err);
-      if (err instanceof Error) alert(err.message);
-      else {
-        // setModalMessage("이미지 업로드 실패!");
-        // setShowModal(true);
-        setModalContent({
-          title: "업로드 실패",
-          message: "이미지 업로드 중 오류가 발생했습니다.",
-          type: "error",
-        });
-        setShowModal(true);
+
+        if (axios.isAxiosError(err)) {
+        console.log("서버 응답 메시지:", err.response?.data.message);
       }
-      //alert("이미지 업로드 실패!");
+
+      setModalContent({
+        title: "업로드 실패",
+        message: "이미지 업로드 중 오류가 발생했습니다.",
+        type: "error",
+      });
+      setShowModal(true);
     }
   };
+
 
   const handleSave = async () => {
     if (!accessToken) return;
@@ -257,8 +262,6 @@ export default function MyProfile() {
 
       // 이미지 기본값 설정
       const imageToUse = profile.uploadedImagePath || profile.image || "/assets/images/user.png";
-
-      // SNS는 최대 3개까지만 처리
       const [sns1 = "", sns2 = "", sns3 = ""] = profile.sns;
 
       await updateMemberProfile({
