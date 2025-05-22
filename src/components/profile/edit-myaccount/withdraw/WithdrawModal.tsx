@@ -2,7 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { checkPassword } from "../../../../api/profile/api";
+import { checkPassword } from "../../../../api/profile/ProfileAPI";
 import LoadingDots from "../../../ui/LoadingDots";
 import CheckIcon from "../../../ui/CheckIcon";
 

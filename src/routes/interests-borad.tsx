@@ -11,6 +11,9 @@ import InterestPostCardList from "../components/interests/board/InterestPostCard
 import InterestBoardWriteButton from "../components/board/tag/BoardWriteButton"    // 글 쓰기 버튼
 import Pagination from "../components/interests/board/Pagination";
 
+//import { fetchPosts } from "../api/interests/InterestsAPI"; // 게시글 목록 API 가져오기
+//import { PostSummary } from "../api/types/interests"; // 타입 불러오기
+
 export default function InterestBoard() {
   const [navHeight, setNavHeight] = useState(0);
   const [showFilterModal, setShowFilterModal] = useState(false);

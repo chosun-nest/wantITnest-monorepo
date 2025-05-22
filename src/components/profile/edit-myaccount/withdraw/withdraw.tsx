@@ -1,7 +1,7 @@
 // 계정 탈퇴 페이지
 import {useState} from "react";
 import { useDispatch } from "react-redux";
-import { withdrawMember } from "../../../../api/profile/api";
+import { withdrawMember } from "../../../../api/profile/ProfileAPI";
 import WithdrawModal from "./WithdrawModal";
 import WithdrawCompleteModal from "./WithdrawCompleteModal";
 import { clearTokens } from "../../../../store/slices/authSlice";

@@ -6,7 +6,7 @@ import {
   getDepartments,
   uploadProfileImage,
   updateMemberProfile,
-} from "../../api/profile/api";
+} from "../../api/profile/ProfileAPI";
 import axios from "axios";
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile/EditProfileImage";

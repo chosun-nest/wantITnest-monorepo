@@ -10,7 +10,7 @@ import {
 } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { clearTokens, selectAccessToken } from "../../store/slices/authSlice";
-import { getMemberProfile, MemberProfile } from "../../api/profile/api";
+import { getMemberProfile, MemberProfile } from "../../api/profile/ProfileAPI";
 
 interface SidebarProps {
   onClose: () => void;
