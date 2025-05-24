@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,6 @@ import java.util.List;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Profile("!prod") // production 환경에서는 실행하지 않음
 @Order(2) // Member 다음에 실행 - Tag 생성
 public class TagInitializer implements ApplicationRunner {
 

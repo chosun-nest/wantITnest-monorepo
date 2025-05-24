@@ -4,7 +4,9 @@ import com.virtukch.nest.interest.model.Interest;
 import com.virtukch.nest.interest.repository.InterestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,12 +14,13 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class InterestDataLoader implements CommandLineRunner {
+@Order(0) // 기본 데이터와 함께 먼저 실행
+public class InterestDataLoader implements ApplicationRunner {
 
     private final InterestRepository interestRepository;
 
     @Override
-    public void run(String... args) {
+    public void run(ApplicationArguments args) throws Exception {
         if (interestRepository.count() == 0) {
             List<String> jobFields = List.of(
                 // 개발 직군
