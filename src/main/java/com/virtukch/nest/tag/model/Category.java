@@ -1,12 +1,13 @@
 package com.virtukch.nest.tag.model;
 
 public enum Category {
-    PROGRAMMING("프로그래밍", "programming"),
-    AI("인공지능", "ai"),
-    WEB_DEVELOPMENT("웹개발", "web-development"),
-    DATABASE("데이터베이스", "database"),
-    GAME_DEVELOPMENT("게임개발", "game-development"),
-    COMPUTER_SCIENCE("컴퓨터과학", "computer-science"),
+    DEVELOPMENT_PROGRAMMING("🖥️ 개발•프로그래밍", "development-programming"),
+    ARTIFICIAL_INTELLIGENCE("🤖 인공지능", "artificial-intelligence"),
+    DATA_SCIENCE("🥼 데이터 사이언스", "data-science"),
+    GAME_DEVELOPMENT("🎮 게임 개발", "game-development"),
+    SECURITY_NETWORK("🛡️ 보안•네트워크", "security-network"),
+    HARDWARE("💽 하드웨어", "hardware"),
+    DESIGN_ART("🎨 디자인•아트", "design-art"),
     UNCATEGORIZED("미분류", "uncategorized");
 
     private final String displayName;
