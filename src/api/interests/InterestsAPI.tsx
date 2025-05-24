@@ -38,8 +38,12 @@ export const createInterestPost = async (
 // =========================================
 
 // 게시글 상세 조회 (GET) - 인증 불필요
-export const fetchPostDetail = async (postId: number): Promise<PostDetail> => {
-  const response = await API.get<PostDetail>(`/api/v1/posts/${postId}`);
+export const fetchPostDetail = async (
+  postId: number
+): Promise<PostDetail> => {
+  const response = await API.get<PostDetail>(`/api/v1/posts/${postId}`, {
+    headers: { skipAuth: true },
+  });
   return response.data;
 };
 
@@ -75,7 +79,9 @@ export const updatePost = async (
 
 // 게시글 목록 요청 파라미터 : params
 // 서버 응답 타입 : Promise<PostListResponse>
-export const fetchPosts = async (params: FetchPostsParams): Promise<PostListResponse> => {  
+export const fetchPosts = async (
+  params: FetchPostsParams
+): Promise<PostListResponse> => {  
   const queryParams = new URLSearchParams();    // ?page=0&size=10&tags=JAVA 같은 형식
 
   if (params.page !== undefined) 
@@ -88,7 +94,10 @@ export const fetchPosts = async (params: FetchPostsParams): Promise<PostListResp
     params.tags.forEach((tag) => queryParams.append("tags", tag));  // tags는 여러 개 지원하므로 tags=JAVA&tags=SPRING처럼 하나씩 반복 추가
   }
 
-  const response = await API.get<PostListResponse>(`/api/v1/posts?${queryParams.toString()}`);
+    const response = await API.get<PostListResponse>(
+    `/api/v1/posts?${queryParams.toString()}`,
+    { headers: { skipAuth: true },}
+  );
   return response.data;
 };
 
@@ -134,7 +143,10 @@ export const searchPosts = async (
   }
 
   const response = await API.get<SearchPostListResponse>(
-    `/api/v1/posts/search?${queryParams.toString()}`
+    `/api/v1/posts/search?${queryParams.toString()}`,
+    {
+      headers: { skipAuth: true },
+    }
   );
   return response.data;
 };

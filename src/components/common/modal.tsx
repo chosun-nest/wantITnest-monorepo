@@ -27,18 +27,18 @@ export default function Modal({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 transition-opacity">
+    <div className="fixed inset-0 z-50 flex items-center justify-center transition-opacity backdrop-blur-sm bg-black/30">
       <div
         ref={modalRef}
         className={`w-[90%] max-w-md bg-white rounded-xl p-6 shadow-lg scale-100 animate-modal-in
           ${type === "error" ? "border-l-4 border-red-500" : "border-l-4 border-blue-500"}
         `}
       >
-        <h2 className="text-lg font-semibold mb-2 text-gray-800 flex items-center gap-2">
+        <h2 className="flex items-center gap-2 mb-2 text-lg font-semibold text-gray-800">
           {type === "error" ? "❌" : "ℹ️"} {title}
         </h2>
         <p className="text-sm text-gray-700">{message}</p>
-        <div className="text-right mt-4">
+        <div className="mt-4 text-right">
           <button
             onClick={onClose}
             className={`px-4 py-2 text-sm rounded font-medium ${

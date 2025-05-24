@@ -3,18 +3,18 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/layout/navbar";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
-
 import BoardTypeSelector from "../components/board/write/BoardTypeSelector";
 import TitleInput from "../components/board/write/TitleInput";
 import ParticipantsInput from "../components/board/write/ParticipantsInput";
 import MarkdownEditor from "../components/board/write/MarkdownEditor";
 import SubmitButtons from "../components/board/write/SubmitButtons";
-
-import { createInterestPost } from "../api/interests/InterestsAPI";   // interests 전용 API
-//import { CreateProjectPayload } from "../api/project/api";
-
 import Modal from "../components/common/modal";
 import { ModalContent } from "../types/modal";
+import {
+  createInterestPost,
+  updatePost,
+} from "../api/interests/InterestsAPI";
+import type { PostDetail } from "../api/types/interest-board";
 
 // 게시판 타입 정의
 type BoardType = "interests" | "projects";
@@ -30,14 +30,12 @@ export default function BoardWrite() {
   const location = useLocation();
   const navbarRef = useRef<HTMLDivElement>(null);
 
+  const postToEdit = location.state?.post as PostDetail | undefined;
+  const isEditMode = !!postToEdit;
+
   const [navHeight, setNavHeight] = useState(0);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-
-  const [boardType, setBoardType] = useState<BoardType>(() => {
-    const from = location.state?.from;
-    return from === "project-board" ? "projects" : "interests";
-  });
-
+  const [boardType, setBoardType] = useState<BoardType>("interests");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<string | undefined>("");
   const [participants, setParticipants] = useState("");
@@ -63,8 +61,7 @@ export default function BoardWrite() {
 
 ## 2. 허깅 페이스 핵심 서비스들 보기
 
-## 3. 허깅 페이스 활용 사례
-`;
+## 3. 허깅 페이스 활용 사례`;
 
   useEffect(() => {
     if (navbarRef.current) {
@@ -73,8 +70,18 @@ export default function BoardWrite() {
   }, []);
 
   useEffect(() => {
-    setContent(boardType === "projects" ? defaultProjectContent : defaultInterestContent);
+    if (!isEditMode) {
+      setContent(boardType === "projects" ? defaultProjectContent : defaultInterestContent);
+    }
   }, [boardType]);
+
+  useEffect(() => {
+    if (isEditMode && postToEdit) {
+      setTitle(postToEdit.title);
+      setContent(postToEdit.content);
+      setSelectedTags(postToEdit.tags);
+    }
+  }, [isEditMode]);
 
   const handleSubmit = async () => {
     if (!title || !content) {
@@ -88,7 +95,18 @@ export default function BoardWrite() {
     }
 
     try {
-      if (boardType === "interests") {
+      if (isEditMode && postToEdit) {
+        await updatePost(postToEdit.postId, { title, content, tags: selectedTags });
+        setModalContent({
+          title: "수정 완료",
+          message: "게시글이 성공적으로 수정되었습니다.",
+          type: "info",
+          onClose: () => {
+            setShowModal(false);
+            navigate(`/interests-detail/${postToEdit.postId}`);
+          },
+        });
+      } else {
         const payload: CreatePostPayload = { title, content, tags: selectedTags };
         await createInterestPost(payload);
         setModalContent({
@@ -99,12 +117,6 @@ export default function BoardWrite() {
             setShowModal(false);
             navigate("/interests-board");
           },
-        });
-      } else {
-        setModalContent({
-          title: "준비 중",
-          message: "프로젝트 게시판 글쓰기 기능은 아직 준비 중입니다.",
-          type: "error",
         });
       }
       setShowModal(true);
@@ -127,7 +139,9 @@ export default function BoardWrite() {
     <>
       <Navbar ref={navbarRef} />
       <div className="max-w-4xl mx-auto px-4 mt-[40px]" style={{ paddingTop: navHeight }}>
-        <BoardTypeSelector boardType={boardType} setBoardType={setBoardType} />
+        {!isEditMode && (
+          <BoardTypeSelector boardType={boardType} setBoardType={setBoardType} />
+        )}
 
         <div className="p-3 mb-4 text-sm border-l-4 border-blue-600 rounded bg-blue-50">
           <strong>
@@ -179,7 +193,11 @@ export default function BoardWrite() {
           />
         )}
 
-        <SubmitButtons onCancel={() => navigate(-1)} onSubmit={handleSubmit} />
+        <SubmitButtons
+          onCancel={() => navigate(-1)}
+          onSubmit={handleSubmit}
+          submitLabel={isEditMode ? "수정 완료" : undefined}
+        />
       </div>
     </>
   );

@@ -3,15 +3,15 @@ import useResponsive from "../../../hooks/responsive";
 
 interface InterestPostCardListProps {
   posts: {
-    id: number;
+    postId: number;
     title: string;
-    summary: string;
+    previewContent: string;
     tags: string[];
-    author: string;
-    date: string;
-    views: number;
-    likes: number;
-    comments: number;
+    authorName: string;
+    createdAt: string;
+    viewCount: number;
+    likeCount: number;
+    commentCount: number;
   }[];
 }
 
@@ -23,8 +23,8 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
     <div className="space-y-4">
       {posts.map((post) => (
         <div
-          key={post.id}
-          onClick={() => navigate(`/interests-detail/${post.id}`)}
+          key={post.postId}
+          onClick={() => navigate(`/interests-detail/${post.postId}`)}
           className="p-4 border rounded-lg cursor-pointer hover:shadow"
         >
           <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>
@@ -34,9 +34,9 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
           </div>
 
           <p className="mb-2 text-sm text-gray-700">
-            {post.summary.length > 100
-              ? `${post.summary.slice(0, 100)}...`
-              : post.summary}
+            {post.previewContent.length > 100     // 100자 preview
+              ? `${post.previewContent.slice(0, 100)}...`
+              : post.previewContent}
           </p>
 
           {post.tags && (
@@ -54,12 +54,12 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
 
           <div className="flex justify-between text-xs text-gray-500">
             <span>
-              {post.author} • {post.date}
+              {post.authorName} • {post.createdAt.slice(0, 10)}
             </span>
             <div className="flex gap-3">
-              <span>조회수 {post.views}</span>
-              <span>좋아요 {post.likes}</span>
-              <span>댓글수 {post.comments}</span>
+              <span>조회수 {post.viewCount}</span>
+              <span>좋아요 {post.likeCount}</span>
+              <span>댓글수 {post.commentCount}</span>
             </div>
           </div>
         </div>

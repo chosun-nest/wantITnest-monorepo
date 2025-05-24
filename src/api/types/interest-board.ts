@@ -56,7 +56,7 @@ export interface UpdatePostResponse {
 // [관심분야 게시판용 - interests-board.tsx]
 // =========================================
 export interface PostSummary {   // 게시글 요약 (게시글 카드)
-  id: number;               // 게시글 id
+  postId: number;               // 게시글 id
   title: string;            // 게시글 제목
   previewContent: string;   // 본문 미리보기
   authorName: string;       // 작성자 이름
@@ -64,6 +64,7 @@ export interface PostSummary {   // 게시글 요약 (게시글 카드)
   viewCount: number;        // 조회수
   likeCount: number;        // 좋아요수
   dislikeCount: number;     // 싫어요수
+  commentCount: number;     // 댓글 수
   createdAt: string;        // 작성 일자
 }
 
