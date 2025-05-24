@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface TagRepository extends JpaRepository<Tag, Long> {
     Optional<Tag> findByName(String name);
     List<Tag> findByCategory(Category category);
-    Optional<Tag> findByPathName(String pathName);
 }

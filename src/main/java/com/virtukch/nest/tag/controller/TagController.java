@@ -16,9 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/tags")
@@ -38,6 +35,7 @@ public class TagController {
     })
     @GetMapping
     public ResponseEntity<TagListResponseDto> getTags() {
+        log.info("[TagController] GET /api/v1/tags 요청 들어옴");
         return ResponseEntity.ok(tagService.getAllTags());
     }
 
@@ -49,24 +47,33 @@ public class TagController {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음")
     })
-    @GetMapping("/category/{categoryPathName}")
-    public ResponseEntity<TagListResponseDto> getTagsByCategory(@PathVariable String categoryPathName) {
-        TagListResponseDto response = tagService.getTagsByCategory(categoryPathName);
-        return ResponseEntity.ok(response);
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<TagListResponseDto> getTagsByCategory(@PathVariable String categoryName) {
+        log.info("[TagController] GET /api/v1/tags/category/{} 요청 들어옴", categoryName);
+        
+        try {
+            Category category = Category.valueOf(categoryName.toUpperCase());
+            TagListResponseDto response = tagService.getTagsByCategory(category);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            log.warn("[TagController] 존재하지 않는 카테고리: {}", categoryName);
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Operation(
             summary = "특정 태그 정보 반환",
-            description = "태그 경로명을 통해 특정 태그의 정보를 반환합니다."
+            description = "태그 이름을 통해 특정 태그의 정보를 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "404", description = "태그를 찾을 수 없음")
     })
-    @GetMapping("/{tagPathName}")
-    public ResponseEntity<TagResponseDto> getTagByPathName(@PathVariable String tagPathName) {
-        TagResponseDto response = tagService.getTagByPathName(tagPathName);
-
+    @GetMapping("/{tagName}")
+    public ResponseEntity<TagResponseDto> getTagByName(@PathVariable String tagName) {
+        log.info("[TagController] GET /api/v1/tags/{} 요청 들어옴", tagName);
+        
+        TagResponseDto response = tagService.getTagByName(tagName);
         return ResponseEntity.ok(response);
     }
 }
