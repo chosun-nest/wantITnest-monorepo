@@ -13,11 +13,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Order(1) // 가장 먼저 실행 - Member 생성이 최우선
 public class MemberDataLoader implements ApplicationRunner {
 
     // 1. 순수 회원가입
@@ -46,7 +48,7 @@ public class MemberDataLoader implements ApplicationRunner {
             .memberSnsUrl4(null)
             .memberIsStudent(true)
             .memberIntroduce("안녕하세요! 컴퓨터공학 전공 중입니다.")
-            .memberImageUrl("http://119.219.30.209/images/nest/kch4731@naver.com")
+            .memberImageUrl(null)
             .memberPasswordLength("kch4731@naver.com".length())
             .build();
 
@@ -63,11 +65,26 @@ public class MemberDataLoader implements ApplicationRunner {
             .memberSnsUrl4(null)
             .memberIsStudent(true)
             .memberIntroduce("안녕하세요! 컴퓨터공학 전공 중입니다.")
-            .memberImageUrl("http://119.219.30.209/images/nest/bimo972@chosun.ac.kr")
+            .memberImageUrl(null)
             .memberPasswordLength("bimo972@chosun.ac.kr".length())
             .build();
 
-        memberRepository.save(member2);
+        Member member3 = Member.builder()
+                .memberEmail("cotjs0321@naver.com")
+                .memberPassword(passwordEncoder.encode("cotjs0321@naver.com")) // 실제로는 BCrypt 등으로 암호화 필요
+                .memberRole(Role.ROLE_USER)
+                .memberName("송채선")
+                .memberSnsUrl1("https://github.com/atrafelis/")
+                .memberSnsUrl2(null)
+                .memberSnsUrl3(null)
+                .memberSnsUrl4(null)
+                .memberIsStudent(true)
+                .memberIntroduce("안녕하세요! 컴퓨터공학 전공 중입니다.")
+                .memberImageUrl(null)
+                .memberPasswordLength("cotjs0321@naver.com".length())
+                .build();
+
+        memberRepository.save(member3);
 
         List<MemberDepartment> memberDepartmentList = List.of(
             MemberDepartment.builder().memberId(member.getMemberId()).departmentId(1L).build(),
@@ -76,7 +93,11 @@ public class MemberDataLoader implements ApplicationRunner {
 
             MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(1L).build(),
             MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(2L).build(),
-            MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(3L).build()
+            MemberDepartment.builder().memberId(member2.getMemberId()).departmentId(3L).build(),
+
+            MemberDepartment.builder().memberId(member3.getMemberId()).departmentId(1L).build(),
+            MemberDepartment.builder().memberId(member3.getMemberId()).departmentId(2L).build(),
+            MemberDepartment.builder().memberId(member3.getMemberId()).departmentId(3L).build()
 
         );
 
@@ -89,7 +110,11 @@ public class MemberDataLoader implements ApplicationRunner {
 
             MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(1L).build(),
             MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(2L).build(),
-            MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(3L).build()
+            MemberTechStack.builder().memberId(member2.getMemberId()).techStackId(3L).build(),
+
+            MemberTechStack.builder().memberId(member3.getMemberId()).techStackId(1L).build(),
+            MemberTechStack.builder().memberId(member3.getMemberId()).techStackId(2L).build(),
+            MemberTechStack.builder().memberId(member3.getMemberId()).techStackId(3L).build()
         );
 
         memberTechStackRepository.saveAll(memberTechStackList);
@@ -101,7 +126,11 @@ public class MemberDataLoader implements ApplicationRunner {
 
             MemberInterest.builder().memberId(member2.getMemberId()).interestId(1L).build(),
             MemberInterest.builder().memberId(member2.getMemberId()).interestId(2L).build(),
-            MemberInterest.builder().memberId(member2.getMemberId()).interestId(3L).build()
+            MemberInterest.builder().memberId(member2.getMemberId()).interestId(3L).build(),
+
+            MemberInterest.builder().memberId(member3.getMemberId()).interestId(1L).build(),
+            MemberInterest.builder().memberId(member3.getMemberId()).interestId(2L).build(),
+            MemberInterest.builder().memberId(member3.getMemberId()).interestId(3L).build()
         );
 
         memberInterestRepository.saveAll(memberInterestList);

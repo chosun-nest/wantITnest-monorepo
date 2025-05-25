@@ -19,4 +19,5 @@ public class PostSummaryDto {
     private Long likeCount;
     private Long dislikeCount;
     private String createdAt;
+    private Long commentCount;
 }

@@ -25,20 +25,23 @@ public class TagService {
 
     @Transactional(readOnly = true)
     public TagListResponseDto getAllTags() {
+        log.info("[TagService] 전체 태그 조회 시작");
         List<Tag> tags = tagRepository.findAll();
+        log.info("[TagService] 조회된 태그 수: {}", tags.size());
         return buildTagListResponseDto(tags);
     }
 
     @Transactional(readOnly = true)
-    public TagListResponseDto getTagsByCategory(String categoryPathName) {
-        Category category = Category.findByPathName(categoryPathName);
+    public TagListResponseDto getTagsByCategory(Category category) {
+        log.info("[TagService] 카테고리별 태그 조회: {}", category);
         List<Tag> tags = tagRepository.findByCategory(category);
         return buildTagListResponseDto(tags);
     }
 
     @Transactional(readOnly = true)
-    public TagResponseDto getTagByPathName(String tagPathName) {
-        Tag tag = findByPathNameOrThrow(tagPathName);
+    public TagResponseDto getTagByName(String tagName) {
+        log.info("[TagService] 태그 이름으로 조회: {}", tagName);
+        Tag tag = findByNameOrThrow(tagName);
         return buildTagResponseDto(tag);
     }
 
@@ -46,10 +49,9 @@ public class TagService {
         return TagResponseDto.builder()
                 .tagId(tag.getId())
                 .tagName(tag.getName())
-                .tagPathName(tag.getPathName())
                 .category(tag.getCategory())
                 .categoryDisplayName(tag.getCategory().getDisplayName())
-                .categoryPathName(tag.getCategory().getPathName())
+                .postCount(postTagRepository.findAllByTagId(tag.getId()).size())
                 .build();
     }
 
@@ -59,16 +61,6 @@ public class TagService {
                 .tags(tagSummaries)
                 .tagCount(tags.size())
                 .build();
-    }
-
-    @Transactional(readOnly = true)
-    public Tag findByPathNameOrThrow(String tagPathName) {
-        log.info("[TagService] 태그 경로명으로 검색 요청: {}", tagPathName);
-        Optional<Tag> existingTag = tagRepository.findByPathName(tagPathName);
-        return existingTag.orElseThrow(() -> {
-            log.warn("[TagService] 태그 없음: {}", tagPathName);
-            return new TagNotFoundException("경로명: " + tagPathName);
-        });
     }
 
     @Transactional(readOnly = true)

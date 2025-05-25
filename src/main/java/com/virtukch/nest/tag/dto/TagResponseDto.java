@@ -11,8 +11,7 @@ import lombok.Getter;
 public class TagResponseDto {
     private Long tagId;
     private String tagName;
-    private String tagPathName;
     private Category category;
     private String categoryDisplayName;
-    private String categoryPathName;
+    private int postCount;
 }

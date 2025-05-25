@@ -16,4 +16,5 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long> {
 
     List<PostTag> findByTagIdIn(Collection<Long> tagIds);
 
+    List<PostTag> findAllByTagId(Long tagId);
 }

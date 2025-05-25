@@ -308,7 +308,7 @@ public class PostService {
 
     /**
      * 게시글 목록에 대한 응답 DTO를 구성합니다.
-     * 게시글 목록과 관련된 회원 이름, 태그 정보를 매핑하여 응답 DTO를 생성합니다.
+     * 게시글 목록과 관련된 회원 이름, 태그 정보, 댓글 개수를 매핑하여 응답 DTO를 생성합니다.
      *
      * @param postPage 게시글 페이지 정보
      * @return 게시글 목록과 페이징 정보를 담은 응답 DTO
@@ -319,12 +319,40 @@ public class PostService {
         Map<Long, String> memberNameMap = fetchMemberNameMap(posts);  // memberId -> memberName
         Map<Long, List<Long>> postTagMap = fetchPostTagMap(posts);  // postId -> List<TagId>
         Map<Long, String> tagNameMap = fetchTagNameMap(postTagMap);  // tagId → tagName
+        Map<Long, Long> commentCountMap = fetchCommentCountMap(posts);  // postId -> commentCount
 
         List<PostSummaryDto> summaries = posts.stream()
-                .map(post -> buildPostSummaryDto(post, memberNameMap, postTagMap, tagNameMap))
+                .map(post -> buildPostSummaryDto(post, memberNameMap, postTagMap, tagNameMap, commentCountMap))
                 .toList();
 
         return PostDtoConverter.toListResponseDto(summaries, postPage);
+    }
+
+    /**
+     * 게시글 요약 DTO를 구성합니다.
+     * 게시글 정보와 작성자 이름, 태그 이름 목록, 댓글 개수를 포함한 DTO를 생성합니다.
+     *
+     * @param post 게시글 엔티티
+     * @param memberNameMap 회원 ID와 이름을 매핑한 맵
+     * @param postTagMap 게시글 ID와 태그 ID 목록을 매핑한 맵
+     * @param tagNameMap 태그 ID와 이름을 매핑한 맵
+     * @param commentCountMap 게시글 ID와 댓글 개수를 매핑한 맵
+     * @return 게시글 요약 정보를 담은 DTO
+     */
+    private PostSummaryDto buildPostSummaryDto(
+            Post post,
+            Map<Long, String> memberNameMap,
+            Map<Long, List<Long>> postTagMap,
+            Map<Long, String> tagNameMap,
+            Map<Long, Long> commentCountMap
+    ){
+        String memberName = memberNameMap.get(post.getMemberId());
+        List<String> tagNames = postTagMap.getOrDefault(post.getId(), Collections.emptyList()).stream()
+                .map(tagNameMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+        Long commentCount = commentCountMap.getOrDefault(post.getId(), 0L);
+        return PostDtoConverter.toSummaryDto(post, memberName, tagNames, commentCount);
     }
 
     /**
@@ -373,26 +401,22 @@ public class PostService {
     }
 
     /**
-     * 게시글 요약 DTO를 구성합니다.
-     * 게시글 정보와 작성자 이름, 태그 이름 목록을 포함한 DTO를 생성합니다.
+     * 게시글 목록에 포함된 게시글 ID에 해당하는 댓글 개수 맵을 조회합니다.
      *
-     * @param post 게시글 엔티티
-     * @param memberNameMap 회원 ID와 이름을 매핑한 맵
-     * @param postTagMap 게시글 ID와 태그 ID 목록을 매핑한 맵
-     * @param tagNameMap 태그 ID와 이름을 매핑한 맵
-     * @return 게시글 요약 정보를 담은 DTO
+     * @param posts 게시글 목록
+     * @return 게시글 ID를 키로, 댓글 개수를 값으로 하는 맵
      */
-    private PostSummaryDto buildPostSummaryDto(
-            Post post,
-            Map<Long, String> memberNameMap,
-            Map<Long, List<Long>> postTagMap,
-            Map<Long, String> tagNameMap
-    ){
-        String memberName = memberNameMap.get(post.getMemberId());
-        List<String> tagNames = postTagMap.getOrDefault(post.getId(), Collections.emptyList()).stream()
-                                      .map(tagNameMap::get)
-                                      .filter(Objects::nonNull)
-                                      .toList();
-        return PostDtoConverter.toSummaryDto(post, memberName, tagNames);
+    private Map<Long, Long> fetchCommentCountMap(List<Post> posts) {
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+        
+        if (postIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        
+        return commentRepository.countByPostIdIn(postIds).stream()
+                .collect(Collectors.toMap(
+                        result -> (Long) result[0],  // postId
+                        result -> (Long) result[1]   // count
+                ));
     }
 }

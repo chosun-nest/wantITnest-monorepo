@@ -5,12 +5,14 @@ import com.virtukch.nest.department.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Order(0)
 public class DepartmentDataLoader implements ApplicationRunner {
 
     private final DepartmentRepository departmentRepository;
