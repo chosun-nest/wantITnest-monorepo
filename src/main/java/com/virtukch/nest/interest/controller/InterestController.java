@@ -17,9 +17,9 @@ public class InterestController {
 
     private final InterestService interestService;
 
-    @Operation(summary = "관심 기술 전체 조회", description = "모든 관심 기술 스택 정보를 조회합니다.")
-    @GetMapping
-    public List<InterestResponseDto> findAll() {
-        return interestService.findAll();
-    }
+//    @Operation(summary = "관심 기술 전체 조회", description = "모든 관심 기술 스택 정보를 조회합니다.")
+//    @GetMapping
+//    public List<InterestResponseDto> findAll() {
+//        return interestService.findAll();
+//    }
 }
