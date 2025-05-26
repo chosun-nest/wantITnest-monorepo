@@ -1,4 +1,3 @@
-// components/profile/history/mypins.tsx
 import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
