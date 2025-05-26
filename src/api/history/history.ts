@@ -9,11 +9,33 @@ export const getUsersAllHistory = async () => {
 
 export const postAHistory = async (payload: {
   content: string;
-  startdate: string;
-  enddate: string;
+  startDate: string;
+  endDate: string;
   important: boolean;
 }) => {
   const res = await API.post("/api/v1/histories", payload, {
+    headers: { skipAuth: false },
+  });
+  return res.data;
+};
+
+export const deleteHistory = async (historyId: number) => {
+  const res = await API.delete(`/api/v1/histories/${historyId}`, {
+    headers: { skipAuth: false },
+  });
+  return res.data;
+};
+
+export const updateHistory = async (
+  historyId: number,
+  payload: {
+    content: string;
+    startDate: string;
+    endDate: string;
+    important: boolean;
+  }
+) => {
+  const res = await API.put(`/api/v1/histories/${historyId}`, payload, {
     headers: { skipAuth: false },
   });
   return res.data;

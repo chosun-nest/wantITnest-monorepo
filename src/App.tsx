@@ -25,6 +25,7 @@ import Events from "./routes/events";
 import PublicRoute from "./components/auth/public-route";
 import ResetPassword from "./routes/reset-password";
 import GlobalModal from "./components/global/global-modal";
+import Dummy from "./routes/dummy";
 
 const router = createBrowserRouter([
   {
@@ -41,10 +42,7 @@ const router = createBrowserRouter([
         path: "project/:id",
         element: <ProjectDetail />,
       },
-      {
-        path: "project-board/",
-        element: <ProjectBoard />,
-      },
+
       {
         path: "project-apply",
         element: <ProjectApply />,
@@ -87,6 +85,10 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
+        path: "dummy/",
+        element: <Dummy />,
+      },
+      {
         path: "profile-edit/",
         element: <ProfileEdit />,
       },
@@ -97,6 +99,10 @@ const router = createBrowserRouter([
       {
         path: "board-write/", // yeong-eun : 게시판 글쓰기 페이지
         element: <BoardWrite />,
+      },
+      {
+        path: "project-board/",
+        element: <ProjectBoard />,
       },
     ],
   },

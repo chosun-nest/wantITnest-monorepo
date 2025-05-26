@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
 import MyPin from "../components/profile/history/mypins";
 import { MyPinProps } from "../components/profile/history/mypins";
-import HistoryTimeline from "../components/profile/history/historytimeline";
 
 export default function Home() {
   const isMobile = useResponsive();
@@ -32,9 +31,13 @@ export default function Home() {
         )}
       </S.GridItem>{" "}
       <S.GridItem $row="1" $isMobile={isMobile} $col="2">
-        <S.ItemTitle>
-          <HistoryTimeline />
-        </S.ItemTitle>
+        {isLoggedIn ? (
+          <MyPin
+            title={myPinData.title}
+            items={myPinData.items}
+            editable={myPinData.editable}
+          />
+        ) : null}
       </S.GridItem>
       <S.GridItem $row="1" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
@@ -51,11 +54,6 @@ export default function Home() {
           관심분야 게시판<Link to="/interests-board">+</Link>
         </S.ItemTitle>
       </S.GridItem>
-      <MyPin
-        title={myPinData.title}
-        items={myPinData.items}
-        editable={myPinData.editable}
-      />
     </S.GridContainer>
   );
 }

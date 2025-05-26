@@ -1,5 +1,6 @@
 // components/MyPin.tsx
 import { FaStar } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export interface MyPinProps {
   title: string;
@@ -20,9 +21,11 @@ export default function MyPin({ title, items, editable }: MyPinProps) {
         ))}
       </ul>
       {editable && (
-        <button className="absolute bottom-4 right-4 px-3 py-1 border border-gray-400 rounded text-sm hover:bg-gray-100">
-          수정
-        </button>
+        <Link to="/dummy">
+          <button className="absolute bottom-4 right-4 px-3 py-1 border border-gray-400 rounded text-sm hover:bg-gray-100">
+            수정
+          </button>
+        </Link>
       )}
     </div>
   );
