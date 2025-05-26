@@ -5,17 +5,19 @@ import {
   deleteHistory,
 } from "../../../api/history/history";
 import CheckModal from "../../common/checkmodal";
-
+interface HistoryPropsFromParent {
+  onEdit: (history: HistoryProps) => void;
+}
 export interface HistoryProps {
   historyId: number;
-  memberId: number;
+  memberId?: number;
   content: string;
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
   important: boolean;
 }
 
-export default function History() {
+export default function History({ onEdit }: HistoryPropsFromParent) {
   const [histories, setHistories] = useState<HistoryProps[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
@@ -61,6 +63,7 @@ export default function History() {
             key={history.historyId}
             {...history}
             onDelete={handleDelete}
+            onEdit={onEdit}
           />
         ))}
       </div>

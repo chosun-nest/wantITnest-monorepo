@@ -6,6 +6,7 @@ interface EditHistoryModalProps {
   onClose: () => void;
   onSuccess?: () => void;
   onSubmit: (data: {
+    historyId?: number;
     content: string;
     startDate: string;
     endDate: string;
@@ -60,7 +61,13 @@ export default function EditHistoryModal({
 
     setLoading(true);
     try {
-      await onSubmit({ content, startDate, endDate, important });
+      await onSubmit({
+        historyId: initialData?.historyId,
+        content,
+        startDate,
+        endDate,
+        important,
+      });
 
       onSuccess?.();
       setContent("");
