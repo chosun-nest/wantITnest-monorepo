@@ -104,7 +104,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectResponseDto deleteProject(Long memberId, Long projectId) {
+    public ProjectResponseDto deleteProject(Long projectId, Long memberId) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
 
         projectTagRepository.deleteAllByProjectId(projectId);
