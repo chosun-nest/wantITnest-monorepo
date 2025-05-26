@@ -1,4 +1,5 @@
 import { useState } from "react";
+const ai = "/assets/images/ai.png";
 
 export default function Ai() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function Ai() {
         className="fixed bottom-6 right-6 w-[50px] h-[50px] bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition duration-300"
         aria-label="AI 도우미 열기"
       >
-        🤖
+        <img src={ai} alt="AI 도우미" className="w-7 h-7" />
       </button>
 
       {/* 모달 (아이콘 바로 위에) */}

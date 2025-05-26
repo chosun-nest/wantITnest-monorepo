@@ -6,12 +6,18 @@ import GuestCard from "../components/profile/card/ProfileCardGuest";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
 import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
-import History from "../components/profile/history/historytimeline";
+import MyPin from "../components/profile/history/mypins";
+import { MyPinProps } from "../components/profile/history/mypins";
 
 export default function Home() {
   const isMobile = useResponsive();
   const { navbarHeight } = useNavbarHeight();
   const isLoggedIn = useSelector(selectIsLoggedIn);
+  const myPinData: MyPinProps = {
+    title: "내 핀",
+    items: [{ text: "핀1", pinned: true }, { text: "핀2" }, { text: "핀3" }],
+    editable: true,
+  };
 
   return (
     <S.GridContainer $navbarHeight={navbarHeight} $isMobile={isMobile}>
@@ -25,10 +31,13 @@ export default function Home() {
         )}
       </S.GridItem>{" "}
       <S.GridItem $row="1" $isMobile={isMobile} $col="2">
-        <S.ItemTitle>
-          <History />
-          {"추후에 History Pin으로 바뀔 예정입니다."}
-        </S.ItemTitle>
+        {isLoggedIn ? (
+          <MyPin
+            title={myPinData.title}
+            items={myPinData.items}
+            editable={myPinData.editable}
+          />
+        ) : null}
       </S.GridItem>
       <S.GridItem $row="1" $isMobile={isMobile} $col="3">
         <S.ItemTitle>

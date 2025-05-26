@@ -32,7 +32,6 @@ API.interceptors.request.use(
     // Authorization 헤더를 추가하지 않음
     if (!skipAuth) {
       const token = selectAccessToken(store.getState());
-      console.log("request에 붙는 토큰:", token);
       if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
