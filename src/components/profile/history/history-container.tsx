@@ -4,6 +4,7 @@ import { FaStar } from "react-icons/fa";
 
 interface HistoryContainerProps extends HistoryProps {
   onDelete: (historyId: number) => void;
+  onEdit: (history: HistoryProps) => void;
 }
 
 export default function HistoryContainer({
@@ -13,18 +14,16 @@ export default function HistoryContainer({
   endDate,
   important,
   onDelete,
+  onEdit,
 }: HistoryContainerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [payload, setPayload] = useState(content);
 
-  const handleEditToggle = () => setIsEditing((prev) => !prev);
   const handleSaveClick = () => {
-    console.log("저장 버튼 클릭됨");
     setIsEditing(false);
     // TODO: 저장 API 연동
   };
   const handleCancelClick = () => {
-    console.log("취소 버튼 클릭됨");
     setPayload(content);
     setIsEditing(false);
   };
@@ -75,7 +74,15 @@ export default function HistoryContainer({
           ) : (
             <>
               <button
-                onClick={handleEditToggle}
+                onClick={() =>
+                  onEdit({
+                    historyId,
+                    content,
+                    startDate,
+                    endDate,
+                    important,
+                  })
+                }
                 className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
               >
                 수정
