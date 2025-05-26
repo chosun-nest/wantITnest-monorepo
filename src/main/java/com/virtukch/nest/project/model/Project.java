@@ -2,7 +2,10 @@ package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.post.exception.InvalidPostTitleException;
+import com.virtukch.nest.post.model.Post;
 import com.virtukch.nest.project.dto.ProjectUpdateRequestDto;
+import com.virtukch.nest.project.exception.InvalidProjectTitleException;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -22,11 +25,12 @@ public class Project extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectId; //프로젝트 아이디
 
+    private Long memberId;
+
     //프로젝트 제목
     private String projectTitle;
 
     //프로젝트 내용 -> 프로젝트 설명
-    @Column(columnDefinition = "TEXT")
     @Lob
     private String projectDescription;
 
@@ -34,94 +38,39 @@ public class Project extends BaseTimeEntity {
     private List<ProjectMember> members = new ArrayList<>();
 
     //최대 모집 인원
+    @Column(nullable = false)
     private int maxMember;
 
     //모집 마감 여부 (2025.05.02 UPDATE)
     @Column(nullable = false)
-    private boolean isRecruiting;
+    private boolean isRecruiting = true;
 
     //조회수
     @Column(nullable = false)
-    private Integer viewCount;
+    private Integer viewCount = 0;
 
-    //좋아요수
-    @Column(nullable = false)
-    private Integer likeCount;
 
-    //프로젝트 시작일
-    private LocalDate projectStartDate;
-
-    //프로젝트 시작일
-    private LocalDate projectEndDate;
-
-    //생성 메서드
-    @Builder
-    public Project(
-            String projectTitle,
-            String projectDescription,
-            Member leader,
-            int maxMember,
-            LocalDate projectStartDate,
-            LocalDate projectEndDate
-    ) {
-        this.projectTitle = projectTitle;
-        this.projectDescription = projectDescription;
-        this.maxMember = maxMember;
-        this.projectStartDate = projectStartDate;
-        this.projectEndDate = projectEndDate;
-        this.viewCount = 0;
-        this.likeCount = 0;
-        this.isRecruiting = false;
-        this.members = new ArrayList<>();
-        ProjectMember leaderMember = ProjectMember.builder()
-                .member(leader)
-                .project(this)
-                .role(ProjectMember.Role.LEADER)
-                .isApproved(true)
-                .build();
-        this.members.add(leaderMember);
-    }
-
-    public static Project createProject(String projectTitle,
+    public static Project createProject(Long memberId,
+                                        String projectTitle,
                                         String projectDescription,
-                                        Member leader,
-                                        int maxMember,
-                                        LocalDate projectStartDate,
-                                        LocalDate projectEndDate) {
-        return Project.builder()
-                .projectTitle(projectTitle)
-                .projectDescription(projectDescription)
-                .leader(leader)
-                .maxMember(maxMember)
-                .projectStartDate(projectStartDate)
-                .projectEndDate(projectEndDate)
-                .build();
+                                        int maxMember) {
+        if(projectTitle == null || projectTitle.isBlank()) {
+            throw new InvalidProjectTitleException();
+        }
+
+        Project project = new Project();
+        project.memberId = memberId;
+        project.projectTitle = projectTitle;
+        project.projectDescription = projectDescription;
+        project.maxMember = maxMember;
+
+        return project;
     }
 
-
-    //모집 마감 메서드
-    public void closeRecruitment(){
-        isRecruiting = true;
-    }
-
-    //모집 오픈 메서드
-    public void openRecruitment(){
-        isRecruiting = false;
-    }
 
     //조회수 증가 메서드
     public void incrementViewCount(){ this.viewCount++; }
 
-
-    //좋아요 수 증가 메서드
-    public void incrementLikeCount() {
-        this.likeCount++;
-    }
-
-    //좋아요 수 감소 메서드
-    public void decrementLikeCount() {
-        if (this.likeCount > 0) this.likeCount--;
-    }
 
     //프로젝트 리더 가져오는 메서드
     public Member getProjectLeader() {
@@ -133,12 +82,26 @@ public class Project extends BaseTimeEntity {
     }
 
     //프로젝트 업데이트 메서드
-    public void updateProject(ProjectUpdateRequestDto dto) {
-        this.projectTitle = dto.getProjectTitle();
-        this.projectDescription = dto.getProjectDescription();
-        this.maxMember = dto.getMaxMember();
-        this.projectStartDate = dto.getProjectStartDate();
-        this.projectEndDate = dto.getProjectEndDate();
-        this.isRecruiting = dto.isRecruiting();
+    public void updateProject(String projectTitle,
+                              String projectDescription,
+                              int maxMember,
+                              boolean isRecruiting) {
+        if(projectTitle != null && !projectTitle.isBlank()) {
+            this.projectTitle = projectTitle;
+        } else throw new InvalidProjectTitleException();
+
+        if(projectDescription != null && !projectDescription.isBlank()) {
+            this.projectDescription = projectDescription;
+        }
+
+        if (maxMember > 0) {
+            this.maxMember = maxMember;
+        }
+
+        if(isRecruiting) {
+            this.isRecruiting = true;
+        } else {
+            this.isRecruiting = false;
+        }
     }
 }

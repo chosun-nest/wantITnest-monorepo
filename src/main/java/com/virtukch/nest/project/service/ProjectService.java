@@ -2,56 +2,58 @@ package com.virtukch.nest.project.service;
 
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
-import com.virtukch.nest.project.dto.ProjectCreateRequestDto;
-import com.virtukch.nest.project.dto.ProjectCreateResponseDto;
-import com.virtukch.nest.project.dto.ProjectUpdateRequestDto;
+import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
 import com.virtukch.nest.project.exception.ProjectNotFoundException;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
-import com.virtukch.nest.project_member.model.ProjectMember;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
+import com.virtukch.nest.project_tag.model.ProjectTag;
+import com.virtukch.nest.project_tag.repository.ProjectTagRepository;
+import com.virtukch.nest.tag.model.Tag;
+import com.virtukch.nest.tag.repository.TagRepository;
+import org.springframework.data.domain.Pageable;
+import com.virtukch.nest.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
     private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
+    private final ProjectTagRepository projectTagRepository;
+    private final TagService tagService;
+//    private final CommentRepository commentRepository;
+    private final TagRepository tagRepository;
 
     @Transactional
-    public ProjectCreateResponseDto createProject(Member member, ProjectCreateRequestDto dto) {
-        Member leader = memberRepository.findById(member.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("리더 멤버가 존재하지 않습니다"));
+    public ProjectResponseDto createProject(Long memberId, ProjectRequestDto dto) {
+        String projectTitle = dto.getProjectTitle();
+        log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
-        Project project = Project.createProject(
-                dto.getProjectTitle(),
-                dto.getProjectDescription(),
-                leader,
-                dto.getMaxMember(),
-                dto.getProjectStartDate(),
-                dto.getProjectEndDate()
-        );
+        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, dto.getProjectDescription(), dto.getMaxMember()));
 
+        saveProjectTags(project, dto.getTags());
         // builder 내부에서 LEADER 자동 등록됨
-        return ProjectDtoConverter.toCreateResponseDTO(project);
+        return ProjectDtoConverter.toCreateResponseDto(project);
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectCreateResponseDto> getAllProjects() {
+    public List<ProjectResponseDto> getAllProjects() {
         return projectRepository.findAll().stream()
-                .map(project -> ProjectCreateResponseDto.builder()
+                .map(project -> ProjectResponseDto.builder()
                         .projectId(project.getProjectId())
                         .message("Complete Create Project")
                         .build())
@@ -59,45 +61,167 @@ public class ProjectService {
     }
 
     @Transactional
-    public void updateProject(Long projectId, Long memberId, ProjectUpdateRequestDto requestDTO) throws AccessDeniedException {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+    public ProjectDetailResponseDto getProjectDetail(Long projectId) {
+        Project project = findByIdOrThrow(projectId);
+        project.incrementViewCount();
 
-        ProjectMember projectMember = projectMemberRepository
-                .findByProject_ProjectIdAndMember_MemberId(projectId, memberId)
-                .orElseThrow(() -> new AccessDeniedException("프로젝트에 속하지 않은 사용자입니다."));
+        Member member = findMemberOrThrow(project);
+        List<String> tagNames = extractTagNames(projectId);
 
-        if (projectMember.getRole() != ProjectMember.Role.LEADER) {
-            throw new AccessDeniedException("프로젝트 리더만 수정할 수 있습니다.");
-        }
-
-        project.updateProject(requestDTO);
+        return ProjectDtoConverter.toDetailResponseDto(project, member, tagNames);
     }
 
-    private Long getProjectLeaderId(Project project) {
-        return Optional.ofNullable(project.getProjectLeader())
-                       .map(Member::getMemberId)
-                       .orElse(null);
-    }
-
-    @Transactional
-    public void closeProjectRecruitment(Long projectId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다."));
-        project.closeRecruitment();
+    // 게시글 목록 조회
+    @Transactional(readOnly = true)
+    public ProjectListResponseDto getProjectList(Pageable pageable) {
+        Page<com.virtukch.nest.project.model.Project> projectPage = projectRepository.findAll(pageable);
+        return buildProjectListResponse(projectPage);
     }
 
     @Transactional(readOnly = true)
-    public Project findByIdOrThrow(Long projectId) {
+    public ProjectListResponseDto getProjectList(List<String> tags, Pageable pageable) {
+        List<Long> tagIds = tags.stream()
+                .map(tagService::findByNameOrThrow)
+                .map(Tag::getId)
+                .toList();
+        Page<Project> projectPage = projectRepository.findByTagIds(tagIds, pageable);
+        return buildProjectListResponse(projectPage);
+    }
+
+    @Transactional
+    public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectRequestDto requestDto) {
+        Project project = validateProjectOwnershipAndGet(projectId, memberId);
+        project.updateProject(requestDto.getProjectTitle(),
+                requestDto.getProjectDescription(),
+                requestDto.getMaxMember(),
+                requestDto.isRecruiting());
+
+        projectTagRepository.deleteAllByProjectId(projectId);
+
+        saveProjectTags(project, requestDto.getTags());
+
+        return ProjectDtoConverter.toUpdateResponseDto(project);
+    }
+
+    @Transactional
+    public ProjectResponseDto deleteProject(Long memberId, Long projectId) {
+        Project project = validateProjectOwnershipAndGet(projectId, memberId);
+
+        projectTagRepository.deleteAllByProjectId(projectId);
+//        commentRepository.deleteAllByProjectId(projectId);
+        projectRepository.delete(project);
+        return ProjectDtoConverter.toDeleteResponseDto(project);
+    }
+
+    @Transactional(readOnly = true)
+    public com.virtukch.nest.project.model.Project findByIdOrThrow(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
 
     @Transactional(readOnly = true)
-    public Project findOwnedProjectOrThrow(Long projectId, Long memberId) {
-        Project project = findByIdOrThrow(projectId);
+    public com.virtukch.nest.project.model.Project findOwnedProjectOrThrow(Long projectId, Long memberId) {
+        com.virtukch.nest.project.model.Project project = findByIdOrThrow(projectId);
         if(!Objects.equals(project.getProjectLeader(), memberId)) {
             throw new NoProjectAuthorityException(projectId, memberId);
         }
         return project;
+    }
+
+    @Transactional
+    public Project validateProjectOwnershipAndGet(Long projectId, Long memberId) {
+        Project project = findByIdOrThrow(projectId);
+        if(!Objects.equals(project.getMemberId(), memberId)) {
+            throw new NoProjectAuthorityException(projectId, memberId);
+        }
+        return project;
+    }
+
+    @Transactional
+    protected void saveProjectTags(Project project, List<String> tagNames) {
+        List<String> tags = (tagNames == null || tagNames.isEmpty())
+                ? List.of("UNCATEGORIZED")
+                : tagNames;
+
+        tags.stream()
+                .map(tagService::findByNameOrThrow)
+                .map(tag -> new ProjectTag(project.getProjectId(), tag.getId()))
+                .forEachOrdered(projectTagRepository::save);
+    }
+
+    private List<String> extractTagNames(Long projectId) {
+        List<ProjectTag> projectTags = projectTagRepository.findAllByProjectId(projectId);
+        List<Long> tagIds = projectTags.stream()
+                .map(ProjectTag::getTagId)
+                .toList();
+
+        Map<Long, String> tagNameMap = tagRepository.findAllById(tagIds).stream()
+                .collect(Collectors.toMap(Tag::getId, Tag::getName));
+
+        return tagIds.stream()
+                .map(tagNameMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private Member findMemberOrThrow(Project project) {
+        return memberRepository.findById(project.getMemberId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    private ProjectListResponseDto buildProjectListResponse(Page<com.virtukch.nest.project.model.Project> projectPage) {
+        List<com.virtukch.nest.project.model.Project> projects = projectPage.getContent();
+
+        Map<Long, String> memberNameMap = fetchMemberNameMap(projects);
+        Map<Long, List<Long>> projectTagMap = fetchPostTagMap(projects);
+        Map<Long, String> tagNameMap = fetchTagNameMap(projectTagMap);
+
+        List<ProjectSummaryDto> summaries = projects.stream()
+                .map(project -> buildProjectSummaryDto(project, memberNameMap, projectTagMap, tagNameMap))
+                .toList();
+
+        return ProjectDtoConverter.toProjectListResponseDto(summaries, projectPage);
+    }
+
+    private Map<Long, String> fetchMemberNameMap(List<Project> projects) {
+        List<Long> memberIds = projects.stream()
+                .map(Project::getMemberId)
+                .distinct()
+                .toList();
+        return memberRepository.findAllById(memberIds).stream()
+                .collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
+    }
+
+    private Map<Long, List<Long>> fetchPostTagMap(List<Project> projects) {
+        List<Long> projectIds = projects.stream()
+                .map(Project::getProjectId)
+                .toList();
+        return projectTagRepository.findByProjectIdIn(projectIds).stream()
+                .collect(Collectors.groupingBy(
+                        ProjectTag::getProjectId,
+                        Collectors.mapping(ProjectTag::getTagId, Collectors.toList())
+                ));
+    }
+
+    private Map<Long, String> fetchTagNameMap(Map<Long, List<Long>> projectTagMap) {
+        List<Long> tagIds = projectTagMap.values().stream()
+                .flatMap(Collection::stream)
+                .distinct()
+                .toList();
+        return tagRepository.findAllById(tagIds).stream()
+                .collect(Collectors.toMap(Tag::getId, Tag::getName));
+    }
+
+    private ProjectSummaryDto buildProjectSummaryDto(
+            Project project,
+            Map<Long, String> memberNameMap,
+            Map<Long, List<Long>> projectTagMap,
+            Map<Long, String> tagNameMap
+    ){
+        String memberName = memberNameMap.get(project.getMemberId());
+        List<String> tagNames = projectTagMap.getOrDefault(project.getProjectId(), Collections.emptyList()).stream()
+                .map(tagNameMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames);
     }
 }

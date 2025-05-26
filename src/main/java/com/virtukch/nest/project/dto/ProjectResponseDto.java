@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProjectCreateResponseDto {
+public class ProjectResponseDto {
 
     private Long projectId;
     private String message;
