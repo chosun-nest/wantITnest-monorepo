@@ -10,7 +10,7 @@ interface HistoryPropsFromParent {
 }
 export interface HistoryProps {
   historyId: number;
-  memberId?: number;
+  memberId: number;
   content: string;
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD

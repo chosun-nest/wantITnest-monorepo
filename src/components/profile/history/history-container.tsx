@@ -9,6 +9,7 @@ interface HistoryContainerProps extends HistoryProps {
 
 export default function HistoryContainer({
   historyId,
+  memberId,
   content,
   startDate,
   endDate,
@@ -81,6 +82,7 @@ export default function HistoryContainer({
                     startDate,
                     endDate,
                     important,
+                    memberId,
                   })
                 }
                 className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
