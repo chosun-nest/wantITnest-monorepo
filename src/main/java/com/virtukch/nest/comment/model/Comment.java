@@ -26,13 +26,16 @@ public class Comment extends BaseTimeEntity {
     private Long parentId; // 대댓글용, null이면 일반 댓글
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isDeleted = false;
 
     @Setter
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long likeCount = 0L;
 
     @Setter
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long dislikeCount = 0L;
 

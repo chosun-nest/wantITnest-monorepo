@@ -12,13 +12,18 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
     @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
     private boolean isActive = true;
 
-    public Tag(String name) {
+    public Tag(Category category, String name) {
+        this.category = category;
         this.name = name;
     }
 
