@@ -57,9 +57,22 @@ export interface MemberProfile {
 }
 
 // 회원 정보 조회 (GET)
+// export const getMemberProfile = async (): Promise<MemberProfile> => {
+//   const res = await API.get("/api/v1/members/me");
+//   return res.data;
+// };
+
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
-  return res.data;
+  const BASE_URL = "http://119.219.30.209:6030";
+
+  return {
+    ...res.data,
+    memberImageUrl: res.data.memberImageUrl
+      ? `${BASE_URL}${res.data.memberImageUrl}`
+      : "",
+
+  };
 };
 
 // 회원 탈퇴 (DELETE)
