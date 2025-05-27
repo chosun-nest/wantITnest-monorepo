@@ -110,11 +110,7 @@ API.interceptors.response.use(
 
     // --- 403 처리 ---
     if (status === 403) {
-      if (
-        !errorMessage ||
-        errorMessage.includes("Token") ||
-        errorMessage.includes("권한")
-      ) {
+      if (!errorMessage) {
         console.warn("권한 문제(403).");
         store.dispatch(
           showModal({
