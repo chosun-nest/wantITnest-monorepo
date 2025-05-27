@@ -1,5 +1,6 @@
 package com.virtukch.nest.comment.model;
 
+import com.virtukch.nest.comment.exception.InvalidCommentContentException;
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -66,21 +67,14 @@ public class Comment extends BaseTimeEntity {
 
     // 비즈니스 로직
     public void update(String commentContent) {
-        if(commentContent != null && !commentContent.isBlank()) {
-            this.commentContent = commentContent;
+        if(commentContent == null || commentContent.isBlank()) {
+            throw new InvalidCommentContentException();
         }
+        this.commentContent = commentContent;
     }
 
     public void delete() {
         this.isDeleted = true;
         this.commentContent = "삭제된 댓글입니다.";
-    }
-
-    public void increaseLikeCount() {
-        this.likeCount += 1;
-    }
-
-    public void increaseDislikeCount() {
-        this.dislikeCount += 1;
     }
 }

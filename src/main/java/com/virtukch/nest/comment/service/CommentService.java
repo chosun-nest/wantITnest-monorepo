@@ -5,13 +5,14 @@ import com.virtukch.nest.comment.dto.CommentListResponseDto;
 import com.virtukch.nest.comment.dto.CommentRequestDto;
 import com.virtukch.nest.comment.dto.CommentResponseDto;
 import com.virtukch.nest.comment.dto.converter.CommentDtoConverter;
-import com.virtukch.nest.comment.exception.CommentNotFoundException;
-import com.virtukch.nest.comment.exception.NoCommentAuthorityException;
+import com.virtukch.nest.comment.exception.*;
 import com.virtukch.nest.comment.model.BoardType;
 import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.comment.repository.CommentRepository;
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
+import com.virtukch.nest.post.exception.PostNotFoundException;
 import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -62,6 +63,21 @@ public class CommentService {
     @Transactional
     public CommentResponseDto createReply(BoardType boardType, Long postId, Long parentId, Long memberId, @Valid CommentRequestDto requestDto) {
         validatePostExistence(boardType, postId);
+
+        Comment parentComment = commentRepository.findById(parentId)
+                .orElseThrow(() -> new ParentCommentNotFoundException(parentId));
+
+        // 부모 댓글이 같은 게시글에 속하는지 검증
+        if (!Objects.equals(parentComment.getPostId(), postId) ||
+            !Objects.equals(parentComment.getBoardType(), boardType)) {
+            throw new ParentCommentMismatchException(parentId, postId);
+        }
+
+        // 삭제된 댓글에는 대댓글 달 수 없음
+        if (parentComment.isDeleted()) {
+            throw new CannotReplyToDeletedCommentException(parentId);
+        }
+
         Comment comment = Comment.createReply(boardType, postId, memberId, requestDto.getContent(), parentId);
         return saveAndConvert(comment, memberId);
     }
@@ -205,15 +221,15 @@ public class CommentService {
         switch (boardType) {
             case INTEREST -> {
                 if (!postRepository.existsById(postId)) {
-                    throw new EntityNotFoundException("[관심분야 정보 게시판] 해당 게시글을 찾을 수 없습니다. postId = " + postId);
+                    throw new PostNotFoundException(boardType, postId);
                 }
             }
             case PROJECT -> {
                 if (!projectRepository.existsById(postId)) {
-                    throw new EntityNotFoundException("[프로젝트 모집 게시판] 해당 게시글을 찾을 수 없습니다. postId = " + postId);
+                    throw new PostNotFoundException(boardType, postId);
                 }
             }
-            default -> throw new IllegalArgumentException("지원하지 않는 게시판 타입입니다: " + boardType);
+            default -> throw new InvalidBoardTypeException(boardType);
         }
     }
 
@@ -223,7 +239,7 @@ public class CommentService {
     }
 
     private Member findMemberOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        String msg = String.format("MemberId [%d] : 회원 정보를 찾을 수 없습니다.", memberId);
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(msg));
     }
 }
