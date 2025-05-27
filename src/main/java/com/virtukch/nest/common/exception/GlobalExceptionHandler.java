@@ -1,5 +1,6 @@
-package com.virtukch.nest.auth.exception;
+package com.virtukch.nest.common.exception;
 
+import com.virtukch.nest.auth.exception.EmailAlreadyExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
