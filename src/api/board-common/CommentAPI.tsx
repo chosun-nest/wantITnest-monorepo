@@ -17,8 +17,14 @@ export const fetchComments = async (    // 댓글 목록 조회
   boardType: BoardType,
   postId: number
 ): Promise<FetchCommentsResponse> => {
-  const res = await API.get<FetchCommentsResponse>(
-    `/api/v1/${boardType}/${postId}/comments`
+  const token = getAccessToken();
+  const headers = token
+    ? { Authorization: `Bearer ${token}` }
+    : undefined;
+
+  const res = await API.get<FetchCommentsResponse>(   // 임시로 로그인 하지 않아도 볼 수 있게 함
+    `/api/v1/${boardType}/${postId}/comments`,
+    { headers } // token이 없으면 headers는 undefined
   );
   return res.data;
 };

@@ -24,12 +24,12 @@ export default function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="max-w-4xl mx-auto px-4 pt-36 pb-10">
-        <h1 className="text-2xl font-bold text-blue-900 mb-4">프로젝트 상세보기</h1>
+      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36">
+        <h1 className="mb-4 text-2xl font-bold text-blue-900">프로젝트 상세보기</h1>
         <p>프로젝트 정보를 불러올 수 없습니다.</p>
         <button
           onClick={() => navigate(-1)}
-          className="mt-4 px-4 py-2 bg-slate-800 text-white rounded"
+          className="px-4 py-2 mt-4 text-white rounded bg-slate-800"
         >
           ← 뒤로 가기
         </button>
@@ -55,7 +55,7 @@ export default function ProjectDetail() {
     <div className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${isMobile ? "flex-col gap-4" : "flex-row gap-8"}`}>
       {/* 왼쪽 영역 */}
       <div className="flex-1">
-        <div className="flex items-center gap-3 mb-2 flex-wrap">
+        <div className="flex flex-wrap items-center gap-3 mb-2">
           <span
             className={`text-sm font-semibold px-3 py-1 rounded-full ${
               projectStatus === "모집중"
@@ -81,7 +81,7 @@ export default function ProjectDetail() {
               {project.author.name}
             </span>
           </div>
-          <button className="text-sm border px-3 py-1 rounded hover:bg-gray-100 w-fit">
+          <button className="px-3 py-1 text-sm border rounded hover:bg-gray-100 w-fit">
             + 팔로우
           </button>
         </div>
@@ -93,20 +93,20 @@ export default function ProjectDetail() {
 
         <hr className="my-4 border-gray-300" />
 
-        <div className="text-gray-700 leading-relaxed mb-6 whitespace-pre-line">
+        <div className="mb-6 leading-relaxed text-gray-700 whitespace-pre-line">
           {project.content}
         </div>
 
         <hr className="my-4 border-gray-300" />
 
-        <div className="border rounded px-5 py-4 bg-gray-50 mb-6">
+        <div className="px-5 py-4 mb-6 border rounded bg-gray-50">
           <CommentSection />
         </div>
 
         <div className="mt-4">
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-slate-800 text-white text-sm rounded"
+            className="px-4 py-2 text-sm text-white rounded bg-slate-800"
           >
             ← 뒤로 가기
           </button>

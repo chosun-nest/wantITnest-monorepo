@@ -41,10 +41,19 @@ export const createInterestPost = async (
 export const fetchPostDetail = async (
   postId: number
 ): Promise<PostDetail> => {
-  const response = await API.get<PostDetail>(`/api/v1/posts/${postId}`, {
-    headers: { skipAuth: true },
-  });
+  const response = await API.get<PostDetail>(
+    `/api/v1/interests/${postId}`,
+    {
+      headers: { skipAuth: true }, // 인터셉터가 Authorization을 붙이지 않게 함
+    }
+  );
   return response.data;
+  // const token = getAccessToken();
+  // const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  // const res = await API.get<PostDetail>(`/api/v1/interests/${postId}`, {
+  //   headers,
+  // });
 };
 
 // 게시글 삭제 (DELETE) - 인증 필요
