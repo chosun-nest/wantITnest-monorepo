@@ -55,8 +55,16 @@ public class Post extends BaseTimeEntity {
     }
 
     public void updatePost(String title, String content) {
-        if (title != null && !title.isBlank()) this.title = title;
-        else throw new InvalidPostTitleException();
+        // title이 제공되었고 유효한 경우에만 수정
+        if (title != null && !title.isBlank()) {
+            this.title = title;
+        }
+        // title이 빈 문자열("")이면서 null이 아닌 경우 예외 발생
+        else if (title != null && title.isBlank()) {
+            throw new InvalidPostTitleException();
+        }
+
+        // content는 null이 아니면 수정 (빈 문자열도 허용)
         if (content != null) this.content = content;
     }
 }
