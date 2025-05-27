@@ -113,7 +113,7 @@ function NoticeBoard() {
     if (category === "전체") {
       Promise.all(
         CATEGORY_LIST.map((cat) =>
-          fetch(`http://localhost:8000/crawl/${cat}`).then((res) => res.json())
+          fetch(`http://34.64.252.112:8000/crawl/${cat}`).then((res) => res.json())
         )
       )
         .then((results) => {
@@ -130,7 +130,7 @@ function NoticeBoard() {
       return;
     }
 
-    fetch(`http://localhost:8000/crawl/${category}`)
+    fetch(`http://34.64.252.112:8000/crawl/${category}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.notices) {
