@@ -1,17 +1,17 @@
-// 관심분야 정보 게시글 상세 페이지
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchPostDetail, deletePost } from "../api/interests/InterestsAPI";
-import { fetchComments } from "../api/board-common/CommentAPI";
+//import { fetchPostDetail, deletePost } from "../api/interests/InterestsAPI";
+import { deletePost } from "../api/interests/InterestsAPI";
+// import { fetchComments } from "../api/board-common/CommentAPI"; // 댓글 API 호출
 import type { PostDetail as PostDetailType } from "../api/types/interest-board";
-import type { Comment } from "../api/types/comments";
+// import type { Comment } from "../api/types/comments"; // 댓글 타입
 import Navbar from "../components/layout/navbar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { DotsThreeVertical } from "phosphor-react";
 import Modal from "../components/common/modal";
 import ConfirmModal from "../components/common/ConfirmModal";
-import CommentSection from "../components/interests/detail/CommentSection";
+// import CommentSection from "../components/interests/detail/CommentSection"; // 댓글 컴포넌트
 
 export default function InterestsDetail() {
   const { id } = useParams();
@@ -19,30 +19,56 @@ export default function InterestsDetail() {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [navHeight, setNavHeight] = useState(0);
   const [post, setPost] = useState<PostDetailType | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDeleteComplete, setShowDeleteComplete] = useState(false);
-  const isLoggedIn = !!localStorage.getItem("accesstoken");
-  
+
+  // const [comments, setComments] = useState<Comment[]>([]); // 댓글 목록 상태
+  // const isLoggedIn = !!localStorage.getItem("accesstoken"); // 로그인 여부
+
   useEffect(() => {
     if (navbarRef.current) {
       setNavHeight(navbarRef.current.offsetHeight);
     }
   }, []);
-
+  
   useEffect(() => {
-    const loadPost = async () => {
-      if (!id) return;
-      try {
-        const data = await fetchPostDetail(Number(id));
-        setPost(data);
-      } catch (err) {
-        console.error("게시글 불러오기 실패", err);
-      }
-    };
-    loadPost();
-  }, [id]);
+  // 임시 게시글 데이터로 UI 테스트
+  const mockPost: PostDetailType = {
+    postId: 1,
+    title: "임시 제목입니다.",
+    content: "### 게시글 본문 예시입니다.\n- 마크다운 렌더링 테스트",
+    tags: ["React", "UI 테스트"],
+    author: {
+      id: 825,
+      name: "관리자",
+    },
+    viewCount: 123,
+    likeCount: 10,
+    dislikeCount: 1,
+    createdAt: new Date().toISOString(), // 오늘 날짜
+    updatedAt: new Date().toISOString()
+  };
 
+  setPost(mockPost);
+}, []);
+
+  // 403 백엔드 해결되면 게시글 호출 주석 풀기
+  // useEffect(() => {
+  //   const loadPost = async () => {
+  //     if (!id) return;
+  //     try {
+  //       const data = await fetchPostDetail(Number(id));
+  //       setPost(data);
+  //     } catch (err) {
+  //       console.error("게시글 불러오기 실패", err);
+  //     }
+  //   };
+  //   loadPost();
+  // }, [id]);
+
+  // 댓글 API 호출 → 서버에서 403 Forbidden 오류 발생으로 주석 처리
+  // 추후 인증 정책이 수정되면 주석 해제하고 복구 예정
+  /*
   useEffect(() => {
     const loadComments = async () => {
       if (!id) return;
@@ -55,6 +81,7 @@ export default function InterestsDetail() {
     };
     loadComments();
   }, [id]);
+  */
 
   const handleDelete = async () => {
     if (!id) return;
@@ -151,8 +178,11 @@ export default function InterestsDetail() {
           </button>
         </div>
 
+        {/* 댓글 렌더링 주석 처리 */}
+        {/* 
         <hr className="my-6 border-gray-300" />
         <CommentSection comments={comments} isLoggedIn={isLoggedIn} />
+        */}
       </div>
 
       {showDeleteConfirm && (
