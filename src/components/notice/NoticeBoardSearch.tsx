@@ -1,5 +1,4 @@
 // 게시글 검색
-// 게시글 검색
 interface NoticeBoardSearchProps {
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;
@@ -26,4 +25,3 @@ export default function NoticeBoardSearch({
     </div>
   );
 }
-
