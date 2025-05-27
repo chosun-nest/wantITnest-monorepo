@@ -1,5 +1,6 @@
 package com.virtukch.nest.post_reaction.service;
 
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.model.Post;
@@ -68,8 +69,8 @@ public class PostReactionService {
     }
 
     private Member findMemberOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        String msg = String.format("MemberId [%d] : 회원 정보를 찾을 수 없습니다.", memberId);
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(msg));
     }
 
     private PostReactionResponseDto createResponseDto(Post post, String message) {

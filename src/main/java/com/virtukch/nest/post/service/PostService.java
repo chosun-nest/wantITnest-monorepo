@@ -1,6 +1,7 @@
 package com.virtukch.nest.post.service;
 
 import com.virtukch.nest.comment.repository.CommentRepository;
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.dto.*;
@@ -303,7 +304,9 @@ public class PostService {
      */
     private Member findMemberOrThrow(Post post) {
         return memberRepository.findById(post.getMemberId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new MemberNotFoundException(
+                        String.format("MemberId [%d] : 회원 정보를 찾을 수 없습니다.", post.getMemberId()))
+                );
     }
 
     /**
