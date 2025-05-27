@@ -1,12 +1,12 @@
 // 관심분야 필터링 모달
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface TagFilterModalProps {
   onClose: () => void;
   onApply: (selectedTags: string[]) => void;
 }
 
-const categories = [
+const TAG_CATEGORIES = [
   {
     title: "🖥️ 개발•프로그래밍",
     tags: [
@@ -45,18 +45,19 @@ const categories = [
 export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps) {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  
+  const [errorMessage, setErrorMessage] = useState("");
+
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => {
       if (prev.includes(tag)) {
-        setErrorMessage(""); // 기존 에러 제거
+        setErrorMessage("");
         return prev.filter((t) => t !== tag);
       } else {
         if (prev.length >= 10) {
           setErrorMessage("⚠️ 최대 10개의 관심분야만 선택할 수 있습니다.");
           return prev;
         }
-        setErrorMessage(""); // 정상 선택 시 에러 제거
+        setErrorMessage("");
         return [...prev, tag];
       }
     });
@@ -65,102 +66,97 @@ export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps
   const removeTag = (tag: string) => {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
-  
-  const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
+  const filteredTags = TAG_CATEGORIES.flatMap((cat) => cat.tags).filter((tag) => tag.includes(search));
 
   return (
-    <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center pt-16 bg-black/40">
-        <div className="w-full max-w-xl bg-white rounded-xl shadow-lg p-8 relative max-h-[70vh] flex flex-col">
-          {/* 닫기 버튼 */}
-          <button onClick={onClose} className="absolute text-gray-400 ext-xl top-4 right-4 hover:text-black">
-            ×
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center pt-16 bg-black/40">
+      <div className="w-full max-w-xl bg-white rounded-xl shadow-lg p-8 relative max-h-[70vh] flex flex-col">
+        <button onClick={onClose} className="absolute text-xl text-gray-400 top-4 right-4 hover:text-black">
+          ×
+        </button>
 
-          <h2 className="text-xl font-bold mb-4 text-[#002F6C]">
-            관심분야
-          </h2>
+        <h2 className="text-xl font-bold mb-4 text-[#002F6C]">관심분야</h2>
 
-          {/* 선택된 태그 미리 보기 */}
-          {selectedTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {selectedTags.map((tag) => (
-                <div
-                  key={tag}
-                  className="flex items-center gap-1 px-3 py-1 text-sm border rounded-full"
-                >
-                  {tag}
-                  <button onClick={() => removeTag(tag)} className="text-gray-500 hover:text-red-500">
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* 검색창 */}
-          <input
-            type="text"
-            placeholder="관심분야 검색"
-            className="w-full p-3 mb-6 border rounded"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {/* 필터 목록 */}
-          <div className="flex-1 pr-1 space-y-6 overflow-y-auto">
-            {categories.map((cat) => (
-              <div key={cat.title}>
-                <p className="font-semibold text-[15px] mb-2">{cat.title}</p>
-                <div className="flex flex-wrap gap-2">
-                  {cat.tags
-                    .filter((tag) => tag.includes(search))
-                    .map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => toggleTag(tag)}
-                        className={`px-3 py-1 rounded-full border text-sm transition
-                          ${selectedTags.includes(tag)
-                            ? "bg-[#002F6C] text-white border-[#002F6C]"
-                            : "border-gray-300 hover:bg-gray-100"}`}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                </div>
+        {selectedTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {selectedTags.map((tag) => (
+              <div key={tag} className="flex items-center gap-1 px-3 py-1 text-sm border rounded-full">
+                {tag}
+                <button onClick={() => removeTag(tag)} className="text-gray-500 hover:text-red-500">×</button>
               </div>
             ))}
           </div>
-          {/* 하단 고정 버튼 영역 */}
-          {errorMessage && (
-            <p className="mt-4 text-sm text-center text-red-600">{errorMessage}</p>
+        )}
+
+        <input
+          type="text"
+          placeholder="관심분야 검색"
+          className="w-full p-3 mb-6 border rounded"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <div className="flex-1 pr-1 space-y-6 overflow-y-auto">
+          {search ? (
+            <div className="flex flex-wrap gap-2">
+              {filteredTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1 rounded-full border text-sm transition ${
+                    selectedTags.includes(tag)
+                      ? "bg-[#002F6C] text-white border-[#002F6C]"
+                      : "border-gray-300 hover:bg-gray-100"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          ) : (
+            TAG_CATEGORIES.map((cat) => (
+              <div key={cat.title}>
+                <p className="font-semibold text-[15px] mb-2">{cat.title}</p>
+                <div className="flex flex-wrap gap-2">
+                  {cat.tags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1 rounded-full border text-sm transition ${
+                        selectedTags.includes(tag)
+                          ? "bg-[#002F6C] text-white border-[#002F6C]"
+                          : "border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))
           )}
-          
-          <div className="sticky bottom-0 left-0 flex justify-between pt-4 mt-4 bg-white border-t">
-            <button
-              className="w-full px-4 py-3 mr-2 text-gray-700 border rounded hover:bg-gray-100"
-              onClick={() => setSelectedTags([])}
-            >
-              ⟳ 초기화
-            </button>
-            <button
-              className="w-full px-4 py-3 ml-2 text-white bg-[#002F6C] rounded hover:bg-[#001f4d]"
-              onClick={() => onApply(selectedTags)}
-            >
-              적용
-            </button>
-          </div>
+        </div>
+
+        {errorMessage && (
+          <p className="mt-4 text-sm text-center text-red-600">{errorMessage}</p>
+        )}
+
+        <div className="sticky bottom-0 left-0 flex justify-between pt-4 mt-4 bg-white border-t">
+          <button
+            className="w-full px-4 py-3 mr-2 text-gray-700 border rounded hover:bg-gray-100"
+            onClick={() => setSelectedTags([])}
+          >
+            ⟳ 초기화
+          </button>
+          <button
+            className="w-full px-4 py-3 ml-2 text-white bg-[#002F6C] rounded hover:bg-[#001f4d]"
+            onClick={() => onApply(selectedTags)}
+          >
+            적용
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
