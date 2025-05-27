@@ -88,6 +88,7 @@ import NoticeBoardHeader from "./NoticeBoardHeader";
 import NoticeBoardSearch from "./NoticeBoardSearch";
 import NoticeDropdown from "./NoticeDropdown";
 import NoticeCard from "./NoticeCard";
+import { fetchNotices } from "../../api/notices/NoticesAPI";
 
 interface Notice {
   number: string;
@@ -118,15 +119,52 @@ export default function NoticeBoard() {
   const [category, setCategory] = useState("전체");
   const [notices, setNotices] = useState<Notice[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [isloading, setIsLoading] = useState(false);
 
   // mount 시점에 navbar 높이 계산
   useEffect(() => {
     if (navbarRef.current) {
       setNavHeight(navbarRef.current.offsetHeight);
     }
-  }, []);
+  }, [category]);
+
+  const fetchData = async (category: string) => {
+    try {
+      setIsLoading(true);
+
+      if (category === "전체") {
+        const results = await Promise.all(
+          CATEGORY_LIST.map((cat) => fetchNotices(cat))
+        );
+        const merged: Notice[] = results.flatMap((res, i) =>
+          (res.notices ?? []).map((n) => ({ ...n, category: CATEGORY_LIST[i] }))
+        );
+        merged.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        setNotices(merged);
+      } else {
+        const res = await fetchNotices(category);
+        const sorted = (res.notices ?? [])
+          .map((n) => ({ ...n, category }))
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+        setNotices(sorted);
+      }
+    } catch (error) {
+      console.error("❌ 공지 불러오기 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(category);
+  }, [category]);
 
   // 카테고리 변경 또는 mount 시 공지 fetch
+  /*
   useEffect(() => {
     const loadNotices = async () => {
       try {
@@ -155,7 +193,7 @@ export default function NoticeBoard() {
 
     loadNotices();
   }, [category]);
-
+*/
   return (
     <>
       {/* 1) 최상단 네비게이션 바 */}
