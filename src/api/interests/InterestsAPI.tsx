@@ -83,7 +83,8 @@ export const fetchPosts = async (
   params: FetchPostsParams
 ): Promise<PostListResponse> => {  
   const queryParams = new URLSearchParams();    // ?page=0&size=10&tags=JAVA 같은 형식
-
+  const token = getAccessToken();
+  
   if (params.page !== undefined) 
     queryParams.append("page", String(params.page));  // page 값이 있으면 쿼리 쿼리 스트링에 추가. ex) "page=0"
   if (params.size !== undefined) 
@@ -96,7 +97,7 @@ export const fetchPosts = async (
 
     const response = await API.get<PostListResponse>(
     `/api/v1/posts?${queryParams.toString()}`,
-    { headers: { skipAuth: true },}
+    { headers: { Authorization: `Bearer ${token}` }}
   );
   return response.data;
 };
