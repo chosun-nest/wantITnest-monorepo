@@ -1,4 +1,4 @@
-import { API } from "../index_c";
+import { API } from "..";
 
 // 프로젝트 타입 (Swagger 기준)
 export interface Project {
@@ -12,7 +12,7 @@ export interface Project {
   closed: boolean;
 }
 
-// 프로젝트 리스트 가져오기 (GET) 
+// 프로젝트 리스트 가져오기 (GET)
 export const getProjects = async (): Promise<Project[]> => {
   const res = await API.get("/api/v1/projects");
   return res.data;

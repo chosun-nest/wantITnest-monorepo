@@ -1,26 +1,13 @@
 // profile/api.tsx
-import { API } from "../index_c";
+import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
 
 // 프로필 이미지 업로드 (POST)
 export const uploadProfileImage = async (file: File): Promise<string> => {
-  const token = getAccessToken();
-
-  if (!token) {
-    console.error("No access token");
-    throw new Error("No access token");
-  }
-
-  const formData = new FormData();  
+  const formData = new FormData();
   formData.append("file", file);
 
-  const res = await API.post("/api/v1/members/me/image", formData, {  // Axios 요청
-    headers: {
-      Authorization: `Bearer ${token}`, // Authorization 헤더, 토큰 검증
-      // Content-Type 생략: Axios가 자동 설정
-    },
-  });
-
+  const res = await API.post("/api/v1/members/me/image", formData);
   return res.data.imageUrl; // 업로드된 imageUrl 추출
 };
 
@@ -70,6 +57,11 @@ export interface MemberProfile {
 }
 
 // 회원 정보 조회 (GET)
+// export const getMemberProfile = async (): Promise<MemberProfile> => {
+//   const res = await API.get("/api/v1/members/me");
+//   return res.data;
+// };
+
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
   const BASE_URL = "http://119.219.30.209:6030";
@@ -79,6 +71,7 @@ export const getMemberProfile = async (): Promise<MemberProfile> => {
     memberImageUrl: res.data.memberImageUrl
       ? `${BASE_URL}${res.data.memberImageUrl}`
       : "",
+
   };
 };
 
@@ -115,7 +108,7 @@ export const updateMemberProfile = async (
 
   return await API.patch("/api/v1/members/me", payload, {
     headers: { Authorization: `Bearer ${token}` },
-  }); // 전체 AxiosResponse<T> 반환
+  });
 };
 
 // 비밀번호 변경 (PATCH)

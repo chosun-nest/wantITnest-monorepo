@@ -9,7 +9,8 @@ export const SidebarContainer = styled.div`
 `;
 
 export const SidebarWrapper = styled.div<{ $visible: boolean }>`
-  width: 500px;
+  width: 300px;
+  max-width: 60%;
   height: 100%;
   background: #ffffff;
   position: absolute;

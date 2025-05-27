@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import PasswordSummary from "./PasswordSummary";
 import ChangePasswordModal from "./PasswordChangeModal";
-import { getMemberProfile } from "../../../../api/profile/api"; // 비밀번호 길이 가져오는 API
+import { getMemberProfile } from "../../../../api/profile/ProfileAPI"; // 비밀번호 길이 가져오는 API
 
 export default function AccountPassword() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
