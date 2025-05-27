@@ -4,7 +4,7 @@ import * as S from "../../assets/styles/navbar.styles";
 import useResponsive from "../../hooks/responsive";
 import { useNavigate } from "react-router-dom";
 import { useNavbarHeight } from "../../context/NavbarHeightContext";
-import { getMemberProfile, MemberProfile } from "../../api/profile/api";
+import { getMemberProfile, MemberProfile } from "../../api/profile/ProfileAPI";
 import Sidebar from "./sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { clearTokens, selectAccessToken } from "../../store/slices/authSlice";

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GithubLogo, LinkedinLogo, InstagramLogo } from "phosphor-react";   // npm install phosphor-react
-import { getMemberProfile } from "../../../api/profile/api";
+import { getMemberProfile } from "../../../api/profile/ProfileAPI";
 
 interface ProfileType {
   image: string;

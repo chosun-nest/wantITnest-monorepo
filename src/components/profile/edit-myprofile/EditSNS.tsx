@@ -18,7 +18,7 @@ export default function EditSNS({ sns, isEditing, onChange }: EditSNSProps) {
               <span className="w-20 text-sm font-semibold">Github</span>
               <input
                 type="text"
-                value={sns[0]}
+                value={sns[0] ?? ""}
                 onChange={(e) => {
                   const newSNS = [...sns];
                   newSNS[0] = e.target.value;
@@ -31,7 +31,7 @@ export default function EditSNS({ sns, isEditing, onChange }: EditSNSProps) {
               <span className="w-20 text-sm font-semibold">LinkedIn</span>
               <input
                 type="text"
-                value={sns[1]}
+                value={sns[1] ?? ""}
                 onChange={(e) => {
                   const newSNS = [...sns];
                   newSNS[1] = e.target.value;
@@ -44,7 +44,7 @@ export default function EditSNS({ sns, isEditing, onChange }: EditSNSProps) {
               <span className="w-20 text-sm font-semibold">Instagram</span>
               <input
                 type="text"
-                value={sns[2]}
+                value={sns[2] ?? ""}
                 onChange={(e) => {
                   const newSNS = [...sns];
                   newSNS[2] = e.target.value;
