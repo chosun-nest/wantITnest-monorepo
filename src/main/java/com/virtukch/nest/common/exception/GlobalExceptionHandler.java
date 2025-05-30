@@ -21,4 +21,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleMemberNotFound(MemberNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    // 이미지 업로드 실패 - 500 INTERNAL_SERVER_ERROR
+    @ExceptionHandler(ImageUploadFailedException.class)
+    public ResponseEntity<String> handleImageUploadFailed(ImageUploadFailedException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    // 이미지 디렉토리 생성 실패 - 500 INTERNAL_SERVER_ERROR
+    @ExceptionHandler(ImageDirectoryCreationException.class)
+    public ResponseEntity<String> handleImageDirectoryCreationFailed(ImageDirectoryCreationException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 }
