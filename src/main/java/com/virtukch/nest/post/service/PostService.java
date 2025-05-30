@@ -1,6 +1,7 @@
 package com.virtukch.nest.post.service;
 
 import com.virtukch.nest.comment.repository.CommentRepository;
+import com.virtukch.nest.common.service.ImageService;
 import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
@@ -41,6 +42,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final TagService tagService;
     private final CommentRepository commentRepository;
+    private final ImageService imageService;
 
     /**
      * 새로운 게시글을 생성합니다.
@@ -63,10 +65,38 @@ public class PostService {
     }
 
     /**
+     * 이미지를 포함한 새로운 게시글을 생성합니다.
+     *
+     * @param memberId 게시글 작성자의 회원 ID
+     * @param requestDto 게시글 생성에 필요한 정보(제목, 내용, 태그, 이미지 파일 등)를 담은 DTO
+     * @return 생성된 게시글 정보를 담은 응답 DTO
+     */
+    @Transactional
+    public PostResponseDto createPost(Long memberId, PostWithImagesRequestDto requestDto) {
+        String title = requestDto.getTitle();
+        log.info("[게시글 생성 시작] title={}, memberId={}", title, memberId);
+        Post post = postRepository.save(Post.createPost(memberId, title, requestDto.getContent()));
+
+        savePostTags(post, requestDto.getTags());
+
+        // 이미지 업로드 및 URL 받기
+        List<String> imageUrls;
+        if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
+            imageUrls = imageService.uploadImages(requestDto.getImages(), "interest", post.getId());
+            post.updatePost(post.getTitle(), post.getContent(), imageUrls);
+        }
+
+
+        log.info("[게시글 생성 완료] postId={}", post.getId());
+
+        return PostDtoConverter.toCreateResponseDto(post);
+    }
+
+    /**
      * 게시글 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.
      *
      * @param postId 조회할 게시글 ID
-     * @return 게시글 상세 정보를 담은 응답 DTO
+     * @return 게시글 상세 정보를 담은 응답 DTOcur
      * @throws PostNotFoundException 게시글이 존재하지 않을 경우
      */
     @Transactional
