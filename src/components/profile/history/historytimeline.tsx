@@ -7,6 +7,7 @@ import {
   deleteHistory,
   getUsersAllHistory,
 } from "../../../api/history/history";
+import CheckModal from "../../common/checkmodal";
 
 export interface HistoryProps {
   historyId: number;
@@ -22,6 +23,8 @@ export default function HistoryTimeline() {
     Record<number, HistoryProps[]>
   >({});
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -94,9 +97,21 @@ export default function HistoryTimeline() {
     handleSuccess();
   };
 
-  const handleDelete = async (id: number) => {
-    await deleteHistory(id);
-    setRefreshKey((prev) => prev + 1);
+  const handleDelete = (id: number) => {
+    setPendingDeleteId(id);
+    setShowDeleteModal(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (pendingDeleteId !== null) {
+      await deleteHistory(pendingDeleteId);
+      setRefreshKey((prev) => prev + 1);
+      setPendingDeleteId(null);
+      setShowDeleteModal(false);
+    }
+  };
+  const handleCancelDelete = () => {
+    setPendingDeleteId(null);
+    setShowDeleteModal(false);
   };
 
   const years = Object.keys(groupedData)
@@ -105,6 +120,16 @@ export default function HistoryTimeline() {
 
   return (
     <div className="w-full py-4 px-2">
+      {showDeleteModal && (
+        <CheckModal
+          title="히스토리 삭제"
+          message="정말로 이 히스토리를 삭제하겠습니까?"
+          type="info"
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
+
       {/* 타임라인 바 */}
       <div className="relative w-full h-12 mb-12">
         <div className="absolute top-1/2 w-full border-t-4 border-blue-800"></div>

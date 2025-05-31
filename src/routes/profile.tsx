@@ -93,7 +93,7 @@ export default function Profile() {
 
           {historyOpen && (
             <div style={{ padding: 16 }}>
-              <MyPin title={"뭐"} />
+              <MyPin title={""} editable />
             </div>
           )}
         </GridItem>
