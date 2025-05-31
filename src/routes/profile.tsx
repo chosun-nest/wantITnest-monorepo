@@ -13,6 +13,8 @@ import {
 import { CaretDown, CaretUp } from "phosphor-react"; // history 열림, 닫힘용
 import useResponsive from "../hooks/responsive";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
+import HistoryTimeline from "../components/profile/history/historytimeline";
+import MyPin from "../components/profile/history/mypins";
 
 export default function Profile() {
   const { navbarHeight } = useNavbarHeight();
@@ -77,11 +79,11 @@ export default function Profile() {
           $row="1"
           $col="2"
           $colSpan="2"
-          $noMinHeight
+          $noMinHeight={true}
         >
           {/* 헤더에 onClick 걸기 */}
           <ItemTitle onClick={() => setHistoryOpen((o) => !o)}>
-            <span>History</span>
+            <span>My Pins</span>
             {historyOpen ? (
               <CaretUp size={20} weight="bold" />
             ) : (
@@ -91,18 +93,16 @@ export default function Profile() {
 
           {historyOpen && (
             <div style={{ padding: 16 }}>
-              {/* 히스토리 콘텐츠 */}
-              <p>• 첫 번째 활동 내역</p>
-              <p>• 두 번째 활동 내역</p>
-              {/* … */}
+              <MyPin title={"뭐"} />
             </div>
           )}
         </GridItem>
 
         {/* 2행: 활동 로그 */}
         <GridItem $isMobile={isMobile} $row="2" $col="2" $colSpan="2">
-          <ItemTitle>활동 로그</ItemTitle>
-          {/* 여기에 실제 로그 리스트 */}
+          <ItemTitle>History</ItemTitle>
+
+          <HistoryTimeline />
         </GridItem>
       </GridContainer>
       {/* <div
