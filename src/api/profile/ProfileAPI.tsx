@@ -64,13 +64,13 @@ export interface MemberProfile {
 
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
-  const BASE_URL = "http://119.219.30.209:6030";
+  const BASE_URL = "http://119.219.30.209:6030";  // 백엔드에서 이미지가 서빙되는 절대 주소
 
   return {
     ...res.data,
-    memberImageUrl: res.data.memberImageUrl
-      ? `${BASE_URL}${res.data.memberImageUrl}`
-      : "",
+    memberImageUrl: res.data.memberImageUrl     // memberImageUrl이 존재
+      ? `${BASE_URL}${res.data.memberImageUrl}` // BASE_URL + memberImageUrl = 절대 경로로 변환
+      : "",                                     // memberImageUrl이 없으면 빈 문자열을 반환(이미지 없는 상태)
 
   };
 };
