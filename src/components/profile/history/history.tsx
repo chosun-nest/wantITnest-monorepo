@@ -5,9 +5,6 @@ import {
   deleteHistory,
 } from "../../../api/history/history";
 import CheckModal from "../../common/checkmodal";
-interface HistoryPropsFromParent {
-  onEdit: (history: HistoryProps) => void;
-}
 export interface HistoryProps {
   historyId: number;
   memberId: number;
@@ -17,14 +14,46 @@ export interface HistoryProps {
   important: boolean;
 }
 
-export default function History({ onEdit }: HistoryPropsFromParent) {
+interface HistoryPropsFromParent {
+  onEdit: (history: HistoryProps) => void;
+  onGroupedHistoryChange?: (grouped: Record<number, HistoryProps[]>) => void;
+}
+
+export default function History({
+  onEdit,
+  onGroupedHistoryChange,
+}: HistoryPropsFromParent) {
   const [histories, setHistories] = useState<HistoryProps[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
+  const groupByYear = (
+    histories: HistoryProps[]
+  ): Record<number, HistoryProps[]> => {
+    return histories.reduce(
+      (acc, history) => {
+        const year = new Date(history.startDate).getFullYear();
+        if (!acc[year]) acc[year] = [];
+        acc[year].push(history);
+        return acc;
+      },
+      {} as Record<number, HistoryProps[]>
+    );
+  };
+
   const fetchHistory = async () => {
     try {
-      setHistories(await getUsersAllHistory());
+      const data = await getUsersAllHistory();
+
+      const sorted = data.sort(
+        (a: HistoryProps, b: HistoryProps) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+
+      setHistories(sorted);
+
+      const grouped = groupByYear(sorted);
+      onGroupedHistoryChange?.(grouped); // 부모에게 전달
     } catch (error) {
       console.error("Error fetching history:", error);
     }
@@ -38,9 +67,14 @@ export default function History({ onEdit }: HistoryPropsFromParent) {
   const handleConfirmDelete = async () => {
     if (pendingDeleteId !== null) {
       await deleteHistory(pendingDeleteId);
-      setHistories((prev) =>
-        prev.filter((history) => history.historyId !== pendingDeleteId)
+      const updated = histories.filter(
+        (history) => history.historyId !== pendingDeleteId
       );
+      setHistories(updated);
+
+      const grouped = groupByYear(updated);
+      onGroupedHistoryChange?.(grouped);
+
       setPendingDeleteId(null);
     }
     setShowModal(false);

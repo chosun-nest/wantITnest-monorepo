@@ -34,7 +34,7 @@ export default function MyPin({ title, editable }: MyPinProps) {
   }, []);
 
   return (
-    <div className="bg-white rounded-xl shadow p-5 mb-6 border border-gray-300 relative">
+    <div className="bg-white rounded-xl shadow p-5 mb-6 border border-gray-300">
       <ul className="mb-4 space-y-1">
         <li className="font-semibold">{title}</li>
         {pinnedItems.length > 0 ? (
