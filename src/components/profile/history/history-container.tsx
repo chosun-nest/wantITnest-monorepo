@@ -1,6 +1,7 @@
-import { useState } from "react";
 import { HistoryProps } from "./history";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaRegStar } from "react-icons/fa";
+import { updateHistory } from "../../../api/history/history";
+import { useState } from "react";
 
 interface HistoryContainerProps extends HistoryProps {
   onDelete: (historyId: number) => void;
@@ -13,23 +14,24 @@ export default function HistoryContainer({
   content,
   startDate,
   endDate,
-  important,
+  important: initialImportant,
   onDelete,
   onEdit,
 }: HistoryContainerProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [payload, setPayload] = useState(content);
+  const [important, setImportant] = useState(initialImportant);
 
-  const handleSaveClick = () => {
-    setIsEditing(false);
-    // TODO: 저장 API 연동
-  };
-  const handleCancelClick = () => {
-    setPayload(content);
-    setIsEditing(false);
-  };
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPayload(e.target.value);
+  const toggleImportant = async () => {
+    try {
+      await updateHistory(historyId, {
+        content,
+        startDate,
+        endDate,
+        important: !important,
+      });
+      setImportant((prev) => !prev);
+    } catch (e) {
+      console.error("중요 여부 업데이트 실패:", e);
+    }
   };
 
   return (
@@ -37,66 +39,45 @@ export default function HistoryContainer({
       <h2 className="font-semibold text-black">
         {startDate} ~ {endDate}
       </h2>
+
       <div className="flex flex-row items-start gap-4">
         <div className="flex-1">
-          {isEditing ? (
-            <textarea
-              value={payload}
-              onChange={handleChange}
-              className="w-full h-28 p-2 border border-blue-300 rounded resize-none focus:outline-none"
-              placeholder="활동 내역을 입력하세요"
-            />
-          ) : (
-            <div className="flex flex-row items-center justify-start gap-2">
-              <p className="text-gray-800 text-sm whitespace-pre-line">
-                {payload}
-              </p>
-              {important && <FaStar className="text-yellow-400" />}
-            </div>
-          )}
+          <div className="flex flex-row items-center justify-start gap-2">
+            <p className="text-gray-800 text-sm whitespace-pre-line">
+              {content}
+            </p>
+            <button onClick={toggleImportant}>
+              {important ? (
+                <FaStar className="text-yellow-400 cursor-pointer" />
+              ) : (
+                <FaRegStar className="text-black cursor-pointer border" />
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-row gap-2 shrink-0">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSaveClick}
-                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-              >
-                저장
-              </button>
-              <button
-                onClick={handleCancelClick}
-                className="px-3 py-1 bg-gray-300 text-gray-800 text-sm rounded hover:bg-gray-400"
-              >
-                취소
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() =>
-                  onEdit({
-                    historyId,
-                    content,
-                    startDate,
-                    endDate,
-                    important,
-                    memberId,
-                  })
-                }
-                className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-              >
-                수정
-              </button>
-              <button
-                onClick={() => onDelete(historyId)}
-                className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-              >
-                삭제
-              </button>
-            </>
-          )}
+          <button
+            onClick={() =>
+              onEdit({
+                historyId,
+                content,
+                startDate,
+                endDate,
+                important,
+                memberId,
+              })
+            }
+            className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+          >
+            수정
+          </button>
+          <button
+            onClick={() => onDelete(historyId)}
+            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+          >
+            삭제
+          </button>
         </div>
       </div>
     </div>

@@ -25,7 +25,6 @@ import Events from "./routes/events";
 import PublicRoute from "./components/auth/public-route";
 import ResetPassword from "./routes/reset-password";
 import GlobalModal from "./components/global/global-modal";
-import Dummy from "./routes/dummy";
 
 const router = createBrowserRouter([
   {
@@ -84,10 +83,7 @@ const router = createBrowserRouter([
         path: "profile/",
         element: <Profile />,
       },
-      {
-        path: "dummy/",
-        element: <Dummy />,
-      },
+
       {
         path: "profile-edit/",
         element: <ProfileEdit />,

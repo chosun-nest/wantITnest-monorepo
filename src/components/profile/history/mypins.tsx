@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { FaStar } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { getUsersAllHistory } from "../../../api/history/history";
+import { FaStar, FaRegStar } from "react-icons/fa"; // ★ 추가: 비어있는 별
+import {
+  getUsersAllHistory,
+  updateHistory,
+} from "../../../api/history/history";
 import { HistoryProps } from "./history";
 
 export interface MyPinProps {
@@ -9,57 +11,64 @@ export interface MyPinProps {
   editable?: boolean;
 }
 
-export default function MyPin({ title, editable }: MyPinProps) {
-  const [pinnedItems, setPinnedItems] = useState<
-    { text: string; pinned: boolean }[]
-  >([]);
+export default function MyPin({ title, editable = false }: MyPinProps) {
+  const [pinnedItems, setPinnedItems] = useState<HistoryProps[]>([]);
+
+  const fetchPinnedHistories = async () => {
+    try {
+      const histories: HistoryProps[] = await getUsersAllHistory();
+      const pinned = histories.filter((h) => h.important);
+      setPinnedItems(pinned);
+    } catch (error) {
+      console.error("히스토리 불러오기 실패:", error);
+    }
+  };
+
+  const toggleImportant = async (item: HistoryProps) => {
+    try {
+      await updateHistory(item.historyId, {
+        content: item.content,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        important: !item.important,
+      });
+      fetchPinnedHistories();
+    } catch (error) {
+      console.error("중요 여부 업데이트 실패:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const histories: HistoryProps[] = await getUsersAllHistory();
-        const pinned = histories
-          .filter((h) => h.important)
-          .map((h) => ({
-            text: h.content,
-            pinned: true,
-          }));
-        setPinnedItems(pinned);
-      } catch (error) {
-        console.error("히스토리 불러오기 실패:", error);
-      }
-    };
-
-    fetchHistory();
+    fetchPinnedHistories();
   }, []);
 
   return (
-    <div className="bg-white rounded-xl shadow p-5 mb-6 border border-gray-300 relative">
-      <ul className="mb-4 space-y-1">
-        <li className="font-semibold">{title}</li>
-        {pinnedItems.length > 0 ? (
-          pinnedItems.map((item, idx) => (
-            <li
-              key={idx}
-              className="flex items-center gap-2 ml-4 text-gray-800"
-            >
-              • {item.text}
-              {item.pinned && <FaStar className="text-yellow-400" />}
-            </li>
-          ))
-        ) : (
-          <li className="text-sm text-gray-400 ml-4">
-            중요 표시된 항목이 없습니다
+    <ul className="mb-4 space-y-1">
+      <li className="font-semibold">{title}</li>
+      {pinnedItems.length > 0 ? (
+        pinnedItems.map((item, idx) => (
+          <li key={idx} className="flex items-center gap-2 ml-4 text-gray-800">
+            •{" "}
+            <strong>
+              {item.startDate}~{item.endDate}
+            </strong>{" "}
+            {item.content}
+            {editable && (
+              <button onClick={() => toggleImportant(item)}>
+                {item.important ? (
+                  <FaStar className="text-yellow-400 cursor-pointer" />
+                ) : (
+                  <FaRegStar className="text-black border border-black cursor-pointer" />
+                )}
+              </button>
+            )}
           </li>
-        )}
-      </ul>
-      {editable && (
-        <Link to="/dummy">
-          <button className="absolute bottom-4 right-4 px-3 py-1 border border-gray-400 rounded text-sm hover:bg-gray-100">
-            수정
-          </button>
-        </Link>
+        ))
+      ) : (
+        <li className="text-sm text-gray-400 ml-4">
+          중요 표시된 항목이 없습니다
+        </li>
       )}
-    </div>
+    </ul>
   );
 }

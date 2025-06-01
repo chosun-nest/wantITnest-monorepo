@@ -29,9 +29,9 @@ export const deleteHistory = async (historyId: number) => {
 export const updateHistory = async (
   historyId: number,
   payload: {
-    content: string;
-    startDate: string;
-    endDate: string;
+    content?: string;
+    startDate?: string;
+    endDate?: string;
     important: boolean;
   }
 ) => {
