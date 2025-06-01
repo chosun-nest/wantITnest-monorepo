@@ -97,46 +97,44 @@ export default function TagFilterModal({ onClose, onApply }: TagFilterModalProps
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <div className="flex-1 pr-1 space-y-6 overflow-y-auto">
-          {search ? (
-            <div className="flex flex-wrap gap-2">
-              {filteredTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1 rounded-full border text-sm transition ${
-                    selectedTags.includes(tag)
-                      ? "bg-[#002F6C] text-white border-[#002F6C]"
-                      : "border-gray-300 hover:bg-gray-100"
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          ) : (
-            TAG_CATEGORIES.map((cat) => (
-              <div key={cat.title}>
-                <p className="font-semibold text-[15px] mb-2">{cat.title}</p>
-                <div className="flex flex-wrap gap-2">
-                  {cat.tags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 rounded-full border text-sm transition ${
-                        selectedTags.includes(tag)
-                          ? "bg-[#002F6C] text-white border-[#002F6C]"
-                          : "border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
+        { search.trim() !== "" ? (
+          <div className="flex flex-wrap gap-2">
+            {filteredTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-3 py-1 rounded-full border text-sm transition ${
+                  selectedTags.includes(tag)
+                    ? "bg-[#002F6C] text-white border-[#002F6C]"
+                    : "border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        ) : (
+          TAG_CATEGORIES.map((cat) => (
+            <div key={cat.title}>
+              <p className="font-semibold text-[15px] mb-2">{cat.title}</p>
+              <div className="flex flex-wrap gap-2">
+                {cat.tags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`px-3 py-1 rounded-full border text-sm transition ${
+                      selectedTags.includes(tag)
+                        ? "bg-[#002F6C] text-white border-[#002F6C]"
+                        : "border-gray-300 hover:bg-gray-100"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
-            ))
-          )}
-        </div>
+            </div>
+          ))
+        )}
 
         {errorMessage && (
           <p className="mt-4 text-sm text-center text-red-600">{errorMessage}</p>
