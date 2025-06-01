@@ -9,8 +9,8 @@ import InterestBoardSortTabs from "../components/interests/board/InterestBoardSo
 import InterestPostCardList from "../components/interests/board/InterestPostCardList";
 import InterestBoardWriteButton from "../components/board/tag/BoardWriteButton";
 import Pagination from "../components/interests/board/Pagination";
-import { fetchPosts } from "../api/interests/InterestsAPI";
-import type { PostSummary } from "../api/types/interest-board";
+import { fetchPosts, searchPosts } from "../api/interests/InterestsAPI";
+import type { PostSummary, SearchType } from "../api/types/interest-board";
 
 export default function InterestBoard() {
   const [navHeight, setNavHeight] = useState(0);
@@ -25,21 +25,53 @@ export default function InterestBoard() {
 
   const navbarRef = useRef<HTMLDivElement>(null);
 
-  const fetchData = async () => {
-    try {
-      const params = {
-        page: currentPage - 1,
-        size: pageSize,
-        sort: sortType === "likes" ? "likeCount,desc" : "createdAt,desc",
-        tags: selectedTags,
-      };
+// ✅ 기존 fetchPosts와 searchPosts 통합 처리
+const fetchData = async () => {
+  try {
+    const params = {
+      page: currentPage - 1,
+      size: pageSize,
+      sort: sortType === "likes" ? "likeCount,desc" : "createdAt,desc",
+      tags: selectedTags,
+    };
+
+    let postsData;
+    if (searchKeyword.trim() === "") {
+      // 전체 목록 API
       const data = await fetchPosts(params);
-      setPosts(data.posts);   // PostSummary[] 타입이 보장됨
+      postsData = data.posts.map((post) => ({
+        ...post,
+        commentCount: post.commentCount ?? 0, // 안전 처리
+      }));
       setTotalCount(data.totalCount);
-    } catch (err) {
-      console.error("게시글 목록 조회 실패", err);
+    } else {
+      // 검색 API
+      const searchParams = {
+        ...params,
+        keyword: searchKeyword,
+        searchType: "ALL" as SearchType, // 또는 "TITLE", "CONTENT"
+      };
+      const data = await searchPosts(searchParams);
+      postsData = data.posts.map((post) => ({
+        postId: post.id,
+        title: post.title,
+        previewContent: post.previewContent,
+        authorName: post.authorName,
+        tags: post.tags,
+        createdAt: post.createdAt,
+        viewCount: post.viewCount,
+        likeCount: post.likeCount,
+        dislikeCount: post.dislikeCount ?? 0,
+        commentCount: post.commentCount ?? 0,
+      }));
+      setTotalCount(data.totalCount);
     }
-  };
+
+    setPosts(postsData);
+  } catch (err) {
+    console.error("게시글 목록 조회 실패", err);
+  }
+};
 
   useEffect(() => {
     if (navbarRef.current) {

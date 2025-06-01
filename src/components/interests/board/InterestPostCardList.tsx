@@ -24,7 +24,13 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
       {posts.map((post) => (
         <div
           key={post.postId}
-          onClick={() => navigate(`/interests-detail/${post.postId}`)}
+          onClick={() => {
+            if (post.postId) {
+              navigate(`/interests-detail/${post.postId}`);
+            } else {
+              console.error("postId가 유효하지 않습니다.", post);
+            }
+          }}
           className="p-4 border rounded-lg cursor-pointer hover:shadow"
         >
           <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>

@@ -38,12 +38,10 @@ export const createInterestPost = async (
 // =========================================
 
 // 게시글 상세 조회 (GET) - 인증 불필요
-export const fetchPostDetail = async (
-  postId: number
-): Promise<PostDetail> => {
+export const fetchPostDetail = async (postId: number): Promise<PostDetail> => {
   const response = await API.get<PostDetail>(
     `/api/v1/interests/${postId}`,
-    {
+    { 
       headers: { skipAuth: true }, // 인터셉터가 Authorization을 붙이지 않게 함
     }
   );
@@ -92,7 +90,7 @@ export const fetchPosts = async (
   params: FetchPostsParams
 ): Promise<PostListResponse> => {  
   const queryParams = new URLSearchParams();    // ?page=0&size=10&tags=JAVA 같은 형식
-  const token = getAccessToken();
+  //const token = getAccessToken();
   
   if (params.page !== undefined) 
     queryParams.append("page", String(params.page));  // page 값이 있으면 쿼리 쿼리 스트링에 추가. ex) "page=0"
@@ -104,9 +102,18 @@ export const fetchPosts = async (
     params.tags.forEach((tag) => queryParams.append("tags", tag));  // tags는 여러 개 지원하므로 tags=JAVA&tags=SPRING처럼 하나씩 반복 추가
   }
 
-    const response = await API.get<PostListResponse>(
+  //   const response = await API.get<PostListResponse>(
+  //   `/api/v1/posts?${queryParams.toString()}`,
+  //   { headers: { Authorization: `Bearer ${token}` }}
+  // );
+  // return response.data;
+
+  // 공개형 게시판이므로 인증 생략
+  const response = await API.get<PostListResponse>(
     `/api/v1/posts?${queryParams.toString()}`,
-    { headers: { Authorization: `Bearer ${token}` }}
+    {
+      headers: { skipAuth: true },
+    }
   );
   return response.data;
 };
