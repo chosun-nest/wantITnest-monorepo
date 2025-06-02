@@ -13,6 +13,7 @@
   import ConfirmModal from "../components/common/ConfirmModal";
   import PostDetailHeader from "../components/interests/detail/PostDetailHeader";
   import PostDetailInfo from "../components/interests/detail/PostDetailInfo";
+  import FollowButton from "../components/interests/detail/FollowButton";
   import PostDetailContent from "../components/interests/detail/PostDetailContent";
   import PostDetailTags from "../components/interests/detail/PostDetailTags";
   import PostDetailActions from "../components/interests/detail/PostDetailActions";
@@ -145,11 +146,18 @@
                 viewCount={post.viewCount}
                 date={post.updatedAt}
               />
-              <PostDetailHeader
-                isAuthor={isAuthor}
-                onEdit={() => navigate("/board-write", { state: { post } })}
-                onDelete={() => setShowDeleteConfirm(true)}
-              />
+
+              {!isAuthor && (
+                <div className="flex gap-2 items-right">
+                  <FollowButton />
+                  <PostDetailHeader
+                    isAuthor={isAuthor}
+                    onEdit={() => navigate("/board-write", { state: { post } })}
+                    onDelete={() => setShowDeleteConfirm(true)}
+                  />
+                </div>
+              )}
+              
             </div>
 
           <hr className="my-5 border-gray-200" />
