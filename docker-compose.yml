@@ -1,0 +1,51 @@
+services:
+  nest-ai:
+    container_name: nest-ai-crawler-8000-container
+    build:
+      context: ./NEST-AI
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_SERVER_URL: http://nest-be:6030
+    restart: unless-stopped
+    networks:
+      - nest-network
+
+  nest-be:
+    container_name: nest-be-spring-boot-6030-container
+    build:
+      context: ./Nest-BE
+      dockerfile: Dockerfile
+    ports:
+      - "6030:6030"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: VIRTUKCH
+      SPRING_DATASOURCE_PASSWORD: VIRTUKCH
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}  # 환경변수 또는 기본값 prod
+    volumes:
+      - ./Nest-BE/uploaded-images:/app/uploaded-images
+    depends_on:
+      - nest-ai
+    restart: unless-stopped
+    networks:
+      - nest-network
+
+  # test시에 주석처리 -> 메모리 부족함.
+  nest-fe:
+    container_name: nest-fe-react-dev-5173-container
+    build:
+      context: ./Nest-FE
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - nest-be
+    restart: unless-stopped
+    networks:
+      - nest-network
+
+networks:
+  nest-network:
+    driver: bridge
