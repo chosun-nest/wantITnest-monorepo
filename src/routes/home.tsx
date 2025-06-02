@@ -24,6 +24,12 @@ export default function Home() {
           </S.ProfileContainer>
         )}
       </S.GridItem>
+      {isLoggedIn ? (
+        <S.GridItem $row="2" $col="1" $colSpan="2" $isMobile={isMobile}>
+          <S.ItemTitle>내 핀</S.ItemTitle>
+          <MyPin title="" editable />
+        </S.GridItem>
+      ) : null}
       <S.GridItem $row="1" $isMobile={isMobile} $col="2">
         <S.ItemTitle>
           관심분야 게시판<Link to="/interests-board">+</Link>
@@ -34,12 +40,6 @@ export default function Home() {
           학사 공지<Link to="/notice-board">+</Link>
         </S.ItemTitle>
       </S.GridItem>
-      {isLoggedIn ? (
-        <S.GridItem $row="2" $col="1" $colSpan="2" $isMobile={isMobile}>
-          <S.ItemTitle>내 핀</S.ItemTitle>
-          <MyPin title="" editable />
-        </S.GridItem>
-      ) : null}
       <S.GridItem $row="2" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
           프로젝트 모집 게시판<Link to="/project-board">+</Link>
