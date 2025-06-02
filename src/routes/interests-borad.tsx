@@ -10,7 +10,7 @@ import InterestPostCardList from "../components/interests/board/InterestPostCard
 import InterestBoardWriteButton from "../components/board/tag/BoardWriteButton";
 import Pagination from "../components/interests/board/Pagination";
 import { fetchPosts, searchPosts } from "../api/interests/InterestsAPI";
-import type { PostSummary, SearchType } from "../api/types/interest-board";
+import type { PostSummary, SearchPost } from "../api/types/interest-board";
 
 export default function InterestBoard() {
   const [navHeight, setNavHeight] = useState(0);
@@ -25,53 +25,71 @@ export default function InterestBoard() {
 
   const navbarRef = useRef<HTMLDivElement>(null);
 
-// ✅ 기존 fetchPosts와 searchPosts 통합 처리
-const fetchData = async () => {
-  try {
-    const params = {
-      page: currentPage - 1,
-      size: pageSize,
-      sort: sortType === "likes" ? "likeCount,desc" : "createdAt,desc",
-      tags: selectedTags,
-    };
-
-    let postsData;
-    if (searchKeyword.trim() === "") {
-      // 전체 목록 API
-      const data = await fetchPosts(params);
-      postsData = data.posts.map((post) => ({
-        ...post,
-        commentCount: post.commentCount ?? 0, // 안전 처리
-      }));
-      setTotalCount(data.totalCount);
-    } else {
-      // 검색 API
-      const searchParams = {
-        ...params,
-        keyword: searchKeyword,
-        searchType: "ALL" as SearchType, // 또는 "TITLE", "CONTENT"
+  // 기존 fetchPosts와 searchPosts 통합 처리
+  const fetchData = async () => {
+    try {
+      const params = {
+        page: currentPage - 1,
+        size: pageSize,
+        sort: sortType === "likes" ? "likeCount,desc" : "createdAt,desc",
+        tags: selectedTags,
       };
-      const data = await searchPosts(searchParams);
-      postsData = data.posts.map((post) => ({
-        postId: post.id,
-        title: post.title,
-        previewContent: post.previewContent,
-        authorName: post.authorName,
-        tags: post.tags,
-        createdAt: post.createdAt,
-        viewCount: post.viewCount,
-        likeCount: post.likeCount,
-        dislikeCount: post.dislikeCount ?? 0,
-        commentCount: post.commentCount ?? 0,
-      }));
-      setTotalCount(data.totalCount);
-    }
 
-    setPosts(postsData);
-  } catch (err) {
-    console.error("게시글 목록 조회 실패", err);
-  }
-};
+      let rawPosts: (PostSummary | SearchPost)[] = [];
+      let total = 0;
+
+      if (searchKeyword.trim() === "") {
+        // 일반 게시글 목록 조회
+        const data = await fetchPosts(params);
+        rawPosts = data.posts;
+        total = data.totalCount;
+
+        console.log("✅ fetchPosts 응답:", rawPosts);
+      } else {
+        // 검색된 게시글 목록 조회
+        const searchParams = {
+          ...params,
+          keyword: searchKeyword,
+          searchType: "ALL" as const,
+        };
+
+        const data = await searchPosts(searchParams);
+        rawPosts = data.posts;
+        total = data.totalCount;
+
+        console.log("searchPosts 응답:", rawPosts);
+      }
+
+      // SearchPost | PostSummary → PostSummary 변환
+      const mappedPosts: PostSummary[] = rawPosts
+        .map((post, idx) => {
+          const converted: PostSummary = {
+            postId: "postId" in post ? post.postId : post.id,
+            title: post.title,
+            previewContent: post.previewContent,
+            authorName: post.authorName,
+            tags: post.tags ?? [],
+            createdAt: post.createdAt,
+            viewCount: post.viewCount ?? 0,
+            likeCount: post.likeCount ?? 0,
+            dislikeCount: post.dislikeCount ?? 0,
+            commentCount: post.commentCount ?? 0,
+          };
+
+          if (!converted.postId) {
+            console.warn(`❗ ${idx}번째 게시글에 postId 없음`, post);
+          }
+
+          return converted;
+        })
+        .filter((post) => !!post.postId); // ❗ 렌더링 전 postId 유효성 보장
+
+      setPosts(mappedPosts);
+      setTotalCount(total);
+    } catch (err) {
+      console.error("❌ 게시글 목록 조회 실패", err);
+    }
+  };
 
   useEffect(() => {
     if (navbarRef.current) {
@@ -82,6 +100,10 @@ const fetchData = async () => {
   useEffect(() => {
     fetchData();
   }, [currentPage, selectedTags, sortType, searchKeyword]);
+
+  useEffect(() => {
+    console.log("fetchData 이후 posts 상태", posts);  // 로그가 뜨는지, postId가 있는지, 배열이 아예 비어 있는지
+  }, [posts]);
 
   const removeSelectedTag = (tag: string) => {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));

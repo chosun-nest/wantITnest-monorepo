@@ -17,17 +17,17 @@ export default function PostDetailActions({
     <div className="flex gap-3 mb-6">
       <button
         onClick={onLike}
-        className="px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50"
+        className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50"
       >
         좋아요 {likeCount}
       </button>
       <button
         onClick={onDislike}
-        className="px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50"
+        className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50"
       >
         싫어요 {dislikeCount}
       </button>
-      <button className="px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50">
+      <button className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 border rounded hover:bg-gray-50">
         🔗 공유
       </button>
     </div>
