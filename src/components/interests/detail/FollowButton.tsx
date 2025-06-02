@@ -13,8 +13,8 @@ export default function FollowButton() {
       onClick={handleClick}
       className={`px-4 py-1.5 border rounded-md text-sm font-bold transition ${
         followed
-          ? "bg-white text-[#2f3b59] border-[#2f3b59] hover:bg-[#f4f6fa]"
-          : "bg-[#2f3b59] text-white border-transparent hover:bg-[#3e4b6b]"
+          ? "bg-white text-[#1E3A8A] border-[#1E3A8A] hover:bg-[#f4f6fa]"
+          : "bg-[#1E3A8A] text-white border-transparent hover:bg-[#5f7fce]"
       }`}
     >
       {followed ? "팔로잉" : "팔로우"}
