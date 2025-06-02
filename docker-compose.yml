@@ -32,7 +32,6 @@ services:
     networks:
       - nest-network
 
-  # test시에 주석처리 -> 메모리 부족함.
   nest-fe:
     container_name: nest-fe-react-dev-5173-container
     build:
