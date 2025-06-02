@@ -109,7 +109,6 @@ API.interceptors.response.use(
     }
 
     // --- 403 처리 ---
-    /*// 간심분야가 해결해질 때 까지 403은 잠시 보료
     if (status === 403) {
       if (!errorMessage) {
         console.warn("권한 문제(403).");
@@ -123,7 +122,6 @@ API.interceptors.response.use(
         store.dispatch(clearTokens());
       }
     }
-    */
 
     // 그 외 모든 에러는 그대로 반환
     return Promise.reject(error);
