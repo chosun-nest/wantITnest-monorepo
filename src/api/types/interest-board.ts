@@ -111,7 +111,7 @@ export interface SearchPost {
   viewCount: number;
   likeCount: number;
   dislikeCount: number;
-  commentCount?: number;
+  commentCount: number;
   createdAt: string;
 }
 

@@ -20,19 +20,16 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-4">
-      {posts.map((post) => (
+  <div className="space-y-4">
+    {posts
+      .filter((post) => !!post.postId) // postId가 있는 게시글만 필터링
+      .map((post) => (
         <div
           key={post.postId}
-          onClick={() => {
-            if (post.postId) {
-              navigate(`/interests-detail/${post.postId}`);
-            } else {
-              console.error("postId가 유효하지 않습니다.", post);
-            }
-          }}
+          onClick={() => navigate(`/interests-detail/${post.postId}`)}
           className="p-4 border rounded-lg cursor-pointer hover:shadow"
         >
+          {/* 카드 내부 */}
           <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>
             <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
               {post.title}
@@ -40,7 +37,7 @@ export default function InterestPostCardList({ posts }: InterestPostCardListProp
           </div>
 
           <p className="mb-2 text-sm text-gray-700">
-            {post.previewContent.length > 100     // 100자 preview
+            {post.previewContent.length > 100
               ? `${post.previewContent.slice(0, 100)}...`
               : post.previewContent}
           </p>

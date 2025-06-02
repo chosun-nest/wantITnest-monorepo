@@ -37,21 +37,18 @@ export const createInterestPost = async (
 // [관심분야 게시글 상세 페이지용 - interests-detail.tsx]
 // =========================================
 
-// 게시글 상세 조회 (GET) - 인증 불필요
+// 게시글 상세 조회 (GET) - 인증 필요
 export const fetchPostDetail = async (postId: number): Promise<PostDetail> => {
+  const token = getAccessToken();
   const response = await API.get<PostDetail>(
-    `/api/v1/interests/${postId}`,
-    { 
-      headers: { skipAuth: true }, // 인터셉터가 Authorization을 붙이지 않게 함
+    `/api/v1/posts/${postId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   return response.data;
-  // const token = getAccessToken();
-  // const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-  // const res = await API.get<PostDetail>(`/api/v1/interests/${postId}`, {
-  //   headers,
-  // });
 };
 
 // 게시글 삭제 (DELETE) - 인증 필요
@@ -119,13 +116,6 @@ export const fetchPosts = async (
 };
 
 // 게시글 좋아요/싫어요 반응 관리(토글 방식) (POST) - 인증 필요
-
-//type ReactionType = "LIKE" | "DISLIKE"; // 반응 타입
-
-// interface ReactionRequest {
-//   reactionType: ReactionType;
-// }
-
 export const reactToPost = async (
   postId: number,               // 게시글 ID
   reactionType: ReactionType    // 반응 타입
