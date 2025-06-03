@@ -64,7 +64,7 @@ export interface MemberProfile {
 
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
-  const BASE_URL = "http://119.219.30.209:6030";  // 백엔드에서 이미지가 서빙되는 절대 주소
+  const BASE_URL = "http://49.246.71.236:6030";  // 백엔드에서 이미지가 서빙되는 절대 주소
 
   return {
     ...res.data,
