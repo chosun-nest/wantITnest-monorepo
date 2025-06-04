@@ -64,6 +64,25 @@ public class PostDtoConverter {
                 .build();
     }
 
+    public static PostWithImagesDetailResponseDto toDetailResponseDto(Post post, Member member, List<String> tagNames, List<String> imageUrls) {
+        return PostWithImagesDetailResponseDto.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .tags(tagNames)
+                .author(AuthorDto.builder()
+                        .id(member.getMemberId())
+                        .name(member.getMemberName())
+                        .build())
+                .viewCount(post.getViewCount())
+                .likeCount(post.getLikeCount())
+                .dislikeCount(post.getDislikeCount())
+                .createdAt(timeFormat(post.getCreatedAt()))
+                .updatedAt(timeFormat(post.getUpdatedAt()))
+                .imageUrls(imageUrls)
+                .build();
+    }
+
     public static PostListResponseDto toListResponseDto(List<PostSummaryDto> summaries, Page<?> page) {
         return PostListResponseDto.builder()
                 .posts(summaries)

@@ -2,6 +2,7 @@ package com.virtukch.nest.post.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.post.dto.PostResponseDto;
+import com.virtukch.nest.post.dto.PostWithImagesDetailResponseDto;
 import com.virtukch.nest.post.dto.PostWithImagesRequestDto;
 import com.virtukch.nest.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -23,7 +21,7 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/posts")
-@Tag(name = "[관심분야 정보 게시판 with image] 게시글 API", description = "게시글 생성, 조회, 수정, 삭제 등 게시판 관련 API")
+@Tag(name = "[관심분야 정보 게시판 with image] 게시글 API", description = "이미지를 포함한 게시글 생성, 조회, 수정, 삭제 등 게시판 관련 API")
 public class PostV2Controller {
 
     private final PostService postService;
@@ -78,6 +76,21 @@ public class PostV2Controller {
         log.info("[게시글 작성 요청] memberId={}", memberId);
 
         PostResponseDto responseDto = postService.createPost(memberId, requestDto);
+        return ResponseEntity
+                .created(URI.create("/api/v2/posts/" + responseDto.getPostId()))
+                .body(responseDto);
+    }
+
+    @Operation(
+            summary = "게시글 작성 (이미지 포함)",
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @GetMapping(("/{postId}"))
+    public ResponseEntity<PostWithImagesDetailResponseDto> getPostDetail(@PathVariable Long postId) {
+
+        log.info("[게시글 조회 요청] postId={}", postId);
+
+        PostWithImagesDetailResponseDto responseDto = postService.getPostDetailWithImage(postId);
         return ResponseEntity
                 .created(URI.create("/api/v2/posts/" + responseDto.getPostId()))
                 .body(responseDto);

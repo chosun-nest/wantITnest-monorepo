@@ -86,7 +86,6 @@ public class PostService {
             post.updatePost(post.getTitle(), post.getContent(), imageUrls);
         }
 
-
         log.info("[게시글 생성 완료] postId={}", post.getId());
 
         return PostDtoConverter.toCreateResponseDto(post);
@@ -96,7 +95,7 @@ public class PostService {
      * 게시글 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.
      *
      * @param postId 조회할 게시글 ID
-     * @return 게시글 상세 정보를 담은 응답 DTOcur
+     * @return 게시글 상세 정보를 담은 응답 DTO
      * @throws PostNotFoundException 게시글이 존재하지 않을 경우
      */
     @Transactional
@@ -108,6 +107,25 @@ public class PostService {
         List<String> tagNames = extractTagNames(postId);
 
         return PostDtoConverter.toDetailResponseDto(post, member, tagNames);
+    }
+
+    /**
+     * 이미지를 포함하여 게시글 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.
+     *
+     * @param postId 조회할 게시글 ID
+     * @return 게시글 상세 정보를 담은 응답 DTO
+     * @throws PostNotFoundException 게시글이 존재하지 않을 경우
+     */
+    @Transactional
+    public PostWithImagesDetailResponseDto getPostDetailWithImage(Long postId) {
+        Post post = findByIdOrThrow(postId);
+        post.increaseViewCount(); // 조회수 증가
+
+        Member member = findMemberOrThrow(post);
+        List<String> tagNames = extractTagNames(postId);
+        List<String> imageUrls = post.getImageUrlList();
+
+        return PostDtoConverter.toDetailResponseDto(post, member, tagNames, imageUrls);
     }
 
     /**
