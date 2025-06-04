@@ -20,4 +20,5 @@ public class PostSummaryDto {
     private Long dislikeCount;
     private String createdAt;
     private Long commentCount;
+    private String ImageUrl; // 게시글 최상위 이미지 url
 }

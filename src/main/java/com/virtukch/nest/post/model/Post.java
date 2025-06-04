@@ -99,6 +99,6 @@ public class Post extends BaseTimeEntity {
         if (imageUrls == null || imageUrls.isEmpty()) {
             return Collections.emptyList();
         }
-        return Arrays.asList(imageUrls.split("||"));
+        return Arrays.asList(imageUrls.split("\\|\\|"));
     }
 }

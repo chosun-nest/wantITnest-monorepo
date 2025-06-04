@@ -31,7 +31,7 @@ public class PostDtoConverter {
                 .build();
     }
 
-    public static PostSummaryDto toSummaryDto(Post post, String memberName, List<String> tagNames, Long commentCount) {
+    public static PostSummaryDto toSummaryDto(Post post, String memberName, List<String> tagNames, Long commentCount, String imageUrl) {
         return PostSummaryDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -43,6 +43,7 @@ public class PostDtoConverter {
                 .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .commentCount(commentCount)
+                .ImageUrl(imageUrl)
                 .build();
     }
 

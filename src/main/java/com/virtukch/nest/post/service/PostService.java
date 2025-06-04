@@ -403,7 +403,14 @@ public class PostService {
                 .filter(Objects::nonNull)
                 .toList();
         Long commentCount = commentCountMap.getOrDefault(post.getId(), 0L);
-        return PostDtoConverter.toSummaryDto(post, memberName, tagNames, commentCount);
+
+        String imageUrl = null;
+        List<String> imageUrlList = post.getImageUrlList();
+        if(imageUrlList != null && !imageUrlList.isEmpty()) {
+            imageUrl = imageUrlList.get(0);
+        }
+
+        return PostDtoConverter.toSummaryDto(post, memberName, tagNames, commentCount, imageUrl);
     }
 
     /**
