@@ -1,13 +1,13 @@
 // 게시글 검색
-interface InterestBoardSearchProps {
+interface NoticeBoardSearchProps {
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;
 }
 
-export default function InterestBoardSearch({
+export default function NoticeBoardSearch({
   searchKeyword,
   setSearchKeyword,
-}: InterestBoardSearchProps) {
+}: NoticeBoardSearchProps) {
   return (
     <div className="flex justify-center mb-4">
       <div className="flex w-full max-w-xl gap-2">
@@ -25,4 +25,3 @@ export default function InterestBoardSearch({
     </div>
   );
 }
-

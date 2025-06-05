@@ -41,10 +41,7 @@ const router = createBrowserRouter([
         path: "project/:id",
         element: <ProjectDetail />,
       },
-      {
-        path: "project-board/",
-        element: <ProjectBoard />,
-      },
+
       {
         path: "project-apply",
         element: <ProjectApply />,
@@ -86,6 +83,7 @@ const router = createBrowserRouter([
         path: "profile/",
         element: <Profile />,
       },
+
       {
         path: "profile-edit/",
         element: <ProfileEdit />,
@@ -97,6 +95,10 @@ const router = createBrowserRouter([
       {
         path: "board-write/", // yeong-eun : 게시판 글쓰기 페이지
         element: <BoardWrite />,
+      },
+      {
+        path: "project-board/",
+        element: <ProjectBoard />,
       },
     ],
   },

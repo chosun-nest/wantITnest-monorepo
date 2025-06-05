@@ -1,7 +1,7 @@
 // 비밀번호 변경 모달
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { checkPassword, updateMemberPassword } from "../../../../api/profile/api";
+import { checkPassword, updateMemberPassword } from "../../../../api/profile/ProfileAPI";
 import LoadingDots from "../../../ui/LoadingDots";
 import CheckIcon from "../../../ui/CheckIcon";
 import PasswordSuccessModal from "./PasswordSuccessModal";
