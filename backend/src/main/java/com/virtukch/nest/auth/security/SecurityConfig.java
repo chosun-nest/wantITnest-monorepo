@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,14 +44,29 @@ public class SecurityConfig {
     }
 
     // ✅ 2. 일반 보안 설정 (JWT 포함)
+    // JWT 가 없어도 호출할 수 있어야 하는 API 라면, 이 메서드에 추가해야 합니다.
     @Bean
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/auth/**"))
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers(
+                    "/api/v1/auth/**",
+                    "/api/v1/tech-stacks",
+                    "/api/v1/interests",
+                    "/api/v1/departments",
+                    "/api/v1/tags/**",
+                    "/api/v1/posts/search",
+                    "/api/v1/notices/**"
+                ).permitAll()
+
+                // GET 메서드만 허용하는 경로
+                .requestMatchers(HttpMethod.GET,
+                        "/api/v1/posts",
+                        "/uploaded-images/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -59,6 +75,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

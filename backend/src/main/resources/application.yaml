@@ -1,13 +1,40 @@
 # Port Number
 server:
-  port: 5030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
+  port: 6030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
 
+# mysql -h 119.219.30.209 -P 6040 -u VIRTUKCH -p --default-character-set=utf8 nest_db
 spring:
   datasource:
-    url: jdbc:mysql://221.156.215.197:5040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+#    url: jdbc:mysql://119.219.30.209:6040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+#    username: VIRTUKCH
+#    password: VIRTUKCH
+
+# mysql -h localhost -P 3306 -u VIRTUKCH -p --default-character-set=utf8 nest_db
+#    url : jdbc:mysql://localhost:3306/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://119.219.30.209:6040/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
     username: VIRTUKCH
     password: VIRTUKCH
-    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# mysql -h localhost -P 3306 -u VIRTUKCH -p --default-character-set=utf8 nest_db
+#    url : jdbc:mysql://localhost:3306/nest_db?serverTimezone=UTC&characterEncoding=UTF-8
+#    username: VIRTUKCH
+#    password: VIRTUKCH
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#    #지혁
+#    url: jdbc:mysql://localhost:3306/nest_db
+#    username: nest
+#    password: nest
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: glosori.help@gmail.com
+    password: jzdschbukjgnjffz
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+    default-encoding: UTF-8
 
   jpa:
     hibernate:
@@ -20,8 +47,8 @@ spring:
 
 jwt:
   secret: VUkwMS0xMjM0LTU2NzgtOWFiYy1kZWZnaGk=
-  access-token-expiration: 3600000  # 1?? (??? ??)
-  refresh-token-expiration: 604800000  # 7? (??? ??)
+  access-token-expiration: 3600000  # 1 hour (in milliseconds)
+  refresh-token-expiration: 604800000  # 7 days (in milliseconds)
 
 springdoc:
   api-docs:
