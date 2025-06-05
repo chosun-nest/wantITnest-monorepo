@@ -1,0 +1,271 @@
+# 통합 프로젝트 .gitignore
+# Backend (Spring Boot) + Frontend (Vite) + AI (Python)
+# ==================================================
+
+# ==================================================
+# 1. BACKEND (Spring Boot/Gradle) - be/ 디렉토리
+# ==================================================
+
+# Gradle
+be/.gradle/
+be/build/
+be/gradle-app.setting
+be/!gradle/wrapper/gradle-wrapper.jar
+be/!**/src/main/**/build/
+be/!**/src/test/**/build/
+
+# Spring Boot
+be/HELP.md
+be/target/
+be/*.jar
+be/*.war
+be/*.nar
+be/*.ear
+be/*.zip
+be/*.tar.gz
+be/*.rar
+
+# IDE - Backend
+be/.idea/
+be/*.iws
+be/*.iml
+be/*.ipr
+be/out/
+be/!**/src/main/**/out/
+be/!**/src/test/**/out/
+
+# Eclipse/STS
+be/.apt_generated
+be/.classpath
+be/.factorypath
+be/.project
+be/.settings/
+be/.springBeans
+be/.sts4-cache
+be/bin/
+be/!**/src/main/**/bin/
+be/!**/src/test/**/bin/
+
+# NetBeans
+be/nbproject/private/
+be/nbbuild/
+be/dist/
+be/nbdist/
+be/.nb-gradle/
+
+# ==================================================
+# 2. FRONTEND (Vite/Node.js) - fe/ 디렉토리
+# ==================================================
+
+# Dependencies
+fe/node_modules/
+fe/.pnp
+fe/.pnp.js
+
+# Build outputs
+fe/dist/
+fe/dist-ssr/
+fe/build/
+fe/.next/
+fe/out/
+
+# Environment variables
+fe/.env
+fe/.env.*
+fe/!.env.example
+
+# Logs
+fe/logs/
+fe/*.log
+fe/npm-debug.log*
+fe/yarn-debug.log*
+fe/yarn-error.log*
+fe/pnpm-debug.log*
+fe/lerna-debug.log*
+
+# Runtime data
+fe/pids/
+fe/*.pid
+fe/*.seed
+fe/*.pid.lock
+
+# Coverage directory used by tools like istanbul
+fe/coverage/
+fe/*.lcov
+
+# nyc test coverage
+fe/.nyc_output
+
+# ESLint cache
+fe/.eslintcache
+
+# Optional npm cache directory
+fe/.npm
+
+# Optional REPL history
+fe/.node_repl_history
+
+# Output of 'npm pack'
+fe/*.tgz
+
+# Yarn Integrity file
+fe/.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+fe/.cache
+fe/.parcel-cache
+
+# Vite
+fe/*.local
+fe/.vite/
+
+# Rollup cache
+fe/.rpt2_cache/
+fe/.rts2_cache_cjs/
+fe/.rts2_cache_es/
+fe/.rts2_cache_umd/
+
+# ==================================================
+# 3. AI/ML (Python) - ai/ 디렉토리
+# ==================================================
+
+# Python
+ai/__pycache__/
+ai/*.py[cod]
+ai/*$py.class
+ai/*.so
+
+# Distribution / packaging
+ai/.Python
+ai/build/
+ai/develop-eggs/
+ai/dist/
+ai/downloads/
+ai/eggs/
+ai/.eggs/
+ai/lib/
+ai/lib64/
+ai/parts/
+ai/sdist/
+ai/var/
+ai/wheels/
+ai/share/python-wheels/
+ai/*.egg-info/
+ai/.installed.cfg
+ai/*.egg
+ai/MANIFEST
+
+# Virtual environments
+ai/venv/
+ai/ENV/
+ai/env/
+ai/.venv/
+ai/.ENV/
+ai/.env/
+
+# Jupyter Notebook
+ai/.ipynb_checkpoints
+
+# IPython
+ai/profile_default/
+ai/ipython_config.py
+
+# ML/AI specific
+ai/models/
+ai/checkpoints/
+ai/data/
+ai/datasets/
+ai/*.pkl
+ai/*.h5
+ai/*.hdf5
+ai/*.pb
+ai/*.pth
+ai/*.ckpt
+ai/wandb/
+ai/mlruns/
+ai/.tensorboard/
+
+# ==================================================
+# 4. 공통 개발 환경
+# ==================================================
+
+# Operating System
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# JetBrains IDEs
+*.iws
+*.iml
+*.ipr
+
+# Visual Studio
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ==================================================
+# 5. Docker & DevOps
+# ==================================================
+
+# Docker
+**/.dockerignore
+**/docker-compose.override.yml
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# ==================================================
+# 6. 기타 임시/백업 파일
+# ==================================================
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# Log files
+*.log
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files with sensitive data
+config.local.*
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# ==================================================
+# 7. 프로젝트별 특수 파일
+# ==================================================
+
+# drawio backup files
+**/*.$*.drawio.bkp
+
+# README files (프로젝트마다 다를 수 있으므로)
+# README.md  # 주석 처리 - 필요시 활성화

@@ -1,0 +1,48 @@
+services:
+  # nest-ai:
+  #   container_name: nest-ai-crawler-8000-container
+  #   build:
+  #     context: ./NEST-AI
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "${NEST_AI_PORT}:${NEST_AI_PORT}"
+  #   environment:
+  #     SPRING_SERVER_URL: ${NEST_BE_BASE_URL}
+  #   restart: unless-stopped
+  #   networks:
+  #     - nest-network
+
+  nest-be:
+    container_name: nest-be-spring-boot-6030-container
+    build:
+      context: ./Nest-BE
+      dockerfile: Dockerfile
+    ports:
+      - "${NEST_BE_PORT}:${NEST_BE_PORT}"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    volumes:
+      - ./Nest-BE/uploaded-images:/app/uploaded-images
+    restart: unless-stopped
+    networks:
+      - nest-network
+
+  nest-fe:
+    container_name: nest-fe-react-dev-5173-container
+    build:
+      context: ./Nest-FE
+      dockerfile: Dockerfile
+    ports:
+      - "${NEST_FE_PORT}:${NEST_FE_PORT}"
+    depends_on:
+      - nest-be
+    restart: unless-stopped
+    networks:
+      - nest-network
+
+networks:
+  nest-network:
+    driver: bridge
