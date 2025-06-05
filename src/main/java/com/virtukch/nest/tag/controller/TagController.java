@@ -2,6 +2,7 @@ package com.virtukch.nest.tag.controller;
 
 import com.virtukch.nest.tag.dto.TagListResponseDto;
 import com.virtukch.nest.tag.dto.TagResponseDto;
+import com.virtukch.nest.tag.exception.CategoryNotFoundException;
 import com.virtukch.nest.tag.model.Category;
 import com.virtukch.nest.tag.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,14 +51,13 @@ public class TagController {
     @GetMapping("/category/{categoryName}")
     public ResponseEntity<TagListResponseDto> getTagsByCategory(@PathVariable String categoryName) {
         log.info("[TagController] GET /api/v1/tags/category/{} 요청 들어옴", categoryName);
-        
         try {
             Category category = Category.valueOf(categoryName.toUpperCase());
             TagListResponseDto response = tagService.getTagsByCategory(category);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.warn("[TagController] 존재하지 않는 카테고리: {}", categoryName);
-            return ResponseEntity.notFound().build();
+            throw new CategoryNotFoundException(categoryName);
         }
     }
 

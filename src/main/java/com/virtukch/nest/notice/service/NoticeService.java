@@ -4,8 +4,9 @@ import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.notice.dto.NoticeListResponseDto;
 import com.virtukch.nest.notice.dto.NoticeRequestDto;
 import com.virtukch.nest.notice.dto.NoticeResponseDto;
+import com.virtukch.nest.notice.exception.InvalidDateFormatException;
 import com.virtukch.nest.notice.exception.InvalidNoticeDataException;
-import com.virtukch.nest.notice.exception.NoticeProcessingException;
+import com.virtukch.nest.notice.exception.InvalidNoticeTypeException;
 import com.virtukch.nest.notice.model.Notice;
 import com.virtukch.nest.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class NoticeService {
      * @param noticeType 공지사항 유형
      * @return 저장된 공지사항 수
      * @throws InvalidNoticeDataException 유효하지 않은 데이터가 있을 경우
-     * @throws NoticeProcessingException  처리 중 오류가 발생할 경우
+     * @throws InvalidNoticeTypeException 유효하지 않은 공지사항 유형이 있을 경우
      */
     @Transactional
     public int saveNotices(NoticeRequestDto requestDto, String noticeType) {
@@ -47,7 +48,7 @@ public class NoticeService {
         }
 
         if (noticeType == null || noticeType.isBlank()) {
-            throw new InvalidNoticeDataException("공지사항 유형이 지정되지 않았습니다.");
+            throw new InvalidNoticeTypeException("공지사항 유형이 지정되지 않았습니다.");
         }
 
         int savedCount = 0;
@@ -97,12 +98,13 @@ public class NoticeService {
      * @param noticeType 공지사항 유형
      * @param keyword    검색 키워드
      * @return 검색 결과 DTO 목록
+     * @throws InvalidNoticeTypeException 유효하지 않은 공지사항 유형이 있을 경우
      * @throws InvalidNoticeDataException 유효하지 않은 공지 유형이나 키워드일 경우
      */
     @Transactional(readOnly = true)
     public NoticeListResponseDto searchNotices(String noticeType, String keyword, Pageable pageable) {
         if (noticeType == null || noticeType.isBlank()) {
-            throw new InvalidNoticeDataException("공지사항 유형이 지정되지 않았습니다.");
+            throw new InvalidNoticeTypeException("공지사항 유형이 지정되지 않았습니다.");
         }
 
         if (keyword == null || keyword.isBlank()) {
@@ -143,7 +145,7 @@ public class NoticeService {
         return notice;
     }
 
-    private String getString(java.util.Map<String, Object> map, String key) {
+    private String getString(Map<String, Object> map, String key) {
         Object value = map.get(key);
         return value != null ? value.toString() : "";
     }
@@ -156,7 +158,7 @@ public class NoticeService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
             return LocalDate.parse(dateString, formatter);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다: " + dateString, e);
+            throw new InvalidDateFormatException(dateString, e);
         }
     }
 }
