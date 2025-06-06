@@ -132,7 +132,8 @@ public class LocalImageServiceImpl implements ImageService {
      */
     public List<String> replaceImages(List<MultipartFile> files, String prefix, Long ownerId, List<String> prevImageUrls) {
         if (files == null || files.isEmpty()) {
-            return prevImageUrls; // 새 파일이 없으면 이전 URL 목록 유지
+            prevImageUrls.forEach(this::deleteImage);
+            return Collections.emptyList();
         }
 
         // 1. 이전 이미지들 삭제

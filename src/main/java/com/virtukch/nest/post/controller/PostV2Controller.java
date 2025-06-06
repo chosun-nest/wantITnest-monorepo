@@ -1,23 +1,20 @@
 package com.virtukch.nest.post.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.post.dto.*;
+import com.virtukch.nest.post.dto.PostResponseDto;
+import com.virtukch.nest.post.dto.PostWithImagesRequestDto;
 import com.virtukch.nest.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,7 +24,6 @@ import java.util.List;
 public class PostV2Controller {
 
     private final PostService postService;
-    private final PostController postController;
 
     @Operation(
             summary = "게시글 작성 (이미지 포함)",
@@ -62,8 +58,8 @@ public class PostV2Controller {
                 const formData = new FormData();
                 formData.append('title', '제목');
                 formData.append('content', '내용');
-                formData.append('tags', 'JAVA');
-                formData.append('tags', 'SPRING');
+                formData.append('tags', '웹개발');
+                formData.append('tags', '백엔드');
                 formData.append('images', file1);
                 formData.append('images', file2);
                 ```
@@ -85,28 +81,16 @@ public class PostV2Controller {
     }
 
     @Operation(
-            summary = "게시글 상세 조회 (이미지 포함)",
+            summary = "게시글 수정 요청 (이미지 포함)",
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @GetMapping(("/{postId}"))
-    public ResponseEntity<PostWithImagesDetailResponseDto> getPostDetail(@PathVariable Long postId) {
-
-        log.info("[게시글 조회 요청] postId={}", postId);
-
-        PostWithImagesDetailResponseDto responseDto = postService.getPostDetailWithImage(postId);
-        return ResponseEntity
-                .created(URI.create("/api/v2/posts/" + responseDto.getPostId()))
-                .body(responseDto);
-    }
-
-    @Operation(
-            summary = "게시글 목록 조회 (이미지 포함)"
-    )
-    @GetMapping
-    public ResponseEntity<PostListResponseDto> getPostList(
-            @RequestParam(required = false) List<String> tags,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
-        return postController.getPostList(tags,  pageable);
+    @PatchMapping(path = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResponseDto> updatePost(@AuthenticationPrincipal CustomUserDetails user,
+                                                      @PathVariable Long postId,
+                                                      @ModelAttribute PostWithImagesRequestDto requestDto) {
+        Long memberId = user.getMember().getMemberId();
+        log.info("[게시글 수정 요청] postId={}, memberId={}", postId, memberId);
+        PostResponseDto responseDto = postService.updatePost(postId, memberId, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

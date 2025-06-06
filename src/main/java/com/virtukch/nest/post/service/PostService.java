@@ -44,6 +44,8 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final ImageService imageService;
 
+    private final String prefix = "interest";
+
     /**
      * 새로운 게시글을 생성합니다.
      *
@@ -82,7 +84,7 @@ public class PostService {
         // 이미지 업로드 및 URL 받기
         List<String> imageUrls;
         if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
-            imageUrls = imageService.uploadImages(requestDto.getImages(), "interest", post.getId());
+            imageUrls = imageService.uploadImages(requestDto.getImages(), prefix, post.getId());
             post.updatePost(post.getTitle(), post.getContent(), imageUrls);
         }
 
@@ -100,24 +102,6 @@ public class PostService {
      */
     @Transactional
     public PostDetailResponseDto getPostDetail(Long postId) {
-        Post post = findByIdOrThrow(postId);
-        post.increaseViewCount(); // 조회수 증가
-
-        Member member = findMemberOrThrow(post);
-        List<String> tagNames = extractTagNames(postId);
-
-        return PostDtoConverter.toDetailResponseDto(post, member, tagNames);
-    }
-
-    /**
-     * 이미지를 포함하여 게시글 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.
-     *
-     * @param postId 조회할 게시글 ID
-     * @return 게시글 상세 정보를 담은 응답 DTO
-     * @throws PostNotFoundException 게시글이 존재하지 않을 경우
-     */
-    @Transactional
-    public PostWithImagesDetailResponseDto getPostDetailWithImage(Long postId) {
         Post post = findByIdOrThrow(postId);
         post.increaseViewCount(); // 조회수 증가
 
@@ -182,6 +166,31 @@ public class PostService {
     }
 
     /**
+     * 게시글을 수정합니다. 게시글 작성자만 수정할 수 있습니다.
+     *
+     * @param postId 수정할 게시글 ID
+     * @param memberId 수정 요청자의 회원 ID
+     * @param requestDto 게시글 수정에 필요한 정보(제목, 내용, 태그 등)를 담은 DTO
+     * @return 수정된 게시글 정보를 담은 응답 DTO
+     * @throws PostNotFoundException 게시글이 존재하지 않을 경우
+     * @throws NoPostAuthorityException 게시글 수정 권한이 없을 경우
+     */
+    @Transactional
+    public PostResponseDto updatePost(Long postId, Long memberId, PostWithImagesRequestDto requestDto) {
+        Post post = validatePostOwnershipAndGet(postId, memberId);
+
+        List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, postId, post.getImageUrlList());
+        post.updatePost(post.getTitle(), post.getContent(), imageUrls);
+
+        // 관련된 postTag 전부 삭제
+        postTagRepository.deleteAllByPostId(post.getId());
+        // 수정된 Tag로 다시 저장
+        savePostTags(post, requestDto.getTags());
+
+        return PostDtoConverter.toUpdateResponseDto(post);
+    }
+
+    /**
      * 게시글을 삭제합니다. 게시글 작성자만 삭제할 수 있습니다.
      * 게시글 삭제 시 관련된 태그 매핑 정보와 댓글도 함께 삭제됩니다.
      *
@@ -197,6 +206,12 @@ public class PostService {
 
         postTagRepository.deleteAllByPostId(postId); // 연관된 postTag 삭제
         commentRepository.deleteAllByPostId(postId); // 연관된 댓글 삭제
+
+        List<String> imageUrlList = post.getImageUrlList();
+        if(!imageUrlList.isEmpty()) {
+            imageUrlList.forEach(imageService::deleteImage);
+        }
+
         postRepository.delete(post);
         return PostDtoConverter.toDeleteResponseDto(post);
     }
@@ -348,7 +363,7 @@ public class PostService {
      *
      * @param post 작성자를 조회할 게시글 엔티티
      * @return 조회된 회원 엔티티
-     * @throws RuntimeException 회원이 존재하지 않을 경우
+     * @throws MemberNotFoundException 회원이 존재하지 않을 경우
      */
     private Member findMemberOrThrow(Post post) {
         return memberRepository.findById(post.getMemberId())
