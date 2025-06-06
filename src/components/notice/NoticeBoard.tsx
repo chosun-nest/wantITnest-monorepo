@@ -118,7 +118,7 @@ export default function NoticeBoard() {
   const [category, setCategory] = useState("전체");
   const [notices, setNotices] = useState<Notice[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [isloading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
 
   // mount 시점에 navbar 높이 계산
   useEffect(() => {

@@ -9,37 +9,16 @@ export default function SignUpDetail({
   name,
   onChangeName,
   onChangeDepartment,
-  interest,
-  onChangeInterest,
   skills,
   onChangeSkills,
   techList,
-  interestsList,
   departmentsList,
 }: SignUpDetailProps) {
-  const [interestInput, setInterestInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
   const [departmentInput, setDepartmentInput] = useState("");
 
-  const [filteredInterests, setFilteredInterests] = useState<Item[]>([]);
   const [filteredSkills, setFilteredSkills] = useState<Item[]>([]);
   const [filteredDepartments, setFilteredDepartments] = useState<Item[]>([]);
-
-  // 관심 분야 입력
-  const handleInterestInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    setInterestInput(value);
-    if (value.trim() !== "") {
-      const filtered = interestsList.filter((item) =>
-        item.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredInterests(filtered);
-    } else {
-      setFilteredInterests([]);
-    }
-  };
 
   // 기술 스택 입력
   const handleSkillsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,14 +48,6 @@ export default function SignUpDetail({
     } else {
       setFilteredDepartments([]);
     }
-  };
-
-  const handleSelectInterest = (item: Item) => {
-    if (!interest.some((i) => i.id === item.id)) {
-      onChangeInterest([...interest, item]);
-    }
-    setInterestInput("");
-    setFilteredInterests([]);
   };
 
   const handleSelectSkill = (item: Item) => {
@@ -141,40 +112,6 @@ export default function SignUpDetail({
           </S.InputWrapper>
         </>
       )}
-
-      {/* 관심 분야 */}
-      <S.InputTitle>관심 분야</S.InputTitle>
-      <S.InputWrapper>
-        <S.Input
-          placeholder="ex) 백엔드, AI"
-          value={interestInput}
-          onChange={handleInterestInputChange}
-        />
-        {filteredInterests.length > 0 && (
-          <S.Dropdown>
-            {filteredInterests.map((item, idx) => (
-              <S.DropdownItem
-                key={idx}
-                onClick={() => handleSelectInterest(item)}
-              >
-                {item.name}
-              </S.DropdownItem>
-            ))}
-          </S.Dropdown>
-        )}
-      </S.InputWrapper>
-      <S.TagList>
-        {interest.map((item, idx) => (
-          <S.TagItem key={idx}>
-            {item.name}
-            <S.TagRemoveButton
-              onClick={() => handleRemove(idx, interest, onChangeInterest)}
-            >
-              ✕
-            </S.TagRemoveButton>
-          </S.TagItem>
-        ))}
-      </S.TagList>
 
       {/* 기술 스택 */}
       <S.InputTitle>기술 스택</S.InputTitle>
