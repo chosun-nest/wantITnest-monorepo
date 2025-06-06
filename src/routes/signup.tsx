@@ -4,7 +4,7 @@ import SignUpComponent from "../components/auth/signup-component";
 import SignUpDetail from "../components/auth/signup-deatil";
 import { sendcode, signup, verifycode } from "../api/auth/auth";
 import { useNavigate } from "react-router-dom";
-import { getDepartments, getInterests, getTech } from "../api/common/common";
+import { getDepartments, getTech } from "../api/common/common";
 import { Item } from "../types/signup";
 import Modal from "../components/common/modal";
 import type { ModalContent } from "../types/modal";
@@ -33,9 +33,10 @@ export default function SignUp() {
   const [skills, setSkills] = useState<Item[]>([]);
 
   const [techList, setTechList] = useState<Item[]>([]);
-  const [interestsList, setInterestsList] = useState<Item[]>([]);
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -50,7 +51,6 @@ export default function SignUp() {
   const getItems = async () => {
     try {
       const techResponse = await getTech();
-      const interestsResponse = await getInterests();
       const departmentsResponse = await getDepartments();
 
       setTechList(
@@ -58,14 +58,6 @@ export default function SignUp() {
           (item: { techStackId: number; techStackName: string }) => ({
             id: item.techStackId,
             name: item.techStackName,
-          })
-        )
-      );
-      setInterestsList(
-        interestsResponse.map(
-          (item: { interestId: number; interestName: string }) => ({
-            id: item.interestId,
-            name: item.interestName,
           })
         )
       );
@@ -94,6 +86,7 @@ export default function SignUp() {
     }
 
     try {
+      setIsLoading(true);
       await sendcode(email);
       setIsEmailVerified(false);
       setTimer(300);
@@ -125,6 +118,8 @@ export default function SignUp() {
         type: "error",
       });
       setShowModal(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -219,6 +214,9 @@ export default function SignUp() {
 
   return (
     <S.Container>
+      {isLoading && (
+        <Modal title={"로딩중"} message={"잠시만 기다려 주세요."} />
+      )}
       {showModal && (
         <Modal
           title={modalContent.title}
@@ -266,7 +264,6 @@ export default function SignUp() {
           onChangeSkills={setSkills}
           onSubmit={handleSignup}
           techList={techList}
-          interestsList={interestsList}
           departmentsList={departmentsList}
         />
       )}
