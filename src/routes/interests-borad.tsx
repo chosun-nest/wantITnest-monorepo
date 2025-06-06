@@ -1,5 +1,9 @@
 // 관심분야 정보 게시판 메인 페이지
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../store/slices/authSlice";
+
 import Navbar from "../components/layout/navbar";
 import InterestBoardHeader from "../components/interests/board/InterestBoardHeader";
 import InterestBoardSearch from "../components/interests/board/InterestBoardSearch";
@@ -9,8 +13,12 @@ import InterestBoardSortTabs from "../components/interests/board/InterestBoardSo
 import InterestPostCardList from "../components/interests/board/InterestPostCardList";
 import InterestBoardWriteButton from "../components/board/tag/BoardWriteButton";
 import Pagination from "../components/interests/board/Pagination";
-import { fetchPosts } from "../api/interests/InterestsAPI";
-import type { PostSummary } from "../api/types/interest-board";
+
+import { fetchPosts, searchPosts } from "../api/interests/InterestsAPI";
+import type { PostSummary, SearchPost } from "../api/types/interest-board";
+
+import Modal from "../components/common/modal";
+import type { ModalContent } from "../types/modal";
 
 export default function InterestBoard() {
   const [navHeight, setNavHeight] = useState(0);
@@ -22,8 +30,35 @@ export default function InterestBoard() {
   const [pageSize] = useState(10);
   const [posts, setPosts] = useState<PostSummary[]>([]);
   const [totalCount, setTotalCount] = useState(0);
-
   const navbarRef = useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate();
+  const accessToken = useSelector(selectAccessToken);
+  const isAuthenticated = !!accessToken;
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState<ModalContent>({
+    title: "",
+    message: "",
+    type: "info",
+  });
+
+  const handleCardClick = (postId: number) => {
+    if (isAuthenticated) {
+      navigate(`/interests-detail/${postId}`);
+    } else {
+      setModalContent({
+        title: "로그인이 필요합니다",
+        message: "게시글을 보려면 먼저 로그인해주세요.",
+        type: "info",
+        onClose: () => {
+          setShowModal(false);
+          navigate("/login");
+        },
+      });
+      setShowModal(true);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -33,11 +68,51 @@ export default function InterestBoard() {
         sort: sortType === "likes" ? "likeCount,desc" : "createdAt,desc",
         tags: selectedTags,
       };
-      const data = await fetchPosts(params);
-      setPosts(data.posts);   // PostSummary[] 타입이 보장됨
-      setTotalCount(data.totalCount);
+
+      let rawPosts: (PostSummary | SearchPost)[] = [];
+      let total = 0;
+
+      if (searchKeyword.trim() === "") {
+        const data = await fetchPosts(params);
+        rawPosts = data.posts;
+        total = data.totalCount;
+      } else {
+        const data = await searchPosts({
+          ...params,
+          keyword: searchKeyword,
+          searchType: "ALL",
+        });
+        rawPosts = data.posts;
+        total = data.totalCount;
+      }
+
+      const mappedPosts: PostSummary[] = rawPosts
+        .map((post, idx) => {
+          const converted: PostSummary = {
+            postId: "postId" in post ? post.postId : post.id,
+            title: post.title,
+            previewContent: post.previewContent,
+            authorName: post.authorName,
+            tags: post.tags ?? [],
+            createdAt: post.createdAt,
+            viewCount: post.viewCount ?? 0,
+            likeCount: post.likeCount ?? 0,
+            dislikeCount: post.dislikeCount ?? 0,
+            commentCount: post.commentCount ?? 0,
+          };
+
+          if (!converted.postId) {
+            console.warn(`❗ ${idx}번째 게시글에 postId 없음`, post);
+          }
+
+          return converted;
+        })
+        .filter((post) => !!post.postId);
+
+      setPosts(mappedPosts);
+      setTotalCount(total);
     } catch (err) {
-      console.error("게시글 목록 조회 실패", err);
+      console.error("❌ 게시글 목록 조회 실패", err);
     }
   };
 
@@ -64,23 +139,19 @@ export default function InterestBoard() {
         className="max-w-4xl min-h-screen p-4 mx-auto bg-white"
         style={{ paddingTop: navHeight }}
       >
-        {/* 제목 + 게시글 개수 */}
         <InterestBoardHeader postCount={totalCount} />
 
-        {/* 검색 + 정렬 */}
         <InterestBoardSearch
           searchKeyword={searchKeyword}
           setSearchKeyword={setSearchKeyword}
         />
 
-        {/* 기술 필터 및 선택된 태그들 */}
         <BoardTagFilterButton
           selectedTags={selectedTags}
           onRemoveTag={removeSelectedTag}
           onOpenFilter={() => setShowFilterModal(true)}
         />
 
-        {/* 관심분야 검색 모달 */}
         {showFilterModal && (
           <TagFilterModal
             onClose={() => setShowFilterModal(false)}
@@ -91,24 +162,26 @@ export default function InterestBoard() {
           />
         )}
 
-        {/* 정렬 드롭다운 */}
-        <InterestBoardSortTabs 
-          sortType={sortType} 
-          onChange={setSortType}
-        />
+        <InterestBoardSortTabs sortType={sortType} onChange={setSortType} />
 
-        {/* 게시글 목록 */}
-        <InterestPostCardList posts={posts} />
+        <InterestPostCardList posts={posts} onCardClick={handleCardClick} />
 
-        {/* 페이지네이션 */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
         />
 
-        {/* 글쓰기 버튼 */}
         <InterestBoardWriteButton />
+
+        {showModal && (
+          <Modal
+            title={modalContent.title}
+            message={modalContent.message}
+            type={modalContent.type}
+            onClose={modalContent.onClose}
+          />
+        )}
       </div>
     </>
   );

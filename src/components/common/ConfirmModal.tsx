@@ -1,4 +1,5 @@
 // 관심분야 정보 게시글 삭제 시 알림 사용하는 모달창
+// 기존 모달 불러오려다가 오류 발생해서 따로 분리해서 사용 중
 interface ConfirmModalProps {
   title: string;
   message: string;

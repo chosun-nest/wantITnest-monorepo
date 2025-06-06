@@ -64,7 +64,7 @@ export interface MemberProfile {
 
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me");
-  const BASE_URL = "http://119.219.30.209:6030";  // 백엔드에서 이미지가 서빙되는 절대 주소
+  const BASE_URL = "http://49.246.71.236:6030";  // 백엔드에서 이미지가 서빙되는 절대 주소
 
   return {
     ...res.data,
@@ -141,7 +141,6 @@ export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
 
 // =============
 
-// 인증이 필요 없는 API 호출들
 // 기술 스택 목록 조회 (GET)
 export const getTech = async () => {
   const res = await API.get("/api/v1/tech-stacks", {
@@ -150,13 +149,31 @@ export const getTech = async () => {
   return res.data;
 };
 
-// 관심 기술 전체 조회 (GET)
-export const getInterests = async () => {
-  const res = await API.get("/api/v1/interests", {
-    headers: { skipAuth: true },
+// 관심 태그 목록 조회 (GET)
+export const getFavoriteTags = async (): Promise<{ tagId: number; tagName: string }[]> => {
+  const token = getAccessToken();
+  const res = await API.get("/api/v1/favorites/tags", {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data;
+  return res.data.favoriteTags;
 };
+
+// 관심 태그 추가
+export const addFavoriteTag = async (tagName: string): Promise<void> => {
+  const token = getAccessToken();
+  await API.post(`/api/v1/favorites/tags/${encodeURIComponent(tagName)}`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// 관심 태그 삭제
+export const deleteFavoriteTag = async (tagName: string): Promise<void> => {
+  const token = getAccessToken();
+  await API.delete(`/api/v1/favorites/tags/${encodeURIComponent(tagName)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
 
 // 학과 전체 조회 (GET)
 export const getDepartments = async () => {

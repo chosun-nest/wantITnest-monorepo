@@ -37,23 +37,18 @@ export const createInterestPost = async (
 // [관심분야 게시글 상세 페이지용 - interests-detail.tsx]
 // =========================================
 
-// 게시글 상세 조회 (GET) - 인증 불필요
-export const fetchPostDetail = async (
-  postId: number
-): Promise<PostDetail> => {
+// 게시글 상세 조회 (GET) - 인증 필요
+export const fetchPostDetail = async (postId: number): Promise<PostDetail> => {
+  const token = getAccessToken();
   const response = await API.get<PostDetail>(
-    `/api/v1/interests/${postId}`,
+    `/api/v1/posts/${postId}`,
     {
-      headers: { skipAuth: true }, // 인터셉터가 Authorization을 붙이지 않게 함
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
   );
   return response.data;
-  // const token = getAccessToken();
-  // const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-  // const res = await API.get<PostDetail>(`/api/v1/interests/${postId}`, {
-  //   headers,
-  // });
 };
 
 // 게시글 삭제 (DELETE) - 인증 필요
@@ -92,7 +87,7 @@ export const fetchPosts = async (
   params: FetchPostsParams
 ): Promise<PostListResponse> => {  
   const queryParams = new URLSearchParams();    // ?page=0&size=10&tags=JAVA 같은 형식
-  const token = getAccessToken();
+  //const token = getAccessToken();
   
   if (params.page !== undefined) 
     queryParams.append("page", String(params.page));  // page 값이 있으면 쿼리 쿼리 스트링에 추가. ex) "page=0"
@@ -104,21 +99,23 @@ export const fetchPosts = async (
     params.tags.forEach((tag) => queryParams.append("tags", tag));  // tags는 여러 개 지원하므로 tags=JAVA&tags=SPRING처럼 하나씩 반복 추가
   }
 
-    const response = await API.get<PostListResponse>(
+  //   const response = await API.get<PostListResponse>(
+  //   `/api/v1/posts?${queryParams.toString()}`,
+  //   { headers: { Authorization: `Bearer ${token}` }}
+  // );
+  // return response.data;
+
+  // 공개형 게시판이므로 인증 생략
+  const response = await API.get<PostListResponse>(
     `/api/v1/posts?${queryParams.toString()}`,
-    { headers: { Authorization: `Bearer ${token}` }}
+    {
+      headers: { skipAuth: true },
+    }
   );
   return response.data;
 };
 
 // 게시글 좋아요/싫어요 반응 관리(토글 방식) (POST) - 인증 필요
-
-//type ReactionType = "LIKE" | "DISLIKE"; // 반응 타입
-
-// interface ReactionRequest {
-//   reactionType: ReactionType;
-// }
-
 export const reactToPost = async (
   postId: number,               // 게시글 ID
   reactionType: ReactionType    // 반응 타입
