@@ -9,6 +9,7 @@ export const login = async (email: string, password: string) => {
     { email, password },
     { headers: { skipAuth: true } }
   ); // 첫 번째 인자는 base url에서 파생된 요청할 주소임
+  console.log("로그인 응답:", res.data);
   return res.data;
 };
 
@@ -79,10 +80,16 @@ export async function refreshAccessToken() {
       }
     );
 
-    const { accessToken, refreshToken: newRefreshToken } = res.data;
+    const { accessToken, refreshToken: newRefreshToken, userId } = res.data;
 
     if (accessToken && newRefreshToken) {
-      store.dispatch(setTokens({ accessToken, refreshToken: newRefreshToken }));
+      store.dispatch(
+        setTokens({
+          accessToken,
+          refreshToken: newRefreshToken,
+          userId: userId,
+        })
+      );
 
       console.log(" 토큰 재발급 성공");
     } else {
