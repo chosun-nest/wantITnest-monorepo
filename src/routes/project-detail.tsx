@@ -1,7 +1,6 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { mockProjects } from "../constants/mock-projects";
-import { mockParticipants } from "../constants/mock-project-participants";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getProjectById, Project } from "../api/project/ProjectAPI";
 import CommentSection from "../components/project/commentsection";
 import ParticipantCardBox from "../components/project/ParticipantCardBox";
 import ApplicationModal from "../components/project/ApplicationModal";
@@ -13,14 +12,49 @@ export default function ProjectDetail() {
   const navigate = useNavigate();
   const isMobile = useResponsive();
 
-  // 로그인 사용자 ID (나중엔 context 등에서 가져오면 됨)
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [projectStatus, setProjectStatus] = useState<"모집중" | "모집완료">("모집중");
+  const [participantCount, setParticipantCount] = useState("0/0");
+
   const currentUserId = 1;
 
-  const project = mockProjects.find((p) => p.id === Number(id));
-  const [participants, setParticipants] = useState<Participant[]>(mockParticipants);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [projectStatus, setProjectStatus] = useState(project?.status || "모집중");
-  const [participantCount, setParticipantCount] = useState(project?.participants || "0/6");
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const data = await getProjectById(Number(id));
+        setProject(data);
+
+        const max = data.maxMember;
+        const curr = Math.floor(Math.random() * (max + 1)); // 예시용
+        setParticipantCount(`${curr}/${max}`);
+        setProjectStatus(data.closed ? "모집완료" : "모집중");
+
+        const dummyParticipants: Participant[] = [
+          { id: 1, name: "홍길동", role: "프론트엔드", followers: 3 },
+          { id: 2, name: "김개발", role: "백엔드", followers: 5 },
+        ];
+        setParticipants(dummyParticipants);
+      } catch (error) {
+        console.error("프로젝트 상세 조회 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center">
+        ⏳ 로딩 중입니다...
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -43,12 +77,24 @@ export default function ProjectDetail() {
 
     const [curr, max] = participantCount.split("/").map(Number);
     const newCount = curr + 1;
-    const updatedCount = `${newCount}/${max}`;
-    setParticipantCount(updatedCount);
+    setParticipantCount(`${newCount}/${max}`);
 
     if (newCount >= max) {
       setProjectStatus("모집완료");
     }
+  };
+
+  // ✅ 타입 보정: ParticipantCardBox용으로 가공
+  const mappedProject = {
+    ...project,
+    id: project.projectId,
+    title: project.projectTitle,
+    content: project.projectDescription,
+    date: project.projectStartDate,
+    author: { id: project.projectLeaderId, name: `유저#${project.projectLeaderId}` },
+    participants: participantCount,
+    views: 123, // 임시
+    status: projectStatus,
   };
 
   return (
@@ -66,7 +112,7 @@ export default function ProjectDetail() {
             {projectStatus} · 참여 {participantCount}
           </span>
           <h1 className={`font-bold text-blue-900 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
-            {project.title}
+            {project.projectTitle}
           </h1>
         </div>
 
@@ -78,7 +124,7 @@ export default function ProjectDetail() {
               className="w-8 h-8 rounded-full"
             />
             <span className="font-semibold text-[16px] text-gray-900">
-              {project.author.name}
+              유저#{project.projectLeaderId}
             </span>
           </div>
           <button className="px-3 py-1 text-sm border rounded hover:bg-gray-100 w-fit">
@@ -87,14 +133,14 @@ export default function ProjectDetail() {
         </div>
 
         <div className="mt-1 text-[15px] text-gray-600 flex gap-2 flex-wrap">
-          <span>작성일: {project.date}</span>
-          <span>· 조회수: {project.views}</span>
+          <span>시작일: {project.projectStartDate}</span>
+          <span>~ 마감일: {project.projectEndDate}</span>
         </div>
 
         <hr className="my-4 border-gray-300" />
 
         <div className="mb-6 leading-relaxed text-gray-700 whitespace-pre-line">
-          {project.content}
+          {project.projectDescription}
         </div>
 
         <hr className="my-4 border-gray-300" />
@@ -116,7 +162,7 @@ export default function ProjectDetail() {
       {/* 오른쪽 참여자 영역 */}
       <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
         <ParticipantCardBox
-          project={project}
+          project={mappedProject}
           participants={participants}
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={handleAccept}

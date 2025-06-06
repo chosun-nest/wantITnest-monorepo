@@ -1,14 +1,26 @@
 import { Participant } from "../../types/participant";
 import { useNavigate } from "react-router-dom";
 
+// ✅ 백엔드 + UI에서 사용하는 프로젝트 타입에 맞게 수정
 interface Props {
   project: {
     id: number;
+    projectTitle: string;
+    projectLeaderId: number;
+    projectDescription: string;
+    projectStartDate: string;
+    projectEndDate: string;
+    maxMember: number;
+    closed: boolean;
+
+    // ✅ 프론트에서 가공된 UI용 필드들
     title: string;
+    content: string;
+    date: string;
     author: { id: number; name: string };
-    status: string;
-    participants: string;
-    [key: string]: any;
+    participants: string; // ex) "2/6"
+    status: "모집중" | "모집완료";
+    views: number;
   };
   participants: Participant[];
   onOpenModal: () => void;
@@ -34,7 +46,7 @@ export default function ParticipantCardBox({
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-[17px] font-semibold text-gray-800">참여인원 현황</h2>
 
-        {project?.author?.id === currentUserId ? (
+        {project.author?.id === currentUserId ? (
           <button
             onClick={onOpenModal}
             className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
@@ -51,7 +63,7 @@ export default function ParticipantCardBox({
         )}
       </div>
 
-      {/* 모바일(기본): 2열, md 이상: 1열 */}
+      {/* 모바일: 2열, md 이상: 1열 */}
       <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
         {participants.map((user) => (
           <div

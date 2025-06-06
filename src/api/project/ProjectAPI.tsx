@@ -1,6 +1,6 @@
 import { API } from "..";
 
-// 프로젝트 타입 (Swagger 기준)
+// ✅ 백엔드에서 온 순수 Project 타입 (Swagger 기준)
 export interface Project {
   projectId: number;
   projectTitle: string;
@@ -12,13 +12,18 @@ export interface Project {
   closed: boolean;
 }
 
-// 프로젝트 리스트 가져오기 (GET)
+// ✅ 프로젝트 리스트 가져오기 (GET)
 export const getProjects = async (): Promise<Project[]> => {
   const res = await API.get("/api/v1/projects");
   return res.data;
 };
 
-// 프로젝트 생성 (POST)
+export const getProjectById = async (id: number): Promise<Project> => {
+  const res = await API.get(`/api/v1/projects/${id}`);
+  return res.data;
+};
+
+// ✅ 프로젝트 생성 (POST)
 export interface CreateProjectPayload {
   projectLeaderId: number;
   projectTitle: string;
@@ -31,7 +36,17 @@ export interface CreateProjectPayload {
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<number> => {
-  // return 값이 projectId 넘버 하나임
+  // return 값은 projectId 하나
   const res = await API.post("/api/v1/projects", payload);
   return res.data;
+};
+
+export interface ApplyProjectPayload {
+  projectId: number;
+  field: string;
+  message: string;
+}
+
+export const applyToProject = async (payload: ApplyProjectPayload): Promise<void> => {
+  await API.post("/api/v1/applications", payload); // 엔드포인트는 백엔드 명세에 맞게 수정 가능
 };
