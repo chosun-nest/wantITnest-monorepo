@@ -9,6 +9,7 @@ import { selectIsLoggedIn } from "../store/slices/authSlice";
 import MyPin from "../components/profile/history/mypins";
 import HomeNotice from "../components/layout/home/home.notice";
 import HomeInterest from "../components/layout/home/home.interest";
+import HomeProject from "../components/layout/home/home.project";
 
 export default function Home() {
   const isMobile = useResponsive();
@@ -48,6 +49,7 @@ export default function Home() {
         <S.ItemTitle>
           프로젝트 모집 게시판<Link to="/project-board">+</Link>
         </S.ItemTitle>
+        <HomeProject />
       </S.GridItem>
     </S.GridContainer>
   );
