@@ -148,6 +148,16 @@ export const getTech = async () => {
   return res.data;
 };
 
+// 학과 전체 조회 (GET)
+export const getDepartments = async () => {
+  const res = await API.get("/api/v1/departments", {
+    headers: { skipAuth: true },
+  });
+  return res.data;
+};
+
+// =============
+
 // 관심 태그 목록 조회 (GET)
 export const getFavoriteTags = async (): Promise<
   { tagId: number; tagName: string }[]
@@ -176,12 +186,4 @@ export const deleteFavoriteTag = async (tagName: string): Promise<void> => {
   await API.delete(`/api/v1/favorites/tags/${encodeURIComponent(tagName)}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-};
-
-// 학과 전체 조회 (GET)
-export const getDepartments = async () => {
-  const res = await API.get("/api/v1/departments", {
-    headers: { skipAuth: true },
-  });
-  return res.data;
 };
