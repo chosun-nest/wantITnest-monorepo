@@ -1,4 +1,6 @@
 import useResponsive from "../../../hooks/responsive";
+
+
 interface InterestPostCardListProps {
   posts: {
     postId: number;
