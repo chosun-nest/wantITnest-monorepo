@@ -77,7 +77,6 @@ class NoticeService:
                 notice = self.parse_notice_row(cols, category, BASE_URL)
                 if notice and not self.cache.is_duplicate(notice):
                     notices.append(notice)
-                    self.cache.add_notice(notice)
             
             # 연도 필터링
             filtered_notices = [
@@ -155,7 +154,11 @@ class NoticeService:
             )
             response.raise_for_status()
             
-            logger.info(f"[{category}] 스프링 서버 전송 성공: {response.status_code}")
+            # ✅ 전송 성공 시에만 캐시에 저장
+            for notice in notices:
+                self.cache.add_notice(notice)
+            
+            logger.info(f"[{category}] 스프링 서버 전송 성공: {response.status_code}, 캐시 업데이트 완료")
             return True
             
         except requests.RequestException as e:
