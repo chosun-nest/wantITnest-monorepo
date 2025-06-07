@@ -47,7 +47,8 @@ export default function BoardWrite() {
     message: "",
     type: "info",
   });
-
+  
+  //예시
   const defaultProjectContent = `[개발 프로젝트 모집 예시]
 
 - 프로젝트 주제: 
