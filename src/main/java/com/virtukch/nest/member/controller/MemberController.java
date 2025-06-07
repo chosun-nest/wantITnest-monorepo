@@ -39,9 +39,23 @@ public class MemberController {
             memberService.getCurrentMemberByCustomUserDetails(customUserDetails));
     }
 
+    @Operation(
+        summary = "특정 회원 프로필 조회 (로그인 필요)",
+        description = """
+            특정 회원의 ID(`memberId`)를 이용해 해당 사용자의 공개 프로필 정보를 조회합니다.
+
+            ✅ 사용 목적:
+            - 다른 회원의 프로필 페이지에서 정보 표시용으로 사용됩니다.
+            - 이메일, 비밀번호 등 민감한 정보는 포함되지 않습니다.
+
+            ✅ 요청 방식:
+            - HTTP Method: `GET`
+            - 요청 URL 예시: `/api/v1/members/3`
+            - 헤더: `Authorization: Bearer {access_token}`
+            """
+    )
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberResponseDto> findByMemberId(
-        @AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long memberId) {
+    public ResponseEntity<MemberResponseDto> findByMemberId(@PathVariable Long memberId) {
         return ResponseEntity.ok(memberService.findByMemberId(memberId));
     }
 
