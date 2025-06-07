@@ -1,6 +1,8 @@
 import { useState } from "react";
 const ai = "/assets/images/ai.png";
 const ai_hover = "/assets/images/ai_hover.png";
+import ChatBotUI from "../chatbot/ChatBotUI";
+
 
 export default function Ai() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,16 +27,18 @@ export default function Ai() {
 
       {/* 모달 (아이콘 바로 위에) */}
       {isOpen && (
-        <div className="fixed right-6 bottom-[calc(6rem+50px+8px)] w-[300px] h-[500px] bg-white rounded-xl p-4 shadow-xl z-50">
-          <h2 className="text-base font-semibold mb-2">AI 도우미</h2>
-          <p className="text-sm">무엇을 도와드릴까요?</p>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            aria-label="닫기"
-          >
-            ✖️
-          </button>
+        <div className="fixed right-6 bottom-[calc(6rem+50px+8px)] w-[350px] h-[500px] bg-white rounded-xl p-4 shadow-xl z-50 flex flex-col">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-base font-semibold">AI 도우미</h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-500 hover:text-gray-700 text-sm"
+              aria-label="닫기"
+            >
+              ✖️
+            </button>
+          </div>
+          <ChatBotUI />
         </div>
       )}
     </>
