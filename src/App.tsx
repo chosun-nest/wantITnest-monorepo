@@ -8,6 +8,7 @@ import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
+import ProjectEdit from "./routes/project-edit"; // yu-gyeom
 import ProjectApply from "./routes/project-apply"; // yu-gyeom
 // import NoticeBoard from "./routes/notice-board"; //yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
@@ -41,7 +42,14 @@ const router = createBrowserRouter([
         path: "project/:id",
         element: <ProjectDetail />,
       },
-
+      {
+        path: "project/:id/edit", // yu-gyeom : 프로젝트 수정 페이지 (작성자만 접근 가능)
+        element: (
+          <ProtectedRoute>
+            <ProjectEdit />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "project-apply",
         element: <ProjectApply />,

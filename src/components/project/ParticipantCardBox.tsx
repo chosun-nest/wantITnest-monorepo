@@ -1,7 +1,6 @@
 import { Participant } from "../../types/participant";
 import { useNavigate } from "react-router-dom";
 
-// ✅ 백엔드 + UI에서 사용하는 프로젝트 타입에 맞게 수정
 interface Props {
   project: {
     id: number;
@@ -13,7 +12,7 @@ interface Props {
     maxMember: number;
     closed: boolean;
 
-    // ✅ 프론트에서 가공된 UI용 필드들
+    // 프론트에서 가공된 UI용 필드들
     title: string;
     content: string;
     date: string;
@@ -41,22 +40,35 @@ export default function ParticipantCardBox({
     navigate("/project-apply", { state: { project } });
   };
 
+  const isAuthor = project.author?.id === currentUserId;
+  const isClosed = project.status === "모집완료";
+
   return (
     <div className="bg-gray-50 p-4 rounded-md shadow-md w-full">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-[17px] font-semibold text-gray-800">참여인원 현황</h2>
 
-        {project.author?.id === currentUserId ? (
+        {isAuthor ? (
           <button
             onClick={onOpenModal}
-            className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+            disabled={isClosed}
+            className={`px-3 py-1.5 text-sm rounded ${
+              isClosed
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
           >
             지원서 확인
           </button>
         ) : (
           <button
             onClick={handleApply}
-            className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+            disabled={isClosed}
+            className={`px-3 py-1.5 text-sm rounded ${
+              isClosed
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
           >
             지원하기
           </button>
