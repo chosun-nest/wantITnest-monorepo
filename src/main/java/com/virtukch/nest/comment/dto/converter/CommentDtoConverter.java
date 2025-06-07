@@ -4,6 +4,7 @@ import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
 import com.virtukch.nest.comment.dto.CommentListResponseDto;
 import com.virtukch.nest.comment.dto.CommentResponseDto;
 import com.virtukch.nest.comment.model.Comment;
+import com.virtukch.nest.post.dto.AuthorDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +16,11 @@ public class CommentDtoConverter {
         return CommentResponseDto.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.getCommentContent())
-                .authorName(memberName)
+                .author(AuthorDto.builder()
+                        .id(comment.getMemberId())
+                        .name(memberName)
+                        .build()
+                )
                 .createdAt(timeFormat(comment.getCreatedAt()))
                 .updatedAt(timeFormat(comment.getUpdatedAt()))
                 .isDeleted(comment.isDeleted())

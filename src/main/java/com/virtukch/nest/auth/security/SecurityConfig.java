@@ -65,6 +65,7 @@ public class SecurityConfig {
                 // GET 메서드만 허용하는 경로
                 .requestMatchers(HttpMethod.GET,
                         "/api/v1/posts",
+                        "/api/v2/posts",
                         "/uploaded-images/**"
                 ).permitAll()
                 .anyRequest().authenticated()
