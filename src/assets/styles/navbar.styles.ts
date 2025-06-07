@@ -22,6 +22,7 @@ export const Logo = styled(Link)`
   text-decoration-line: none;
   color: inherit;
   font-size: 1.2rem;
+  font-family: "Monomaniac One", sans-serif;
   font-weight: bold;
   color: #002f6c;
   gap: 0.5rem;
