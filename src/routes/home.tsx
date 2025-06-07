@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
 import MyPin from "../components/profile/history/mypins";
 import HomeNotice from "../components/layout/home/home.notice";
+import HomeInterest from "../components/layout/home/home.interest";
 
 export default function Home() {
   const isMobile = useResponsive();
@@ -35,6 +36,7 @@ export default function Home() {
         <S.ItemTitle>
           관심분야 게시판<Link to="/interests-board">+</Link>
         </S.ItemTitle>
+        <HomeInterest />
       </S.GridItem>
       <S.GridItem $row="1" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
