@@ -1,3 +1,10 @@
+import {
+  MemberProfile,
+  UpdateMemberProfilePayload,
+  CheckPasswordPayload,
+  UpdateMemberPasswordPayload,
+} from "../types/profile";
+
 // 프로필 API
 import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
@@ -20,49 +27,12 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
 };
 
 // 비밀번호 확인 (POST)
-export interface CheckPasswordPayload {
-  password: string;
-}
 export const checkPassword = async (payload: CheckPasswordPayload) => {
   return API.post("/api/v1/members/check-password", payload, {
     ...authHeader(),
     validateStatus: (status) => status < 500,
   });
 };
-
-// 회원 정보 조회 (GET)
-export interface MemberProfile {
-  memberId: number;
-  memberEmail: string;
-  memberRole: string;
-  memberName: string;
-  memberSnsUrl1: string;
-  memberSnsUrl2: string;
-  memberSnsUrl3: string;
-  memberSnsUrl4: string;
-  memberIsStudent: boolean;
-  memberIntroduce: string;
-  memberImageUrl: string;
-  memberPasswordLength: number;
-  memberDepartmentResponseDtoList: {
-    memberDepartmentId: number;
-    memberId: number;
-    departmentId: number;
-    departmentName: string;
-  }[];
-  memberInterestResponseDtoList: {
-    memberInterestId: number;
-    memberId: number;
-    interestId: number;
-    interestName: string;
-  }[];
-  memberTechStackResponseDtoList: {
-    memberTechStackId: number;
-    memberId: number;
-    techStackId: number;
-    techStackName: string;
-  }[];
-}
 
 // 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
@@ -84,20 +54,6 @@ export const withdrawMember = async (): Promise<{ message: string }> => {
 };
 
 // 회원 정보 수정 (PATCH)
-export interface UpdateMemberProfilePayload {
-  memberName?: string;
-  memberImageUrl?: string;
-  memberIsStudent?: boolean;
-  memberIntroduce?: string;
-  memberSnsUrl1?: string;
-  memberSnsUrl2?: string;
-  memberSnsUrl3?: string;
-  memberSnsUrl4?: string;
-  memberDepartmentUpdateRequestIdList?: number[];
-  memberInterestUpdateRequestIdList?: number[];
-  memberTechStackUpdateRequestIdList?: number[];
-}
-
 export const updateMemberProfile = async (
   payload: UpdateMemberProfilePayload
 ) => {
@@ -105,12 +61,6 @@ export const updateMemberProfile = async (
 };
 
 // 비밀번호 변경 (PATCH)
-export interface UpdateMemberPasswordPayload {
-  currentPassword?: string;
-  newPassword?: string;
-  newPasswordConfirm?: string;
-}
-
 export const updateMemberPassword = async (
   payload: UpdateMemberPasswordPayload
 ): Promise<{ message: string }> => {
