@@ -7,6 +7,11 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from urllib.parse import urljoin
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+SPRING_SERVER_BASE_URL = os.getenv("SPRING_SERVER_BASE_URL", "http://localhost:6030")
 
 app = FastAPI()
 
@@ -125,10 +130,15 @@ def crawl_notices(category: str):
 
     # 모든 notice를 한 번에 Spring 서버로 전송
     try:
-        api_url = f"http://localhost:6030/api/v1/notices/{category}" # TODO: 추후 배포 중인 스프링 서버 주소로 변경 필요
+        api_url = f"{SPRING_SERVER_BASE_URL.rstrip('/')}/api/v1/notices/{category}"
         res = requests.post(api_url, json={"notices": notices})
         print(f"✅ 전체 등록 완료: {res.status_code}, 스프링 응답: {res.json()}")
     except Exception as e:
         print(f"❌ 전체 등록 실패: {e}")
 
     return {"message": f"{len(notices)} notices added", "notices": notices}
+
+# FastAPI 서버 실행을 위한 메인 함수
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
