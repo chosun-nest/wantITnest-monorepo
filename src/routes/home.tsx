@@ -7,6 +7,7 @@ import { useNavbarHeight } from "../context/NavbarHeightContext";
 import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
 import MyPin from "../components/profile/history/mypins";
+import HomeNotice from "../components/layout/home/home.notice";
 
 export default function Home() {
   const isMobile = useResponsive();
@@ -39,6 +40,7 @@ export default function Home() {
         <S.ItemTitle>
           학사 공지<Link to="/notice-board">+</Link>
         </S.ItemTitle>
+        <HomeNotice />
       </S.GridItem>
       <S.GridItem $row="2" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
