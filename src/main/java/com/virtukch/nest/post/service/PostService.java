@@ -281,13 +281,13 @@ public class PostService {
         // 검색 타입에 따라 다른 메서드 호출
         switch (searchType.toUpperCase()) {
             case "TITLE" -> postPage = postRepository
-                    .findByTitleContainingIgnoreCase(keyword, pageable);
+                    .searchByTitle(keyword, pageable);
 
             case "CONTENT" -> postPage = postRepository
-                    .findByContentContainingIgnoreCase(keyword, pageable);
+                    .searchByContent(keyword, pageable);
 
             default -> postPage = postRepository
-                    .findByTitleContainingIgnoreCaseOrContentContaining(keyword, keyword, pageable);
+                    .searchByTitleOrContent(keyword, keyword, pageable);
         }
 
         return buildPostListResponse(postPage);
@@ -327,11 +327,11 @@ public class PostService {
         Page<Post> postPage;
         switch (searchType.toUpperCase()) {
             case "TITLE" -> postPage = postRepository
-                    .findByIdInAndTitleContainingIgnoreCase(postIds, keyword, pageable);
+                    .searchByTitleInIds(postIds, keyword, pageable);
             case "CONTENT" -> postPage = postRepository
-                    .findByIdInAndContentContaining(postIds, keyword, pageable);
+                    .searchByContentInIds(postIds, keyword, pageable);
             default -> postPage = postRepository
-                    .findByIdInAndTitleContainingIgnoreCaseOrIdInAndContentContaining(postIds, keyword, postIds, keyword, pageable);
+                    .searchByTitleOrContentInIds(postIds, keyword, postIds, keyword, pageable);
         }
 
         return buildPostListResponse(postPage);
