@@ -53,7 +53,7 @@ export const InputTitle = styled.div`
 export const Title = styled.h2`
   font-size: 28px;
   font-weight: bold;
-  font-family: "Outfit", sans-serif;
+  font-family: "Monomaniac One", sans-serif;
   color: #00256c;
 `;
 
@@ -68,11 +68,12 @@ export const Input = styled.input`
   height: 100%;
   max-height: 50px;
   padding: 0.75rem;
+  padding-right: 40px; /* 아이콘 공간 확보: EyeIcon의 width + right 간격 */
   border: 1px solid #ddd;
   background-color: white;
   border-radius: 6px;
   font-size: 13px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.75rem; /* PasswordInputWrapper에서는 이 margin을 제거할 예정이므로, 이곳에는 그대로 두거나, 필요에 따라 조정 */
   outline: none;
 
   &:focus {
@@ -214,7 +215,6 @@ export const HeaderBox = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: "Monomaniac One", sans-serif;
 `;
 export const HeaderLogo = styled.img`
   width: 63px;
@@ -351,20 +351,35 @@ export const TimerText = styled.span`
   font-size: 13px;
   color: #999;
 `;
-export const PasswordInputWrapper = styled.div`
-  position: relative;
-  width: 100%;
-`;
 
+export const PasswordInputWrapper = styled.div`
+  position: relative; /* 중요: 자식 요소의 absolute 위치를 위한 기준점 */
+  width: 100%;
+  margin-bottom: 0.75rem; /* input에 있던 margin-bottom을 이곳으로 이동 */
+  display: flex; /* 내부 요소들을 flex로 정렬 (선택 사항) */
+  align-items: center; /* 세로 중앙 정렬 (선택 사항) */
+
+  /* PasswordInputWrapper 내부의 Input에는 margin-bottom 제거 */
+  ${Input} {
+    margin-bottom: 0;
+  }
+`;
 export const EyeIcon = styled.span`
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: absolute; /* PasswordInputWrapper를 기준으로 절대 위치 지정 */
+  top: 50%; /* 컨테이너의 세로 중앙 */
+  right: 15px; /* input 오른쪽에서 15px 떨어뜨림 (padding-right 40px와 조화) */
+  transform: translateY(-50%); /* 정확한 세로 중앙 정렬 */
   cursor: pointer;
-  font-size: 16px;
   color: #999;
   user-select: none;
+  display: flex; /* SVG를 중앙에 정렬하기 위함 */
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 `;
 export const ButtonRow = styled.div`
   display: flex;
