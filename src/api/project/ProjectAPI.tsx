@@ -1,4 +1,5 @@
 import { API } from "..";
+import { getAccessToken } from "../../utils/auth";
 
 //
 // ✅ 1. 타입 정의
@@ -56,15 +57,20 @@ export interface Applicant {
 // ✅ 2. 프로젝트 관련 API
 //
 
+// 공통 헤더 생성 함수
+const authHeader = () => ({
+  headers: { Authorization: `Bearer ${getAccessToken()}` },
+});
+
 // 프로젝트 전체 목록 가져오기 (GET)
 export const getProjects = async (): Promise<Project[]> => {
-  const res = await API.get("/api/v1/projects");
+  const res = await API.get("/api/v1/projects", authHeader());
   return res.data;
 };
 
 // 특정 프로젝트 상세 조회 (GET)
 export const getProjectById = async (id: number): Promise<Project> => {
-  const res = await API.get(`/api/v1/projects/${id}`);
+  const res = await API.get(`/api/v1/projects/${id}`, authHeader());
   return res.data;
 };
 
@@ -72,8 +78,8 @@ export const getProjectById = async (id: number): Promise<Project> => {
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<number> => {
-  const res = await API.post("/api/v1/projects", payload);
-  return res.data; // 프로젝트 ID 반환
+  const res = await API.post("/api/v1/projects", payload, authHeader());
+  return res.data;
 };
 
 // 프로젝트 수정 (PATCH)
@@ -81,12 +87,12 @@ export const updateProject = async (
   projectId: number,
   payload: UpdateProjectPayload
 ): Promise<void> => {
-  await API.patch(`/api/v1/projects/${projectId}`, payload);
+  await API.patch(`/api/v1/projects/${projectId}`, payload, authHeader());
 };
 
 // 프로젝트 삭제 (DELETE)
 export const deleteProject = async (projectId: number): Promise<void> => {
-  await API.delete(`/api/v1/projects/${projectId}`);
+  await API.delete(`/api/v1/projects/${projectId}`, authHeader());
 };
 
 //
@@ -97,14 +103,17 @@ export const deleteProject = async (projectId: number): Promise<void> => {
 export const applyToProject = async (
   payload: ApplyProjectPayload
 ): Promise<void> => {
-  await API.post("/api/v1/applications", payload);
+  await API.post("/api/v1/applications", payload, authHeader());
 };
 
 // 특정 프로젝트의 지원자 목록 조회 (GET)
 export const getApplicationsByProjectId = async (
   projectId: number
 ): Promise<Applicant[]> => {
-  const res = await API.get(`/api/v1/projects/${projectId}/applications`);
+  const res = await API.get(
+    `/api/v1/projects/${projectId}/applications`,
+    authHeader()
+  );
   return res.data;
 };
 
@@ -113,5 +122,9 @@ export const updateApplicationStatus = async (
   applicationId: number,
   status: "accepted" | "rejected"
 ): Promise<void> => {
-  await API.patch(`/api/v1/applications/${applicationId}/status`, { status });
+  await API.patch(
+    `/api/v1/applications/${applicationId}/status`,
+    { status },
+    authHeader()
+  );
 };
