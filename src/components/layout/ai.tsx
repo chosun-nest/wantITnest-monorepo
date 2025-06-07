@@ -4,6 +4,7 @@ import { useState, CSSProperties } from "react";
 import { MemoizedReactMarkdown } from "../ai/Markdown";
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { fetchOpenAIStream } from "../../api/ai/ai";
+
 const ai = "/assets/images/ai.png";
 const ai_hover = "/assets/images/ai_hover.png";
 
@@ -80,7 +81,7 @@ export default function Ai() {
 
       {/* 챗봇 모달 */}
       {isOpen && (
-        <div className="fixed right-6 bottom-[calc(6rem+50px+8px)] w-[350px] h-[600px] bg-white dark:bg-gray-900 rounded-xl p-4 shadow-xl z-50 flex flex-col">
+        <div className="fixed right-6 bottom-[calc(3rem+50px+8px)] w-[350px] h-[500px] bg-white dark:bg-gray-900 rounded-xl p-4 shadow-xl z-50 flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-base font-semibold text-gray-800 dark:text-white">
               AI 도우미 위닛(WitN)
@@ -118,7 +119,7 @@ export default function Ai() {
             </button>
           </div>
 
-          <div className="overflow-y-auto flex-grow pr-1 space-y-2">
+          <div className="overflow-y-auto flex-grow pr-1 space-y-2 custom-scroll transition-all duration-300 ease-in-out">
             {messages.map((message, index) => {
               const isUser = message.role === "user";
               const displayName = isUser ? "me" : "위닛";

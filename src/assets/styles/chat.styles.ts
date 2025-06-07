@@ -18,7 +18,7 @@ export const ChatContainer = styled.div<{ isMobile: boolean }>`
   border: 1px solid #002f6c;
   overflow: hidden;
   width: 100%;
-  height: 100%; /* Container가 차지하는 남은 높이를 모두 사용 */
+  height: 100%;
 
   ${({ isMobile }) =>
     isMobile
@@ -40,14 +40,13 @@ export const ChatContainer = styled.div<{ isMobile: boolean }>`
 
 export const MessagesContainer = styled.div<{ isMobile?: boolean }>`
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden; /* ✅ 스크롤 제거 */
   background-color: #fff;
 
   ${({ isMobile }) =>
     isMobile
       ? css`
-          // ChatContainer에 패딩을 줬으므로 여기서는 0으로 유지해도 됩니다.
-          padding: 10px 0; /* 위아래 10px, 좌우 0 */
+          padding: 10px 0;
         `
       : css`
           flex: 3;
@@ -63,8 +62,7 @@ export const InputContainer = styled.div<{ isMobile?: boolean }>`
   ${({ isMobile }) =>
     isMobile
       ? css`
-          // ChatContainer에 패딩을 줬으므로 여기서는 0으로 유지해도 됩니다.
-          padding: 10px 0; /* 위아래 10px, 좌우 0 */
+          padding: 10px 0;
           border-top: 1px solid #ccc;
         `
       : css`
@@ -101,9 +99,11 @@ export const UnderbarItem = styled.div`
   width: 100%;
   height: 100%;
   cursor: pointer;
+
   &:hover {
     background-color: #002f6c38;
   }
+
   svg {
     width: 24px;
     height: 24px;
