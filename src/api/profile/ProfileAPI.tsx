@@ -1,23 +1,31 @@
-// profile/api.tsx
+// 프로필 API
 import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
+
+// 공통 인증 헤더
+const authHeader = () => ({
+  headers: { Authorization: `Bearer ${getAccessToken()}` },
+});
 
 // 프로필 이미지 업로드 (POST)
 export const uploadProfileImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-
-  const res = await API.post("/api/v1/members/me/image", formData);
-  return res.data.imageUrl; // 업로드된 imageUrl 추출
+  const res = await API.post(
+    "/api/v1/members/me/image",
+    formData,
+    authHeader()
+  );
+  return res.data.imageUrl;
 };
 
 // 비밀번호 확인 (POST)
 export interface CheckPasswordPayload {
   password: string;
 }
-
 export const checkPassword = async (payload: CheckPasswordPayload) => {
   return API.post("/api/v1/members/check-password", payload, {
+    ...authHeader(),
     validateStatus: (status) => status < 500,
   });
 };
@@ -57,14 +65,9 @@ export interface MemberProfile {
 }
 
 // 회원 정보 조회 (GET)
-// export const getMemberProfile = async (): Promise<MemberProfile> => {
-//   const res = await API.get("/api/v1/members/me");
-//   return res.data;
-// };
-
 export const getMemberProfile = async (): Promise<MemberProfile> => {
-  const res = await API.get("/api/v1/members/me");
-  const BASE_URL = "http://49.246.71.236:6902"; // 백엔드에서 이미지가 서빙되는 절대 주소
+  const res = await API.get("/api/v1/members/me", authHeader());
+  const BASE_URL = "http://49.246.71.236:6030"; // 백엔드에서 이미지가 서빙되는 절대 주소
 
   return {
     ...res.data,
@@ -76,12 +79,7 @@ export const getMemberProfile = async (): Promise<MemberProfile> => {
 
 // 회원 탈퇴 (DELETE)
 export const withdrawMember = async (): Promise<{ message: string }> => {
-  const token = getAccessToken();
-
-  const res = await API.delete("/api/v1/members/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
+  const res = await API.delete("/api/v1/members/me", authHeader());
   return res.data;
 };
 
@@ -103,11 +101,7 @@ export interface UpdateMemberProfilePayload {
 export const updateMemberProfile = async (
   payload: UpdateMemberProfilePayload
 ) => {
-  const token = getAccessToken();
-
-  return await API.patch("/api/v1/members/me", payload, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  return await API.patch("/api/v1/members/me", payload, authHeader());
 };
 
 // 비밀번호 변경 (PATCH)
@@ -120,13 +114,11 @@ export interface UpdateMemberPasswordPayload {
 export const updateMemberPassword = async (
   payload: UpdateMemberPasswordPayload
 ): Promise<{ message: string }> => {
-  // Promise<{ message: string }> 단순 메시지 리턴
-  const token = getAccessToken();
-
-  const res = await API.patch("/api/v1/members/me/password", payload, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
+  const res = await API.patch(
+    "/api/v1/members/me/password",
+    payload,
+    authHeader()
+  );
   return res.data;
 };
 
@@ -134,7 +126,7 @@ export const updateMemberPassword = async (
 // 인증 관련 API
 // 토큰 유효성 검사 (GET)
 export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
-  const res = await API.get("/api/v1/auth/me");
+  const res = await API.get("/api/v1/auth/me", authHeader());
   return res.data;
 };
 
@@ -162,28 +154,23 @@ export const getDepartments = async () => {
 export const getFavoriteTags = async (): Promise<
   { tagId: number; tagName: string }[]
 > => {
-  const res = await API.get("/api/v1/favorites/tags", {
-    headers: { skipAuth: false },
-  });
+  const res = await API.get("/api/v1/favorites/tags", authHeader());
   return res.data.favoriteTags;
 };
 
 // 관심 태그 추가
 export const addFavoriteTag = async (tagName: string): Promise<void> => {
-  const token = getAccessToken();
   await API.post(
     `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
     null,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    authHeader()
   );
 };
 
 // 관심 태그 삭제
 export const deleteFavoriteTag = async (tagName: string): Promise<void> => {
-  const token = getAccessToken();
-  await API.delete(`/api/v1/favorites/tags/${encodeURIComponent(tagName)}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  await API.delete(
+    `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
+    authHeader()
+  );
 };
