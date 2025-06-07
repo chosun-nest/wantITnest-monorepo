@@ -13,7 +13,7 @@ public class PostSummaryDto {
     private Long id;
     private String title;
     private String previewContent;
-    private String authorName;
+    private AuthorDto author;
     private List<String> tags;
     private Long viewCount;
     private Long likeCount;
