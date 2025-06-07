@@ -40,7 +40,7 @@ export const ChatContainer = styled.div<{ isMobile: boolean }>`
 
 export const MessagesContainer = styled.div<{ isMobile?: boolean }>`
   flex: 1;
-  overflow-y: hidden; /* ✅ 스크롤 제거 */
+  overflow-y: hidden;
   background-color: #fff;
 
   ${({ isMobile }) =>
