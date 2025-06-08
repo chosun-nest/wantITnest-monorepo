@@ -6,7 +6,7 @@ import {
   deletePost,
   reactToPost,
 } from "../api/interests/InterestsAPI";
-import type { PostDetail } from "../api/types/interest-board";
+import type { PostDetail } from "../types/api/interest-board";
 
 import { getMemberProfile } from "../api/profile/ProfileAPI";
 import { useSelector, useDispatch } from "react-redux"; // 리덕스를 통해 사용자 구분 상태 관리

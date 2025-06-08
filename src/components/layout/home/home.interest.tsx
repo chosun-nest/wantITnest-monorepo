@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTopPosts } from "../../../utils/getTopPosts";
 import InterestPostCardList from "../../interests/board/InterestPostCardList";
-import { PostSummary } from "../../../api/types/interest-board";
+import { PostSummary } from "../../../types/api/interest-board";
 import { useNavigate } from "react-router-dom";
 
 export default function HomeInterest() {

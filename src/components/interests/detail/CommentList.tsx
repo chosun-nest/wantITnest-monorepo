@@ -1,6 +1,6 @@
 // 댓글 배열을 parentId 기반으로 계층 구조로 재정렬하고, 각 댓글을 CommentItem으로 렌더링
 import CommentItem from "./CommentItem";
-import type { Comment, BoardType } from "../../../api/types/comments";
+import type { Comment, BoardType } from "../../../types/api/comments";
 
 interface CommentListProps {
   comments: Comment[];

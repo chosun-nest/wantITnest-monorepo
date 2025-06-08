@@ -6,7 +6,7 @@ import ParticipantCardBox from "../components/project/ParticipantCardBox";
 import ApplicationModal from "../components/project/ApplicationModal";
 import useResponsive from "../hooks/responsive";
 import { Participant } from "../types/participant";
-import type { ProjectDetail } from "../api/types/project-board";
+import type { ProjectDetail } from "../types/api/project-board";
 
 // 💡 ParticipantCardBox에 넘길 전체 타입에 맞춰 재구성
 export default function ProjectDetail() {

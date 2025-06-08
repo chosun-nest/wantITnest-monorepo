@@ -4,7 +4,7 @@ import {
   MemberFavoriteTagsResponse,
   CheckFavoriteTagResponse,
   FavoriteTagItem,
-} from "../types/favorite-tag";
+} from "../../types/api/favorite-tag";
 
 // =========================================
 // 특정 태그가 즐겨찾기인지 확인 (GET) - 인증 필요

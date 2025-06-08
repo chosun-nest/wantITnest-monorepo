@@ -1,5 +1,5 @@
 import { fetchPosts, searchPosts } from "../api/interests/InterestsAPI";
-import type { PostSummary, SearchPost } from "../api/types/interest-board";
+import type { PostSummary, SearchPost } from "../types/api/interest-board";
 
 interface Params {
   sortType?: "latest" | "likes";

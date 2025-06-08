@@ -3,7 +3,7 @@ import {
   UpdateMemberProfilePayload,
   CheckPasswordPayload,
   UpdateMemberPasswordPayload,
-} from "../types/profile";
+} from "../../types/api/profile";
 
 // 프로필 API
 import { API } from "..";
