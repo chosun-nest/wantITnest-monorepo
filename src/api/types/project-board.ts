@@ -1,6 +1,24 @@
 // ✅ types/project-board.ts
 
 // ==================================
+// POST /api/projects/new - 프로젝트 게시글 생성
+// ==================================
+// 요청 타입
+export interface CreateProjectPostPayload {
+  projectTitle: string;
+  projectDescription: string;
+  maxMember: number;
+  tags: string[];
+  recruiting: boolean;
+}
+
+// 응답 타입
+export interface CreateProjectPostResponse {
+  projectId: number;
+  message: string;
+}
+
+// ==================================
 // 📘 GET /api/projects - 전체 목록 조회
 // ==================================
 
