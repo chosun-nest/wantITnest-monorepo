@@ -14,7 +14,7 @@ import {
   createInterestPost,
   updatePost,
 } from "../api/interests/InterestsAPI";
-import type { PostDetail } from "../api/types/interest-board";
+import type { PostDetail } from "../types/api/interest-board";
 import { createProjectPost } from "../api/project/ProjectAPI";
 
 // 게시판 타입 정의

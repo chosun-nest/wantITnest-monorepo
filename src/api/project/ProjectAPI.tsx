@@ -12,7 +12,7 @@ import {
   DeleteProjectResponse,
   ApplyProjectPayload,
   Applicant,
-} from "../types/project-board";
+} from "../../types/api/project-board";
 
 // ✅ 공통 인증 헤더
 const authHeader = () => ({

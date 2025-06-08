@@ -9,7 +9,7 @@ import {      // CommentAPI.tsx에서 겹치는 타입들 모아둠
   CommentReactionResponse,
   DeleteCommentResponse,
   FetchCommentsResponse
-} from "../types/comments";
+} from "../../types/api/comments";
 
 // =========================================
 // 댓글 목록 조회 (GET)

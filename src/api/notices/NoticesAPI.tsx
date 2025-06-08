@@ -1,7 +1,7 @@
 // [공지사항 API] - 학교 공지사항 연동용
 import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
-import { NoticeItem, NoticeListResponse } from "../types/notice-board";
+import { NoticeItem, NoticeListResponse } from "../../types/api/notice-board";
 
 // =======================
 // 공지사항 목록 조회 (GET)

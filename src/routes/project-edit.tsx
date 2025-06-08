@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getProjectById, updateProject } from "../api/project/ProjectAPI";
-import { ProjectDetail, UpdateProjectPayload } from "../api/types/project-board";
+import { ProjectDetail, UpdateProjectPayload } from "../types/api/project-board";
 
 export default function ProjectEdit() {
   const { id } = useParams();

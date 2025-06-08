@@ -1,7 +1,7 @@
 // 댓글 / 대댓글 재귀 랜더링
 import { useState, useRef, useEffect } from "react";
 import CommentForm from "./CommentForm";
-import type { Comment, BoardType } from "../../../api/types/comments";
+import type { Comment, BoardType } from "../../../types/api/comments";
 import {
   deleteComment,
   updateComment,

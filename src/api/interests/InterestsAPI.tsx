@@ -14,7 +14,7 @@ import {
   ReactionResponse,
   SearchPostListResponse,
   SearchPostsParams
-} from "../types/interest-board";
+} from "../../types/api/interest-board";
 
 // =========================================
 // [관심분야 게시판 글쓰기용 - board-write.tsx]

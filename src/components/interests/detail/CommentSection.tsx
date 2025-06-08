@@ -8,7 +8,7 @@ import {
   fetchComments,
   createComment,
 } from "../../../api/board-common/CommentAPI";
-import type { Comment, BoardType } from "../../../api/types/comments";
+import type { Comment, BoardType } from "../../../types/api/comments";
 import { useDispatch } from "react-redux";
 
 export default function CommentSection({ boardType, postId }: { boardType: BoardType; postId: number }) {
