@@ -1,9 +1,9 @@
 package com.virtukch.nest.project.service;
 
+import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.common.service.ImageService;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
-import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
@@ -38,7 +38,7 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
     private final ProjectTagRepository projectTagRepository;
     private final TagService tagService;
-//    private final CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final ImageService imageService;
     private final String prefix = "project";
@@ -55,14 +55,22 @@ public class ProjectService {
         return ProjectDtoConverter.toCreateResponseDto(project);
     }
 
-    @Transactional(readOnly = true)
-    public List<ProjectResponseDto> getAllProjects() {
-        return projectRepository.findAll().stream()
-                .map(project -> ProjectResponseDto.builder()
-                        .projectId(project.getProjectId())
-                        .message("Complete Create Project")
-                        .build())
-                .collect(Collectors.toList());
+    @Transactional
+    public ProjectResponseDto createProject(Long memberId, ProjectWithImagesRequestDto requestDto) {
+        String title = requestDto.getProjectTitle();
+        log.info("[모집글 생성 시작] title={}, memberId={}", title, memberId);
+        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription(), requestDto.getMaxMember()));
+
+        saveProjectTags(project, requestDto.getTags());
+
+        List<String> imageUrls;
+        if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()){
+            imageUrls = imageService.uploadImages(requestDto.getImages(), prefix, project.getProjectId());
+            project.updateProject(project.getProjectTitle(), project.getProjectDescription(), project.getMaxMember(), project.isRecruiting(), imageUrls);
+         }
+
+        log.info("[모집글 생성 완료] projectId={}", project.getProjectId());
+        return ProjectDtoConverter.toCreateResponseDto(project);
     }
 
     @Transactional
@@ -127,7 +135,7 @@ public class ProjectService {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
 
         projectTagRepository.deleteAllByProjectId(projectId);
-//        commentRepository.deleteAllByProjectId(projectId);
+        commentRepository.deleteAllByPostId(projectId);
         projectRepository.delete(project);
         return ProjectDtoConverter.toDeleteResponseDto(project);
     }
@@ -240,9 +248,10 @@ public class ProjectService {
         Map<Long, String> memberNameMap = fetchMemberNameMap(projects);
         Map<Long, List<Long>> projectTagMap = fetchPostTagMap(projects);
         Map<Long, String> tagNameMap = fetchTagNameMap(projectTagMap);
+        Map<Long, Long> commentCountMap = fetchCommentCountMap(projects);
 
         List<ProjectSummaryDto> summaries = projects.stream()
-                .map(project -> buildProjectSummaryDto(project, memberNameMap, projectTagMap, tagNameMap))
+                .map(project -> buildProjectSummaryDto(project, memberNameMap, projectTagMap, tagNameMap, commentCountMap))
                 .toList();
 
         return ProjectDtoConverter.toProjectListResponseDto(summaries, projectPage);
@@ -281,13 +290,36 @@ public class ProjectService {
             Project project,
             Map<Long, String> memberNameMap,
             Map<Long, List<Long>> projectTagMap,
-            Map<Long, String> tagNameMap
+            Map<Long, String> tagNameMap,
+            Map<Long, Long> commentCountMap
     ){
         String memberName = memberNameMap.get(project.getMemberId());
         List<String> tagNames = projectTagMap.getOrDefault(project.getProjectId(), Collections.emptyList()).stream()
                 .map(tagNameMap::get)
                 .filter(Objects::nonNull)
                 .toList();
-        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames);
+        Long commentCount = commentCountMap.getOrDefault(project.getProjectId(), 0L);
+
+        String imageUrl = null;
+        List<String> imageUrlList = project.getImageUrlList();
+        if (imageUrlList != null && !imageUrlList.isEmpty()) {
+            imageUrl = imageUrlList.get(0);
+        }
+
+        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl);
+    }
+
+    private Map<Long, Long> fetchCommentCountMap(List<Project> projects) {
+        List<Long> projectIds = projects.stream().map(Project::getProjectId).toList();
+
+        if (projectIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return commentRepository.countByPostIdIn(projectIds).stream()
+                .collect(Collectors.toMap(
+                        result -> (Long) result[0], // projectId
+                        result -> (Long) result[1]  // count
+                ));
     }
 }
