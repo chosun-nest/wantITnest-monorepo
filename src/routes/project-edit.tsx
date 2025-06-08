@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getProjectById, updateProject } from "../api/project/ProjectAPI";
-import { ProjectDetail, UpdateProjectPayload } from "../types/project-board";
+import { ProjectDetail, UpdateProjectPayload } from "../api/types/project-board";
 
 export default function ProjectEdit() {
   const { id } = useParams();
@@ -12,10 +12,9 @@ export default function ProjectEdit() {
   // 수정할 필드 상태값
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [maxMember, setMaxMember] = useState(1); // ⚠️ 서버 응답에는 없지만 UI에선 필요
-  const [startDate, setStartDate] = useState(""); // ⚠️ 서버 응답에는 없지만 UI에선 필요
-  const [endDate, setEndDate] = useState("");
+  const [maxMember, setMaxMember] = useState(1);
 
+  // 1. 기존 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -24,10 +23,7 @@ export default function ProjectEdit() {
         setProject(data);
         setTitle(data.projectTitle);
         setDescription(data.projectDescription);
-
-        // 서버에서 날짜 정보가 없으므로 비워두거나 필요 시 수동 설정
-        setStartDate(data.createdAt.split("T")[0]); // createdAt → YYYY-MM-DD 추출용
-        setEndDate(data.updatedAt.split("T")[0]);
+        setMaxMember(data.maxMember);
       } catch (err) {
         alert("프로젝트 데이터를 불러오지 못했습니다.");
       } finally {
@@ -38,6 +34,7 @@ export default function ProjectEdit() {
     fetchData();
   }, [id]);
 
+  // 2. 수정 요청
   const handleSubmit = async () => {
     if (!id) return;
     if (!title || !description) {
@@ -49,8 +46,8 @@ export default function ProjectEdit() {
       projectTitle: title,
       projectDescription: description,
       maxMember,
-      projectStartDate: startDate,
-      projectEndDate: endDate,
+      tags: [], // TODO: 태그 기능 구현 시 반영
+      recruiting: true, // TODO: 마감 여부 상태에 따라 수정
     };
 
     try {
@@ -98,27 +95,6 @@ export default function ProjectEdit() {
             onChange={(e) => setMaxMember(Number(e.target.value))}
             min={1}
           />
-        </div>
-
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block font-semibold mb-1">시작일</label>
-            <input
-              type="date"
-              className="w-full border px-3 py-2 rounded"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block font-semibold mb-1">마감일</label>
-            <input
-              type="date"
-              className="w-full border px-3 py-2 rounded"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
         </div>
       </div>
 

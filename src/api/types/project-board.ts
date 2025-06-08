@@ -47,6 +47,7 @@ export interface ProjectDetail {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
+  maxMember: number;
 }
 
 // ==================================
