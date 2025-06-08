@@ -30,7 +30,7 @@ export default function PostDetailInfo({
 
       {/* 날짜 및 조회수 */}
       <div className="mt-1 text-[15px] text-gray-600 flex gap-2">
-        <span>{date.slice(0, 10).replace(/-/g, ".")}</span>
+        <span>{date}</span>
         <span>· 조회수 {viewCount}</span>
       </div>
     </div>

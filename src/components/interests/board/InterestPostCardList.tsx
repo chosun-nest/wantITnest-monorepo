@@ -14,7 +14,10 @@ interface InterestPostCardListProps {
   onCardClick: (postId: number) => void; // 카드 클릭 핸들러 추가
 }
 
-export default function InterestPostCardList({ posts, onCardClick }: InterestPostCardListProps) {
+export default function InterestPostCardList({
+  posts,
+  onCardClick,
+}: InterestPostCardListProps) {
   const isMobile = useResponsive();
 
   return (
@@ -24,11 +27,15 @@ export default function InterestPostCardList({ posts, onCardClick }: InterestPos
         .map((post) => (
           <div
             key={post.postId}
-            onClick={() => onCardClick(post.postId)} // navigate → props 호출
+            onClick={() => onCardClick(post.postId)} // navigate > props 호출
             className="p-4 border rounded-lg cursor-pointer hover:shadow"
           >
-            <div className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}>
-              <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
+            <div
+              className={`flex items-center gap-2 mb-2 ${isMobile ? "flex-wrap" : ""}`}
+            >
+              <h2
+                className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}
+              >
                 {post.title}
               </h2>
             </div>
@@ -54,7 +61,7 @@ export default function InterestPostCardList({ posts, onCardClick }: InterestPos
 
             <div className="flex justify-between text-xs text-gray-500">
               <span>
-                {post.authorName} • {post.createdAt.slice(0, 10)}
+                {post.authorName} • {post.createdAt}
               </span>
               <div className="flex gap-3">
                 <span>조회수 {post.viewCount}</span>

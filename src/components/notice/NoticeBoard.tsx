@@ -90,7 +90,7 @@ import NoticeDropdown from "./NoticeDropdown";
 import NoticeCard from "./NoticeCard";
 import { fetchNotices } from "../../api/notices/NoticesAPI";
 
-interface Notice {
+export interface Notice {
   number: string;
   title: string;
   writer: string;
@@ -108,7 +108,6 @@ const CATEGORY_LIST = [
   "IT융합대학 공지",
   "컴퓨터공학과 공지",
 ];
-
 
 export default function NoticeBoard() {
   // 내비게이션 바 높이를 측정할 ref/state

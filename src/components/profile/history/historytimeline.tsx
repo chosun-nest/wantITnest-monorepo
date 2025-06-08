@@ -129,6 +129,7 @@ export default function HistoryTimeline() {
           onCancel={handleCancelDelete}
         />
       )}
+<<<<<<< HEAD
 
       {/* 타임라인 바 */}
       <div className="relative w-full h-12 mb-12">
@@ -136,11 +137,20 @@ export default function HistoryTimeline() {
 
         <div className="flex items-center px-4 gap-6">
           {/* 좌측 고정: 전체 버튼 */}
+=======
+      <div className="relative w-full py-10 px-6 mb-10 overflow-hidden">
+        {/* 수평선 */}
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-300 z-0" />
+
+        <div className="relative z-10 flex items-end gap-12">
+          {/* 항상 좌측 고정: 전체 버튼 */}
+>>>>>>> origin/dev
           <div
             onClick={() => setSelectedYear(null)}
             className={`flex flex-col items-center cursor-pointer transition-all duration-300 ${
               selectedYear === null
                 ? "scale-110"
+<<<<<<< HEAD
                 : "opacity-80 hover:opacity-100"
             }`}
           >
@@ -150,12 +160,28 @@ export default function HistoryTimeline() {
                 selectedYear === null
                   ? "text-yellow-700 font-semibold"
                   : "text-blue-900"
+=======
+                : "opacity-60 hover:opacity-100"
+            }`}
+          >
+            <div
+              className={`w-1.5 h-12 rounded-md transition-all duration-300 ${
+                selectedYear === null ? "bg-yellow-400" : "bg-gray-400"
+              }`}
+            />
+            <span
+              className={`mt-2 text-sm ${
+                selectedYear === null
+                  ? "text-yellow-600 font-semibold"
+                  : "text-gray-500"
+>>>>>>> origin/dev
               }`}
             >
               전체
             </span>
           </div>
 
+<<<<<<< HEAD
           {/* 타임라인 연도 정렬 */}
           {selectedYear === null ? (
             // 전체 보기: 균등 정렬
@@ -218,6 +244,55 @@ export default function HistoryTimeline() {
               </div>
             </div>
           )}
+=======
+          {/* 연도 막대기들 */}
+          <div className="flex items-end justify-center gap-12 flex-1 transition-all duration-500">
+            {years.map((year) => {
+              const isSelected = selectedYear === year;
+
+              const direction =
+                selectedYear === null
+                  ? "center"
+                  : year < selectedYear
+                    ? "left"
+                    : year > selectedYear
+                      ? "right"
+                      : "center";
+
+              const baseTranslate =
+                selectedYear === null
+                  ? "translate-x-0"
+                  : direction === "left"
+                    ? "-translate-x-6"
+                    : direction === "right"
+                      ? "translate-x-6"
+                      : "translate-x-0";
+
+              return (
+                <div
+                  key={year}
+                  onClick={() => setSelectedYear(year)}
+                  className={`group flex flex-col items-center cursor-pointer transition-transform duration-500 ${baseTranslate}`}
+                >
+                  <div
+                    className={`w-1.5 h-12 rounded-md transition-all duration-300 ease-in-out group-hover:scale-y-125 ${
+                      isSelected ? "bg-[#002f6c]" : "bg-gray-400"
+                    }`}
+                  />
+                  <span
+                    className={`mt-2 text-sm transition-all duration-300 ease-in-out ${
+                      isSelected
+                        ? "text-[#002f6c] font-semibold"
+                        : "text-gray-500 group-hover:opacity-100"
+                    }`}
+                  >
+                    {year}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+>>>>>>> origin/dev
         </div>
       </div>
 
