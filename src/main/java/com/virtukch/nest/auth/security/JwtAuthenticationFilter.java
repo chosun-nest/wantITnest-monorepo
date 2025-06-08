@@ -1,5 +1,6 @@
 package com.virtukch.nest.auth.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -9,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -60,15 +62,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.warn("JWT 인증 실패: 토큰 만료됨");
+            handleUnauthorized(response, "토큰이 만료되었습니다.");
+            return;
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
             log.warn("JWT 인증 실패: 잘못된 토큰");
+            handleUnauthorized(response, "유효하지 않은 토큰입니다.");
+            return;
         } catch (UsernameNotFoundException e) {
             log.warn("JWT 인증 실패: 사용자 정보 없음");
+            handleUnauthorized(response, "사용자 정보를 찾을 수 없습니다.");
+            return;
         } catch (Exception e) {
             log.error("JWT 인증 중 알 수 없는 오류 발생", e);
+            handleUnauthorized(response, "인증 처리 중 오류가 발생했습니다.");
+            return;
         }
 
-        // ✅ 필터 체인 계속 진행
+        // ✅ 토큰이 유효하거나 아예 없는 경우만 계속 진행
         filterChain.doFilter(request, response);
     }
 
@@ -78,5 +88,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    // 401 에러를 반환하게 만드는 메서드
+    private void handleUnauthorized(HttpServletResponse response, String message) throws IOException {
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(
+            new ObjectMapper().writeValueAsString(
+                Map.of("code", "UNAUTHORIZED", "message", message)
+            )
+        );
     }
 }
