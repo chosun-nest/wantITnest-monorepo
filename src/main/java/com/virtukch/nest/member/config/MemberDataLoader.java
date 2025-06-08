@@ -69,6 +69,8 @@ public class MemberDataLoader implements ApplicationRunner {
             .memberPasswordLength("bimo972@chosun.ac.kr".length())
             .build();
 
+        memberRepository.save(member2);
+
         Member member3 = Member.builder()
                 .memberEmail("cotjs0321@naver.com")
                 .memberPassword(passwordEncoder.encode("cotjs0321@naver.com")) // 실제로는 BCrypt 등으로 암호화 필요

@@ -6,6 +6,7 @@ import com.virtukch.nest.comment_reaction.dto.CommentReactionResponseDto;
 import com.virtukch.nest.comment_reaction.model.CommentReaction;
 import com.virtukch.nest.comment_reaction.model.ReactionType;
 import com.virtukch.nest.comment_reaction.repository.CommentReactionRepository;
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +122,7 @@ public class CommentReactionService {
      * @throws RuntimeException 사용자가 존재하지 않는 경우
      */
     private Member findMemberOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        String msg = String.format("MemberId [%d] : 회원 정보를 찾을 수 없습니다.", memberId);
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(msg));
     }
 }

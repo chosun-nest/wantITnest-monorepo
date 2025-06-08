@@ -31,22 +31,26 @@ public class PostDtoConverter {
                 .build();
     }
 
-    public static PostSummaryDto toSummaryDto(Post post, String memberName, List<String> tagNames, Long commentCount) {
+    public static PostSummaryDto toSummaryDto(Post post, String memberName, List<String> tagNames, Long commentCount, String imageUrl) {
         return PostSummaryDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .previewContent(generatePreview(post.getContent()))
                 .tags(tagNames)
-                .authorName(memberName)
+                .author(AuthorDto.builder()
+                        .id(post.getMemberId())
+                        .name(memberName).build()
+                )
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .commentCount(commentCount)
+                .ImageUrl(imageUrl)
                 .build();
     }
 
-    public static PostDetailResponseDto toDetailResponseDto(Post post, Member member, List<String> tagNames) {
+    public static PostDetailResponseDto toDetailResponseDto(Post post, Member member, List<String> tagNames, List<String> imageUrls) {
         return PostDetailResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
@@ -61,6 +65,7 @@ public class PostDtoConverter {
                 .dislikeCount(post.getDislikeCount())
                 .createdAt(timeFormat(post.getCreatedAt()))
                 .updatedAt(timeFormat(post.getUpdatedAt()))
+                .imageUrls(imageUrls)
                 .build();
     }
 

@@ -75,6 +75,36 @@ public class MemberService {
             .build();
     }
 
+    public MemberResponseDto findByMemberId(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<MemberInterestResponseDto> memberInterestResponseDtoList = memberInterestService.findByMemberId(
+            memberId);
+        List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList = memberDepartmentService.findByMemberId(
+            memberId);
+        List<MemberTechStackResponseDto> memberTechStackResponseDtoList = memberTechStackService.findByMemberId(
+            memberId);
+
+        return MemberResponseDto.builder()
+            .memberId(member.getMemberId())
+            .memberEmail(member.getMemberEmail())
+            .memberRole(member.getMemberRole())
+            .memberName(member.getMemberName())
+            .memberSnsUrl1(member.getMemberSnsUrl1())
+            .memberSnsUrl2(member.getMemberSnsUrl2())
+            .memberSnsUrl3(member.getMemberSnsUrl3())
+            .memberSnsUrl4(member.getMemberSnsUrl4())
+            .memberIsStudent(member.getMemberIsStudent())
+            .memberIntroduce(member.getMemberIntroduce())
+            .memberImageUrl(member.getMemberImageUrl())
+            .memberPasswordLength(member.getMemberPasswordLength())
+            .memberInterestResponseDtoList(memberInterestResponseDtoList)
+            .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
+            .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
+            .build();
+    }
+
     @Transactional
     public MemberResponseDto updateMemberInfo(CustomUserDetails customUserDetails,
         MemberUpdateRequestDto dto) {

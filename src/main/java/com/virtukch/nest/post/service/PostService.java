@@ -1,6 +1,8 @@
 package com.virtukch.nest.post.service;
 
 import com.virtukch.nest.comment.repository.CommentRepository;
+import com.virtukch.nest.common.service.ImageService;
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.dto.*;
@@ -40,6 +42,9 @@ public class PostService {
     private final TagRepository tagRepository;
     private final TagService tagService;
     private final CommentRepository commentRepository;
+    private final ImageService imageService;
+
+    private final String prefix = "interest";
 
     /**
      * 새로운 게시글을 생성합니다.
@@ -62,6 +67,33 @@ public class PostService {
     }
 
     /**
+     * 이미지를 포함한 새로운 게시글을 생성합니다.
+     *
+     * @param memberId 게시글 작성자의 회원 ID
+     * @param requestDto 게시글 생성에 필요한 정보(제목, 내용, 태그, 이미지 파일 등)를 담은 DTO
+     * @return 생성된 게시글 정보를 담은 응답 DTO
+     */
+    @Transactional
+    public PostResponseDto createPost(Long memberId, PostWithImagesRequestDto requestDto) {
+        String title = requestDto.getTitle();
+        log.info("[게시글 생성 시작] title={}, memberId={}", title, memberId);
+        Post post = postRepository.save(Post.createPost(memberId, title, requestDto.getContent()));
+
+        savePostTags(post, requestDto.getTags());
+
+        // 이미지 업로드 및 URL 받기
+        List<String> imageUrls;
+        if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
+            imageUrls = imageService.uploadImages(requestDto.getImages(), prefix, post.getId());
+            post.updatePost(post.getTitle(), post.getContent(), imageUrls);
+        }
+
+        log.info("[게시글 생성 완료] postId={}", post.getId());
+
+        return PostDtoConverter.toCreateResponseDto(post);
+    }
+
+    /**
      * 게시글 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.
      *
      * @param postId 조회할 게시글 ID
@@ -75,8 +107,9 @@ public class PostService {
 
         Member member = findMemberOrThrow(post);
         List<String> tagNames = extractTagNames(postId);
+        List<String> imageUrls = post.getImageUrlList();
 
-        return PostDtoConverter.toDetailResponseDto(post, member, tagNames);
+        return PostDtoConverter.toDetailResponseDto(post, member, tagNames, imageUrls);
     }
 
     /**
@@ -133,6 +166,31 @@ public class PostService {
     }
 
     /**
+     * 게시글을 수정합니다. 게시글 작성자만 수정할 수 있습니다.
+     *
+     * @param postId 수정할 게시글 ID
+     * @param memberId 수정 요청자의 회원 ID
+     * @param requestDto 게시글 수정에 필요한 정보(제목, 내용, 태그 등)를 담은 DTO
+     * @return 수정된 게시글 정보를 담은 응답 DTO
+     * @throws PostNotFoundException 게시글이 존재하지 않을 경우
+     * @throws NoPostAuthorityException 게시글 수정 권한이 없을 경우
+     */
+    @Transactional
+    public PostResponseDto updatePost(Long postId, Long memberId, PostWithImagesRequestDto requestDto) {
+        Post post = validatePostOwnershipAndGet(postId, memberId);
+
+        List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, postId, post.getImageUrlList());
+        post.updatePost(post.getTitle(), post.getContent(), imageUrls);
+
+        // 관련된 postTag 전부 삭제
+        postTagRepository.deleteAllByPostId(post.getId());
+        // 수정된 Tag로 다시 저장
+        savePostTags(post, requestDto.getTags());
+
+        return PostDtoConverter.toUpdateResponseDto(post);
+    }
+
+    /**
      * 게시글을 삭제합니다. 게시글 작성자만 삭제할 수 있습니다.
      * 게시글 삭제 시 관련된 태그 매핑 정보와 댓글도 함께 삭제됩니다.
      *
@@ -148,6 +206,12 @@ public class PostService {
 
         postTagRepository.deleteAllByPostId(postId); // 연관된 postTag 삭제
         commentRepository.deleteAllByPostId(postId); // 연관된 댓글 삭제
+
+        List<String> imageUrlList = post.getImageUrlList();
+        if(!imageUrlList.isEmpty()) {
+            imageUrlList.forEach(imageService::deleteImage);
+        }
+
         postRepository.delete(post);
         return PostDtoConverter.toDeleteResponseDto(post);
     }
@@ -217,13 +281,13 @@ public class PostService {
         // 검색 타입에 따라 다른 메서드 호출
         switch (searchType.toUpperCase()) {
             case "TITLE" -> postPage = postRepository
-                    .findByTitleContainingIgnoreCase(keyword, pageable);
+                    .searchByTitle(keyword, pageable);
 
             case "CONTENT" -> postPage = postRepository
-                    .findByContentContainingIgnoreCase(keyword, pageable);
+                    .searchByContent(keyword, pageable);
 
             default -> postPage = postRepository
-                    .findByTitleContainingIgnoreCaseOrContentContaining(keyword, keyword, pageable);
+                    .searchByTitleOrContent(keyword, keyword, pageable);
         }
 
         return buildPostListResponse(postPage);
@@ -263,11 +327,11 @@ public class PostService {
         Page<Post> postPage;
         switch (searchType.toUpperCase()) {
             case "TITLE" -> postPage = postRepository
-                    .findByIdInAndTitleContainingIgnoreCase(postIds, keyword, pageable);
+                    .searchByTitleInIds(postIds, keyword, pageable);
             case "CONTENT" -> postPage = postRepository
-                    .findByIdInAndContentContaining(postIds, keyword, pageable);
+                    .searchByContentInIds(postIds, keyword, pageable);
             default -> postPage = postRepository
-                    .findByIdInAndTitleContainingIgnoreCaseOrIdInAndContentContaining(postIds, keyword, postIds, keyword, pageable);
+                    .searchByTitleOrContentInIds(postIds, keyword, postIds, keyword, pageable);
         }
 
         return buildPostListResponse(postPage);
@@ -299,11 +363,13 @@ public class PostService {
      *
      * @param post 작성자를 조회할 게시글 엔티티
      * @return 조회된 회원 엔티티
-     * @throws RuntimeException 회원이 존재하지 않을 경우
+     * @throws MemberNotFoundException 회원이 존재하지 않을 경우
      */
     private Member findMemberOrThrow(Post post) {
         return memberRepository.findById(post.getMemberId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new MemberNotFoundException(
+                        String.format("MemberId [%d] : 회원 정보를 찾을 수 없습니다.", post.getMemberId()))
+                );
     }
 
     /**
@@ -352,7 +418,14 @@ public class PostService {
                 .filter(Objects::nonNull)
                 .toList();
         Long commentCount = commentCountMap.getOrDefault(post.getId(), 0L);
-        return PostDtoConverter.toSummaryDto(post, memberName, tagNames, commentCount);
+
+        String imageUrl = null;
+        List<String> imageUrlList = post.getImageUrlList();
+        if(imageUrlList != null && !imageUrlList.isEmpty()) {
+            imageUrl = imageUrlList.get(0);
+        }
+
+        return PostDtoConverter.toSummaryDto(post, memberName, tagNames, commentCount, imageUrl);
     }
 
     /**

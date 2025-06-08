@@ -12,7 +12,6 @@ import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByBoardTypeAndPostIdOrderByCreatedAtAsc(BoardType boardType, Long postId);
-    boolean existsByBoardTypeAndPostIdAndParentId(BoardType boardType, Long postId, Long parentId);
     void deleteAllByPostId(Long postId);
     Optional<Comment> findById(Long commentId);
 
