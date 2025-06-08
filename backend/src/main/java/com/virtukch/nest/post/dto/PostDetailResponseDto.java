@@ -30,4 +30,5 @@ public class PostDetailResponseDto {
     private String createdAt;
     private String updatedAt;
 
+    private List<String> imageUrls;
 }

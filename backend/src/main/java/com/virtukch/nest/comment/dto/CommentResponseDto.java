@@ -1,5 +1,6 @@
 package com.virtukch.nest.comment.dto;
 
+import com.virtukch.nest.post.dto.AuthorDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.util.List;
 public class CommentResponseDto {
     private Long commentId;
     private String content;
-    private String authorName;
+    private AuthorDto author;
     private String createdAt;
     private String updatedAt;
     private Long parentId;

@@ -8,6 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -34,6 +38,9 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private Long dislikeCount = 0L;
 
+    // || 구분자로 이미지 URL을 저장
+    @Column(columnDefinition = "TEXT")
+    private String imageUrls;
 
     // 생성 편의 메서드
     public static Post createPost(Long memberId, String title, String content) {
@@ -65,6 +72,21 @@ public class Post extends BaseTimeEntity {
         }
 
         // content는 null이 아니면 수정 (빈 문자열도 허용)
-        if (content != null) this.content = content;
+        if (content != null)
+            this.content = content;
+    }
+
+    public void updatePost(String title, String content, List<String> imageUrls) {
+        updatePost(title, content);
+        if (imageUrls != null) {
+            this.imageUrls = imageUrls.isEmpty() ? null : String.join("||", imageUrls);
+        }
+    }
+
+    public List<String> getImageUrlList() {
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(imageUrls.split("\\|\\|"));
     }
 }
