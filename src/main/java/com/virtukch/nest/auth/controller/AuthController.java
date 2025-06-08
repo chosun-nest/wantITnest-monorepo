@@ -60,12 +60,6 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<Long> getMemberIdFromJWT(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-
-        if (customUserDetails == null) {
-            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
-                .body(null); // 혹은 custom error body
-        }
-
         return ResponseEntity.ok(customUserDetails.getMember().getMemberId());
     }
 
