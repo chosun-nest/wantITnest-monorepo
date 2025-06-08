@@ -26,13 +26,13 @@ import BoardWrite from "./routes/board-write"; //yeong-eun
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
-import Chat from "./routes/chat";
 import NotFound from "./routes/notfound";
 import ProtectedRoute from "./components/auth/protected-route";
 import Events from "./routes/events";
 import PublicRoute from "./components/auth/public-route";
 import ResetPassword from "./routes/reset-password";
 import GlobalModal from "./components/global/global-modal";
+import ChatMain from "./routes/chat-main";
 
 const router = createBrowserRouter([
   {
@@ -76,7 +76,7 @@ const router = createBrowserRouter([
 
       {
         path: "chat/",
-        element: <Chat />,
+        element: <ChatMain />,
       },
       {
         path: "events/",
@@ -164,11 +164,13 @@ function App() {
     const initUser = async () => {
       try {
         const user = await getMemberProfile();
-        dispatch(setUser({
-          memberId: user.memberId,    // 사용자 id
-          memberName: user.memberName,// 사용자 이름
-          memberRole: user.memberRole,// 사용자 역할 redux에 저장
-        }));
+        dispatch(
+          setUser({
+            memberId: user.memberId, // 사용자 id
+            memberName: user.memberName, // 사용자 이름
+            memberRole: user.memberRole, // 사용자 역할 redux에 저장
+          })
+        );
       } catch {
         dispatch(clearUser());
       }
