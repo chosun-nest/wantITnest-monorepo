@@ -18,7 +18,7 @@ export interface ProfileFormData {
   email: string;
   major: string;
   introduce: string;
-  interests: string[];
+  //interests: string[];
   sns: string[];
   image: string;
   uploadedImagePath: string;

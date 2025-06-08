@@ -3,6 +3,8 @@ import { getAccessToken } from "../../utils/auth";
 
 // ✅ 타입 분리 후 import
 import {
+  CreateProjectPostPayload,
+  CreateProjectPostResponse,
   ProjectListResponse,
   ProjectDetail,
   CreateProjectPayload,
@@ -20,6 +22,23 @@ const authHeader = () => ({
 //
 // ✅ 프로젝트 관련 API
 //
+
+// POST /api/projects/new - 프로젝트 게시글 생성
+export const createProjectPost = async (
+  payload: CreateProjectPostPayload
+): Promise<CreateProjectPostResponse> => {
+  const token = getAccessToken();
+  const response = await API.post<CreateProjectPostResponse>(
+    "/api/projects/new",
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
 // 전체 프로젝트 목록 가져오기
 export const getProjects = async (): Promise<ProjectListResponse> => {

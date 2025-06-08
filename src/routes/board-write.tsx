@@ -15,6 +15,7 @@ import {
   updatePost,
 } from "../api/interests/InterestsAPI";
 import type { PostDetail } from "../api/types/interest-board";
+import { createProjectPost } from "../api/project/ProjectAPI";
 
 // 게시판 타입 정의
 type BoardType = "interests" | "projects";
@@ -108,18 +109,50 @@ export default function BoardWrite() {
           },
         });
       } else {
-        const payload: CreatePostPayload = { title, content, tags: selectedTags };
-        await createInterestPost(payload);
-        setModalContent({
-          title: "게시 완료",
-          message: "게시글이 등록되었습니다. 관심분야 정보 게시판에서 확인하세요.",
-          type: "info",
-          onClose: () => {
-            setShowModal(false);
-            navigate("/interests-board");
-          },
-        });
+        if (boardType === "interests") {
+          const payload: CreatePostPayload = { title, content, tags: selectedTags };
+          await createInterestPost(payload);
+          setModalContent({
+            title: "게시 완료",
+            message: "게시글이 등록되었습니다. 관심분야 정보 게시판에서 확인하세요.",
+            type: "info",
+            onClose: () => {
+              setShowModal(false);
+              navigate("/interests-board");
+            },
+          });
+        } else {
+          const parsedMax = parseInt(participants, 10);
+          if (isNaN(parsedMax)) {
+            setModalContent({
+              title: "입력 오류",
+              message: "참여 인원은 숫자로 입력해주세요.",
+              type: "error",
+            });
+            setShowModal(true);
+            return;
+          }
+
+          const payload = {
+            projectTitle: title,
+            projectDescription: content || "",
+            maxMember: parsedMax,
+            tags: selectedTags,
+            recruiting: true,
+          };
+          await createProjectPost(payload);
+          setModalContent({
+            title: "게시 완료",
+            message: "게시글이 등록되었습니다. 프로젝트 게시판에서 확인하세요.",
+            type: "info",
+            onClose: () => {
+              setShowModal(false);
+              navigate("/project-board");
+            },
+          });
+        }
       }
+
       setShowModal(true);
     } catch (err) {
       console.error(err);
@@ -131,6 +164,7 @@ export default function BoardWrite() {
       setShowModal(true);
     }
   };
+
 
   const removeSelectedTag = (tag: string) => {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));
