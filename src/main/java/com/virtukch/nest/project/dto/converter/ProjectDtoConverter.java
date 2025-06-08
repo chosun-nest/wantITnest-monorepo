@@ -1,6 +1,7 @@
 package com.virtukch.nest.project.dto.converter;
 
 import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.post.dto.AuthorDto;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.model.Project;
 import org.springframework.data.domain.Page;
@@ -30,16 +31,20 @@ public class ProjectDtoConverter {
                 .build();
     }
 
-    public static ProjectSummaryDto toSummaryDto(Project project, String memberName, List<String> tagNames) {
+    public static ProjectSummaryDto toSummaryDto(Project project, String memberName, List<String> tagNames, Long commentCount, String imageUrl) {
         return ProjectSummaryDto.builder()
                 .projectId(project.getProjectId())
                 .projectTitle(project.getProjectTitle())
                 .previewContent(generatePreview(project.getProjectDescription()))
                 .tags(tagNames)
-                .authorName(memberName)
-
+                .author(AuthorDto.builder()
+                        .id(project.getMemberId())
+                        .name(memberName).build()
+                )
                 .viewCount(project.getViewCount())
                 .createdAt(timeFormat(project.getCreatedAt()))
+                .commentCount(commentCount)
+                .imageUrl(imageUrl)
                 .build();
     }
 

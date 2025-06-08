@@ -24,7 +24,6 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final PostService postService;
 
     // 프로젝트 생성
     @PostMapping("/new")
@@ -82,5 +81,22 @@ public class ProjectController {
         return ResponseEntity.ok(responseDto);
     }
 
+
+    @GetMapping("/search")
+    public ResponseEntity<ProjectListResponseDto> searchProjects(
+            @RequestParam String keyword,
+            @RequestParam(required = false, defaultValue = "ALL") String searchType,
+            @RequestParam(required = false) List<String> tags,
+            @PageableDefault(size = 10, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        ProjectListResponseDto responseDto;
+        if(tags == null || tags.isEmpty()) {
+            responseDto = projectService.searchProjects(keyword, searchType, pageable);
+        } else {
+            responseDto = projectService.searchProjectsWithTags(keyword, tags, searchType, pageable);
+        }
+
+        return ResponseEntity.ok(responseDto);
+    }
 
 }

@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -48,6 +50,10 @@ public class Project extends BaseTimeEntity {
     //조회수
     @Column(nullable = false)
     private Integer viewCount = 0;
+
+    // image url
+    @Column(columnDefinition = "TEXT")
+    private String imageUrls;
 
 
     public static Project createProject(Long memberId,
@@ -103,5 +109,23 @@ public class Project extends BaseTimeEntity {
         } else {
             this.isRecruiting = false;
         }
+    }
+
+    public void updateProject(String projectTitle,
+                              String projectDescription,
+                              int maxMember,
+                              boolean isRecruiting,
+                              List<String> imageUrls) {
+        updateProject(projectTitle, projectDescription, maxMember, isRecruiting);
+        if(imageUrls != null) {
+            this.imageUrls = imageUrls.isEmpty() ? null : String.join("||", imageUrls);
+        }
+    }
+
+    public List<String> getImageUrlList() {
+        if(imageUrls == null || imageUrls.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(imageUrls.split("\\|\\|"));
     }
 }
