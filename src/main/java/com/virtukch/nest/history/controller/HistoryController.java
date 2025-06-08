@@ -48,11 +48,6 @@ public class HistoryController {
     @GetMapping
     public ResponseEntity<List<HistoryResponseDto>> getHistories(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        if (customUserDetails == null) {
-            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
-                .body(null); // 혹은 custom error body
-        }
-
         Long memberId = customUserDetails.getMember().getMemberId();
         return ResponseEntity.ok(historyService.getHistoriesByMember(memberId));
     }

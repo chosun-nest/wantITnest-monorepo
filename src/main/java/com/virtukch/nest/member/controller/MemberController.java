@@ -36,12 +36,6 @@ public class MemberController {
     @GetMapping("/me")
     public ResponseEntity<MemberResponseDto> getMemberInfo(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-
-        if (customUserDetails == null) {
-            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
-                .body(null); // 혹은 custom error body
-        }
-
         return ResponseEntity.ok(
             memberService.getCurrentMemberByCustomUserDetails(customUserDetails));
     }
