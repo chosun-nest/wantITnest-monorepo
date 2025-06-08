@@ -1,5 +1,3 @@
-import React from "react";
-
 interface Notice {
   number: string;
   title: string;

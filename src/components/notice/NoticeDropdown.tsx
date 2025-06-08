@@ -1,4 +1,3 @@
-import React from "react";
 import { Listbox } from "@headlessui/react"; //설치 필요 패키지 (한 번만) - npm install @headlessui/react lucide-react
 import { ChevronDown, Check } from "lucide-react"; // 아이콘 없으면 제거해도 됨
 
@@ -18,19 +17,19 @@ const categories = [
 
 export default function NoticeDropdown({ selected, onChange }: Props) {
   return (
-    <div className="w-60 mb-4">
+    <div className="mb-4 w-60">
       <Listbox value={selected} onChange={onChange}>
         <div className="relative">
           {/* 선택된 항목 표시 버튼 */}
-          <Listbox.Button className="w-full cursor-pointer rounded-md border border-gray-300 bg-white py-2 pl-4 pr-10 text-left text-sm font-medium text-gray-700 shadow-sm hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <Listbox.Button className="w-full py-2 pl-4 pr-10 text-sm font-medium text-left text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm cursor-pointer hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400">
             <span>{selected}</span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <ChevronDown className="h-4 w-4 text-gray-400" />
+            <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <ChevronDown className="w-4 h-4 text-gray-400" />
             </span>
           </Listbox.Button>
 
           {/* 옵션 리스트 */}
-          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+          <Listbox.Options className="absolute z-50 w-full py-1 mt-1 overflow-auto text-sm bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none">
             {categories.map((category) => (
               <Listbox.Option
                 key={category}
