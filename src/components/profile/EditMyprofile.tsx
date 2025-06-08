@@ -8,6 +8,14 @@ import {
   updateMemberProfile,
 } from "../../api/profile/ProfileAPI";
 import axios from "axios";
+
+import {
+  Item,
+  DepartmentResponse,
+  TechStackResponse,
+  ProfileFormData,
+} from "../../types/profile";
+
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile/EditProfileImage";
 import EditProfileField from "./edit-myprofile/EditProfileField";
@@ -22,36 +30,20 @@ import { selectAccessToken } from "../../store/slices/authSlice";
 import { ModalContent } from "../../types/modal";
 import Modal from "../common/modal";
 
-interface Item {
-  id: number;
-  name: string;
-}
-interface DepartmentResponse {
-  departmentId: number;
-  departmentName: string;
-}
-// interface InterestResponse {
-//   interestId: number;
-//   interestName: string;
-// }
-interface TechStackResponse {
-  techStackId: number;
-  techStackName: string;
-}
-
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<ProfileFormData>({
     name: "",
     email: "",
     major: "",
     introduce: "",
-    interests: [] as string[],
+    interests: [],
     sns: ["", "", ""],
     image: "",
     uploadedImagePath: "",
-    techStacks: [] as string[],
+    techStacks: [],
   });
+
 
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [interestsList, setInterestsList] = useState<Item[]>([]);
@@ -252,7 +244,6 @@ export default function MyProfile() {
       setShowModal(true);
     }
   };
-
 
   const handleSave = async () => {
     if (!accessToken) return;

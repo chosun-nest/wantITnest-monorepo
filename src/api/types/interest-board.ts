@@ -4,9 +4,9 @@
 // [관심분야 게시판 글쓰기용 - board-write.tsx]
 // =========================================
 // 관심분야 게시글 작성 (POST)
-export interface CreatePostPayload {
-  title: string;
-  content: string;
+export interface CreatePostPayload {  // BE, redux 사용자 처리 완료 후, uid 추가하기
+  title: string;    
+  content: string;  
   tags: string[];
 }
 export interface CreatePostResponse {
