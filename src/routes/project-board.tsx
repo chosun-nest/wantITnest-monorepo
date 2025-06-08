@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { mockProjects } from "../constants/mock-projects";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getProjects, Project } from "../api/project/ProjectAPI";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 import BoardWriteButton from "../components/board/tag/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
@@ -10,27 +10,58 @@ const ITEMS_PER_PAGE = 7;
 export default function ProjectBoard() {
   const navigate = useNavigate();
   const isMobile = useResponsive();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<"전체" | "모집중" | "모집완료">("전체");
 
-  const fixedProjects = mockProjects.map((project) => {
-    if (project.status === "모집완료") {
-      const [curr, max] = project.participants.split("/");
-      if (curr !== max) {
-        return { ...project, participants: `${max}/${max}` };
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setAllProjects(data);
+      } catch (error) {
+        console.error("프로젝트 목록 불러오기 실패:", error);
+      } finally {
+        setLoading(false);
       }
-    }
-    return project;
+    };
+
+    fetchProjects();
+  }, []);
+
+  if (loading) {
+    return <div className="p-10 text-center">⏳ 로딩 중입니다...</div>;
+  }
+
+  // ✅ 임시 가공 로직: 닫힘 여부 → 모집 상태 / 참여자 수 가상 계산
+  const fixedProjects = allProjects.map((project) => {
+    const status = project.closed ? "모집완료" : "모집중";
+    const max = project.maxMember;
+    const curr = Math.floor(Math.random() * max); // 예시용 랜덤 참여 수
+    const participants = `${curr}/${max}`;
+    return {
+      ...project,
+      status,
+      participants,
+      title: project.projectTitle,
+      content: project.projectDescription,
+      tags: ["React", "UX/UI"], // 실제 백엔드에서 tags 필드 필요
+      author: { name: `유저#${project.projectLeaderId}` },
+      date: project.projectStartDate,
+      views: Math.floor(Math.random() * 200), // 예시용
+    };
   });
 
   const filteredProjects = [...fixedProjects]
     .sort(
       (a, b) =>
-        new Date(b.date.replace(/\./g, "-")).getTime() -
-        new Date(a.date.replace(/\./g, "-")).getTime()
+        new Date(b.date).getTime() - new Date(a.date).getTime()
     )
     .filter(
       (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
@@ -59,12 +90,12 @@ export default function ProjectBoard() {
   };
 
   const handleRowClick = (project: any) => {
-    navigate(`/project/${project.id}`, { state: { project } });
+    navigate(`/project/${project.projectId}`, { state: { project } });
   };
 
   return (
     <div className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}>
-      {/* 상단 필터와 제목 라인 */}
+      {/* 상단 필터 */}
       <div className={`flex ${isMobile ? "flex-col items-start gap-2" : "flex-row justify-between items-center"} mb-4`}>
         <h1 className="text-2xl font-bold text-[#00256c]">프로젝트 모집 게시판</h1>
         <div className="flex space-x-2">
@@ -82,9 +113,7 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      <hr className="mb-4" />
-
-      {/* 제목 아래 통계 + 검색창 */}
+      {/* 검색 + 태그 */}
       <div className={`flex ${isMobile ? "flex-col items-start gap-2" : "flex-row justify-between items-center"} mb-4`}>
         <p className="text-sm text-gray-600">
           총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
@@ -138,7 +167,7 @@ export default function ProjectBoard() {
 
           return (
             <div
-              key={project.id}
+              key={project.projectId}
               onClick={() => handleRowClick(project)}
               className="border rounded-lg p-4 cursor-pointer hover:shadow"
             >

@@ -109,19 +109,7 @@ API.interceptors.response.use(
     }
 
     // --- 403 처리 ---
-    if (status === 403) {
-      if (!errorMessage) {
-        console.warn("권한 문제(403).");
-        store.dispatch(
-          showModal({
-            title: "접근 권한 오류",
-            message: "로그인이 필요하거나 권한이 없습니다.",
-            type: "error",
-          })
-        );
-        store.dispatch(clearTokens());
-      }
-    }
+
 
     // 그 외 모든 에러는 그대로 반환
     return Promise.reject(error);
