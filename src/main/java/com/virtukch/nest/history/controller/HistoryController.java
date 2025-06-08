@@ -8,6 +8,7 @@ import com.virtukch.nest.history.dto.HistoryRequestDto;
 import com.virtukch.nest.history.dto.HistoryResponseDto;
 import com.virtukch.nest.history.service.HistoryService;
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,6 +48,11 @@ public class HistoryController {
     @GetMapping
     public ResponseEntity<List<HistoryResponseDto>> getHistories(
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        if (customUserDetails == null) {
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
+                .body(null); // 혹은 custom error body
+        }
+
         Long memberId = customUserDetails.getMember().getMemberId();
         return ResponseEntity.ok(historyService.getHistoriesByMember(memberId));
     }
