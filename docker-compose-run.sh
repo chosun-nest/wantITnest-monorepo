@@ -11,13 +11,13 @@ if [ "$1" == "up" ]; then
   
   # Spring Boot 프로젝트 빌드 (BE 서비스 준비)
   echo "🔨 Spring Boot 프로젝트 빌드 중..."
-  cd Nest-BE
+  cd backend
   ./gradlew bootJar
   cd ..
   
   # uploaded-images 디렉토리 생성
   echo "🗂️ 이미지 업로드 디렉토리 확인 중..."
-  mkdir -p Nest-BE/uploaded-images
+  mkdir -p backend/uploaded-images
   
   # Profile 환경변수 설정 후 Docker Compose 실행
   echo "🐳 Docker Compose로 모든 서비스 시작 중... (SPRING_PROFILES_ACTIVE=$PROFILE)"
@@ -38,7 +38,7 @@ if [ "$1" == "up" ]; then
 elif [ "$1" == "dev" ]; then
   echo "🧪 개발 모드로 모든 서비스를 시작합니다... (테스트 데이터 포함)"
   
-  cd Nest-BE
+  cd backend
   ./gradlew bootJar
   cd ..
   
@@ -56,7 +56,7 @@ elif [ "$1" == "dev" ]; then
 elif [ "$1" == "prod" ]; then
   echo "🚀 운영 모드로 모든 서비스를 시작합니다... (테스트 데이터 제외)"
   
-  cd Nest-BE
+  cd backend
   ./gradlew bootJar
   cd ..
   

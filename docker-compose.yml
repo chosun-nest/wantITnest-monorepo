@@ -1,22 +1,28 @@
 services:
-  # nest-ai:
-  #   container_name: nest-ai-crawler-8000-container
-  #   build:
-  #     context: ./NEST-AI
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "${NEST_AI_PORT}:${NEST_AI_PORT}"
-  #   environment:
-  #     SPRING_SERVER_URL: ${NEST_BE_BASE_URL}
-  #   restart: unless-stopped
-  #   networks:
-  #     - nest-network
+  nest-ai:
+    container_name: nest-ai-crawler-8000-container
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env  # 루트의 .env 파일 지정
+    ports:
+      - "${NEST_AI_PORT}:${NEST_AI_PORT}"
+    environment:
+      SPRING_SERVER_URL: ${NEST_BE_BASE_URL}
+    depends_on:
+      - nest-be
+    restart: unless-stopped
+    networks:
+      - nest-network
 
   nest-be:
     container_name: nest-be-spring-boot-6030-container
     build:
-      context: ./Nest-BE
+      context: ./backend
       dockerfile: Dockerfile
+    env_file:
+      - ./.env  # 루트의 .env 파일 지정
     ports:
       - "${NEST_BE_PORT}:${NEST_BE_PORT}"
     environment:
@@ -25,7 +31,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     volumes:
-      - ./Nest-BE/uploaded-images:/app/uploaded-images
+      - ./backend/uploaded-images:/app/uploaded-images
     restart: unless-stopped
     networks:
       - nest-network
@@ -33,8 +39,10 @@ services:
   nest-fe:
     container_name: nest-fe-react-dev-5173-container
     build:
-      context: ./Nest-FE
+      context: ./frontend
       dockerfile: Dockerfile
+    env_file:
+      - ./.env  # 루트의 .env 파일 지정
     ports:
       - "${NEST_FE_PORT}:${NEST_FE_PORT}"
     depends_on:
