@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getProjectById, updateProject, Project, UpdateProjectPayload } from "../api/project/ProjectAPI";
+import { getProjectById, updateProject } from "../api/project/ProjectAPI";
+import { ProjectDetail, UpdateProjectPayload } from "../types/project-board";
 
 export default function ProjectEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<ProjectDetail | null>(null);
 
   // 수정할 필드 상태값
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [maxMember, setMaxMember] = useState(1);
-  const [startDate, setStartDate] = useState("");
+  const [maxMember, setMaxMember] = useState(1); // ⚠️ 서버 응답에는 없지만 UI에선 필요
+  const [startDate, setStartDate] = useState(""); // ⚠️ 서버 응답에는 없지만 UI에선 필요
   const [endDate, setEndDate] = useState("");
 
-  // 1. 기존 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -24,9 +24,10 @@ export default function ProjectEdit() {
         setProject(data);
         setTitle(data.projectTitle);
         setDescription(data.projectDescription);
-        setMaxMember(data.maxMember);
-        setStartDate(data.projectStartDate);
-        setEndDate(data.projectEndDate);
+
+        // 서버에서 날짜 정보가 없으므로 비워두거나 필요 시 수동 설정
+        setStartDate(data.createdAt.split("T")[0]); // createdAt → YYYY-MM-DD 추출용
+        setEndDate(data.updatedAt.split("T")[0]);
       } catch (err) {
         alert("프로젝트 데이터를 불러오지 못했습니다.");
       } finally {
@@ -37,7 +38,6 @@ export default function ProjectEdit() {
     fetchData();
   }, [id]);
 
-  // 2. 수정 요청
   const handleSubmit = async () => {
     if (!id) return;
     if (!title || !description) {

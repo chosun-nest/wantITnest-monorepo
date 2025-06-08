@@ -1,80 +1,39 @@
 import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
 
-//
-// ✅ 1. 타입 정의
-//
+// ✅ 타입 분리 후 import
+import {
+  ProjectListResponse,
+  ProjectDetail,
+  CreateProjectPayload,
+  UpdateProjectPayload,
+  DeleteProjectResponse,
+  ApplyProjectPayload,
+  Applicant,
+} from "../types/project-board";
 
-// 백엔드에서 받은 Project 타입 (Swagger 기준)
-export interface Project {
-  projectId: number;
-  projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  projectLeaderId: number;
-  projectStartDate: string;
-  projectEndDate: string;
-  closed: boolean;
-}
-
-// 프로젝트 생성 시 필요한 데이터
-export interface CreateProjectPayload {
-  projectLeaderId: number;
-  projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  projectStartDate: string;
-  projectEndDate: string;
-}
-
-// 프로젝트 수정 시 필요한 데이터
-export interface UpdateProjectPayload {
-  projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  projectStartDate: string;
-  projectEndDate: string;
-}
-
-// 프로젝트 지원서 제출 시 필요한 데이터
-export interface ApplyProjectPayload {
-  projectId: number;
-  field: string;
-  message: string;
-}
-
-// 지원자 타입
-export interface Applicant {
-  id: number;
-  name: string;
-  major: string;
-  message: string;
-  role: string;
-  status: string;
-}
-
-//
-// ✅ 2. 프로젝트 관련 API
-//
-
-// 공통 헤더 생성 함수
+// ✅ 공통 인증 헤더
 const authHeader = () => ({
   headers: { Authorization: `Bearer ${getAccessToken()}` },
 });
 
-// 프로젝트 전체 목록 가져오기 (GET)
-export const getProjects = async (): Promise<Project[]> => {
+//
+// ✅ 프로젝트 관련 API
+//
+
+// 전체 프로젝트 목록 가져오기
+export const getProjects = async (): Promise<ProjectListResponse> => {
   const res = await API.get("/api/v1/projects", authHeader());
   return res.data;
 };
 
-// 특정 프로젝트 상세 조회 (GET)
-export const getProjectById = async (id: number): Promise<Project> => {
-  const res = await API.get(`/api/v1/projects/${id}`, authHeader());
+// 특정 프로젝트 상세 조회
+export const getProjectById = async (projectId: number): Promise<ProjectDetail> => {
+  const res = await API.get(`/api/v1/projects/${projectId}`, authHeader());
   return res.data;
 };
 
-// 프로젝트 생성 (POST)
+// 프로젝트 생성
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<number> => {
@@ -82,7 +41,7 @@ export const createProject = async (
   return res.data;
 };
 
-// 프로젝트 수정 (PATCH)
+// 프로젝트 수정
 export const updateProject = async (
   projectId: number,
   payload: UpdateProjectPayload
@@ -90,23 +49,26 @@ export const updateProject = async (
   await API.patch(`/api/v1/projects/${projectId}`, payload, authHeader());
 };
 
-// 프로젝트 삭제 (DELETE)
-export const deleteProject = async (projectId: number): Promise<void> => {
-  await API.delete(`/api/v1/projects/${projectId}`, authHeader());
+// 프로젝트 삭제
+export const deleteProject = async (
+  projectId: number
+): Promise<DeleteProjectResponse> => {
+  const res = await API.delete(`/api/v1/projects/${projectId}`, authHeader());
+  return res.data;
 };
 
 //
-// ✅ 3. 지원서 관련 API
+// ✅ 지원서 관련 API
 //
 
-// 프로젝트 지원서 제출 (POST)
+// 프로젝트 지원서 제출
 export const applyToProject = async (
   payload: ApplyProjectPayload
 ): Promise<void> => {
   await API.post("/api/v1/applications", payload, authHeader());
 };
 
-// 특정 프로젝트의 지원자 목록 조회 (GET)
+// 특정 프로젝트의 지원자 목록 조회
 export const getApplicationsByProjectId = async (
   projectId: number
 ): Promise<Applicant[]> => {
