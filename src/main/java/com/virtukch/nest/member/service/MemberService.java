@@ -99,7 +99,7 @@ public class MemberService {
             .memberIntroduce(member.getMemberIntroduce())
             .memberImageUrl(member.getMemberImageUrl())
             .memberPasswordLength(member.getMemberPasswordLength())
-            .memberInterestResponseDtoList(memberInterestResponseDtoList)
+//            .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
             .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
             .build();
