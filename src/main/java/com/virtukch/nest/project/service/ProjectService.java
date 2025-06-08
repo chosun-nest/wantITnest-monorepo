@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.service;
 
+import com.virtukch.nest.common.service.ImageService;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.post.repository.PostRepository;
@@ -39,7 +40,8 @@ public class ProjectService {
     private final TagService tagService;
 //    private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
-    private final PostRepository postRepository;
+    private final ImageService imageService;
+    private final String prefix = "project";
 
     @Transactional
     public ProjectResponseDto createProject(Long memberId, ProjectRequestDto dto) {
@@ -101,6 +103,20 @@ public class ProjectService {
 
         projectTagRepository.deleteAllByProjectId(projectId);
 
+        saveProjectTags(project, requestDto.getTags());
+
+        return ProjectDtoConverter.toUpdateResponseDto(project);
+    }
+
+    @Transactional
+    public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectWithImagesRequestDto requestDto){
+        Project project = validateProjectOwnershipAndGet(projectId, memberId);
+
+        List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, projectId, project.getImageUrlList());
+        project.updateProject(project.getProjectTitle(), project.getProjectDescription(),
+                project.getMaxMember(), project.isRecruiting(), imageUrls);
+
+        projectTagRepository.deleteAllByProjectId(project.getProjectId());
         saveProjectTags(project, requestDto.getTags());
 
         return ProjectDtoConverter.toUpdateResponseDto(project);

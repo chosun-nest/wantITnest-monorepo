@@ -24,7 +24,6 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final PostService postService;
 
     // 프로젝트 생성
     @PostMapping("/new")
