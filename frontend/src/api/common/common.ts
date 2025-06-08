@@ -7,7 +7,7 @@ export const getTech = async () => {
 };
 
 export const getInterests = async () => {
-  const res = API.get("/api/v1/interests", { headers: { skipAuth: true } });
+  const res = API.get("/api/v1/favorite/tag", { headers: { skipAuth: true } });
   return (await res).data;
 };
 

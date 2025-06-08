@@ -6,6 +6,13 @@ import Login from "./routes/login";
 import SignUp from "./routes/signup";
 import PasswdReset from "./routes/passwd-reset";
 import Layout from "./components/layout/layout";
+
+//yeong-eun : 앱 로드될 때 user 정보를 redux에 저장. 게시판에서 본인/타인 구분하는데 사용
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { getMemberProfile } from "./api/profile/ProfileAPI";
+import { setUser, clearUser } from "./store/slices/userSlice";
+
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
 import ProjectApply from "./routes/project-apply"; // yu-gyeom
@@ -143,6 +150,25 @@ const router = createBrowserRouter([
 
 function App() {
   const [showBackdrop, setShowBackdrop] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const initUser = async () => {
+      try {
+        const user = await getMemberProfile();
+        dispatch(setUser({
+          memberId: user.memberId,    // 사용자 id
+          memberName: user.memberName,// 사용자 이름
+          memberRole: user.memberRole,// 사용자 역할 redux에 저장
+        }));
+      } catch {
+        dispatch(clearUser());
+      }
+    };
+
+    initUser();
+  }, [dispatch]);
+
   return (
     <>
       <BackdropContext.Provider value={{ showBackdrop, setShowBackdrop }}>

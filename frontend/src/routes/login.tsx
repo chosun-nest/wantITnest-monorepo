@@ -36,6 +36,7 @@ export default function Login() {
         setTokens({
           accessToken: res.accessToken,
           refreshToken: res.refreshToken,
+          userId: res.userId,
         })
       );
       navigate("/");

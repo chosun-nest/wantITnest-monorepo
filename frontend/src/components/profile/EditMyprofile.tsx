@@ -2,12 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   getMemberProfile,
   getTech,
-  getInterests,
+  getFavoriteTags, addFavoriteTag, deleteFavoriteTag,
   getDepartments,
   uploadProfileImage,
   updateMemberProfile,
 } from "../../api/profile/ProfileAPI";
 import axios from "axios";
+
+import {
+  Item,
+  DepartmentResponse,
+  TechStackResponse,
+  ProfileFormData,
+} from "../../types/profile";
+
 // 하위 컴포넌트 import
 import EditProfileImage from "./edit-myprofile/EditProfileImage";
 import EditProfileField from "./edit-myprofile/EditProfileField";
@@ -22,36 +30,20 @@ import { selectAccessToken } from "../../store/slices/authSlice";
 import { ModalContent } from "../../types/modal";
 import Modal from "../common/modal";
 
-interface Item {
-  id: number;
-  name: string;
-}
-interface DepartmentResponse {
-  departmentId: number;
-  departmentName: string;
-}
-interface InterestResponse {
-  interestId: number;
-  interestName: string;
-}
-interface TechStackResponse {
-  techStackId: number;
-  techStackName: string;
-}
-
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<ProfileFormData>({
     name: "",
     email: "",
     major: "",
     introduce: "",
-    interests: [] as string[],
+    interests: [],
     sns: ["", "", ""],
     image: "",
     uploadedImagePath: "",
-    techStacks: [] as string[],
+    techStacks: [],
   });
+
 
   const [departmentsList, setDepartmentsList] = useState<Item[]>([]);
   const [interestsList, setInterestsList] = useState<Item[]>([]);
@@ -109,28 +101,26 @@ export default function MyProfile() {
   };
 
   const getItems = async () => {
-    const [deps, ints, techs] = await Promise.all([
+    const [deps, techs, tags] = await Promise.all([
       getDepartments(),
-      getInterests(),
       getTech(),
+      getFavoriteTags(),
     ]);
 
-    const formattedDepartments = deps.map((d: DepartmentResponse) => ({
+    setDepartmentsList(deps.map((d: DepartmentResponse) => ({
       id: d.departmentId,
       name: d.departmentName,
-    }));
-    const formattedInterests = ints.map((i: InterestResponse) => ({
-      id: i.interestId,
-      name: i.interestName,
-    }));
-    const formattedTechs = techs.map((t: TechStackResponse) => ({
+    })));
+
+    setTechList(techs.map((t: TechStackResponse) => ({
       id: t.techStackId,
       name: t.techStackName,
-    }));
+    })));
 
-    setDepartmentsList(formattedDepartments);
-    setInterestsList(formattedInterests);
-    setTechList(formattedTechs);
+    setInterestsList(tags.map((t) => ({
+      id: t.tagId,
+      name: t.tagName,
+    })));
   };
 
   const handleChange = (field: string, value: string) => {
@@ -161,15 +151,35 @@ export default function MyProfile() {
     setFilteredInterests(filtered);
   };
 
-  const handleSelectInterest = (item: Item) => {
+  const handleSelectInterest = async (item: Item) => {
     if (!profile.interests.includes(item.name)) {
-      setProfile((prev) => ({
-        ...prev,
-        interests: [...prev.interests, item.name],
-      }));
+      try {
+        await addFavoriteTag(item.name);
+        setProfile((prev) => ({
+          ...prev,
+          interests: [...prev.interests, item.name],
+        }));
+      } catch (e) {
+        console.error("관심 태그 추가 실패", e);
+      }
     }
     setNewInterest("");
     setFilteredInterests([]);
+  };
+
+  const handleDeleteItem = async (field: "interests" | "techStacks", index: number) => {
+    const tagName = profile[field][index];
+    if (field === "interests") {
+      try {
+        await deleteFavoriteTag(tagName);
+      } catch (e) {
+        console.error("관심 태그 삭제 실패", e);
+      }
+    }
+    setProfile((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
   };
 
   const handleTechInputChange = (value: string) => {
@@ -192,16 +202,6 @@ export default function MyProfile() {
     setFilteredTechs([]);
   };
 
-  const handleDeleteItem = (
-    field: "interests" | "techStacks",
-    index: number
-  ) => {
-    setProfile((prev) => ({
-      ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
-    }));
-  };
-  
   // 이미지 변경 함수
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -245,7 +245,6 @@ export default function MyProfile() {
     }
   };
 
-
   const handleSave = async () => {
     if (!accessToken) return;
 
@@ -253,9 +252,9 @@ export default function MyProfile() {
       const departmentId = departmentsList.find(
         (d) => d.name === profile.major
       )?.id;
-      const interestIdList = interestsList
-        .filter((i) => profile.interests.includes(i.name))
-        .map((i) => i.id);
+      // const interestIdList = interestsList
+      //   .filter((i) => profile.interests.includes(i.name))
+      //   .map((i) => i.id);
       const techStackIdList = techList
         .filter((t) => profile.techStacks.includes(t.name))
         .map((t) => t.id);
@@ -271,7 +270,7 @@ export default function MyProfile() {
         memberSnsUrl2: sns2,
         memberSnsUrl3: sns3,
         memberDepartmentUpdateRequestIdList: departmentId ? [departmentId] : [],
-        memberInterestUpdateRequestIdList: interestIdList,
+        // interests는 favoriteTags API로 따로 관리되므로 불필요
         memberTechStackUpdateRequestIdList: techStackIdList,
       });
       

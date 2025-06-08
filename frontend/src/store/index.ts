@@ -13,16 +13,18 @@ import {
 } from "redux-persist";
 import authReducer from "./slices/authSlice";
 import modalReducer from "./slices/modalSlice";
+import userReducer from "./slices/userSlice"; // yeong-eun. 게시글 UI 본인/다른사용자 구분하기 위해 userSlice 만듦.
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"],
+  whitelist: ["auth", "userId"],
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   modal: modalReducer,
+  user: userReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -39,7 +39,6 @@ type SignUpDetailProps = {
   skills: Item[];
   onChangeSkills: (values: Item[]) => void;
   techList: Item[];
-  interestsList: Item[];
   departmentsList: Item[];
 };
 
@@ -52,8 +51,6 @@ type SignupPayload = {
   interestIdList: number[];
   techStackIdList: number[];
 };
-
-
 
 export type {
   SignupPayload,
