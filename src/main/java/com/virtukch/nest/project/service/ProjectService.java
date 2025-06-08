@@ -2,6 +2,7 @@ package com.virtukch.nest.project.service;
 
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
+import com.virtukch.nest.post.repository.PostRepository;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
@@ -13,6 +14,7 @@ import com.virtukch.nest.project_tag.model.ProjectTag;
 import com.virtukch.nest.project_tag.repository.ProjectTagRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import com.virtukch.nest.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class ProjectService {
     private final TagService tagService;
 //    private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public ProjectResponseDto createProject(Long memberId, ProjectRequestDto dto) {
@@ -147,6 +150,53 @@ public class ProjectService {
                 .map(tag -> new ProjectTag(project.getProjectId(), tag.getId()))
                 .forEachOrdered(projectTagRepository::save);
     }
+
+
+    @Transactional(readOnly = true)
+    public ProjectListResponseDto searchProjects(String keyword, String searchType, Pageable pageable) {
+        Page<Project> projectPage;
+
+        switch (searchType) {
+            case "TITLE" -> projectPage = projectRepository
+                    .findByProjectTitleContainingIgnoreCase(keyword, pageable);
+            case "CONTENT" -> projectPage = projectRepository
+                    .findByProjectDescriptionContainingIgnoreCase(keyword, pageable);
+            default -> projectPage = projectRepository
+                    .findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContainingIgnoreCase(keyword, keyword, pageable);
+        }
+        return buildProjectListResponse(projectPage);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectListResponseDto searchProjectsWithTags(String keyword, List<String> tags, String searchType, Pageable pageable) {
+        List<Long> tagIds = tags.stream()
+                .map(tagService::findByNameOrThrow)
+                .map(Tag::getId)
+                .toList();
+
+        List<Long> projectIds = projectTagRepository.findByTagIdIn(tagIds).stream()
+                .map(ProjectTag::getProjectId)
+                .distinct()
+                .toList();
+
+        if(projectIds.isEmpty()) {
+            Page<Project> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+            return buildProjectListResponse(emptyPage);
+        }
+
+        Page<Project> projectPage;
+        switch (searchType.toUpperCase()) {
+            case "TITLE" -> projectPage = projectRepository
+                    .findByProjectIdInAndProjectTitleContainingIgnoreCase(projectIds, keyword, pageable);
+            case "CONTENT" -> projectPage = projectRepository
+                    .findByProjectIdInAndProjectDescriptionContaining(projectIds, keyword, pageable);
+            default -> projectPage = projectRepository
+                    .findByProjectIdInAndProjectTitleContainingIgnoreCaseOrProjectIdInAndProjectDescriptionContainingIgnoreCase(projectIds, keyword, projectIds, keyword, pageable);
+        }
+
+        return buildProjectListResponse(projectPage);
+    }
+
 
     private List<String> extractTagNames(Long projectId) {
         List<ProjectTag> projectTags = projectTagRepository.findAllByProjectId(projectId);
