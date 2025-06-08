@@ -12,6 +12,7 @@ import com.virtukch.nest.common.dto.CommonResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -58,8 +59,13 @@ public class AuthController {
     )
     @GetMapping("/me")
     public ResponseEntity<Long> getMemberIdFromJWT(
-        @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        log.info("customUserDetails: {}", customUserDetails);
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        if (customUserDetails == null) {
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
+                .body(null); // 혹은 custom error body
+        }
+
         return ResponseEntity.ok(customUserDetails.getMember().getMemberId());
     }
 
