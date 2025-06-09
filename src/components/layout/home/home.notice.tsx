@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Notice } from "../../notice/NoticeBoard";
+import { Notice } from "../../../routes/NoticeBoard";
 import { fetchNotices } from "../../../api/notices/NoticesAPI";
 import NoticeCard from "../../notice/NoticeCard";
 

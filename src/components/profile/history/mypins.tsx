@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-<<<<<<< HEAD
-import { FaStar, FaRegStar } from "react-icons/fa"; // ★ 추가: 비어있는 별
-=======
 import { FaStar, FaRegStar } from "react-icons/fa";
->>>>>>> origin/dev
 import {
   getUsersAllHistory,
   updateHistory,
@@ -47,33 +43,6 @@ export default function MyPin({ title, editable = false }: MyPinProps) {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <ul className="mb-4 space-y-1">
-      <li className="font-semibold">{title}</li>
-      {pinnedItems.length > 0 ? (
-        pinnedItems.map((item, idx) => (
-          <li key={idx} className="flex items-center gap-2 ml-4 text-gray-800">
-            •{" "}
-            <strong>
-              {item.startDate}~{item.endDate}
-            </strong>{" "}
-            {item.content}
-            {editable && (
-              <button onClick={() => toggleImportant(item)}>
-                {item.important ? (
-                  <FaStar className="text-yellow-400 cursor-pointer" />
-                ) : (
-                  <FaRegStar className="text-black border border-black cursor-pointer" />
-                )}
-              </button>
-            )}
-          </li>
-        ))
-      ) : (
-        <li className="text-sm text-gray-400 ml-4">
-          중요 표시된 항목이 없습니다
-        </li>
-=======
     <div className="mb-6">
       <h3 className="text-base font-semibold text-gray-700 mb-3">{title}</h3>
 
@@ -110,8 +79,7 @@ export default function MyPin({ title, editable = false }: MyPinProps) {
         <div className="text-sm text-gray-400 ml-1">
           중요 표시된 항목이 없습니다
         </div>
->>>>>>> origin/dev
       )}
-    </ul>
+    </div>
   );
 }

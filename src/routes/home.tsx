@@ -37,19 +37,13 @@ export default function Home() {
         <S.ItemTitle>
           관심분야 게시판<Link to="/interests-board">+</Link>
         </S.ItemTitle>
-<<<<<<< HEAD
-=======
         <HomeInterest />
->>>>>>> origin/dev
       </S.GridItem>
       <S.GridItem $row="1" $isMobile={isMobile} $col="3">
         <S.ItemTitle>
           학사 공지<Link to="/notice-board">+</Link>
         </S.ItemTitle>
-<<<<<<< HEAD
-=======
         <HomeNotice />
->>>>>>> origin/dev
       </S.GridItem>
       <S.GridItem $row="2" $isMobile={isMobile} $col="3">
         <S.ItemTitle>

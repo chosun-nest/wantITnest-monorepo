@@ -16,7 +16,7 @@ import { setUser, clearUser } from "./store/slices/userSlice";
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
 import ProjectApply from "./routes/project-apply"; // yu-gyeom
-import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
+import NoticeBoard from "./routes/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import InterestsDetail from "./routes/interests-detail"; //yeong-eun
 import BoardWrite from "./routes/board-write"; //yeong-eun

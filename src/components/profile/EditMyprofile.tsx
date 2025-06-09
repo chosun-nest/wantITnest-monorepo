@@ -30,26 +30,6 @@ import { selectAccessToken } from "../../store/slices/authSlice";
 import { ModalContent } from "../../types/modal";
 import Modal from "../common/modal";
 
-<<<<<<< HEAD
-interface Item {
-  id: number;
-  name: string;
-}
-interface DepartmentResponse {
-  departmentId: number;
-  departmentName: string;
-}
-// interface InterestResponse {
-//   interestId: number;
-//   interestName: string;
-// }
-interface TechStackResponse {
-  techStackId: number;
-  techStackName: string;
-}
-
-=======
->>>>>>> origin/dev
 export default function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<ProfileFormData>({
