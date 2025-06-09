@@ -59,7 +59,10 @@ export interface PostSummary {   // 게시글 요약 (게시글 카드)
   postId: number;               // 게시글 id
   title: string;            // 게시글 제목
   previewContent: string;   // 본문 미리보기
-  authorName: string;       // 작성자 이름
+  author: {         // 작성자 정보
+    id: number;
+    name: string;
+  };
   tags: string[];           // 태그
   viewCount: number;        // 조회수
   likeCount: number;        // 좋아요수
@@ -106,7 +109,10 @@ export interface SearchPost {
   id: number;
   title: string;
   previewContent: string;
-  authorName: string;
+  author: {         // 작성자 정보
+    id: number;
+    name: string;
+  };
   tags: string[];
   viewCount: number;
   likeCount: number;

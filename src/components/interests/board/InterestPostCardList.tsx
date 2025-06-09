@@ -6,7 +6,10 @@ interface InterestPostCardListProps {
     title: string;
     previewContent: string;
     tags: string[];
-    authorName: string;
+    author: {         // 작성자 정보
+      id: number;
+      name: string;
+    };
     createdAt: string;
     viewCount: number;
     likeCount: number;
@@ -24,7 +27,7 @@ export default function InterestPostCardList({
   return (
     <div className="space-y-4">
       {posts
-        .filter((post) => !!post.postId)
+        .filter((post) => !!post.postId && !!post.author)
         .map((post) => (
           <div
             key={post.postId}
@@ -62,7 +65,15 @@ export default function InterestPostCardList({
 
             <div className="flex justify-between text-xs text-gray-500">
               <span>
-                {post.authorName} • {post.createdAt}
+                {post.author ? (
+                  <span>
+                    {post.author.name} • {post.createdAt}
+                  </span>
+                ) : (
+                  <span>
+                    작성자 없음 • {post.createdAt}
+                  </span>
+                )}
               </span>
               <div className="flex gap-3">
                 <span>조회수 {post.viewCount}</span>

@@ -92,7 +92,7 @@ export default function InterestBoard() {
             postId: "postId" in post ? post.postId : post.id,
             title: post.title,
             previewContent: post.previewContent,
-            authorName: post.authorName,
+            author: post.author,
             tags: post.tags ?? [],
             createdAt: post.createdAt,
             viewCount: post.viewCount ?? 0,

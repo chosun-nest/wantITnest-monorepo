@@ -1,32 +1,38 @@
 // 관심분야 정보 게시판 댓글 전체 랜더링 컨트롤
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { showModal } from "../../../store/slices/modalSlice";
-//import { useSelector, useDispatch } from "react-redux"; // 리덕스를 통해 사용자 구분 상태 관리
-import { useDispatch } from "react-redux"
-//import { setUser, selectCurrentUserId } from "../../../store/slices/userSlice"; // memberId, memberName, memberRole
 import {
   fetchComments,
   createComment,
 } from "../../../api/board-common/CommentAPI";
-import type { Comment, BoardType } from "../../../types/api/comments";
+import type { RawComment, CommentWithReplies, BoardType } from "../../../types/api/comments";
 import CommentList from "./CommentList";
 import CommentForm from "./CommentForm";
 import SkeletonComment from "./SkeletonComment";
 
 export default function CommentSection({ boardType, postId }: { boardType: BoardType; postId: number }) {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentWithReplies[]>([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
   const memberId = Number(localStorage.getItem("memberId"));
   const isLoggedIn = !Number.isNaN(memberId);
 
+  // children → replies 변환 함수
+  const mapBackendComments = (rawComments: RawComment[]): CommentWithReplies[] => {
+    return rawComments.map((comment) => ({
+      ...comment,
+      replies: comment.children ? mapBackendComments(comment.children) : [],
+    }));
+  };
+
   const loadComments = async () => {
     setLoading(true);
     try {
       const res = await fetchComments(boardType, postId);
-      console.log("🔍 댓글 목록:", res.comments);
-      setComments(res.comments);
+      const converted = mapBackendComments(res.comments);
+      setComments(converted);
     } catch (err) {
       console.error("댓글 불러오기 실패", err);
       dispatch(
@@ -43,6 +49,7 @@ export default function CommentSection({ boardType, postId }: { boardType: Board
 
   useEffect(() => {
     loadComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId]);
 
   const handleAddComment = async (content: string) => {
@@ -58,8 +65,8 @@ export default function CommentSection({ boardType, postId }: { boardType: Board
     }
     try {
       await createComment(boardType, postId, { content });
-      await new Promise((res) => setTimeout(res, 300));   // 약간의 지연 후, 다시 댓글 부르기
-      await loadComments(); // 반드시 최신 목록을 다시 불러오기
+      await new Promise((res) => setTimeout(res, 300)); // 약간의 지연
+      await loadComments();
     } catch (err) {
       console.error("댓글 작성 실패", err);
       dispatch(

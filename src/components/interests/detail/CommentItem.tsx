@@ -7,27 +7,32 @@ import {
   updateComment,
   createReplyComment,
 } from "../../../api/board-common/CommentAPI";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { showModal } from "../../../store/slices/modalSlice";
-import { MoreVertical } from "lucide-react";
+import { selectCurrentUserId } from "../../../store/slices/userSlice";
+import { DotsThreeVertical } from "phosphor-react";
 
 interface CommentItemProps {
   comment: Comment & { replies: Comment[] };
   boardType: BoardType;
   postId: number;
-  memberId?: number;
   onRefresh: () => void;
 }
 
-export default function CommentItem({ comment, boardType, postId, memberId, onRefresh }: CommentItemProps) {
+export default function CommentItem({
+  comment,
+  boardType,
+  postId,
+  onRefresh,
+}: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const dispatch = useDispatch();
+  const currentUserId = useSelector(selectCurrentUserId);
+  const isMine = comment.author?.id === currentUserId;
 
   const menuRef = useRef<HTMLDivElement>(null);
-  const username = localStorage.getItem("username");
-  const isMine = username && comment.authorName === username;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,11 +51,13 @@ export default function CommentItem({ comment, boardType, postId, memberId, onRe
       await deleteComment(boardType, postId, comment.commentId);
       onRefresh();
     } catch {
-      dispatch(showModal({
-        title: "삭제 실패",
-        message: "댓글을 삭제하는 중 문제가 발생했습니다.",
-        type: "error",
-      }));
+      dispatch(
+        showModal({
+          title: "삭제 실패",
+          message: "댓글을 삭제하는 중 문제가 발생했습니다.",
+          type: "error",
+        })
+      );
     }
   };
 
@@ -60,11 +67,13 @@ export default function CommentItem({ comment, boardType, postId, memberId, onRe
       setIsEditing(false);
       onRefresh();
     } catch {
-      dispatch(showModal({
-        title: "수정 실패",
-        message: "댓글 수정 중 문제가 발생했습니다.",
-        type: "error",
-      }));
+      dispatch(
+        showModal({
+          title: "수정 실패",
+          message: "댓글 수정 중 문제가 발생했습니다.",
+          type: "error",
+        })
+      );
     }
   };
 
@@ -74,65 +83,73 @@ export default function CommentItem({ comment, boardType, postId, memberId, onRe
       setIsReplying(false);
       onRefresh();
     } catch {
-      dispatch(showModal({
-        title: "대댓글 실패",
-        message: "답글 작성 중 문제가 발생했습니다.",
-        type: "error",
-      }));
+      dispatch(
+        showModal({
+          title: "대댓글 실패",
+          message: "답글 작성 중 문제가 발생했습니다.",
+          type: "error",
+        })
+      );
     }
   };
 
   return (
     <div className="flex gap-3 px-4 py-3 border-b">
-      {/* 프로필 이미지 */}
       <img
         src="/default-profile.png"
         alt="profile"
         className="object-cover w-10 h-10 rounded-full"
       />
 
-      {/* 본문 */}
       <div className="flex-1">
-        {/* 상단 정보 */}
         <div className="flex items-center text-sm text-gray-500">
-          <span className="font-semibold text-black">{comment.authorName}</span>
+          <span className="font-semibold text-black">{comment.author.name}</span>
           <span className="mx-1">·</span>
           <span>{comment.createdAt.slice(0, 16).replace("T", " ")}</span>
-          <span className="mx-1">·</span>
-          <button className="hover:underline">신고</button>
 
-          {isMine && (
-            <div className="relative ml-auto" ref={menuRef}>
-              <button onClick={() => setShowMenu(!showMenu)} className="p-1">
-                <MoreVertical size={16} />
-              </button>
-              {showMenu && (
-                <div className="absolute right-0 z-10 mt-2 text-sm bg-white border rounded shadow-sm w-28">
+          <div className="relative ml-auto" ref={menuRef}>
+            <button
+              className="p-2 text-gray-500 rounded hover:bg-gray-100"
+              onClick={() => setShowMenu(!showMenu)}
+            >
+              <DotsThreeVertical size={20} weight="bold" />
+            </button>
+
+            {showMenu && (
+              <div className="absolute right-0 z-20 mt-2 bg-white border border-gray-200 rounded shadow-md w-36">
+                {isMine ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsEditing(true);
+                        setShowMenu(false);
+                      }}
+                      className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
+                    >
+                      댓글 수정
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleDelete();
+                        setShowMenu(false);
+                      }}
+                      className="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-gray-100"
+                    >
+                      댓글 삭제
+                    </button>
+                  </>
+                ) : (
                   <button
-                    className="w-full px-3 py-2 text-left hover:bg-gray-100"
-                    onClick={() => {
-                      setIsEditing(true);
-                      setShowMenu(false);
-                    }}
+                    className="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-gray-100"
                   >
-                    수정
+                    신고하기
                   </button>
-                  <button
-                    className="w-full px-3 py-2 text-left text-red-500 hover:bg-gray-100"
-                    onClick={() => {
-                      handleDelete();
-                      setShowMenu(false);
-                    }}
-                  >
-                    삭제
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 본문 or 수정 */}
         <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">
           {isEditing ? (
             <CommentForm
@@ -148,16 +165,17 @@ export default function CommentItem({ comment, boardType, postId, memberId, onRe
           )}
         </div>
 
-        {/* 하단 버튼 */}
         {!comment.isDeleted && (
           <div className="mt-2 text-sm text-gray-500">
-            <button onClick={() => setIsReplying(!isReplying)} className="hover:underline">
+            <button
+              onClick={() => setIsReplying(!isReplying)}
+              className="hover:underline"
+            >
               {isReplying ? "취소" : "답글"}
             </button>
           </div>
         )}
 
-        {/* 대댓글 입력 */}
         {isReplying && (
           <div className="mt-2">
             <CommentForm
@@ -169,16 +187,14 @@ export default function CommentItem({ comment, boardType, postId, memberId, onRe
           </div>
         )}
 
-        {/* 대댓글 목록 */}
         {comment.replies.length > 0 && (
           <div className="mt-4 ml-4 space-y-2">
             {comment.replies.map((reply) => (
               <CommentItem
                 key={reply.commentId}
-                comment={{ ...reply, replies: [] }}
+                comment={reply as Comment & { replies: Comment[] }}
                 boardType={boardType}
                 postId={postId}
-                memberId={memberId}
                 onRefresh={onRefresh}
               />
             ))}
