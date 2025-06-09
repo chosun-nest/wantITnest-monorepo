@@ -39,7 +39,7 @@ public class NoticeService {
      * @throws InvalidNoticeTypeException 유효하지 않은 공지사항 유형이 있을 경우
      */
     @Transactional
-    public int ㅋ(NoticeRequestDto requestDto, String noticeType) {
+    public int saveNotices(NoticeRequestDto requestDto, String noticeType) {
         List<Map<String, Object>> notices = requestDto.getNotices();
 
         // 데이터 유효성 검사
