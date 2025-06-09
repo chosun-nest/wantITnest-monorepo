@@ -69,7 +69,7 @@ export default function HistoryContainer({
               memberId,
             })
           }
-          className="px-4 py-1.5 text-xs rounded-md bg-[#1877F2] text-white hover:bg-blue-600 transition-all"
+          className="px-4 py-1.5 text-xs rounded-md bg-[#002f6c] text-white hover:bg-blue-600 transition-all"
         >
           수정
         </button>
