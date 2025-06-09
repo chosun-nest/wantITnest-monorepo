@@ -7,49 +7,45 @@ import {
 
 // 프로필 API
 import { API } from "..";
-import { getAccessToken } from "../../utils/auth";
-
-// 공통 인증 헤더
-const authHeader = () => ({
-  headers: { Authorization: `Bearer ${getAccessToken()}` },
-});
 
 // 프로필 이미지 업로드 (POST)
 export const uploadProfileImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await API.post(
-    "/api/v1/members/me/image",
-    formData,
-    authHeader()
-  );
+  const res = await API.post("/api/v1/members/me/image", formData, {
+    headers: { skipAuth: false },
+  });
   return res.data.imageUrl;
 };
 
 // 비밀번호 확인 (POST)
 export const checkPassword = async (payload: CheckPasswordPayload) => {
   return API.post("/api/v1/members/check-password", payload, {
-    ...authHeader(),
+    headers: { skipAuth: false },
     validateStatus: (status) => status < 500,
   });
 };
 
 // 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
-  const res = await API.get("/api/v1/members/me", authHeader());
-  const BASE_URL = "http://49.246.71.236:6030"; // 백엔드에서 이미지가 서빙되는 절대 주소
+  const res = await API.get("/api/v1/members/me", {
+    headers: { skipAuth: false },
+  });
+  const BASE_URL = "http://49.246.71.236:6030";
 
   return {
     ...res.data,
-    memberImageUrl: res.data.memberImageUrl // memberImageUrl이 존재
-      ? `${BASE_URL}${res.data.memberImageUrl}` // BASE_URL + memberImageUrl = 절대 경로로 변환
-      : "", // memberImageUrl이 없으면 빈 문자열을 반환(이미지 없는 상태)
+    memberImageUrl: res.data.memberImageUrl
+      ? `${BASE_URL}${res.data.memberImageUrl}`
+      : "",
   };
 };
 
 // 회원 탈퇴 (DELETE)
 export const withdrawMember = async (): Promise<{ message: string }> => {
-  const res = await API.delete("/api/v1/members/me", authHeader());
+  const res = await API.delete("/api/v1/members/me", {
+    headers: { skipAuth: false },
+  });
   return res.data;
 };
 
@@ -57,18 +53,18 @@ export const withdrawMember = async (): Promise<{ message: string }> => {
 export const updateMemberProfile = async (
   payload: UpdateMemberProfilePayload
 ) => {
-  return await API.patch("/api/v1/members/me", payload, authHeader());
+  return await API.patch("/api/v1/members/me", payload, {
+    headers: { skipAuth: false },
+  });
 };
 
 // 비밀번호 변경 (PATCH)
 export const updateMemberPassword = async (
   payload: UpdateMemberPasswordPayload
 ): Promise<{ message: string }> => {
-  const res = await API.patch(
-    "/api/v1/members/me/password",
-    payload,
-    authHeader()
-  );
+  const res = await API.patch("/api/v1/members/me/password", payload, {
+    headers: { skipAuth: false },
+  });
   return res.data;
 };
 
@@ -76,7 +72,9 @@ export const updateMemberPassword = async (
 // 인증 관련 API
 // 토큰 유효성 검사 (GET)
 export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
-  const res = await API.get("/api/v1/auth/me", authHeader());
+  const res = await API.get("/api/v1/auth/me", {
+    headers: { skipAuth: false },
+  });
   return res.data;
 };
 
@@ -104,7 +102,9 @@ export const getDepartments = async () => {
 export const getFavoriteTags = async (): Promise<
   { tagId: number; tagName: string }[]
 > => {
-  const res = await API.get("/api/v1/favorites/tags", authHeader());
+  const res = await API.get("/api/v1/favorites/tags", {
+    headers: { skipAuth: false },
+  });
   return res.data.favoriteTags;
 };
 
@@ -113,7 +113,9 @@ export const addFavoriteTag = async (tagName: string): Promise<void> => {
   await API.post(
     `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
     null,
-    authHeader()
+    {
+      headers: { skipAuth: false },
+    }
   );
 };
 
@@ -121,6 +123,8 @@ export const addFavoriteTag = async (tagName: string): Promise<void> => {
 export const deleteFavoriteTag = async (tagName: string): Promise<void> => {
   await API.delete(
     `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
-    authHeader()
+    {
+      headers: { skipAuth: false },
+    }
   );
 };
