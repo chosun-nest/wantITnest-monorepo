@@ -1,15 +1,17 @@
 // 관심분야 정보 게시판 댓글 전체 랜더링 컨트롤
 import { useEffect, useState } from "react";
-import CommentList from "./CommentList";
-import CommentForm from "./CommentForm";
-import SkeletonComment from "./SkeletonComment";
 import { showModal } from "../../../store/slices/modalSlice";
+//import { useSelector, useDispatch } from "react-redux"; // 리덕스를 통해 사용자 구분 상태 관리
+import { useDispatch } from "react-redux"
+//import { setUser, selectCurrentUserId } from "../../../store/slices/userSlice"; // memberId, memberName, memberRole
 import {
   fetchComments,
   createComment,
 } from "../../../api/board-common/CommentAPI";
 import type { Comment, BoardType } from "../../../types/api/comments";
-import { useDispatch } from "react-redux";
+import CommentList from "./CommentList";
+import CommentForm from "./CommentForm";
+import SkeletonComment from "./SkeletonComment";
 
 export default function CommentSection({ boardType, postId }: { boardType: BoardType; postId: number }) {
   const [comments, setComments] = useState<Comment[]>([]);

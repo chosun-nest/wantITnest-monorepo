@@ -164,7 +164,7 @@ export default function InterestsDetail() {
             author={post.author}
             isAuthor={isAuthor}
             viewCount={post.viewCount}
-            date={post.updatedAt}
+            createdAt={post.createdAt}
           />
 
           <div className="flex items-center gap-2">
