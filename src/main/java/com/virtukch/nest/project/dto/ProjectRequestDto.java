@@ -1,9 +1,11 @@
 package com.virtukch.nest.project.dto;
 
+import com.virtukch.nest.project_member.model.ProjectMember;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class ProjectRequestDto {
@@ -13,4 +15,7 @@ public class ProjectRequestDto {
     private int maxMember;
     private boolean isRecruiting;
     private List<String> tags;
+    private Map<ProjectMember.Part, Integer> partCounts;
+    private ProjectMember.Part creatorPart; // 작성자가 들어갈 파트
+    private ProjectMember.Role creatorRole = ProjectMember.Role.LEADER; // 기본값 LEADER
 }
