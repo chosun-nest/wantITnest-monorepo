@@ -69,6 +69,10 @@ public class NoticeService {
                     continue;
                 }
 
+                // 모든 공백 문자를 일반 공백으로 변환하고 연속된 것들을 하나로 줄임
+                String title = ((String) noticeData.get("title")).replaceAll("\\s+", " ");
+                noticeData.put("title", title);
+
                 Notice notice = buildNotice(noticeType, noticeData);
 
                 noticeRepository.save(notice);
@@ -84,6 +88,12 @@ public class NoticeService {
         log.info("공지사항 저장이 완료되었습니다. noticeType: {}, 총 {}개 중 {}개 저장됨", noticeType, notices.size(), savedCount);
 
         return savedCount;
+    }
+
+    @Transactional(readOnly = true)
+    public NoticeListResponseDto getNotices(Pageable pageable) {
+        Page<Notice> noticePage = noticeRepository.findAll(pageable);
+        return buildListResponseDto(noticePage);
     }
 
     @Transactional(readOnly = true)
@@ -150,7 +160,7 @@ public class NoticeService {
         return value != null ? value.toString() : "";
     }
 
-    private static LocalDate stringToLocalDate(String dateString) {
+    private LocalDate stringToLocalDate(String dateString) {
         if (dateString == null || dateString.isEmpty()) {
             return null;
         }
