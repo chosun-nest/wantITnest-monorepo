@@ -75,6 +75,41 @@ public class NoticeController {
         return ResponseEntity.ok(ApiResponseDto.success(noticeType, savedCount));
     }
 
+
+    @Operation(
+            summary = "공지사항 전체 조회",
+            description = """
+                    전체 공지사항 목록을 조회합니다.
+                    
+                    ## 페이지네이션
+                    - 페이지 번호: `?page=0` (기본값: 0, 첫 페이지)
+                    - 페이지 크기: `?size=10` (기본값: 10, 페이지당 10개 항목)
+                    
+                    ## 정렬
+                    - 기본 정렬: 게시일 내림차순(최신순)
+                    - 정렬 필드 변경: `?sort={필드명}`
+                    - 정렬 방향 변경: `?sort={필드명},{정렬방향}`
+                      - 예: `?sort=postDate,desc`
+                    
+                    ## 응답 형식
+                    응답은 다음 정보를 포함합니다:
+                    - 공지사항 목록
+                    - 전체 공지사항 수
+                    - 페이지 정보 (현재 페이지, 전체 페이지, 다음/이전 페이지 존재 여부 등)
+                    
+                    ## 사용 예시
+                    - `/api/v1/notices/일반공지?page=0&size=10&sort=postDate,desc`
+                    """
+    )
+    @GetMapping
+    public ResponseEntity<NoticeListResponseDto> getNotices(
+            @PageableDefault(size = 10, sort = "postDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("공지사항 전체 조회");
+
+        NoticeListResponseDto responseDto = noticeService.getNotices(pageable);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @Operation(
             summary = "공지사항 목록 조회",
             description = """
