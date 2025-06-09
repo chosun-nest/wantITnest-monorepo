@@ -27,8 +27,6 @@ public class ProjectMember {
     @Enumerated(EnumType.STRING)
     private Part part; // 백엔드, 프론트엔드 등
 
-    @Enumerated(EnumType.STRING)
-    private ApplicationStatus applicationStatus = ApplicationStatus.WAITING;
 
     private boolean isApproved;
 
@@ -38,12 +36,6 @@ public class ProjectMember {
 
     public enum Part {
         BACKEND, FRONTEND, PM, DESIGN, AI, ETC
-    }
-
-    public enum ApplicationStatus {
-        WAITING,    // 요청만 된 상태
-        APPROVED,   // 승인됨
-        REJECTED    // 거절됨
     }
 
     // 유효성 검사 메서드 (DTO or Service 단에서 사용 가능)

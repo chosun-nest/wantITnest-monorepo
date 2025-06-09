@@ -1,7 +1,6 @@
 package com.virtukch.nest.project.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.post.service.PostService;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
