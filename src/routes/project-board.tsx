@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getProjects, Project } from "../api/project/ProjectAPI";
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../store/slices/authSlice";
+import { getProjects } from "../api/project/ProjectAPI";
+import type { ProjectSummary } from "../types/api/project-board";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 import BoardWriteButton from "../components/board/tag/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
@@ -10,21 +13,30 @@ const ITEMS_PER_PAGE = 7;
 export default function ProjectBoard() {
   const navigate = useNavigate();
   const isMobile = useResponsive();
+  const accessToken = useSelector(selectAccessToken);
+  const isAuthenticated = !!accessToken;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState<"전체" | "모집중" | "모집완료">("전체");
-
-  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  
+  const [allProjects, setAllProjects] = useState<ProjectSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setAuthError(true);
+      setLoading(false);
+      return;
+    }
+
     const fetchProjects = async () => {
       try {
         const data = await getProjects();
-        setAllProjects(data);
+        setAllProjects(data.projects); // ✅ 수정된 부분
       } catch (error) {
         console.error("프로젝트 목록 불러오기 실패:", error);
       } finally {
@@ -33,43 +45,48 @@ export default function ProjectBoard() {
     };
 
     fetchProjects();
-  }, []);
+  }, [isAuthenticated]);
 
   if (loading) {
     return <div className="p-10 text-center">⏳ 로딩 중입니다...</div>;
   }
 
-  // ✅ 임시 가공 로직: 닫힘 여부 → 모집 상태 / 참여자 수 가상 계산
+  if (authError) {
+    return (
+      <div className="p-10 text-center text-red-500 font-semibold">
+        🔒 로그인 후 프로젝트 목록을 볼 수 있습니다.
+      </div>
+    );
+  }
+
   const fixedProjects = allProjects.map((project) => {
-    const status = project.closed ? "모집완료" : "모집중";
-    const max = project.maxMember;
-    const curr = Math.floor(Math.random() * max); // 예시용 랜덤 참여 수
+    const status = Math.random() > 0.5 ? "모집완료" : "모집중"; // 임시 랜덤
+    // const max = project.maxMember;
+    const max = 6; // 예시로 하드코딩
+    const curr = Math.floor(Math.random() * max);
     const participants = `${curr}/${max}`;
     return {
-      ...project,
-      status,
-      participants,
-      title: project.projectTitle,
-      content: project.projectDescription,
-      tags: ["React", "UX/UI"], // 실제 백엔드에서 tags 필드 필요
-      author: { name: `유저#${project.projectLeaderId}` },
-      date: project.projectStartDate,
-      views: Math.floor(Math.random() * 200), // 예시용
-    };
+    ...project,
+    status,
+    participants,
+    title: project.projectTitle,
+    content: project.previewContent, // 또는 project.projectDescription
+    tags: ["React", "UX/UI"],
+    author: { name: project.authorName }, // ✅ 수정
+    date: project.createdAt,
+    views: Math.floor(Math.random() * 200),
+  };
   });
 
   const filteredProjects = [...fixedProjects]
-    .sort(
-      (a, b) =>
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-    )
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter(
       (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
     )
     .filter((p) => {
       if (
         selectedTags.length > 0 &&
-        !p.tags?.some((tag) => selectedTags.includes(tag))
+        !p.tags?.some((tag: string) => selectedTags.includes(tag))
       )
         return false;
       if (filter !== "전체" && p.status !== filter) return false;
@@ -78,10 +95,7 @@ export default function ProjectBoard() {
 
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentProjects = filteredProjects.slice(
-    startIdx,
-    startIdx + ITEMS_PER_PAGE
-  );
+  const currentProjects = filteredProjects.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   const handlePageClick = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -95,7 +109,6 @@ export default function ProjectBoard() {
 
   return (
     <div className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}>
-      {/* 상단 필터 */}
       <div className={`flex ${isMobile ? "flex-col items-start gap-2" : "flex-row justify-between items-center"} mb-4`}>
         <h1 className="text-2xl font-bold text-[#00256c]">프로젝트 모집 게시판</h1>
         <div className="flex space-x-2">
@@ -113,7 +126,6 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* 검색 + 태그 */}
       <div className={`flex ${isMobile ? "flex-col items-start gap-2" : "flex-row justify-between items-center"} mb-4`}>
         <p className="text-sm text-gray-600">
           총 <strong>{filteredProjects.length}</strong>개의 게시물이 있습니다.
@@ -138,15 +150,12 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* 선택된 태그 보기 */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {selectedTags.map((tag) => (
             <span
               key={tag}
-              onClick={() =>
-                setSelectedTags(selectedTags.filter((t) => t !== tag))
-              }
+              onClick={() => setSelectedTags(selectedTags.filter((t) => t !== tag))}
               className="inline-flex items-center px-2 py-1 text-[13px] font-medium bg-gray-100 text-gray-800 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-200 transition"
             >
               {tag}
@@ -156,7 +165,6 @@ export default function ProjectBoard() {
         </div>
       )}
 
-      {/* 카드 리스트 */}
       <div className="space-y-4">
         {currentProjects.map((project) => {
           const [current, max] = project.participants?.split("/") || ["0", "0"];
@@ -186,7 +194,7 @@ export default function ProjectBoard() {
               </p>
               {project.tags && (
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {project.tags.map((tag) => (
+                  {project.tags.map((tag: string) => (
                     <span key={tag} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
                       {tag}
                     </span>
@@ -202,7 +210,6 @@ export default function ProjectBoard() {
         })}
       </div>
 
-      {/* 페이지네이션 */}
       <div className="flex justify-center mt-6 space-x-2">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
@@ -217,7 +224,6 @@ export default function ProjectBoard() {
         ))}
       </div>
 
-      {/* 태그 모달 */}
       {isModalOpen && (
         <TagFilterModal
           onClose={() => setIsModalOpen(false)}

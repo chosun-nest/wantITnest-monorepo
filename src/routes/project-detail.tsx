@@ -1,42 +1,80 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { selectAccessToken } from "../store/slices/authSlice";
+import { setUser, selectCurrentUserId } from "../store/slices/userSlice";
+import { getMemberProfile } from "../api/profile/ProfileAPI";
 import { getProjectById, deleteProject } from "../api/project/ProjectAPI";
 import CommentSection from "../components/project/commentsection";
 import ParticipantCardBox from "../components/project/ParticipantCardBox";
 import ApplicationModal from "../components/project/ApplicationModal";
+import ConfirmModal from "../components/common/ConfirmModal";
 import useResponsive from "../hooks/responsive";
 import { Participant } from "../types/participant";
 import type { ProjectDetail } from "../types/api/project-board";
 
-// 💡 ParticipantCardBox에 넘길 전체 타입에 맞춰 재구성
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isMobile = useResponsive();
+  const dispatch = useDispatch();
+
+  const accessToken = useSelector(selectAccessToken);
+  const currentUserId = useSelector(selectCurrentUserId);
+  const isAuthenticated = !!accessToken;
 
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectStatus, setProjectStatus] = useState<"모집중" | "모집완료">("모집중");
 
-  const currentUserId = 1;
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setAuthError(true);
+      setLoading(false);
+      return;
+    }
+
+    getMemberProfile()
+      .then((user) => {
+        dispatch(
+          setUser({
+            memberId: user.memberId,
+            memberName: user.memberName,
+            memberRole: user.memberRole,
+          })
+        );
+      })
+      .catch((err) => console.error("유저 정보 불러오기 실패", err));
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const fetchProject = async () => {
+      if (!id) return;
+
       try {
         const data = await getProjectById(Number(id));
         setProject(data);
-        setProjectStatus("모집중"); // 기본값 (백엔드 없으므로 가정)
-      } catch (error) {
-        console.error("프로젝트 상세 조회 실패:", error);
+        setProjectStatus("모집중"); // TODO: 추후 백엔드 값으로 대체
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          setNotFound(true);
+        } else {
+          console.error("프로젝트 상세 조회 실패:", error);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProject();
-  }, [id]);
+    if (isAuthenticated) {
+      fetchProject();
+    }
+  }, [id, isAuthenticated]);
 
   const handleAccept = (user: Participant) => {
     const updated = [...participants, user];
@@ -53,11 +91,9 @@ export default function ProjectDetail() {
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm("정말 삭제하시겠습니까?");
-    if (!confirmed) return;
-
     try {
       await deleteProject(Number(id));
+      setShowDeleteConfirm(false);
       alert("삭제 완료되었습니다.");
       navigate("/project-board");
     } catch (err) {
@@ -74,19 +110,18 @@ export default function ProjectDetail() {
       projectDescription: project.projectDescription,
       projectStartDate: project.createdAt,
       projectEndDate: project.updatedAt,
-      maxMember: 6, // 백엔드 없으면 기본값 (ex. 6)
-      closed: false, // 모집 완료 여부 - 임시 false
-
-      // 프론트 가공 필드
+      maxMember: project.maxMember ?? 6,
+      closed: false,
       title: project.projectTitle,
       content: project.projectDescription,
       date: project.createdAt,
       author: project.author,
-      participants: `${participants.length}/${6}`,
+      participants: `${participants.length}/${project.maxMember ?? 6}`,
       status: projectStatus,
       views: project.viewCount ?? 0,
     };
 
+  // ✅ 렌더링 분기 처리
   if (loading) {
     return (
       <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center">
@@ -95,20 +130,33 @@ export default function ProjectDetail() {
     );
   }
 
-  if (!project || !mappedProject) {
+  if (authError) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36">
-        <h1 className="mb-4 text-2xl font-bold text-blue-900">프로젝트 상세보기</h1>
-        <p>프로젝트 정보를 불러올 수 없습니다.</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 mt-4 text-white rounded bg-slate-800"
-        >
-          ← 뒤로 가기
-        </button>
+      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center text-red-500 font-semibold">
+        🔒 로그인 후 프로젝트 정보를 확인할 수 있습니다.
       </div>
     );
   }
+
+  if (notFound) {
+    return (
+      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center text-gray-600">
+        ❌ 해당 프로젝트를 찾을 수 없습니다.
+        <div className="mt-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 text-sm text-white rounded bg-slate-800"
+          >
+            ← 뒤로 가기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!project || !mappedProject) return null;
+
+  const isAuthor = mappedProject.projectLeaderId === currentUserId;
 
   return (
     <div
@@ -126,7 +174,7 @@ export default function ProjectDetail() {
           {project.projectTitle}
         </h1>
 
-        {/* 작성자 */}
+        {/* 작성자 정보 */}
         <div
           className={`flex ${
             isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"
@@ -153,7 +201,7 @@ export default function ProjectDetail() {
         </div>
 
         {/* 수정 / 삭제 */}
-        {project.author.id === currentUserId && (
+        {isAuthor && (
           <div className="flex gap-2 mt-4">
             <button
               onClick={handleEdit}
@@ -162,7 +210,7 @@ export default function ProjectDetail() {
               ✏️ 수정
             </button>
             <button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
             >
               🗑 삭제
@@ -199,15 +247,25 @@ export default function ProjectDetail() {
           participants={participants}
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={handleAccept}
-          currentUserId={currentUserId}
+          currentUserId={currentUserId!} // ✅ 오류 해결을 위해 ! 추가
         />
       </div>
 
-      {/* 모달 */}
+      {/* 지원자 모달 */}
       {isModalOpen && (
         <ApplicationModal
           onClose={() => setIsModalOpen(false)}
           onAccept={handleAccept}
+        />
+      )}
+
+      {/* 삭제 확인 모달 */}
+      {showDeleteConfirm && (
+        <ConfirmModal
+          title="프로젝트 삭제"
+          message="정말 이 프로젝트를 삭제하시겠습니까?"
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
     </div>
