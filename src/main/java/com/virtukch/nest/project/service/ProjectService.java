@@ -10,6 +10,7 @@ import com.virtukch.nest.project.exception.NoProjectAuthorityException;
 import com.virtukch.nest.project.exception.ProjectNotFoundException;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
+import com.virtukch.nest.project_member.model.ProjectMember;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
 import com.virtukch.nest.project_tag.model.ProjectTag;
 import com.virtukch.nest.project_tag.repository.ProjectTagRepository;
@@ -44,13 +45,21 @@ public class ProjectService {
     private final String prefix = "project";
 
     @Transactional
-    public ProjectResponseDto createProject(Long memberId, ProjectRequestDto dto) {
-        String projectTitle = dto.getProjectTitle();
+    public ProjectResponseDto createProject(Long memberId, ProjectRequestDto requestDto) {
+        String projectTitle = requestDto.getProjectTitle();
         log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
-        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, dto.getProjectDescription(), dto.getMaxMember()));
+        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription(), requestDto.getMaxMember()));
 
-        saveProjectTags(project, dto.getTags());
+        saveProjectTags(project, requestDto.getTags());
+
+        if (requestDto.getPartCounts() != null && !requestDto.getPartCounts().isEmpty()) {
+            Member creator = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new RuntimeException("Member not found"));
+            createProjectMembers(project.getProjectId(), creator.getMemberId(),
+                    requestDto.getPartCounts(), requestDto.getCreatorPart(), requestDto.getCreatorRole());
+        }
+
         // builder 내부에서 LEADER 자동 등록됨
         return ProjectDtoConverter.toCreateResponseDto(project);
     }
@@ -62,6 +71,13 @@ public class ProjectService {
         Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription(), requestDto.getMaxMember()));
 
         saveProjectTags(project, requestDto.getTags());
+
+        if (requestDto.getPartCounts() != null && !requestDto.getPartCounts().isEmpty()) {
+            Member creator = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new RuntimeException("Member not found"));
+            createProjectMembers(project.getProjectId(), creator.getMemberId(),
+                    requestDto.getPartCounts(), requestDto.getCreatorPart(), requestDto.getCreatorRole());
+        }
 
         List<String> imageUrls;
         if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()){
@@ -78,10 +94,23 @@ public class ProjectService {
         Project project = findByIdOrThrow(projectId);
         project.incrementViewCount();
 
-        Member member = findMemberOrThrow(project);
+        Member creator = findMemberOrThrow(project);
         List<String> tagNames = extractTagNames(projectId);
 
-        return ProjectDtoConverter.toDetailResponseDto(project, member, tagNames);
+        List<ProjectMember> projectMembers = projectMemberRepository.findByProjectId(projectId);
+
+        Map<Long, String> memberIdToName = projectMembers.stream()
+                .map(ProjectMember::getMemberId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        id -> memberRepository.findById(id)
+                                .map(Member::getMemberName)
+                                .orElse("탈퇴한 사용자")
+                ));
+
+        return ProjectDtoConverter.toDetailResponseDto(project, creator, tagNames, projectMembers, memberIdToName);
     }
 
     // 게시글 목록 조회
@@ -145,14 +174,14 @@ public class ProjectService {
         return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
 
-    @Transactional(readOnly = true)
-    public com.virtukch.nest.project.model.Project findOwnedProjectOrThrow(Long projectId, Long memberId) {
-        com.virtukch.nest.project.model.Project project = findByIdOrThrow(projectId);
-        if(!Objects.equals(project.getProjectLeader(), memberId)) {
-            throw new NoProjectAuthorityException(projectId, memberId);
-        }
-        return project;
-    }
+//    @Transactional(readOnly = true)
+//    public com.virtukch.nest.project.model.Project findOwnedProjectOrThrow(Long projectId, Long memberId) {
+//        com.virtukch.nest.project.model.Project project = findByIdOrThrow(projectId);
+//        if(!Objects.equals(project.getProjectLeader(), memberId)) {
+//            throw new NoProjectAuthorityException(projectId, memberId);
+//        }
+//        return project;
+//    }
 
     @Transactional
     public Project validateProjectOwnershipAndGet(Long projectId, Long memberId) {
@@ -321,5 +350,35 @@ public class ProjectService {
                         result -> (Long) result[0], // projectId
                         result -> (Long) result[1]  // count
                 ));
+    }
+
+    // 프로젝트 멤버 생성
+    public void createProjectMembers(Long projectId, Long creatorId,
+                                     Map<ProjectMember.Part, Integer> partCounts,
+                                     ProjectMember.Part creatorPart,
+                                     ProjectMember.Role creatorRole) {
+        List<ProjectMember> slots = new ArrayList<>();
+        boolean assignedCreator = false;
+
+        for (Map.Entry<ProjectMember.Part, Integer> entry : partCounts.entrySet()) {
+            ProjectMember.Part part = entry.getKey();
+            int count = entry.getValue();
+            for (int i = 0; i < count; i++) {
+                ProjectMember.ProjectMemberBuilder builder = ProjectMember.builder()
+                        .projectId(projectId)
+                        .part(part)
+                        .role(ProjectMember.Role.MEMBER)
+                        .isApproved(false);
+
+                if (!assignedCreator && part == creatorPart) {
+                    builder.memberId(creatorId);
+                    builder.role(creatorRole);
+                    assignedCreator = true;
+                }
+
+                slots.add(builder.build());
+            }
+        }
+        projectMemberRepository.saveAll(slots);
     }
 }

@@ -29,4 +29,6 @@ public class ProjectDetailResponseDto {
     private String createdAt;
     private String updatedAt;
 
+    private List<ProjectMemberSimpleDto> projectMembers;
+
 }

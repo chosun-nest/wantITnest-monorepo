@@ -4,11 +4,13 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.AuthorDto;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.model.Project;
+import com.virtukch.nest.project_member.model.ProjectMember;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 public class ProjectDtoConverter {
 
@@ -48,21 +50,34 @@ public class ProjectDtoConverter {
                 .build();
     }
 
-    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member member, List<String> tagNames) {
+    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member leader, List<String> tagNames, List<ProjectMember> projectMemberList, Map<Long, String> memberIdToName) {
+        List<ProjectMemberSimpleDto> memberDtos = projectMemberList.stream().map(pm -> {
+            ProjectMemberSimpleDto dto = new ProjectMemberSimpleDto();
+            dto.setPart(pm.getPart());
+            dto.setRole(pm.getRole());
+            if (pm.getMemberId() != null) {
+                dto.setMemberId(pm.getMemberId());
+                dto.setMemberName(memberIdToName.getOrDefault(pm.getMemberId(), "알 수 없음"));
+            }
+            return dto;
+        }).toList();
+
         return ProjectDetailResponseDto.builder()
                 .projectId(project.getProjectId())
                 .projectTitle(project.getProjectTitle())
                 .projectDescription(project.getProjectDescription())
                 .tags(tagNames)
-                .author(ProjectAuthorDto.builder()
-                        .id(member.getMemberId())
-                        .name(member.getMemberName())
-                        .build())
                 .viewCount(project.getViewCount())
                 .createdAt(timeFormat(project.getCreatedAt()))
                 .updatedAt(timeFormat(project.getUpdatedAt()))
+                .author(ProjectAuthorDto.builder()
+                        .id(leader.getMemberId())
+                        .name(leader.getMemberName())
+                        .build())
+                .projectMembers(memberDtos)
                 .build();
     }
+
 
     public static ProjectListResponseDto toProjectListResponseDto(List<ProjectSummaryDto> summaries, Page<?> page) {
         return ProjectListResponseDto.builder()
