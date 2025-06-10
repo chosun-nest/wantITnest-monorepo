@@ -1,26 +1,9 @@
 import { Participant } from "../../types/participant";
 import { useNavigate } from "react-router-dom";
+import type { ProjectDetail } from "../../types/api/project-board";
 
 interface Props {
-  project: {
-    id: number;
-    projectTitle: string;
-    projectLeaderId: number;
-    projectDescription: string;
-    projectStartDate: string;
-    projectEndDate: string;
-    maxMember: number;
-    closed: boolean;
-
-    // 프론트에서 가공된 UI용 필드들
-    title: string;
-    content: string;
-    date: string;
-    author: { id: number; name: string };
-    participants: string; // ex) "2/6"
-    status: "모집중" | "모집완료";
-    views: number;
-  };
+  project: ProjectDetail;
   participants: Participant[];
   onOpenModal: () => void;
   onAccept: (user: Participant) => void;

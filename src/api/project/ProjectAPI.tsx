@@ -23,7 +23,7 @@ const authHeader = () => ({
 // ✅ 프로젝트 관련 API
 //
 
-// POST /api/projects/new - 프로젝트 게시글 생성
+// 프로젝트 게시글 생성 (POST)
 export const createProjectPost = async (
   payload: CreateProjectPostPayload
 ): Promise<CreateProjectPostResponse> => {
@@ -40,19 +40,30 @@ export const createProjectPost = async (
   return response.data;
 };
 
-// 전체 프로젝트 목록 가져오기
-export const getProjects = async (): Promise<ProjectListResponse> => {
-  const res = await API.get("/api/v1/projects", authHeader());
+// ✅ 프로젝트 목록 조회 (GET) - 서버 필터링 지원
+export const getProjects = async (
+  params: {
+    "pageable.page": number;
+    "pageable.size": number;
+    "pageable.sort": string;
+  }
+): Promise<ProjectListResponse> => {
+  const res = await API.get("/api/v1/projects", {
+    ...authHeader(),
+    params,
+  });
   return res.data;
 };
 
-// 특정 프로젝트 상세 조회
-export const getProjectById = async (projectId: number): Promise<ProjectDetail> => {
+// 프로젝트 상세 조회 (GET)
+export const getProjectById = async (
+  projectId: number
+): Promise<ProjectDetail> => {
   const res = await API.get(`/api/v1/projects/${projectId}`, authHeader());
   return res.data;
 };
 
-// 프로젝트 생성
+// 프로젝트 생성 (POST)
 export const createProject = async (
   payload: CreateProjectPayload
 ): Promise<number> => {
@@ -60,7 +71,7 @@ export const createProject = async (
   return res.data;
 };
 
-// 프로젝트 수정
+// 프로젝트 수정 (PATCH)
 export const updateProject = async (
   projectId: number,
   payload: UpdateProjectPayload
@@ -68,7 +79,7 @@ export const updateProject = async (
   await API.patch(`/api/v1/projects/${projectId}`, payload, authHeader());
 };
 
-// 프로젝트 삭제
+// 프로젝트 삭제 (DELETE)
 export const deleteProject = async (
   projectId: number
 ): Promise<DeleteProjectResponse> => {
@@ -80,14 +91,14 @@ export const deleteProject = async (
 // ✅ 지원서 관련 API
 //
 
-// 프로젝트 지원서 제출
+// 프로젝트 지원서 제출 (POST)
 export const applyToProject = async (
   payload: ApplyProjectPayload
 ): Promise<void> => {
   await API.post("/api/v1/applications", payload, authHeader());
 };
 
-// 특정 프로젝트의 지원자 목록 조회
+// 프로젝트 지원자 목록 조회 (GET)
 export const getApplicationsByProjectId = async (
   projectId: number
 ): Promise<Applicant[]> => {
@@ -98,7 +109,7 @@ export const getApplicationsByProjectId = async (
   return res.data;
 };
 
-// 지원서 상태 변경 (수락 / 거절)
+// 지원서 상태 변경 (수락/거절) (PATCH)
 export const updateApplicationStatus = async (
   applicationId: number,
   status: "accepted" | "rejected"

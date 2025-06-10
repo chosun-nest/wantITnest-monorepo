@@ -10,7 +10,6 @@ import ParticipantCardBox from "../components/project/ParticipantCardBox";
 import ApplicationModal from "../components/project/ApplicationModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import useResponsive from "../hooks/responsive";
-import { Participant } from "../types/participant";
 import type { ProjectDetail } from "../types/api/project-board";
 
 export default function ProjectDetail() {
@@ -27,10 +26,8 @@ export default function ProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const [participants, setParticipants] = useState<Participant[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [projectStatus, setProjectStatus] = useState<"모집중" | "모집완료">("모집중");
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -59,7 +56,6 @@ export default function ProjectDetail() {
       try {
         const data = await getProjectById(Number(id));
         setProject(data);
-        setProjectStatus("모집중"); // TODO: 추후 백엔드 값으로 대체
       } catch (error: any) {
         if (error.response?.status === 404) {
           setNotFound(true);
@@ -75,16 +71,6 @@ export default function ProjectDetail() {
       fetchProject();
     }
   }, [id, isAuthenticated]);
-
-  const handleAccept = (user: Participant) => {
-    const updated = [...participants, user];
-    setParticipants(updated);
-
-    const max = mappedProject?.maxMember ?? 0;
-    if (updated.length >= max) {
-      setProjectStatus("모집완료");
-    }
-  };
 
   const handleEdit = () => {
     navigate(`/project-edit/${id}`);
@@ -102,26 +88,6 @@ export default function ProjectDetail() {
     }
   };
 
-  const mappedProject =
-    project && {
-      id: project.projectId,
-      projectTitle: project.projectTitle,
-      projectLeaderId: project.author.id,
-      projectDescription: project.projectDescription,
-      projectStartDate: project.createdAt,
-      projectEndDate: project.updatedAt,
-      maxMember: project.maxMember ?? 6,
-      closed: false,
-      title: project.projectTitle,
-      content: project.projectDescription,
-      date: project.createdAt,
-      author: project.author,
-      participants: `${participants.length}/${project.maxMember ?? 6}`,
-      status: projectStatus,
-      views: project.viewCount ?? 0,
-    };
-
-  // ✅ 렌더링 분기 처리
   if (loading) {
     return (
       <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center">
@@ -154,9 +120,9 @@ export default function ProjectDetail() {
     );
   }
 
-  if (!project || !mappedProject) return null;
+  if (!project) return null;
 
-  const isAuthor = mappedProject.projectLeaderId === currentUserId;
+  const isAuthor = project.author.id === currentUserId;
 
   return (
     <div
@@ -166,20 +132,12 @@ export default function ProjectDetail() {
     >
       {/* 왼쪽 영역 */}
       <div className="flex-1">
-        <h1
-          className={`font-bold text-blue-900 mb-2 ${
-            isMobile ? "text-lg" : "text-xl md:text-2xl"
-          }`}
-        >
+        <h1 className={`font-bold text-blue-900 mb-2 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
           {project.projectTitle}
         </h1>
 
         {/* 작성자 정보 */}
-        <div
-          className={`flex ${
-            isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"
-          }`}
-        >
+        <div className={`flex ${isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"}`}>
           <div className="flex items-center gap-2">
             <img
               src="/assets/images/manager-bird.png"
@@ -224,7 +182,20 @@ export default function ProjectDetail() {
           {project.projectDescription}
         </div>
 
-        <hr className="my-4 border-gray-300" />
+        <div className="mb-6 flex flex-wrap gap-2">
+          {project.tags.map((tag) => (
+            <span key={tag} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* 아래 항목은 타입에 없으므로 주석 처리하거나 추후 확장 */}
+        {/* 
+        <div className="text-sm text-gray-500 mb-6">
+          모집 상태: <strong>{project.status}</strong> / 참여 인원: {project.currentMember} / {project.maxMember}
+        </div>
+        */}
 
         <div className="px-5 py-4 mb-6 border rounded bg-gray-50">
           <CommentSection />
@@ -243,11 +214,11 @@ export default function ProjectDetail() {
       {/* 오른쪽 참여자 카드 */}
       <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
         <ParticipantCardBox
-          project={mappedProject}
-          participants={participants}
+          project={project}
+          participants={[]} // 서버 연동 시 대체 예정
           onOpenModal={() => setIsModalOpen(true)}
-          onAccept={handleAccept}
-          currentUserId={currentUserId!} // ✅ 오류 해결을 위해 ! 추가
+          onAccept={() => {}}
+          currentUserId={currentUserId!}
         />
       </div>
 
@@ -255,7 +226,7 @@ export default function ProjectDetail() {
       {isModalOpen && (
         <ApplicationModal
           onClose={() => setIsModalOpen(false)}
-          onAccept={handleAccept}
+          onAccept={() => {}}
         />
       )}
 

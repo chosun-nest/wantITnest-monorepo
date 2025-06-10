@@ -4,6 +4,16 @@
 // POST /api/projects/new - 프로젝트 게시글 생성
 // ==================================
 // 요청 타입
+
+export interface Project {
+  projectId: number;
+  projectTitle: string;
+  projectDescription: string;
+  maxMember: number;
+  closed: boolean;
+  projectLeaderId: number;
+  projectStartDate: string;
+}
 export interface CreateProjectPostPayload {
   projectTitle: string;
   projectDescription: string;
@@ -22,15 +32,30 @@ export interface CreateProjectPostResponse {
 // 📘 GET /api/projects - 전체 목록 조회
 // ==================================
 
+// export interface ProjectSummary {
+//   projectId: number;
+//   projectTitle: string;
+//   previewContent: string;
+//   authorName: string;
+//   tags: string[];
+//   viewCount: number;
+//   createdAt: string;
+// }
 export interface ProjectSummary {
   projectId: number;
   projectTitle: string;
   previewContent: string;
-  authorName: string;
+  author: {
+    id: number;
+    name: string;
+  };
   tags: string[];
   viewCount: number;
   createdAt: string;
+  commentCount: number;
+  imageUrl: string;
 }
+
 
 export interface PageInfo {
   pageNumber: number;
@@ -65,7 +90,7 @@ export interface ProjectDetail {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
-  maxMember: number;
+  //maxMember: number;
 }
 
 // ==================================
