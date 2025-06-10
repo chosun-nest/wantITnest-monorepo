@@ -14,6 +14,14 @@ import {
   SearchPostListResponse,
   SearchPostsParams
 } from "../../types/api/interest-board";
+import { getAccessToken } from "../../utils/auth";
+
+// ✅ 공통 인증 헤더
+const authHeader = () => ({
+  headers: {
+    Authorization: `Bearer ${getAccessToken()}`,
+  },
+});
 
 // =========================================
 // [관심분야 게시판 글쓰기용 - board-write.tsx]
@@ -26,7 +34,7 @@ export const createInterestPost = async (
   const response = await API.post<CreatePostResponse>(
     "/api/v1/posts",
     payload,
-    { headers: { skipAuth: false } }
+    authHeader()
   );
   return response.data;
 };
@@ -39,9 +47,7 @@ export const createInterestPost = async (
 export const fetchPostDetail = async (postId: number): Promise<PostDetail> => {
   const response = await API.get<PostDetail>(
     `/api/v1/posts/${postId}`,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return response.data;
 };
@@ -50,7 +56,7 @@ export const fetchPostDetail = async (postId: number): Promise<PostDetail> => {
 export const deletePost = async (postId: number): Promise<DeletePostResponse> => {
   const response = await API.delete<DeletePostResponse>(
     `/api/v1/posts/${postId}`,
-    { headers: { skipAuth: false } }
+    authHeader()
   );
   return response.data;
 };
@@ -63,7 +69,7 @@ export const updatePost = async (
   const response = await API.patch<UpdatePostResponse>(
     `/api/v1/posts/${postId}`,
     payload,
-    { headers: { skipAuth: false } }
+    authHeader()
   );
   return response.data; // postId, message
 };
@@ -106,7 +112,7 @@ export const reactToPost = async (
   const response = await API.post<ReactionResponse>(
     `/api/v1/posts/${postId}/reaction`,
     { reactionType },
-    { headers: { skipAuth: false } }
+    authHeader()
   );
   return response.data;
 };
