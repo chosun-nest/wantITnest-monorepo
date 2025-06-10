@@ -9,6 +9,7 @@ export interface CreatePostPayload {  // BE, redux 사용자 처리 완료 후, 
   content: string;  
   tags: string[];
 }
+
 export interface CreatePostResponse {
   postId: number;
   message: string;

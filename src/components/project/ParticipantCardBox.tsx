@@ -24,7 +24,7 @@ export default function ParticipantCardBox({
   };
 
   const isAuthor = project.author?.id === currentUserId;
-  const isClosed = project.status === "모집완료";
+  const isClosed = project.isRecruiting === false;
 
   return (
     <div className="bg-gray-50 p-4 rounded-md shadow-md w-full">

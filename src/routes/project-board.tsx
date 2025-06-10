@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { selectAccessToken } from "../store/slices/authSlice";
 import { getProjects } from "../api/project/ProjectAPI";
 import type { ProjectSummary } from "../types/api/project-board";
-import TagFilterModal from "../components/board/tag/TagFilterModal";
 import BoardWriteButton from "../components/board/tag/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
 
@@ -91,9 +90,21 @@ export default function ProjectBoard() {
             onClick={() => handleRowClick(project)}
             className="border rounded-lg p-4 cursor-pointer hover:shadow"
           >
-            <h2 className={`font-semibold mb-2 ${isMobile ? "text-base" : "text-lg"}`}>
-              {project.projectTitle}
-            </h2>
+            <div className="flex justify-between items-center mb-2">
+              <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
+                {project.projectTitle}
+              </h2>
+              {project.isRecruiting !== undefined && (
+                <span className={`px-2 py-1 text-sm font-semibold border rounded-full ${
+                  project.isRecruiting
+                    ? "text-green-700 bg-green-100 border-green-300"
+                    : "text-gray-500 bg-gray-100 border-gray-300"
+                }`}>
+                  {project.isRecruiting ? "모집중" : "모집완료"}
+                </span>
+              )}
+            </div>
+
             <p className="text-sm text-gray-700 mb-2">
               {project.previewContent.length > 100
                 ? `${project.previewContent.slice(0, 100)}...`

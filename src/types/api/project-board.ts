@@ -1,46 +1,9 @@
 // ✅ types/project-board.ts
 
 // ==================================
-// POST /api/projects/new - 프로젝트 게시글 생성
-// ==================================
-// 요청 타입
-
-export interface Project {
-  projectId: number;
-  projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  closed: boolean;
-  projectLeaderId: number;
-  projectStartDate: string;
-}
-export interface CreateProjectPostPayload {
-  projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  tags: string[];
-  recruiting: boolean;
-}
-
-// 응답 타입
-export interface CreateProjectPostResponse {
-  projectId: number;
-  message: string;
-}
-
-// ==================================
 // 📘 GET /api/projects - 전체 목록 조회
 // ==================================
 
-// export interface ProjectSummary {
-//   projectId: number;
-//   projectTitle: string;
-//   previewContent: string;
-//   authorName: string;
-//   tags: string[];
-//   viewCount: number;
-//   createdAt: string;
-// }
 export interface ProjectSummary {
   projectId: number;
   projectTitle: string;
@@ -54,8 +17,8 @@ export interface ProjectSummary {
   createdAt: string;
   commentCount: number;
   imageUrl: string;
+  isRecruiting: boolean;
 }
-
 
 export interface PageInfo {
   pageNumber: number;
@@ -90,19 +53,34 @@ export interface ProjectDetail {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
-  //maxMember: number;
+  projectMembers: {
+    part: string;
+    role: string;
+    memberId: number;
+    memberName: string;
+  }[];
+  isRecruiting: boolean;
 }
 
 // ==================================
-// 🟢 POST /api/projects/new - 프로젝트 생성
+// 🟢 POST /api/projects/new - 프로젝트 생성 (Swagger 기준)
 // ==================================
 
 export interface CreateProjectPayload {
   projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  tags: string[];
+  projectDescription?: string;
+  tags?: string[];
+  partCounts: {
+    [key: string]: number; // 예: FRONTEND: 2, BACKEND: 1
+  };
+  creatorPart: string;     // 예: "FRONTEND"
+  creatorRole: string;     // 예: "LEADER"
   recruiting: boolean;
+}
+
+export interface CreateProjectPostResponse {
+  projectId: number;
+  message: string;
 }
 
 // ==================================
@@ -127,7 +105,7 @@ export interface DeleteProjectResponse {
 }
 
 // ==================================
-// 📬 지원서 제출 및 지원자 조회 (추가로 필요할 경우)
+// 📬 지원서 제출 및 지원자 조회
 // ==================================
 
 export interface ApplyProjectPayload {
