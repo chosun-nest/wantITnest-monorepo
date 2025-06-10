@@ -9,6 +9,14 @@ import {
   DeleteCommentResponse,
   FetchCommentsResponse
 } from "../../types/api/comments";
+import { getAccessToken } from "../../utils/auth";
+
+// ✅ 공통 인증 헤더
+const authHeader = () => ({
+  headers: {
+    Authorization: `Bearer ${getAccessToken()}`,
+  },
+});
 
 // =========================================
 // 댓글 목록 조회 (GET)
@@ -18,9 +26,7 @@ export const fetchComments = async (
 ): Promise<FetchCommentsResponse> => {
   const res = await API.get<FetchCommentsResponse>(
     `/api/v1/${boardType}/${postId}/comments`,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return res.data;
 };
@@ -35,9 +41,7 @@ export const createComment = async (
   const res = await API.post<CommentResponse>(
     `/api/v1/${boardType}/${postId}/comments`,
     payload,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return res.data;
 };
@@ -53,9 +57,7 @@ export const createReplyComment = async (
   const res = await API.post<CommentResponse>(
     `/api/v1/${boardType}/${postId}/comments/${parentId}/reply`,
     payload,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return res.data;
 };
@@ -71,9 +73,7 @@ export const reactToComment = async (
   const res = await API.post<CommentReactionResponse>(
     `/api/v1/${boardType}/${postId}/comments/${commentId}/reaction`,
     payload,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return res.data;
 };
@@ -87,9 +87,7 @@ export const deleteComment = async (
 ): Promise<DeleteCommentResponse> => {
   const res = await API.delete<DeleteCommentResponse>(
     `/api/v1/${boardType}/${postId}/comments/${commentId}`,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return res.data;
 };
@@ -105,9 +103,7 @@ export const updateComment = async (
   const res = await API.patch<CommentResponse>(
     `/api/v1/${boardType}/${postId}/comments/${commentId}`,
     payload,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return res.data;
 };
@@ -131,5 +127,3 @@ export const updateComment = async (
 //   );
 //   return res.data;
 // };
-
-

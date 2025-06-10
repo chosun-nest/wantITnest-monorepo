@@ -1,13 +1,23 @@
 import { API } from "..";
+import { getAccessToken } from "../../utils/auth";
+
+// ✅ 공통 인증 헤더
+const authHeader = () => ({
+  headers: {
+    Authorization: `Bearer ${getAccessToken()}`,
+  },
+});
+
+//
+// 관심 태그 관련 API
+//
 
 // 회원 관심 태그 확인 (GET)
 // 해당 태그가 사용자의 관심 태그인지 확인함
 export const checkFavoriteTag = async (tagName: string): Promise<boolean> => {
   const response = await API.get<boolean>(
-    `/api/v1/favorites/tags/${tagName}`,
-    {
-      headers: { skipAuth: false },
-    }
+    `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
+    authHeader()
   );
   return response.data;
 };
@@ -15,21 +25,17 @@ export const checkFavoriteTag = async (tagName: string): Promise<boolean> => {
 // 회원 관심 태그 추가 (POST)
 export const addFavoriteTag = async (tagName: string): Promise<void> => {
   await API.post(
-    `/api/v1/favorites/tags/${tagName}`,
+    `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
     null,
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
 };
 
 // 회원 관심 태그 삭제 (DELETE)
 export const removeFavoriteTag = async (tagName: string): Promise<void> => {
   await API.delete(
-    `/api/v1/favorites/tags/${tagName}`,
-    {
-      headers: { skipAuth: false },
-    }
+    `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
+    authHeader()
   );
 };
 
@@ -49,9 +55,7 @@ interface FavoriteTagsResponse {
 export const getFavoriteTags = async (): Promise<FavoriteTagsResponse> => {
   const response = await API.get<FavoriteTagsResponse>(
     "/api/v1/favorites/tags",
-    {
-      headers: { skipAuth: false },
-    }
+    authHeader()
   );
   return response.data;
 };
