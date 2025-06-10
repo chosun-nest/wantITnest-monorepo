@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/projects")
+@RequestMapping("/api/v1/projects")
 @Tag(name = "[프로젝트 모집글 지원 관리] 지원 처리 API", description = "프로젝트 모집글에 지원하고, 지원 현황(지원자 목록 등)을 조회할 수 있는 API입니다.\n문의 : dlwlgur02@gmail.com")
 public class ProjectApplicationController {
     private final ProjectApplicationService projectApplicationService;
