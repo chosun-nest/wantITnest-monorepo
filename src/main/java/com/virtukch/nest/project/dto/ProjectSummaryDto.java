@@ -20,4 +20,5 @@ public class ProjectSummaryDto {
     private String createdAt;
     private Long commentCount;
     private String imageUrl;
+    private Boolean isRecruiting;
 }

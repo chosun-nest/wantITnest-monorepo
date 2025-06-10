@@ -30,5 +30,6 @@ public class ProjectDetailResponseDto {
     private String updatedAt;
 
     private List<ProjectMemberSimpleDto> projectMembers;
+    private Boolean isRecruiting;
 
 }

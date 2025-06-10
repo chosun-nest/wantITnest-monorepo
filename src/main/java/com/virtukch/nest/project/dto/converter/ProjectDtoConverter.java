@@ -33,7 +33,7 @@ public class ProjectDtoConverter {
                 .build();
     }
 
-    public static ProjectSummaryDto toSummaryDto(Project project, String memberName, List<String> tagNames, Long commentCount, String imageUrl) {
+    public static ProjectSummaryDto toSummaryDto(Project project, String memberName, List<String> tagNames, Long commentCount, String imageUrl, Boolean isRecruiting) {
         return ProjectSummaryDto.builder()
                 .projectId(project.getProjectId())
                 .projectTitle(project.getProjectTitle())
@@ -47,10 +47,11 @@ public class ProjectDtoConverter {
                 .createdAt(timeFormat(project.getCreatedAt()))
                 .commentCount(commentCount)
                 .imageUrl(imageUrl)
+                .isRecruiting(isRecruiting)
                 .build();
     }
 
-    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member leader, List<String> tagNames, List<ProjectMember> projectMemberList, Map<Long, String> memberIdToName) {
+    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member leader, List<String> tagNames, List<ProjectMember> projectMemberList, Map<Long, String> memberIdToName, Boolean isRecruiting) {
         List<ProjectMemberSimpleDto> memberDtos = projectMemberList.stream().map(pm -> {
             ProjectMemberSimpleDto dto = new ProjectMemberSimpleDto();
             dto.setPart(pm.getPart());
@@ -75,6 +76,7 @@ public class ProjectDtoConverter {
                         .name(leader.getMemberName())
                         .build())
                 .projectMembers(memberDtos)
+                .isRecruiting(isRecruiting)
                 .build();
     }
 

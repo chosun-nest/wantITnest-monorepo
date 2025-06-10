@@ -111,8 +111,9 @@ public class ProjectService {
                                 .map(Member::getMemberName)
                                 .orElse("탈퇴한 사용자")
                 ));
+        Boolean isRecruiting = project.isRecruiting();
 
-        return ProjectDtoConverter.toDetailResponseDto(project, creator, tagNames, projectMembers, memberIdToName);
+        return ProjectDtoConverter.toDetailResponseDto(project, creator, tagNames, projectMembers, memberIdToName, isRecruiting);
     }
 
     // 게시글 목록 조회
@@ -338,7 +339,9 @@ public class ProjectService {
             imageUrl = imageUrlList.get(0);
         }
 
-        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl);
+        Boolean isRecruiting = project.isRecruiting();
+
+        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting);
     }
 
     private Map<Long, Long> fetchCommentCountMap(List<Project> projects) {
