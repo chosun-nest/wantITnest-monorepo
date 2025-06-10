@@ -1,7 +1,6 @@
-import axios from "axios";
 import { SignupPayload } from "../../types/signup";
 import { API } from "..";
-import { setTokens } from "../../store/slices/authSlice";
+import { setTokens, clearTokens } from "../../store/slices/authSlice";
 import { store } from "../../store";
 
 export const login = async (email: string, password: string) => {
@@ -63,35 +62,46 @@ export const passwordReset = async (token: string, newPassword: string) => {
 };
 
 export async function refreshAccessToken() {
-  const refreshToken = store.getState().auth.refreshToken;
-  if (!refreshToken) {
-    throw new Error("리프레시 토큰 없음");
-  }
+  try {
+    const refreshToken = store.getState().auth.refreshToken;
 
-  const rawAxios = axios.create();
-  console.log("리프레시 중");
-  const res = await rawAxios.post(
-    `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`,
-    {},
-    {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${refreshToken}`,
-      },
+    if (!refreshToken) {
+      throw new Error("리프레시 토큰이 없습니다.");
     }
-  );
 
-  const { accessToken, refreshToken: newRefreshToken, userId } = res.data;
+    const res = await API.post(
+      "/api/v1/auth/refresh",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+          skipAuth: true,
+        },
+      }
+    );
 
-  if (!accessToken || !newRefreshToken) {
-    throw new Error("재발급된 토큰 없음");
+    const { accessToken, refreshToken: newRefreshToken, userId } = res.data;
+
+    if (accessToken && newRefreshToken) {
+      store.dispatch(
+        setTokens({
+          accessToken,
+          refreshToken: newRefreshToken,
+          userId: userId,
+        })
+      );
+
+      console.log(" 토큰 재발급 성공");
+    } else {
+      throw new Error("재발급된 토큰이 없습니다.");
+    }
+  } catch (error) {
+    console.error(" 토큰 재발급 실패:", error);
+
+    store.dispatch(clearTokens());
+
+    // 로그인 페이지로 이동
+    window.location.href = "/login";
+    throw error;
   }
-
-  store.dispatch(
-    setTokens({
-      accessToken,
-      refreshToken: newRefreshToken,
-      userId,
-    })
-  );
 }
