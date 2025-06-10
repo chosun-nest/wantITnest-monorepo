@@ -175,6 +175,28 @@ export default function InterestsDetail() {
               onDelete={() => setShowDeleteConfirm(true)}
             />
           </div>
+
+          {/* 태그 */}
+          <div className="mb-6">
+            <PostDetailTags tags={post.tags} />
+          </div>
+
+          {/* 좋아요 / 싫어요 버튼 */}
+          <div className="mb-8">
+            <PostDetailActions
+              likeCount={post.likeCount}
+              dislikeCount={post.dislikeCount}
+              onLike={() => handleReaction("LIKE")}
+              onDislike={() => handleReaction("DISLIKE")}
+            />
+          </div>
+          
+          {/* 댓글란 */}
+          <CommentSection
+          boardType="INTEREST"
+          postId={post.postId}
+          //memberId={memberId}
+        />
         </div>
 
         <hr className="my-5 border-gray-200" />

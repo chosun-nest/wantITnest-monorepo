@@ -3,6 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        nestblue: "#002f6c", // NEST 전용 페이지네이션 색상
+      },
       animation: {
         "modal-in": "scaleIn 0.4s cubic-bezier(0.25,1,0.5,1) forwards",
       },
