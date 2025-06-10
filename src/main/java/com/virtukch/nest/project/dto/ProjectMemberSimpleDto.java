@@ -11,5 +11,4 @@ public class ProjectMemberSimpleDto {
     private ProjectMember.Role role;
     private Long memberId;
     private String memberName;
-    private ProjectMember.ApplicationStatus applicationStatus;
 }

@@ -49,7 +49,8 @@ public class ProjectService {
         String projectTitle = requestDto.getProjectTitle();
         log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
-        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription(), requestDto.getMaxMember()));
+        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
+        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription(), maxMember));
 
         saveProjectTags(project, requestDto.getTags());
 
@@ -68,7 +69,8 @@ public class ProjectService {
     public ProjectResponseDto createProject(Long memberId, ProjectWithImagesRequestDto requestDto) {
         String title = requestDto.getProjectTitle();
         log.info("[모집글 생성 시작] title={}, memberId={}", title, memberId);
-        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription(), requestDto.getMaxMember()));
+        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
+        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription(), maxMember));
 
         saveProjectTags(project, requestDto.getTags());
 
@@ -133,9 +135,10 @@ public class ProjectService {
     @Transactional
     public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectRequestDto requestDto) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
+        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
         project.updateProject(requestDto.getProjectTitle(),
                 requestDto.getProjectDescription(),
-                requestDto.getMaxMember(),
+                maxMember,
                 requestDto.isRecruiting());
 
         projectTagRepository.deleteAllByProjectId(projectId);
