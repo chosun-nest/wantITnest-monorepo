@@ -89,12 +89,13 @@ export interface CreateProjectPostResponse {
 
 export interface UpdateProjectPayload {
   projectTitle: string;
-  projectDescription: string;
-  maxMember: number;
-  tags: string[];
+  projectDescription?: string;
+  tags?: string[];
+  partCounts?: {
+    [key: string]: number;
+  };
   recruiting: boolean;
 }
-
 // ==================================
 // ❌ DELETE /api/projects/{projectId} - 삭제 응답
 // ==================================
