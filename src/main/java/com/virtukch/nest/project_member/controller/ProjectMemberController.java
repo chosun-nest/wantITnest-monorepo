@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 @Tag(name = "[프로젝트 모집 게시판] 역할 API", description = "프로젝트 참여 역할 관련 API\n문의 : dlwlgur02@gmail.com")
 @RestController
-@RequestMapping("/api/project-members")
+@RequestMapping("/api/v1/projects/members")
 @RequiredArgsConstructor
 public class ProjectMemberController {
     @Operation(

@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "[프로젝트 모집 게시판] 게시글 API", description = "게시글 CRUD 등 게시판 관련 API\n문의 : dlwlgur02@gmail.com")
