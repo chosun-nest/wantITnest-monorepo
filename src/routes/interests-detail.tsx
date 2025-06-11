@@ -156,7 +156,7 @@ export default function InterestsDetail() {
         style={{ paddingTop: navHeight + 120 }}
       >
         {/* 게시글 제목 */}
-        <h2 className="text-2xl font-bold text-[#00256c] mb-4">
+        <h2 className="text-2xl font-bold text-[#00256c] mb-4 break-words">
           {post?.title || "제목 없음"}
         </h2>
 
@@ -180,32 +180,32 @@ export default function InterestsDetail() {
 
         <hr className="my-5 border-gray-200" />
 
-        {/* 게시글 본문 */}
-        <div className="mb-6">
-          <PostDetailContent content={post.content} />
-        </div>
+        {/* Grid 레이아웃: 내부 요소 폭 제한 */}
+        <div className="grid w-full grid-cols-1 gap-8 overflow-hidden">
+          <div className="w-full break-words">
+            <PostDetailContent content={post.content} />
+          </div>
 
-        {/* 태그 */}
-        <div className="mb-6">
-          <PostDetailTags tags={post.tags} />
-        </div>
+          <div className="w-full">
+            <PostDetailTags tags={post.tags} />
+          </div>
 
-        {/* 좋아요 / 싫어요 버튼 */}
-        <div className="mb-8">
-          <PostDetailActions
-            likeCount={post.likeCount}
-            dislikeCount={post.dislikeCount}
-            onLike={() => handleReaction("LIKE")}
-            onDislike={() => handleReaction("DISLIKE")}
-          />
-        </div>
+          <div className="w-full">
+            <PostDetailActions
+              likeCount={post.likeCount}
+              dislikeCount={post.dislikeCount}
+              onLike={() => handleReaction("LIKE")}
+              onDislike={() => handleReaction("DISLIKE")}
+            />
+          </div>
 
-        {/* 댓글란 */}
-        <CommentSection
-          boardType="INTEREST"
-          postId={post.postId}
-          //memberId={memberId}
-        />
+          <div className="w-full pt-4 border-t border-gray-200">
+            <CommentSection
+              boardType="INTEREST"
+              postId={post.postId}
+            />
+          </div>
+        </div>
       </div>
 
       {showDeleteConfirm && (
