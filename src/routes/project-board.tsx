@@ -5,7 +5,7 @@ import { selectAccessToken } from "../store/slices/authSlice";
 import { getProjects } from "../api/project/ProjectAPI";
 import type { ProjectSummary } from "../types/api/project-board";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
-import BoardWriteButton from "../components/board/tag/BoardWriteButton";
+import BoardWriteButton from "../components/board/write/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
 
 const ITEMS_PER_PAGE = 7;

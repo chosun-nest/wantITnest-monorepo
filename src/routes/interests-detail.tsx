@@ -42,16 +42,17 @@ export default function InterestsDetail() {
   const isLoggedIn = memberId !== null;
 
   useEffect(() => {
-    getMemberProfile().then((user) => {
-      dispatch(
-        setUser({
-          memberId: user.memberId,
-          memberName: user.memberName,
-          memberRole: user.memberRole,
-        })
-      );
-    });
+  getMemberProfile().then((user) => {
+    dispatch(
+      setUser({
+        memberId: user.memberId,
+        memberName: user.memberName,
+        memberRole: user.memberRole,
+      })
+    );
   });
+  }, []); // 의존성 배열 추가
+
 
   // 네비게이션 바 높이 계산
   useEffect(() => {

@@ -21,7 +21,9 @@ import ProjectApply from "./routes/project-apply"; // yu-gyeom
 import NoticeBoard from "./components/notice/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import InterestsDetail from "./routes/interests-detail"; //yeong-eun
-import BoardWrite from "./routes/board-write"; //yeong-eun
+//import BoardWrite from "./routes/board-write"; //yeong-eun
+import InterestWrite from "./routes/interests-write"; //yeong-eun
+import ProjectWrite from "./routes/project-write";    //yeong-eun
 
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
@@ -70,7 +72,7 @@ const router = createBrowserRouter([
         element: <InterestsBorad />,
       },
       {
-        path: "interests-detail/:id", // yeong-eun : 관심 분야 정보 글쓰기 페이지
+        path: "interests-detail/:id", // yeong-eun : 관심 분야 정보 상세 페이지
         element: <InterestsDetail />,
       },
 
@@ -103,17 +105,29 @@ const router = createBrowserRouter([
         path: "profile-edit/",
         element: <ProfileEdit />,
       },
-      // {
-      //   path: "interests-write",
-      //   element: <InterestsWrite />,   // 게시판 글쓰기 페이지 통합함.
-      // },
       {
-        path: "board-write/", // yeong-eun : 게시판 글쓰기 페이지
-        element: <BoardWrite />,
+        path: "interests-write",
+        element: (
+          <ProtectedRoute>
+            <InterestWrite />
+          </ProtectedRoute>
+        ),
       },
+      // {
+      //   path: "board-write/", // yeong-eun : 게시판 글쓰기 페이지 통합 -> 분리함.
+      //   element: <BoardWrite />,
+      // },
       {
         path: "project-board/",
         element: <ProjectBoard />,
+      },
+      {
+        path: "project-write",
+        element: (
+          <ProtectedRoute>
+            <ProjectWrite />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
