@@ -17,5 +17,7 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),   // 게시글 detail 페이지 마크다운 형식으로 보여지도록 하기 위해 추가함. // 설치 : npm install @tailwindcss/typography 
+  ],
 };
