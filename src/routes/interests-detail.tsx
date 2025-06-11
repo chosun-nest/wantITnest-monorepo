@@ -21,7 +21,7 @@ import FollowButton from "../components/interests/detail/FollowButton";
 import PostDetailContent from "../components/interests/detail/PostDetailContent";
 import PostDetailTags from "../components/interests/detail/PostDetailTags";
 import PostDetailActions from "../components/interests/detail/PostDetailActions";
-import CommentSection from "../components/interests/detail/CommentSection";
+import CommentSection from "../components/interests/comment/CommentSection";
 
 export default function InterestsDetail() {
   const { id } = useParams(); // 주소에서 postId 추출
