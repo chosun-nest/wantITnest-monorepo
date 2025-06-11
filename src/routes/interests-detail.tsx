@@ -147,7 +147,6 @@ export default function InterestsDetail() {
   if (!post) return null;
 
   //const isAuthor = post.author.id === memberId; // 로그인한 사용자와 memberID(작성자) 같은지 비교?
-
   return (
     <>
       <Navbar ref={navbarRef} />
@@ -155,19 +154,19 @@ export default function InterestsDetail() {
         className="max-w-4xl min-h-screen p-4 mx-auto bg-white"
         style={{ paddingTop: navHeight + 120 }}
       >
-        {/* 게시글 제목 */}
+        {/* 제목 */}
         <h2 className="text-2xl font-bold text-[#00256c] mb-4 break-words">
-          {post?.title || "제목 없음"}
+          {post.title}
         </h2>
 
-        <div className="flex items-start justify-between mb-2">
+        {/* 작성자 정보 + 메뉴 */}
+        <div className="flex items-start justify-between mb-6">
           <PostDetailInfo
             author={post.author}
             isAuthor={isAuthor}
             viewCount={post.viewCount}
             createdAt={post.createdAt}
           />
-
           <div className="flex items-center gap-2">
             {!isAuthor && <FollowButton />}
             <PostDetailHeader
@@ -178,36 +177,31 @@ export default function InterestsDetail() {
           </div>
         </div>
 
-        <hr className="my-5 border-gray-200" />
+        {/* 게시글 본문 */}
+        <PostDetailContent content={post.content} />
 
-        {/* Grid 레이아웃: 내부 요소 폭 제한 */}
-        <div className="grid w-full grid-cols-1 gap-8 overflow-hidden">
-          <div className="w-full break-words">
-            <PostDetailContent content={post.content} />
-          </div>
+        {/* 태그 목록 */}
+        <PostDetailTags tags={post.tags} />
 
-          <div className="w-full">
-            <PostDetailTags tags={post.tags} />
-          </div>
+        {/* 좋아요/싫어요/공유 버튼 */}
+        <PostDetailActions
+          likeCount={post.likeCount}
+          dislikeCount={post.dislikeCount}
+          onLike={() => handleReaction("LIKE")}
+          onDislike={() => handleReaction("DISLIKE")}
+        />
 
-          <div className="w-full">
-            <PostDetailActions
-              likeCount={post.likeCount}
-              dislikeCount={post.dislikeCount}
-              onLike={() => handleReaction("LIKE")}
-              onDislike={() => handleReaction("DISLIKE")}
-            />
-          </div>
+        {/* 구분선 */}
+        <hr className="my-6 border-gray-200" />
 
-          <div className="w-full pt-4 border-t border-gray-200">
-            <CommentSection
-              boardType="INTEREST"
-              postId={post.postId}
-            />
-          </div>
-        </div>
+        {/* 댓글 섹션 */}
+        <CommentSection
+          boardType="INTEREST"
+          postId={post.postId}
+        />
       </div>
 
+      {/* 삭제 확인 모달 */}
       {showDeleteConfirm && (
         <ConfirmModal
           title="게시글 삭제"
@@ -217,6 +211,7 @@ export default function InterestsDetail() {
         />
       )}
 
+      {/* 삭제 완료 모달 */}
       {showDeleteComplete && (
         <Modal
           title="삭제 완료"
@@ -227,4 +222,5 @@ export default function InterestsDetail() {
       )}
     </>
   );
+
 }
