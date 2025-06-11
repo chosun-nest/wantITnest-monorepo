@@ -11,7 +11,7 @@ import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 import InterestBoardSortTabs from "../components/interests/board/InterestBoardSortTabs";
 import InterestPostCardList from "../components/interests/board/InterestPostCardList";
-import InterestBoardWriteButton from "../components/board/tag/BoardWriteButton";
+import InterestBoardWriteButton from "../components/board/write/BoardWriteButton";
 import Pagination from "../components/interests/board/Pagination";
 
 import { fetchPosts, searchPosts } from "../api/interests/InterestsAPI";

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { selectAccessToken } from "../store/slices/authSlice";
 import { getProjects } from "../api/project/ProjectAPI";
 import type { ProjectSummary } from "../types/api/project-board";
-import BoardWriteButton from "../components/board/tag/BoardWriteButton";
+import BoardWriteButton from "../components/board/write/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
 
 const ITEMS_PER_PAGE = 7;
@@ -55,7 +55,7 @@ export default function ProjectBoard() {
 
   if (authError) {
     return (
-      <div className="p-10 text-center text-red-500 font-semibold">
+      <div className="p-10 font-semibold text-center text-red-500">
         🔒 로그인 후 프로젝트 목록을 볼 수 있습니다.
       </div>
     );
@@ -79,7 +79,7 @@ export default function ProjectBoard() {
         <h1 className="text-2xl font-bold text-[#00256c]">프로젝트 모집 게시판</h1>
       </div>
 
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="mb-4 text-sm text-gray-600">
         총 <strong>{totalCount}</strong>개의 게시물이 있습니다.
       </p>
 
@@ -88,9 +88,9 @@ export default function ProjectBoard() {
           <div
             key={project.projectId}
             onClick={() => handleRowClick(project)}
-            className="border rounded-lg p-4 cursor-pointer hover:shadow"
+            className="p-4 border rounded-lg cursor-pointer hover:shadow"
           >
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex items-center justify-between mb-2">
               <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
                 {project.projectTitle}
               </h2>
@@ -105,14 +105,14 @@ export default function ProjectBoard() {
               )}
             </div>
 
-            <p className="text-sm text-gray-700 mb-2">
+            <p className="mb-2 text-sm text-gray-700">
               {project.previewContent.length > 100
                 ? `${project.previewContent.slice(0, 100)}...`
                 : project.previewContent}
             </p>
             <div className="flex flex-wrap gap-2 mb-2">
               {project.tags.map((tag) => (
-                <span key={tag} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
+                <span key={tag} className="px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded">
                   {tag}
                 </span>
               ))}

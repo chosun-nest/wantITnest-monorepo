@@ -21,7 +21,7 @@ export default function InterestPostCardList({
   posts,
   onCardClick,
 }: InterestPostCardListProps) {
-  const isMobile = useResponsive();
+  const isMobile = useResponsive();     // 모바일 대응 없애기
 
   return (
     <div className="space-y-4">
