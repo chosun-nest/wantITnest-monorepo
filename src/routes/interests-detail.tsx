@@ -171,7 +171,7 @@ export default function InterestsDetail() {
             {!isAuthor && <FollowButton />}
             <PostDetailHeader
               isAuthor={isAuthor}
-              onEdit={() => navigate("/board-write", { state: { post } })}
+              onEdit={() => navigate("/interests-write", { state: { post } })}
               onDelete={() => setShowDeleteConfirm(true)}
             />
           </div>
