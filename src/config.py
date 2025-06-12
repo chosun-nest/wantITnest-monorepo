@@ -9,23 +9,24 @@ load_dotenv()
 SCHEDULE_CONFIG = {
     "enabled": os.getenv("SCHEDULE_ENABLED", "true").lower() == "true",
     "schedules": [
-        # {"type": "interval", "minutes": 1} # test 시 활성화
-        {"type": "cron", "hour": 9, "minute": 0},
-        {"type": "cron", "hour": 11, "minute": 0},
-        {"type": "cron", "hour": 13, "minute": 0},
-        {"type": "cron", "hour": 15, "minute": 0},
-        {"type": "cron", "hour": 17, "minute": 0},
+        {"type": "interval", "minutes": 1} # test 시 활성화
+        # {"type": "cron", "hour": 9, "minute": 0},
+        # {"type": "cron", "hour": 11, "minute": 0},
+        # {"type": "cron", "hour": 13, "minute": 0},
+        # {"type": "cron", "hour": 15, "minute": 0},
+        # {"type": "cron", "hour": 17, "minute": 0},
     ],
     "timezone": os.getenv("SCHEDULE_TIMEZONE", "Asia/Seoul")
 }
 
-# 크롤링 대상 카테고리 (기존 코드에서 가져옴)
+# 크롤링 대상 카테고리
 CATEGORIES = {
     "일반공지": "https://www3.chosun.ac.kr/chosun/217/subview.do",
     "학사공지": "https://www4.chosun.ac.kr/acguide/9326/subview.do?layout=unknown",
     "장학공지": "https://www3.chosun.ac.kr/scho/2138/subview.do",
     "IT융합대학 공지": "https://eie.chosun.ac.kr/eie/5563/subview.do",
-    "컴퓨터공학과 공지": "https://eie.chosun.ac.kr/ce/5670/subview.do"
+    "컴퓨터공학과 공지": "https://eie.chosun.ac.kr/ce/5670/subview.do",
+    "SW중심대학사업단 공지": "https://sw.chosun.ac.kr/main/menu?gc=605XOAS"
 }
 
 # API 설정

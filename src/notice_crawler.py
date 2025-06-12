@@ -9,9 +9,11 @@ from urllib.parse import urljoin
 import requests
 import os
 from dotenv import load_dotenv
+import re  # 정규표현식을 위한 import 추가
 
 load_dotenv()
 SPRING_SERVER_BASE_URL = os.getenv("SPRING_SERVER_BASE_URL", "http://localhost:6030")
+print("SPRING_SERVER_BASE_URL : " + SPRING_SERVER_BASE_URL)
 
 app = FastAPI()
 
@@ -30,7 +32,8 @@ CATEGORIES = {
     "학사공지": "https://www4.chosun.ac.kr/acguide/9326/subview.do?layout=unknown",
     "장학공지": "https://www3.chosun.ac.kr/scho/2138/subview.do",
     "IT융합대학 공지": "https://eie.chosun.ac.kr/eie/5563/subview.do",
-    "컴퓨터공학과 공지": "https://eie.chosun.ac.kr/ce/5670/subview.do"
+    "컴퓨터공학과 공지": "https://eie.chosun.ac.kr/ce/5670/subview.do",
+    "소중대": "https://sw.chosun.ac.kr/main/menu?gc=605XOAS"
 }
 
 # 기본 URL 추출 함수
@@ -88,7 +91,9 @@ def crawl_notices(category: str):
         else:
             date = cols[3].text.strip()
 
-        views = cols[4].text.strip().replace(",", "")
+        # 조회수 처리 - 숫자만 추출
+        views_text = cols[4].text.strip()
+        views = re.sub(r'[^0-9]', '', views_text)
 
         #  제목과 링크 처리
         subject_cell = cols[1]
@@ -129,6 +134,7 @@ def crawl_notices(category: str):
         notices.append(notice)
 
     # 모든 notice를 한 번에 Spring 서버로 전송
+    print("SPRING_SERVER_BASE_URL : " + SPRING_SERVER_BASE_URL)
     try:
         api_url = f"{SPRING_SERVER_BASE_URL.rstrip('/')}/api/v1/notices/{category}"
         res = requests.post(api_url, json={"notices": notices})

@@ -1,5 +1,7 @@
 import requests
 import time
+import re
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -94,7 +96,9 @@ class NoticeService:
         try:
             number = cols[0].text.strip()
             writer = cols[2].text.strip()
-            views = cols[4].text.strip().replace(",", "")
+                    # 조회수 처리 - 숫자만 추출
+            views_text = cols[4].text.strip()
+            views = re.sub(r'[^0-9]', '', views_text)
             
             # 날짜 처리 (장학공지 특별 처리)
             if category == "장학공지":
