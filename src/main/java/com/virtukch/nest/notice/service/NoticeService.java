@@ -164,9 +164,12 @@ public class NoticeService {
         if (dateString == null || dateString.isEmpty()) {
             return null;
         }
+
+        String normalizedDate = dateString.replace(".", "-");
+
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-            return LocalDate.parse(dateString, formatter);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDate.parse(normalizedDate, formatter);
         } catch (DateTimeParseException e) {
             throw new InvalidDateFormatException(dateString, e);
         }
