@@ -1,5 +1,5 @@
 import { fetchPosts, searchPosts } from "../api/interests/InterestsAPI";
-import type { PostSummary, SearchPost } from "../api/types/interest-board";
+import type { PostSummary, SearchPost } from "../types/api/interest-board";
 
 interface Params {
   sortType?: "latest" | "likes";
@@ -41,14 +41,17 @@ export const getTopPosts = async ({
         const converted: PostSummary = {
           postId: "postId" in post ? post.postId : post.id,
           title: post.title,
-          previewContent: post.previewContent,
-          authorName: post.authorName,
+          previewContent: "",
           tags: post.tags ?? [],
           createdAt: post.createdAt,
           viewCount: post.viewCount ?? 0,
           likeCount: post.likeCount ?? 0,
           dislikeCount: post.dislikeCount ?? 0,
           commentCount: post.commentCount ?? 0,
+          author: {
+            id: post.author.id,
+            name: post.author.name,
+          },
         };
 
         if (!converted.postId) {

@@ -40,7 +40,11 @@ export const ChatContainer = styled.div<{ isMobile: boolean }>`
 
 export const MessagesContainer = styled.div<{ isMobile?: boolean }>`
   flex: 1;
+<<<<<<< HEAD
+  overflow-y: hidden; /* ✅ 스크롤 제거 */
+=======
   overflow-y: hidden;
+>>>>>>> origin/dev
   background-color: #fff;
 
   ${({ isMobile }) =>
@@ -73,16 +77,13 @@ export const InputContainer = styled.div<{ isMobile?: boolean }>`
           border-top: none;
         `}
 `;
-
 export const Underbar = styled.div`
   display: flex;
   flex-direction: row;
   border-radius: 8px;
   border: 1px solid #002f6c;
   width: 100%;
-  min-height: 40px;
-  height: 15%;
-  max-height: 100px;
+  height: 60px;
   box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
   margin-top: 10px;
   margin-bottom: 10px;
@@ -92,11 +93,11 @@ export const Underbar = styled.div`
 
 export const UnderbarItem = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
-  font-family: "Monomaniac One", sans-serif;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  font-family: "Monomaniac One", sans-serif;
   height: 100%;
   cursor: pointer;
 

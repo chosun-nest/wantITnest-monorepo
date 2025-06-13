@@ -12,7 +12,7 @@ interface ProfileType {
   email: string;
   major: string;
   introduce: string;
-  interests: string[];
+  //interests: string[];
   techStacks: string[];
   sns: string[];
 }
@@ -116,9 +116,9 @@ export default function ProfileCard() {
           email: data.memberEmail,
           major: data.memberDepartmentResponseDtoList[0]?.departmentName || "",
           introduce: data.memberIntroduce || "",
-          interests: data.memberInterestResponseDtoList.map(
-            (i: { interestId: number; interestName: string }) => i.interestName
-          ),
+          // interests: data.memberInterestResponseDtoList.map(
+          //   (i: { interestId: number; interestName: string }) => i.interestName
+          // ),
           techStacks: data.memberTechStackResponseDtoList.map(
             (t: { techStackId: number; techStackName: string }) =>
               t.techStackName
@@ -191,7 +191,7 @@ export default function ProfileCard() {
         {/* 한 줄 소개 */}
         <p className="mt-2 text-sm text-left">{profile.introduce}</p>
 
-        {/* 관심사 태그 */}
+        {/* 관심사 태그
         <div className="flex flex-wrap gap-2 mt-6 justify-left">
           {profile.interests?.map((tag, i) => (
             <span
@@ -201,7 +201,7 @@ export default function ProfileCard() {
               #{tag}
             </span>
           ))}
-        </div>
+        </div> */}
 
         {/* 기술 스택 */}
         <div className="flex flex-wrap gap-2 mt-5 justify-left">

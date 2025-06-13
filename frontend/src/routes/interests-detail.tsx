@@ -6,7 +6,7 @@ import {
   deletePost,
   reactToPost,
 } from "../api/interests/InterestsAPI";
-import type { PostDetail } from "../api/types/interest-board";
+import type { PostDetail } from "../types/api/interest-board";
 
 import { getMemberProfile } from "../api/profile/ProfileAPI";
 import { useSelector, useDispatch } from "react-redux"; // 리덕스를 통해 사용자 구분 상태 관리
@@ -21,7 +21,7 @@ import FollowButton from "../components/interests/detail/FollowButton";
 import PostDetailContent from "../components/interests/detail/PostDetailContent";
 import PostDetailTags from "../components/interests/detail/PostDetailTags";
 import PostDetailActions from "../components/interests/detail/PostDetailActions";
-import CommentSection from "../components/interests/detail/CommentSection";
+import CommentSection from "../components/interests/comment/CommentSection";
 
 export default function InterestsDetail() {
   const { id } = useParams(); // 주소에서 postId 추출
@@ -42,16 +42,17 @@ export default function InterestsDetail() {
   const isLoggedIn = memberId !== null;
 
   useEffect(() => {
-    getMemberProfile().then((user) => {
-      dispatch(
-        setUser({
-          memberId: user.memberId,
-          memberName: user.memberName,
-          memberRole: user.memberRole,
-        })
-      );
-    });
+  getMemberProfile().then((user) => {
+    dispatch(
+      setUser({
+        memberId: user.memberId,
+        memberName: user.memberName,
+        memberRole: user.memberRole,
+      })
+    );
   });
+  }, []); // 의존성 배열 추가
+
 
   // 네비게이션 바 높이 계산
   useEffect(() => {
@@ -146,7 +147,6 @@ export default function InterestsDetail() {
   if (!post) return null;
 
   //const isAuthor = post.author.id === memberId; // 로그인한 사용자와 memberID(작성자) 같은지 비교?
-
   return (
     <>
       <Navbar ref={navbarRef} />
@@ -154,59 +154,54 @@ export default function InterestsDetail() {
         className="max-w-4xl min-h-screen p-4 mx-auto bg-white"
         style={{ paddingTop: navHeight + 120 }}
       >
-        {/* 게시글 제목 */}
-        <h2 className="text-2xl font-bold text-[#00256c] mb-4">
-          {post?.title || "제목 없음"}
+        {/* 제목 */}
+        <h2 className="text-2xl font-bold text-[#00256c] mb-4 break-words">
+          {post.title}
         </h2>
 
-        <div className="flex items-start justify-between mb-2">
+        {/* 작성자 정보 + 메뉴 */}
+        <div className="flex items-start justify-between mb-6">
           <PostDetailInfo
             author={post.author}
             isAuthor={isAuthor}
             viewCount={post.viewCount}
-            date={post.updatedAt}
+            createdAt={post.createdAt}
           />
-
           <div className="flex items-center gap-2">
             {!isAuthor && <FollowButton />}
             <PostDetailHeader
               isAuthor={isAuthor}
-              onEdit={() => navigate("/board-write", { state: { post } })}
+              onEdit={() => navigate("/interests-write", { state: { post } })}
               onDelete={() => setShowDeleteConfirm(true)}
             />
           </div>
         </div>
 
-        <hr className="my-5 border-gray-200" />
-
         {/* 게시글 본문 */}
-        <div className="mb-6">
-          <PostDetailContent content={post.content} />
-        </div>
+        <PostDetailContent content={post.content} />
 
-        {/* 태그 */}
-        <div className="mb-6">
-          <PostDetailTags tags={post.tags} />
-        </div>
+        {/* 태그 목록 */}
+        <PostDetailTags tags={post.tags} />
 
-        {/* 좋아요 / 싫어요 버튼 */}
-        <div className="mb-8">
-          <PostDetailActions
-            likeCount={post.likeCount}
-            dislikeCount={post.dislikeCount}
-            onLike={() => handleReaction("LIKE")}
-            onDislike={() => handleReaction("DISLIKE")}
-          />
-        </div>
+        {/* 좋아요/싫어요/공유 버튼 */}
+        <PostDetailActions
+          likeCount={post.likeCount}
+          dislikeCount={post.dislikeCount}
+          onLike={() => handleReaction("LIKE")}
+          onDislike={() => handleReaction("DISLIKE")}
+        />
 
-        {/* 댓글란 */}
+        {/* 구분선 */}
+        <hr className="my-6 border-gray-200" />
+
+        {/* 댓글 섹션 */}
         <CommentSection
           boardType="INTEREST"
           postId={post.postId}
-          //memberId={memberId}
         />
       </div>
 
+      {/* 삭제 확인 모달 */}
       {showDeleteConfirm && (
         <ConfirmModal
           title="게시글 삭제"
@@ -216,6 +211,7 @@ export default function InterestsDetail() {
         />
       )}
 
+      {/* 삭제 완료 모달 */}
       {showDeleteComplete && (
         <Modal
           title="삭제 완료"
@@ -226,4 +222,5 @@ export default function InterestsDetail() {
       )}
     </>
   );
+
 }

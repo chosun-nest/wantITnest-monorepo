@@ -1,4 +1,4 @@
-import { Notice } from "./NoticeBoard";
+import { Notice } from "../../routes/NoticeBoard";
 
 const NoticeCard = ({ notice }: { notice: Notice }) => {
   return (

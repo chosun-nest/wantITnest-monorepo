@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@reduxjs/toolkit": "^2.7.0",
+    "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.0.14",
     "@types/react-modal": "^3.16.3",
     "@uiw/react-markdown-preview": "^5.1.4",
@@ -41,7 +42,8 @@
     "redux-persist": "^6.0.0",
     "remark-gfm": "^4.0.1",
     "styled-components": "^6.1.17",
-    "styled-reset": "^4.5.2"
+    "styled-reset": "^4.5.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

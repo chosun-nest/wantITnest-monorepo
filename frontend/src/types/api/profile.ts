@@ -13,7 +13,6 @@ export interface MemberProfile {
   memberImageUrl: string;
   memberPasswordLength: number;
   memberDepartmentResponseDtoList: MemberDepartment[];
-  memberInterestResponseDtoList: MemberInterest[];
   memberTechStackResponseDtoList: MemberTechStack[];
 }
 
@@ -25,13 +24,13 @@ export interface MemberDepartment {
   departmentName: string;
 }
 
-// 관심 분야 정보
-export interface MemberInterest {
-  memberInterestId: number;
-  memberId: number;
-  interestId: number;
-  interestName: string;
-}
+// // 관심 분야 정보
+// export interface MemberInterest {
+//   memberInterestId: number;
+//   memberId: number;
+//   interestId: number;
+//   interestName: string;
+// }
 
 // 기술 스택 정보
 export interface MemberTechStack {
@@ -52,7 +51,6 @@ export interface UpdateMemberProfilePayload {
   memberSnsUrl3?: string;
   memberSnsUrl4?: string;
   memberDepartmentUpdateRequestIdList?: number[];
-  memberInterestUpdateRequestIdList?: number[];
   memberTechStackUpdateRequestIdList?: number[];
 }
 
