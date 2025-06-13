@@ -20,8 +20,12 @@ if [ "$1" == "up" ]; then
   mkdir -p backend/uploaded-images
   
   # Profile 환경변수 설정 후 Docker Compose 실행
-  echo "🐳 Docker Compose로 모든 서비스 시작 중... (SPRING_PROFILES_ACTIVE=$PROFILE)"
-  SPRING_PROFILES_ACTIVE=$PROFILE docker-compose -f docker-compose.proxy.yml up -d --build
+  echo "🔨 기존 컨테이너와 이미지를 정리합니다..."
+  docker-compose -f docker-compose.proxy.yml down
+  docker system prune -f --volumes
+  
+  echo "🐳 최신 코드로 전체 재빌드합니다... (SPRING_PROFILES_ACTIVE=$PROFILE)"
+  SPRING_PROFILES_ACTIVE=$PROFILE docker-compose -f docker-compose.proxy.yml up -d --build --force-recreate
   
   echo "✅ 모든 서비스가 시작되었습니다! (Profile: $PROFILE)"
   echo "🔍 서비스 확인:"
@@ -43,7 +47,12 @@ elif [ "$1" == "dev" ]; then
   mkdir -p backend/uploaded-images
   
   # 개발 모드로 실행
-  SPRING_PROFILES_ACTIVE=dev docker-compose -f docker-compose.proxy.yml up -d --build
+  echo "🔨 기존 컨테이너와 이미지를 정리합니다..."
+  docker-compose -f docker-compose.proxy.yml down
+  docker system prune -f --volumes
+  
+  echo "🐳 최신 코드로 전체 재빌드합니다..."
+  SPRING_PROFILES_ACTIVE=dev docker-compose -f docker-compose.proxy.yml up -d --build --force-recreate
   
   echo "✅ 개발 모드로 시작 완료! 테스트 데이터가 로드됩니다."
   echo "🔍 서비스 확인:"
@@ -59,7 +68,12 @@ elif [ "$1" == "prod" ]; then
   mkdir -p backend/uploaded-images
   
   # 운영 모드로 실행
-  SPRING_PROFILES_ACTIVE=prod docker-compose -f docker-compose.proxy.yml up -d --build
+  echo "🔨 기존 컨테이너와 이미지를 정리합니다..."
+  docker-compose -f docker-compose.proxy.yml down
+  docker system prune -f --volumes
+  
+  echo "🐳 최신 코드로 전체 재빌드합니다..."
+  SPRING_PROFILES_ACTIVE=prod docker-compose -f docker-compose.proxy.yml up -d --build --force-recreate
   
   echo "✅ 운영 모드로 시작 완료! 테스트 데이터를 건너뜁니다."
   echo "🔍 서비스 확인:"
