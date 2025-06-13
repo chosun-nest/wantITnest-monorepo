@@ -131,6 +131,9 @@ public class CommentService {
     private List<CommentResponseDto> buildFlatTreeStructure(List<Comment> comments, Map<Long, CommentResponseDto> responseMap) {
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
+        Map<Long, Comment> commentMap = comments.stream()
+                .collect(Collectors.toMap(Comment::getCommentId, c -> c));
+
         // 최상위 댓글들을 찾기
         for (Comment comment : comments) {
             if (comment.getParentId() == null) {
@@ -141,7 +144,7 @@ public class CommentService {
         // 각 대댓글에 대해 최상위 부모를 찾아서 해당 부모의 children에 추가
         for (Comment comment : comments) {
             if (comment.getParentId() != null) {
-                Long rootParentId = findRootParentId(comment, comments);
+                Long rootParentId = findRootParentId(comment, commentMap);
                 CommentResponseDto rootParent = responseMap.get(rootParentId);
                 CommentResponseDto replyDto = responseMap.get(comment.getCommentId());
 
@@ -162,10 +165,7 @@ public class CommentService {
     /**
      * 주어진 댓글의 최상위 부모 댓글 ID를 찾습니다.
      */
-    private Long findRootParentId(Comment comment, List<Comment> allComments) {
-        Map<Long, Comment> commentMap = allComments.stream()
-                .collect(Collectors.toMap(Comment::getCommentId, c -> c));
-
+    private Long findRootParentId(Comment comment, Map<Long, Comment> commentMap) {
         Comment current = comment;
         while (current.getParentId() != null) {
             Comment parent = commentMap.get(current.getParentId());
