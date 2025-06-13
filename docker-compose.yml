@@ -25,11 +25,6 @@ services:
       - ./.env  # 루트의 .env 파일 지정
     ports:
       - "${NEST_BE_PORT}:${NEST_BE_PORT}"
-    environment:
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     volumes:
       - ./backend/uploaded-images:/app/uploaded-images
     restart: unless-stopped

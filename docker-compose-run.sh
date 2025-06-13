@@ -21,13 +21,11 @@ if [ "$1" == "up" ]; then
   
   # Profile 환경변수 설정 후 Docker Compose 실행
   echo "🐳 Docker Compose로 모든 서비스 시작 중... (SPRING_PROFILES_ACTIVE=$PROFILE)"
-  SPRING_PROFILES_ACTIVE=$PROFILE docker-compose up -d --build
+  SPRING_PROFILES_ACTIVE=$PROFILE docker-compose -f docker-compose.proxy.yml up -d --build
   
   echo "✅ 모든 서비스가 시작되었습니다! (Profile: $PROFILE)"
   echo "🔍 서비스 확인:"
-  echo "   - AI 서비스: http://localhost:8000"
-  echo "   - 백엔드: http://localhost:6030"
-  echo "   - 프론트엔드: http://localhost:5173"
+  echo "   - 웹 애플리케이션: http://localhost"
   
   if [ "$PROFILE" == "dev" ] || [ "$PROFILE" == "local" ] || [ "$PROFILE" == "test" ]; then
     echo "🧪 개발 모드: 테스트 데이터가 자동으로 로드됩니다."
@@ -42,16 +40,14 @@ elif [ "$1" == "dev" ]; then
   ./gradlew bootJar
   cd ..
   
-  mkdir -p Nest-BE/uploaded-images
+  mkdir -p backend/uploaded-images
   
   # 개발 모드로 실행
-  SPRING_PROFILES_ACTIVE=dev docker-compose up -d --build
+  SPRING_PROFILES_ACTIVE=dev docker-compose -f docker-compose.proxy.yml up -d --build
   
   echo "✅ 개발 모드로 시작 완료! 테스트 데이터가 로드됩니다."
   echo "🔍 서비스 확인:"
-  echo "   - AI 서비스: http://localhost:8000"
-  echo "   - 백엔드: http://localhost:6030"
-  echo "   - 프론트엔드: http://localhost:5173"
+  echo "   - 웹 애플리케이션: http://localhost"
 
 elif [ "$1" == "prod" ]; then
   echo "🚀 운영 모드로 모든 서비스를 시작합니다... (테스트 데이터 제외)"
@@ -60,41 +56,39 @@ elif [ "$1" == "prod" ]; then
   ./gradlew bootJar
   cd ..
   
-  mkdir -p Nest-BE/uploaded-images
+  mkdir -p backend/uploaded-images
   
   # 운영 모드로 실행
-  SPRING_PROFILES_ACTIVE=prod docker-compose up -d --build
+  SPRING_PROFILES_ACTIVE=prod docker-compose -f docker-compose.proxy.yml up -d --build
   
   echo "✅ 운영 모드로 시작 완료! 테스트 데이터를 건너뜁니다."
   echo "🔍 서비스 확인:"
-  echo "   - AI 서비스: http://localhost:8000"
-  echo "   - 백엔드: http://localhost:6030"
-  echo "   - 프론트엔드: http://localhost:5173"
+  echo "   - 웹 애플리케이션: http://localhost"
 
 elif [ "$1" == "down" ]; then
   echo "🛑 모든 서비스를 중지합니다..."
-  docker-compose down
+  docker-compose -f docker-compose.proxy.yml down
   echo "✅ 모든 서비스가 중지되었습니다!"
 
 elif [ "$1" == "logs" ]; then
   # 특정 서비스 로그 확인
   if [ "$2" != "" ]; then
     echo "📜 $2 서비스의 로그를 확인합니다..."
-    docker-compose logs -f $2
+    docker-compose -f docker-compose.proxy.yml logs -f $2
   else
     echo "📜 모든 서비스의 로그를 확인합니다..."
-    docker-compose logs -f
+    docker-compose -f docker-compose.proxy.yml logs -f
   fi
 
 elif [ "$1" == "restart" ]; then
   # 특정 서비스 재시작
   if [ "$2" != "" ]; then
     echo "🔄 $2 서비스를 재시작합니다..."
-    docker-compose restart $2
+    docker-compose -f docker-compose.proxy.yml restart $2
     echo "✅ $2 서비스가 재시작되었습니다!"
   else
     echo "🔄 모든 서비스를 재시작합니다..."
-    docker-compose restart
+    docker-compose -f docker-compose.proxy.yml restart
     echo "✅ 모든 서비스가 재시작되었습니다!"
   fi
 
