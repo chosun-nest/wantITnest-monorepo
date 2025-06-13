@@ -19,6 +19,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,91 +91,193 @@ public class CommentService {
     }
 
     /**
-     * 특정 게시글의 댓글 목록을 트리 구조로 조회합니다.
+     * 특정 게시글의 댓글 목록을 트리 구조로 조회합니다. (최상위 댓글 기준 페이징)
      * <p>
-     * - 대댓글 기능을 포함한 트리 구조로 응답을 구성합니다.<br>
+     * - 최상위 댓글만 페이징하고, 해당 댓글들의 모든 대댓글을 함께 조회합니다.<br>
      * - 대댓글의 대댓글도 최상위 댓글의 children에 평면적으로 포함됩니다.<br>
-     * - 댓글 작성자의 이름은 memberId 기반으로 조회하여 매핑합니다.<br>
-     * - 댓글은 작성일 기준 오름차순으로 정렬됩니다.
+     * - 각 페이지에서 댓글-대댓글 관계가 끊어지지 않도록 보장합니다.<br>
+     * - 댓글 작성자의 이름은 memberId 기반으로 조회하여 매핑합니다.
      * </p>
      *
      * @param boardType 댓글을 조회할 대상 게시글이 속한 게시판
      * @param postId    댓글을 조회할 대상 게시글의 ID
+     * @param pageable  페이징 정보 (최상위 댓글 기준)
      * @return {@link CommentListResponseDto} 트리 구조로 구성된 댓글 목록 DTO
      */
     @Transactional(readOnly = true)
-    public CommentListResponseDto getCommentList(BoardType boardType, Long postId) {
+    public CommentListResponseDto getCommentList(BoardType boardType, Long postId, Pageable pageable) {
         validatePostExistence(boardType, postId);
 
-        List<Comment> comments = commentRepository.findByBoardTypeAndPostIdOrderByCreatedAtAsc(boardType, postId);
+        // 1. 최상위 댓글만 페이징 조회
+        Page<Comment> rootCommentsPage = commentRepository.findRootCommentsPaged(
+                boardType, postId, pageable);
 
+        List<Comment> rootComments = rootCommentsPage.getContent();
+
+        if (rootComments.isEmpty()) {
+            return CommentDtoConverter.toCommentList(List.of(), rootCommentsPage);
+        }
+
+        // 2. 해당 최상위 댓글들의 모든 대댓글을 재귀적으로 조회
+        List<Comment> allComments = new ArrayList<>(rootComments);
+        List<Comment> allReplies = findAllRepliesRecursively(boardType, postId, rootComments);
+        allComments.addAll(allReplies);
+
+        // 3. 멤버 이름 매핑
         Map<Long, String> memberNameMap = memberRepository.findAllById(
-                comments.stream().map(Comment::getMemberId).distinct().toList()
+                allComments.stream().map(Comment::getMemberId).distinct().toList()
         ).stream().collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
 
-        // 모든 댓글을 DTO로 변환
+        // 4. DTO 변환
         Map<Long, CommentResponseDto> responseMap = new LinkedHashMap<>();
-        for (Comment comment : comments) {
+        for (Comment comment : allComments) {
             String authorName = memberNameMap.get(comment.getMemberId());
             CommentResponseDto dto = CommentDtoConverter.toResponseDto(comment, authorName);
             responseMap.put(comment.getCommentId(), dto);
         }
 
-        // 최상위 댓글들을 찾고, 모든 대댓글을 해당 최상위 댓글의 children에 추가
-        List<CommentResponseDto> rootComments = buildFlatTreeStructure(comments, responseMap);
+        // 5. 트리 구조 생성 (최상위 댓글들만 root로 사용)
+        List<CommentResponseDto> rootCommentsDto = buildOptimizedTreeStructure(rootComments, allComments, responseMap);
 
-        return CommentDtoConverter.toCommentList(rootComments);
+        return CommentDtoConverter.toCommentList(rootCommentsDto, rootCommentsPage);
     }
 
     /**
-     * 대댓글의 대댓글도 최상위 댓글의 children에 평면적으로 배치하는 트리 구조를 생성.
+     * 주어진 최상위 댓글들의 모든 대댓글을 재귀적으로 조회합니다.
      */
-    private List<CommentResponseDto> buildFlatTreeStructure(List<Comment> comments, Map<Long, CommentResponseDto> responseMap) {
-        List<CommentResponseDto> rootComments = new ArrayList<>();
+    private List<Comment> findAllRepliesRecursively(BoardType boardType, Long postId, List<Comment> parentComments) {
+        List<Comment> allReplies = new ArrayList<>();
+        List<Long> currentParentIds = parentComments.stream()
+                .map(Comment::getCommentId)
+                .toList();
 
-        Map<Long, Comment> commentMap = comments.stream()
-                .collect(Collectors.toMap(Comment::getCommentId, c -> c));
+        while (!currentParentIds.isEmpty()) {
+            // 현재 부모들의 직접 대댓글들 조회
+            List<Comment> directReplies = commentRepository.findDirectRepliesByParentIds(boardType, postId, currentParentIds);
 
-        // 최상위 댓글들을 찾기
-        for (Comment comment : comments) {
-            if (comment.getParentId() == null) {
-                rootComments.add(responseMap.get(comment.getCommentId()));
+            if (directReplies.isEmpty()) {
+                break; // 더 이상 대댓글이 없으면 종료
             }
+
+            allReplies.addAll(directReplies);
+
+            // 다음 레벨의 부모 ID들 (대댓글의 대댓글을 찾기 위해)
+            currentParentIds = directReplies.stream()
+                    .map(Comment::getCommentId)
+                    .toList();
         }
 
-        // 각 대댓글에 대해 최상위 부모를 찾아서 해당 부모의 children에 추가
-        for (Comment comment : comments) {
-            if (comment.getParentId() != null) {
-                Long rootParentId = findRootParentId(comment, commentMap);
-                CommentResponseDto rootParent = responseMap.get(rootParentId);
-                CommentResponseDto replyDto = responseMap.get(comment.getCommentId());
+        return allReplies;
+    }
 
-                if (rootParent != null && replyDto != null) {
-                    rootParent.getChildren().add(replyDto);
+    /**
+     * 최상위 댓글들과 그들의 모든 대댓글로 최적화된 트리 구조를 생성합니다.
+     */
+    private List<CommentResponseDto> buildOptimizedTreeStructure(
+            List<Comment> rootComments,
+            List<Comment> allComments,
+            Map<Long, CommentResponseDto> responseMap) {
+
+        List<CommentResponseDto> result = new ArrayList<>();
+
+        // 성능 최적를 위해 commentMap과 rootMapping을 미리 계산
+        Map<Long, Long> commentToRootMap = calculateRootParentMapping(allComments);
+
+        Set<Long> rootCommentIds = rootComments.stream()
+                .map(Comment::getCommentId)
+                .collect(Collectors.toSet());
+
+        // 1. 최상위 댓글들을 결과에 추가
+        for (Comment rootComment : rootComments) {
+            result.add(responseMap.get(rootComment.getCommentId()));
+        }
+
+        // 2. 모든 대댓글을 해당하는 최상위 댓글의 children에 추가
+        for (Comment comment : allComments) {
+            if (comment.getParentId() != null) {
+                Long rootParentId = commentToRootMap.get(comment.getCommentId());
+
+                // 현재 페이지에 있는 최상위 댓글인지 확인
+                if (rootCommentIds.contains(rootParentId)) {
+                    CommentResponseDto rootParent = responseMap.get(rootParentId);
+                    CommentResponseDto replyDto = responseMap.get(comment.getCommentId());
+
+                    if (rootParent != null && replyDto != null) {
+                        rootParent.getChildren().add(replyDto);
+                    }
                 }
             }
         }
 
-        // 각 최상위 댓글의 children을 작성시간순으로 정렬
-        for (CommentResponseDto rootComment : rootComments) {
+        // 3. 각 최상위 댓글의 children을 작성시간순으로 정렬
+        for (CommentResponseDto rootComment : result) {
             rootComment.getChildren().sort(Comparator.comparing(CommentResponseDto::getCreatedAt));
         }
 
-        return rootComments;
+        return result;
     }
 
     /**
-     * 주어진 댓글의 최상위 부모 댓글 ID를 찾습니다.
+     * 모든 댓글의 최상위 부모를 메모이제이션으로 효율적으로 계산합니다.
      */
-    private Long findRootParentId(Comment comment, Map<Long, Comment> commentMap) {
-        Comment current = comment;
-        while (current.getParentId() != null) {
-            Comment parent = commentMap.get(current.getParentId());
-            if (parent == null) break;
-            current = parent;
+    private Map<Long, Long> calculateRootParentMapping(List<Comment> allComments) {
+        Map<Long, Comment> commentMap = allComments.stream()
+                .collect(Collectors.toMap(Comment::getCommentId, c -> c));
+
+        Map<Long, Long> rootMapping = new HashMap<>();
+
+        for (Comment comment : allComments) {
+            if (comment.getParentId() == null) {
+                // 최상위 댓글은 자기 자신이 root
+                rootMapping.put(comment.getCommentId(), comment.getCommentId());
+            } else if (!rootMapping.containsKey(comment.getCommentId())) {
+                // 대댓글은 부모 체인을 따라 최상위 찾기 (메모이제이션 활용)
+                Long rootId = findRootParentIdWithMemo(comment, commentMap, rootMapping);
+                rootMapping.put(comment.getCommentId(), rootId);
+            }
         }
 
-        return current.getCommentId();
+        return rootMapping;
+    }
+
+    /**
+     * 메모이제이션을 활용한 최적화된 최상위 부모 찾기
+     */
+    private Long findRootParentIdWithMemo(Comment comment, Map<Long, Comment> commentMap, Map<Long, Long> memo) {
+        // 이미 계산된 값이 있으면 재사용
+        if (memo.containsKey(comment.getCommentId())) {
+            return memo.get(comment.getCommentId());
+        }
+
+        Comment current = comment;
+        List<Long> path = new ArrayList<>();
+
+        while (current.getParentId() != null) {
+            path.add(current.getCommentId());
+
+            // 이미 계산된 부모가 있으면 사용
+            if (memo.containsKey(current.getParentId())) {
+                Long rootId = memo.get(current.getParentId());
+                // 경로상의 모든 댓글들도 같은 root를 가짐
+                for (Long commentId : path) {
+                    memo.put(commentId, rootId);
+                }
+                return rootId;
+            }
+
+            current = commentMap.get(current.getParentId());
+            if (current == null) break;
+        }
+
+        // 최상위에 도달
+        Long rootId = current.getCommentId();
+
+        // 경로상의 모든 댓글들을 메모에 저장
+        for (Long commentId : path) {
+            memo.put(commentId, rootId);
+        }
+
+        return rootId;
     }
 
     /**

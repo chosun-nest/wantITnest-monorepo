@@ -22,6 +22,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +56,9 @@ public class CommentController {
 
     @CommentListOperation
     @GetMapping
-    public ResponseEntity<CommentListResponseDto> getCommentList(@PathVariable BoardType boardType, @PathVariable Long postId) {
-        return ResponseEntity.ok(commentService.getCommentList(boardType, postId));
+    public ResponseEntity<CommentListResponseDto> getCommentList(@PathVariable BoardType boardType, @PathVariable Long postId,
+                                                                 @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(commentService.getCommentList(boardType, postId ,pageable));
     }
 
     @Operation(

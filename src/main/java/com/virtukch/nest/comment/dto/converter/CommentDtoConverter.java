@@ -4,7 +4,9 @@ import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
 import com.virtukch.nest.comment.dto.CommentListResponseDto;
 import com.virtukch.nest.comment.dto.CommentResponseDto;
 import com.virtukch.nest.comment.model.Comment;
+import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.post.dto.AuthorDto;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,10 +39,11 @@ public class CommentDtoConverter {
                 .build();
     }
 
-    public static CommentListResponseDto toCommentList(List<CommentResponseDto> comments) {
+    public static CommentListResponseDto toCommentList(List<CommentResponseDto> comments, Page<Comment> page) {
         return CommentListResponseDto.builder()
                 .comments(comments)
                 .totalCount(comments.size())
+                .pageInfo(PageInfoDto.create(page))
                 .build();
     }
 
