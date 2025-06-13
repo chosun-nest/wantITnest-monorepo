@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -34,8 +36,6 @@ public class Project extends BaseTimeEntity {
     @Lob
     private String projectDescription;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectMember> members = new ArrayList<>();
 
     //최대 모집 인원
     @Column(nullable = false)
@@ -48,6 +48,10 @@ public class Project extends BaseTimeEntity {
     //조회수
     @Column(nullable = false)
     private Integer viewCount = 0;
+
+    // image url
+    @Column(columnDefinition = "TEXT")
+    private String imageUrls;
 
 
     public static Project createProject(Long memberId,
@@ -72,14 +76,6 @@ public class Project extends BaseTimeEntity {
     public void incrementViewCount(){ this.viewCount++; }
 
 
-    //프로젝트 리더 가져오는 메서드
-    public Member getProjectLeader() {
-        return members.stream()
-                .filter(pm -> pm.getRole() == ProjectMember.Role.LEADER)
-                .map(ProjectMember::getMember)
-                .findFirst()
-                .orElse(null); // orElseThrow 로 바꿔도 됨
-    }
 
     //프로젝트 업데이트 메서드
     public void updateProject(String projectTitle,
@@ -103,5 +99,23 @@ public class Project extends BaseTimeEntity {
         } else {
             this.isRecruiting = false;
         }
+    }
+
+    public void updateProject(String projectTitle,
+                              String projectDescription,
+                              int maxMember,
+                              boolean isRecruiting,
+                              List<String> imageUrls) {
+        updateProject(projectTitle, projectDescription, maxMember, isRecruiting);
+        if(imageUrls != null) {
+            this.imageUrls = imageUrls.isEmpty() ? null : String.join("||", imageUrls);
+        }
+    }
+
+    public List<String> getImageUrlList() {
+        if(imageUrls == null || imageUrls.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(imageUrls.split("\\|\\|"));
     }
 }

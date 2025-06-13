@@ -49,8 +49,8 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<MemberInterestResponseDto> memberInterestResponseDtoList = memberInterestService.findByMemberId(
-            memberId);
+//        List<MemberInterestResponseDto> memberInterestResponseDtoList = memberInterestService.findByMemberId(
+//            memberId);
         List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList = memberDepartmentService.findByMemberId(
             memberId);
         List<MemberTechStackResponseDto> memberTechStackResponseDtoList = memberTechStackService.findByMemberId(
@@ -69,7 +69,7 @@ public class MemberService {
             .memberIntroduce(member.getMemberIntroduce())
             .memberImageUrl(member.getMemberImageUrl())
             .memberPasswordLength(member.getMemberPasswordLength())
-            .memberInterestResponseDtoList(memberInterestResponseDtoList)
+//            .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
             .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
             .build();
@@ -79,8 +79,8 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<MemberInterestResponseDto> memberInterestResponseDtoList = memberInterestService.findByMemberId(
-            memberId);
+//        List<MemberInterestResponseDto> memberInterestResponseDtoList = memberInterestService.findByMemberId(
+//            memberId);
         List<MemberDepartmentResponseDto> memberDepartmentResponseDtoList = memberDepartmentService.findByMemberId(
             memberId);
         List<MemberTechStackResponseDto> memberTechStackResponseDtoList = memberTechStackService.findByMemberId(
@@ -99,7 +99,7 @@ public class MemberService {
             .memberIntroduce(member.getMemberIntroduce())
             .memberImageUrl(member.getMemberImageUrl())
             .memberPasswordLength(member.getMemberPasswordLength())
-            .memberInterestResponseDtoList(memberInterestResponseDtoList)
+//            .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
             .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
             .build();
@@ -167,7 +167,7 @@ public class MemberService {
             .memberIsStudent(member.getMemberIsStudent())
             .memberIntroduce(member.getMemberIntroduce())
             .memberImageUrl(member.getMemberImageUrl())
-            .memberInterestResponseDtoList(memberInterestService.findByMemberId(memberId))
+//            .memberInterestResponseDtoList(memberInterestService.findByMemberId(memberId))
             .memberDepartmentResponseDtoList(memberDepartmentService.findByMemberId(memberId))
             .memberTechStackResponseDtoList(memberTechStackService.findByMemberId(memberId))
             .build();
