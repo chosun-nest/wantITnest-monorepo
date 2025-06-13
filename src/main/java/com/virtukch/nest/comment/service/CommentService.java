@@ -37,10 +37,10 @@ public class CommentService {
     /**
      * 게시글에 새로운 댓글을 작성하고, 저장 후 응답 DTO로 반환합니다.
      *
-     * @param boardType     댓글을 작성한 게시판
-     * @param postId       댓글을 작성할 게시글 ID
-     * @param memberId      댓글을 작성한 사용자 ID
-     * @param requestDto    댓글 내용이 담긴 요청 DTO
+     * @param boardType  댓글을 작성한 게시판
+     * @param postId     댓글을 작성할 게시글 ID
+     * @param memberId   댓글을 작성한 사용자 ID
+     * @param requestDto 댓글 내용이 담긴 요청 DTO
      * @return 작성된 댓글에 대한 응답 DTO
      */
     @Transactional
@@ -53,7 +53,7 @@ public class CommentService {
     /**
      * 기존 댓글(parentId)에 대한 대댓글을 작성하고 저장한 후, 응답 DTO로 반환합니다.
      *
-     * @param boardType     댓글을 작성한 게시판
+     * @param boardType  댓글을 작성한 게시판
      * @param postId     대댓글이 달릴 게시글 ID
      * @param parentId   부모 댓글 ID (대댓글 대상)
      * @param memberId   대댓글을 작성한 사용자 ID
@@ -69,7 +69,7 @@ public class CommentService {
 
         // 부모 댓글이 같은 게시글에 속하는지 검증
         if (!Objects.equals(parentComment.getPostId(), postId) ||
-            !Objects.equals(parentComment.getBoardType(), boardType)) {
+                !Objects.equals(parentComment.getBoardType(), boardType)) {
             throw new ParentCommentMismatchException(parentId, postId);
         }
 
@@ -89,15 +89,16 @@ public class CommentService {
     }
 
     /**
-     * 특정 게시글의 댓글 목록을 계층 구조로 조회합니다.
+     * 특정 게시글의 댓글 목록을 트리 구조로 조회합니다.
      * <p>
      * - 대댓글 기능을 포함한 트리 구조로 응답을 구성합니다.<br>
+     * - 대댓글의 대댓글도 최상위 댓글의 children에 평면적으로 포함됩니다.<br>
      * - 댓글 작성자의 이름은 memberId 기반으로 조회하여 매핑합니다.<br>
-     * - 댓글은 작성일 기준 오름차순으로 정렬되며, 자식 댓글은 부모 댓글 하위에 포함됩니다.
+     * - 댓글은 작성일 기준 오름차순으로 정렬됩니다.
      * </p>
      *
      * @param boardType 댓글을 조회할 대상 게시글이 속한 게시판
-     * @param postId 댓글을 조회할 대상 게시글의 ID
+     * @param postId    댓글을 조회할 대상 게시글의 ID
      * @return {@link CommentListResponseDto} 트리 구조로 구성된 댓글 목록 DTO
      */
     @Transactional(readOnly = true)
@@ -110,37 +111,69 @@ public class CommentService {
                 comments.stream().map(Comment::getMemberId).distinct().toList()
         ).stream().collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
 
+        // 모든 댓글을 DTO로 변환
         Map<Long, CommentResponseDto> responseMap = new LinkedHashMap<>();
-
         for (Comment comment : comments) {
             String authorName = memberNameMap.get(comment.getMemberId());
             CommentResponseDto dto = CommentDtoConverter.toResponseDto(comment, authorName);
             responseMap.put(comment.getCommentId(), dto);
         }
 
+        // 최상위 댓글들을 찾고, 모든 대댓글을 해당 최상위 댓글의 children에 추가
+        List<CommentResponseDto> rootComments = buildFlatTreeStructure(comments, responseMap);
+
+        return CommentDtoConverter.toCommentList(rootComments);
+    }
+
+    /**
+     * 대댓글의 대댓글도 최상위 댓글의 children에 평면적으로 배치하는 트리 구조를 생성.
+     */
+    private List<CommentResponseDto> buildFlatTreeStructure(List<Comment> comments, Map<Long, CommentResponseDto> responseMap) {
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
+        // 최상위 댓글들을 찾기
         for (Comment comment : comments) {
-            CommentResponseDto dto = responseMap.get(comment.getCommentId());
-            Long parentId = comment.getParentId();
+            if (comment.getParentId() == null) {
+                rootComments.add(responseMap.get(comment.getCommentId()));
+            }
+        }
 
-            if (parentId == null) {
-                rootComments.add(dto);
-            } else {
-                CommentResponseDto parentDto = responseMap.get(parentId);
-                if (parentDto != null) {
-                    parentDto.getChildren().add(dto);
+        // 각 대댓글에 대해 최상위 부모를 찾아서 해당 부모의 children에 추가
+        for (Comment comment : comments) {
+            if (comment.getParentId() != null) {
+                Long rootParentId = findRootParentId(comment, comments);
+                CommentResponseDto rootParent = responseMap.get(rootParentId);
+                CommentResponseDto replyDto = responseMap.get(comment.getCommentId());
+
+                if (rootParent != null && replyDto != null) {
+                    rootParent.getChildren().add(replyDto);
                 }
             }
         }
 
-        // 자식 댓글들을 작성일 기준 오름차순으로 정렬
-        Comparator<CommentResponseDto> byCreatedAt = Comparator.comparing(CommentResponseDto::getCreatedAt);
-        for (CommentResponseDto parent : responseMap.values()) {
-            parent.getChildren().sort(byCreatedAt);
+        // 각 최상위 댓글의 children을 작성시간순으로 정렬
+        for (CommentResponseDto rootComment : rootComments) {
+            rootComment.getChildren().sort(Comparator.comparing(CommentResponseDto::getCreatedAt));
         }
 
-        return CommentDtoConverter.toCommentList(rootComments);
+        return rootComments;
+    }
+
+    /**
+     * 주어진 댓글의 최상위 부모 댓글 ID를 찾습니다.
+     */
+    private Long findRootParentId(Comment comment, List<Comment> allComments) {
+        Map<Long, Comment> commentMap = allComments.stream()
+                .collect(Collectors.toMap(Comment::getCommentId, c -> c));
+
+        Comment current = comment;
+        while (current.getParentId() != null) {
+            Comment parent = commentMap.get(current.getParentId());
+            if (parent == null) break;
+            current = parent;
+        }
+
+        return current.getCommentId();
     }
 
     /**
@@ -151,13 +184,12 @@ public class CommentService {
      * - 수정 시점은 updatedAt 필드에 자동으로 반영됩니다.
      * </p>
      *
-     * @param commentId 수정할 댓글의 ID
-     * @param memberId  요청 사용자(댓글 작성자)의 ID
+     * @param commentId  수정할 댓글의 ID
+     * @param memberId   요청 사용자(댓글 작성자)의 ID
      * @param requestDto 수정할 댓글 내용을 담은 요청 DTO
      * @return 수정된 댓글 정보를 담은 {@link CommentResponseDto}
-     *
      * @throws NoCommentAuthorityException 댓글 소유자가 아닌 경우
-     * @throws EntityNotFoundException 댓글 또는 사용자 정보가 존재하지 않는 경우
+     * @throws EntityNotFoundException     댓글 또는 사용자 정보가 존재하지 않는 경우
      */
     @Transactional
     public CommentResponseDto updateComment(Long commentId, Long memberId, CommentRequestDto requestDto) {
@@ -179,9 +211,8 @@ public class CommentService {
      * @param commentId 삭제할 댓글의 ID
      * @param memberId  요청 사용자(댓글 작성자)의 ID
      * @return 삭제 결과 메시지를 포함한 {@link CommentDeleteResponseDto}
-     *
      * @throws NoCommentAuthorityException 댓글 소유자가 아닌 경우
-     * @throws EntityNotFoundException 댓글 또는 사용자 정보가 존재하지 않는 경우
+     * @throws EntityNotFoundException     댓글 또는 사용자 정보가 존재하지 않는 경우
      */
     @Transactional
     public CommentDeleteResponseDto deleteComment(Long commentId, Long memberId) {
@@ -197,10 +228,10 @@ public class CommentService {
             Long parentId = comment.getParentId();
             commentRepository.delete(comment);
 
-            if(parentId != null) {
+            if (parentId != null) {
                 Comment parentComment = findByIdOrThrow(parentId);
                 // 부모 댓글이 이미 삭제 되었고, 하위 대댓글이 존재하지 않으면 부모 댓글도 hard-delete
-                if(parentComment.isDeleted() && !commentRepository.existsByParentId(parentId)) {
+                if (parentComment.isDeleted() && !commentRepository.existsByParentId(parentId)) {
                     commentRepository.delete(parentComment);
                 }
             }

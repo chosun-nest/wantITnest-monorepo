@@ -23,6 +23,7 @@ public class CommentDtoConverter {
                 )
                 .createdAt(timeFormat(comment.getCreatedAt()))
                 .updatedAt(timeFormat(comment.getUpdatedAt()))
+                .parentId(comment.getParentId())
                 .isDeleted(comment.isDeleted())
                 .likeCount(comment.getLikeCount())
                 .dislikeCount(comment.getDislikeCount())
@@ -42,7 +43,7 @@ public class CommentDtoConverter {
                 .totalCount(comments.size())
                 .build();
     }
-    
+
     private static String timeFormat(LocalDateTime dateTime) {
         return dateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
     }
