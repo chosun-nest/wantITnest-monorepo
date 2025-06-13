@@ -1,5 +1,7 @@
 import requests
 import time
+import re
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -77,7 +79,6 @@ class NoticeService:
                 notice = self.parse_notice_row(cols, category, BASE_URL)
                 if notice and not self.cache.is_duplicate(notice):
                     notices.append(notice)
-                    self.cache.add_notice(notice)
             
             # 연도 필터링
             filtered_notices = [
@@ -95,7 +96,9 @@ class NoticeService:
         try:
             number = cols[0].text.strip()
             writer = cols[2].text.strip()
-            views = cols[4].text.strip().replace(",", "")
+                    # 조회수 처리 - 숫자만 추출
+            views_text = cols[4].text.strip()
+            views = re.sub(r'[^0-9]', '', views_text)
             
             # 날짜 처리 (장학공지 특별 처리)
             if category == "장학공지":
@@ -155,7 +158,11 @@ class NoticeService:
             )
             response.raise_for_status()
             
-            logger.info(f"[{category}] 스프링 서버 전송 성공: {response.status_code}")
+            # ✅ 전송 성공 시에만 캐시에 저장
+            for notice in notices:
+                self.cache.add_notice(notice)
+            
+            logger.info(f"[{category}] 스프링 서버 전송 성공: {response.status_code}, 캐시 업데이트 완료")
             return True
             
         except requests.RequestException as e:
