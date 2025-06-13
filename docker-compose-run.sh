@@ -68,14 +68,12 @@ elif [ "$1" == "prod" ]; then
   echo "✅ 운영 모드로 시작 완료! 테스트 데이터를 건너뜁니다."
   echo "🔍 서비스 확인:"
   echo "   - 웹 애플리케이션: http://localhost"
-  
-  echo "✅ 운영 모드로 시작 완료! 테스트 데이터를 건너뜁니다."
-  echo "🔍 서비스 확인:"
-  echo "   - 웹 애플리케이션: http://localhost"
 
 elif [ "$1" == "down" ]; then
   echo "🛑 모든 서비스를 중지합니다..."
   docker-compose -f docker-compose.proxy.yml down
+  echo "🗑️ React 빌드 볼륨을 삭제합니다..."
+  docker volume rm capstone-design-gitlab_react-build 2>/dev/null || true
   echo "✅ 모든 서비스가 중지되었습니다!"
 
 elif [ "$1" == "logs" ]; then
@@ -118,5 +116,5 @@ else
   echo "   ./docker-compose-run.sh up dev        # 개발용"
   echo "   ./docker-compose-run.sh up prod       # 운영용 (기본값)"
   echo
-  echo "📌 서비스명 예시: nest-ai, nest-be, nest-fe"
+  echo "📌 서비스명 예시: nest-ai, nest-be, nest-fe, nginx"
 fi

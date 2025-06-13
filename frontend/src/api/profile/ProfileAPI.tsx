@@ -23,7 +23,11 @@ const authHeader = () => ({
 export const uploadProfileImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await API.post("/api/v1/members/me/image", formData, authHeader());
+  const res = await API.post(
+    "/api/v1/members/me/image",
+    formData,
+    authHeader()
+  );
   return res.data.imageUrl;
 };
 
@@ -38,7 +42,7 @@ export const checkPassword = async (payload: CheckPasswordPayload) => {
 // 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me", authHeader());
-  const BASE_URL = "http://49.246.71.236:6030";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   return {
     ...res.data,
@@ -65,7 +69,11 @@ export const updateMemberProfile = async (
 export const updateMemberPassword = async (
   payload: UpdateMemberPasswordPayload
 ): Promise<{ message: string }> => {
-  const res = await API.patch("/api/v1/members/me/password", payload, authHeader());
+  const res = await API.patch(
+    "/api/v1/members/me/password",
+    payload,
+    authHeader()
+  );
   return res.data;
 };
 
