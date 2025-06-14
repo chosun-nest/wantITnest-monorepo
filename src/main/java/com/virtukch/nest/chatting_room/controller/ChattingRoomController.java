@@ -45,7 +45,7 @@ public class ChattingRoomController {
 
     @Operation(
         summary = "채팅방 이름 수정",
-        description = "인증된 사용자가 특정 채팅방의 이름을 수정합니다. 수정 권한은 해당 채팅방에 대한 접근 권한이 있는 사용자로 제한됩니다.",
+        description = "인증된 사용자가 특정 채팅방의 이름을 수정합니다.",
         security = @SecurityRequirement(name = "bearerAuth"),
         responses = {
             @ApiResponse(
@@ -67,7 +67,7 @@ public class ChattingRoomController {
 
     @Operation(
         summary = "채팅방 삭제",
-        description = "인증된 사용자가 특정 채팅방을 삭제합니다. 삭제 권한은 해당 채팅방에 대한 접근 권한이 있는 사용자로 제한됩니다.",
+        description = "인증된 사용자가 특정 채팅방을 삭제합니다.",
         security = @SecurityRequirement(name = "bearerAuth"),
         responses = {
             @ApiResponse(
