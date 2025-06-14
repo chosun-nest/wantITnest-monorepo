@@ -43,14 +43,7 @@ export default function ProjectEdit() {
     const payload: UpdateProjectPayload = {
       projectTitle: title,
       projectDescription: description,
-<<<<<<< HEAD
-      tags: [], // TODO: 태그 기능 구현 시 반영
-      partCounts: {
-        DEFAULT: maxMember, // TODO: 임시 키 사용 → 추후 파트 선택 UI 구현 필요
-      },
-      recruiting: true, // TODO: 마감 여부 상태에 따라 수정
-    };
-=======
+
       tags: [], // TODO: 추후 태그 연결
       parts: [
         {
@@ -58,7 +51,6 @@ export default function ProjectEdit() {
           count: maxMember,  // 기존 maxMember를 임시로 재활용
         },
       ],
->>>>>>> origin/dev
 
   imageUrls: null, // TODO: 이미지 업로드 기능 구현되면 배열로 대체
 };
