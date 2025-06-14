@@ -70,7 +70,7 @@ export const updateMemberPassword = async (
 };
 
 //
-// ✅ 인증 관련 API
+// 인증 관련 API
 //
 
 // 토큰 유효성 검사 (GET)
@@ -80,7 +80,7 @@ export const checkTokenValidity = async (): Promise<{ memberId: number }> => {
 };
 
 //
-// ✅ 기술 스택 / 학과 관련 API (공개 API)
+// 기술 스택 / 학과 관련 API (공개 API)
 //
 
 // 기술 스택 목록 조회 (GET)
@@ -100,7 +100,7 @@ export const getDepartments = async () => {
 };
 
 //
-// ✅ 관심 태그 관련 API
+// 관심 태그 관련 API
 //
 
 // 관심 태그 목록 조회 (GET)
@@ -120,10 +120,26 @@ export const addFavoriteTag = async (tagName: string): Promise<void> => {
   );
 };
 
-// 관심 태그 삭제
+// 관심 태그 삭제 (DELETE)
 export const deleteFavoriteTag = async (tagName: string): Promise<void> => {
   await API.delete(
     `/api/v1/favorites/tags/${encodeURIComponent(tagName)}`,
     authHeader()
   );
+};
+
+
+// 다른 사용자 프로필 조회
+
+// 특정 회원 프로필 조회 - 로그인 필요(GET)
+export const getMemberProfileById = async (memberId: number): Promise<MemberProfile> => {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const res = await API.get(`/api/v1/members/${memberId}`, authHeader());
+
+  return {
+    ...res.data,
+    memberImageUrl: res.data.memberImageUrl
+      ? `${BASE_URL}${res.data.memberImageUrl}`
+      : "",
+  };
 };

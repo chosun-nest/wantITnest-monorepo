@@ -90,7 +90,7 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center">
+      <div className="max-w-4xl px-4 pb-10 mx-auto text-center pt-36">
         ⏳ 로딩 중입니다...
       </div>
     );
@@ -98,7 +98,7 @@ export default function ProjectDetail() {
 
   if (authError) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center text-red-500 font-semibold">
+      <div className="max-w-4xl px-4 pb-10 mx-auto font-semibold text-center text-red-500 pt-36">
         🔒 로그인 후 프로젝트 정보를 확인할 수 있습니다.
       </div>
     );
@@ -106,7 +106,7 @@ export default function ProjectDetail() {
 
   if (notFound) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center text-gray-600">
+      <div className="max-w-4xl px-4 pb-10 mx-auto text-center text-gray-600 pt-36">
         ❌ 해당 프로젝트를 찾을 수 없습니다.
         <div className="mt-4">
           <button
@@ -163,13 +163,13 @@ export default function ProjectDetail() {
           <div className="flex gap-2 mt-4">
             <button
               onClick={handleEdit}
-              className="px-3 py-1 text-sm bg-yellow-400 text-white rounded hover:bg-yellow-500"
+              className="px-3 py-1 text-sm text-white bg-yellow-400 rounded hover:bg-yellow-500"
             >
               ✏️ 수정
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
             >
               🗑 삭제
             </button>
@@ -182,9 +182,9 @@ export default function ProjectDetail() {
           {project.projectDescription}
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-6">
           {project.tags.map((tag) => (
-            <span key={tag} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
+            <span key={tag} className="px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded">
               {tag}
             </span>
           ))}
@@ -192,7 +192,7 @@ export default function ProjectDetail() {
 
         {/* 아래 항목은 타입에 없으므로 주석 처리하거나 추후 확장 */}
         {/* 
-        <div className="text-sm text-gray-500 mb-6">
+        <div className="mb-6 text-sm text-gray-500">
           모집 상태: <strong>{project.status}</strong> / 참여 인원: {project.currentMember} / {project.maxMember}
         </div>
         */}
