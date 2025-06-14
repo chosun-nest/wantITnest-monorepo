@@ -100,7 +100,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
       text,
       user: String(currentUser.memberId),
       userName: currentUser.memberName,
-      userImage: currentUser.profileImageUrl || "",
+      userImage: currentUser.memberImageUrl || "",
     };
 
     wsRef.current.send(
