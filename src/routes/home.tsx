@@ -39,7 +39,6 @@ export default function Home() {
         </S.ItemTitle>
         <HomeInterest />
       </S.GridItem>
-
       <S.GridItem $row="1" $rowSpan="2" $col="3" $isMobile={isMobile}>
         <S.ItemTitle>
           학사 공지<Link to="/notice-board">+</Link>
