@@ -1,5 +1,6 @@
 package com.virtukch.nest.chatting_room_member.controller;
 
+import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.chatting_room_member.dto.ChattingRoomMemberRequestDto;
 import com.virtukch.nest.chatting_room_member.service.ChattingRoomMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,9 +33,11 @@ public class ChattingRoomMemberController {
         }
     )
     public ResponseEntity<Void> registerChattingRoomMember(
+        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRegisterOrRemoveRequestDto,
         @Parameter(hidden = true)
-        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRequestDto) {
-        chattingRoomMemberService.registerChattingRoomMember(chattingRoomMemberRequestDto);
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        chattingRoomMemberService.registerChattingRoomMember(
+            chattingRoomMemberRegisterOrRemoveRequestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -47,9 +51,11 @@ public class ChattingRoomMemberController {
         }
     )
     public ResponseEntity<Void> removeChattingRoomMember(
+        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRegisterOrRemoveRequestDto,
         @Parameter(hidden = true)
-        @RequestBody ChattingRoomMemberRequestDto dto) {
-        chattingRoomMemberService.removeChattingRoomMember(dto);
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        chattingRoomMemberService.removeChattingRoomMember(
+            chattingRoomMemberRegisterOrRemoveRequestDto);
         return ResponseEntity.ok().build();
     }
 }
