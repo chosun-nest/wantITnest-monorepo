@@ -8,7 +8,7 @@ import {
 import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
 
-// ✅ 공통 인증 헤더
+// 공통 인증 헤더
 const authHeader = () => ({
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,
@@ -16,7 +16,7 @@ const authHeader = () => ({
 });
 
 //
-// ✅ 프로필 관련 API
+// 프로필 관련 API
 //
 
 // 프로필 이미지 업로드 (POST)
@@ -38,7 +38,7 @@ export const checkPassword = async (payload: CheckPasswordPayload) => {
 // 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me", authHeader());
-  const BASE_URL = "http://49.246.71.236:6030";
+  const BASE_URL = "http://121.178.113.153:6030";
 
   return {
     ...res.data,
