@@ -60,7 +60,7 @@ public class SecurityConfig {
                     "/api/v1/tags/**",
                     "/api/v1/posts/search",
                     "/api/v1/notices/**",
-                    "/api/v1/projects/**"
+                    "/api/v1/projects"
                 ).permitAll()
 
                 // GET 메서드만 허용하는 경로
