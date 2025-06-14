@@ -10,6 +10,7 @@ interface GridItemProps {
   $col: string;
   $rowSpan?: string;
   $colSpan?: string;
+  $width?: string;
 }
 
 export const GridContainer = styled.div<GridContainerProps>`
@@ -17,10 +18,10 @@ export const GridContainer = styled.div<GridContainerProps>`
   gap: 20px;
   padding: ${({ $navbarHeight }) => `${$navbarHeight + 20}px 20px 40px`};
   margin: 0 auto;
-  max-width: 1200px;
+  max-width: 1900px;
 
   grid-template-columns: ${({ $isMobile }) =>
-    $isMobile ? "1fr" : "repeat(3, 1fr)"};
+    $isMobile ? "1fr" : "1fr 2fr 2fr 2fr"};
   grid-template-rows: repeat(auto-fit, auto);
 `;
 
@@ -38,7 +39,7 @@ export const GridItem = styled.div<GridItemProps>`
   padding: 20px;
 
   min-height: 160px;
-
+  ${({ $width }) => $width && `width: ${$width};`}
   grid-row: ${({ $row, $isMobile, $rowSpan }) =>
     $isMobile ? "auto" : `${$row} / span ${$rowSpan || 1}`};
 
