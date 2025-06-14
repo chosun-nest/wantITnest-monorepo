@@ -1,27 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-.scrollbar-instagram::-webkit-scrollbar {
-  height: 2px;
-}
-
-.scrollbar-instagram::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollbar-instagram::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 100, 100, 0.25);
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-}
-
-.scrollbar-instagram:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 100, 100, 0.4);
-}
-
-/* Firefox */
-.scrollbar-instagram {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(100, 100, 100, 0.25) transparent;
-}
