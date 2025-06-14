@@ -105,14 +105,27 @@ export default function Ai() {
                   key={index}
                   className="flex border-t border-gray-200 dark:border-gray-700 pt-3"
                 >
-                  {!isUser && (
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1 border border-gray-200">
-                      <img src={ai} className="w-7 h-7 rounded-full" />
-                    </div>
-                  )}
-                  <p className="w-1/6 py-2 px-2 font-semibold text-sm text-gray-600 dark:text-gray-300">
-                    {displayName}
-                  </p>
+                  <div className="w-1/6 flex flex-col items-center justify-start pt-1">
+                    {!isUser && (
+                      <>
+                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1 border border-gray-200">
+                          <img
+                            src={ai}
+                            alt="위닛 프로필"
+                            className="w-7 h-7 rounded-full"
+                          />
+                        </div>
+                        <p className="font-semibold text-sm text-gray-600 dark:text-gray-300">
+                          {displayName}
+                        </p>
+                      </>
+                    )}
+                    {isUser && (
+                      <p className="font-semibold text-sm text-gray-600 dark:text-gray-300">
+                        {displayName}
+                      </p>
+                    )}
+                  </div>
                   <div
                     className="w-5/6 px-3 py-2 rounded-2xl shadow-sm"
                     style={{
