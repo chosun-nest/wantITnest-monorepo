@@ -1,20 +1,24 @@
 package com.virtukch.nest.history.controller;
 
-import com.virtukch.nest.history.dto.HistoryUpdateRequestDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
+import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.history.dto.HistoryRequestDto;
 import com.virtukch.nest.history.dto.HistoryResponseDto;
+import com.virtukch.nest.history.dto.HistoryUpdateRequestDto;
 import com.virtukch.nest.history.service.HistoryService;
-import com.virtukch.nest.auth.security.CustomUserDetails;
-import jakarta.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/histories")
@@ -43,7 +47,7 @@ public class HistoryController {
         return ResponseEntity.ok(historyService.getHistoryById(memberId, historyId));
     }
 
-    // 3. 리스트 조회
+    // 3. 나의 리스트 조회
     @Operation(summary = "히스토리 전체 조회", description = "로그인한 사용자의 전체 히스토리 목록을 반환합니다. 최신순 정렬은 별도 파라미터 구현이 필요합니다.")
     @GetMapping
     public ResponseEntity<List<HistoryResponseDto>> getHistories(
@@ -71,6 +75,7 @@ public class HistoryController {
         historyService.deleteHistory(memberId, historyId);
         return ResponseEntity.noContent().build();
     }
+
     // 6. 여러 개 생성
     @Operation(summary = "히스토리 여러 개 생성", description = "타임라인 항목 여러 개를 한 번에 생성합니다.")
     @PostMapping("/bulk")
