@@ -16,7 +16,11 @@ interface ChatRoomProps {
   onBack: () => void;
 }
 
-const WS_SERVER_URL = "ws://localhost:4000";
+const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL.replace(
+  /^http:/,
+  "ws:"
+);
+
 const FIXED_ROOM_NAME = "chat_1";
 
 const safeJsonStringify = (data: unknown): string => {
