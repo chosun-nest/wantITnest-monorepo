@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { getMemberProfile } from "../../api/profile/ProfileAPI";
 import { MemberProfile } from "../../types/api/profile";
 import ChatBubble from "./chatbubble";
+
 interface ChatMessage {
   text: string;
   user: string;
@@ -11,7 +12,7 @@ interface ChatMessage {
 
 interface ChatRoomProps {
   isMobile: boolean;
-  user: MemberProfile; // 상대방 정보
+  user: MemberProfile; // 대화 상대 정보
   onBack: () => void;
 }
 
@@ -49,6 +50,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
   useEffect(() => {
     if (!currentUser) return;
 
+    // 기존 연결 종료
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.close();
     }
@@ -60,7 +62,10 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
       ws.send(
         safeJsonStringify({
           type: "joinRoom",
-          payload: { roomName: FIXED_ROOM_NAME },
+          payload: {
+            roomName: FIXED_ROOM_NAME,
+            userId: String(currentUser.memberId), // 식별자 명시
+          },
         })
       );
     };
@@ -80,7 +85,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
       ws.close();
       setMessages([]);
     };
-  }, [currentUser]); // only runs once when profile is loaded
+  }, [currentUser]);
 
   const handleSend = () => {
     const text = inputMessage.trim();
@@ -116,7 +121,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
           : "h-[600px] max-w-xl mx-auto border border-gray-200 rounded-xl shadow-md overflow-hidden"
       }`}
     >
-      {/* 상단 헤더 */}
+      {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-100">
         <button
           onClick={onBack}
@@ -130,7 +135,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
         <div className="w-6" />
       </div>
 
-      {/* 메시지 영역 */}
+      {/* 메시지 리스트 */}
       <div className="flex-1 overflow-y-auto p-4 bg-white">
         {messages.map((msg, index) => {
           const isMe = msg.user === String(currentUser.memberId);
@@ -138,7 +143,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
         })}
       </div>
 
-      {/* 입력 영역 */}
+      {/* 입력 */}
       <div className="flex items-center gap-2 px-4 py-3 border-t bg-gray-50">
         <input
           value={inputMessage}
