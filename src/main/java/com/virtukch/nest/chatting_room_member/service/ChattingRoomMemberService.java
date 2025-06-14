@@ -13,18 +13,18 @@ public class ChattingRoomMemberService {
     private final ChattingRoomMemberRepository chattingRoomMemberRepository;
 
     public void registerChattingRoomMember(
-        ChattingRoomMemberRequestDto chattingRoomMemberRegisterOrRemoveRequestDto) {
+        ChattingRoomMemberRequestDto chattingRoomMemberRequestDto) {
         ChattingRoomMember chattingRoomMember = ChattingRoomMember.builder()
-            .chattingRoomId(chattingRoomMemberRegisterOrRemoveRequestDto.getChattingRoomId())
-            .memberId(chattingRoomMemberRegisterOrRemoveRequestDto.getMemberId())
+            .chattingRoomId(chattingRoomMemberRequestDto.getChattingRoomId())
+            .memberId(chattingRoomMemberRequestDto.getMemberId())
             .build();
         chattingRoomMemberRepository.save(chattingRoomMember);
     }
 
     public void removeChattingRoomMember(
-        ChattingRoomMemberRequestDto chattingRoomMemberRegisterOrRemoveRequestDto) {
+        ChattingRoomMemberRequestDto chattingRoomMemberRequestDto) {
         chattingRoomMemberRepository.deleteByChattingRoomIdAndMemberId(
-            chattingRoomMemberRegisterOrRemoveRequestDto.getChattingRoomId(),
-            chattingRoomMemberRegisterOrRemoveRequestDto.getMemberId());
+            chattingRoomMemberRequestDto.getChattingRoomId(),
+            chattingRoomMemberRequestDto.getMemberId());
     }
 }
