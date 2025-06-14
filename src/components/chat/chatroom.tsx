@@ -19,7 +19,7 @@ interface ChatRoomProps {
 const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL.replace(
   /^http:/,
   "ws:"
-).replace(/^https:/, "wss:");
+);
 
 const FIXED_ROOM_NAME = "chat_1";
 
