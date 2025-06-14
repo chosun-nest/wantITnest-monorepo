@@ -12,9 +12,8 @@ export default function ProjectEdit() {
   // 수정할 필드 상태값
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [maxMember, setMaxMember] = useState(1);
+  const [maxMember, setMaxMember] = useState(1); // 👉 상태는 그대로 유지
 
-  // 1. 기존 데이터 불러오기
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,7 +22,7 @@ export default function ProjectEdit() {
         setProject(data);
         setTitle(data.projectTitle);
         setDescription(data.projectDescription);
-        setMaxMember(data.maxMember);
+        // 🔥 maxMember는 API 응답에 없음 → 그대로 유지
       } catch (err) {
         alert("프로젝트 데이터를 불러오지 못했습니다.");
       } finally {
@@ -34,7 +33,6 @@ export default function ProjectEdit() {
     fetchData();
   }, [id]);
 
-  // 2. 수정 요청
   const handleSubmit = async () => {
     if (!id) return;
     if (!title || !description) {
@@ -45,11 +43,16 @@ export default function ProjectEdit() {
     const payload: UpdateProjectPayload = {
       projectTitle: title,
       projectDescription: description,
-      maxMember,
-      tags: [], // TODO: 태그 기능 구현 시 반영
-      recruiting: true, // TODO: 마감 여부 상태에 따라 수정
-    };
+      tags: [], // TODO: 추후 태그 연결
+      parts: [
+        {
+          part: "DEFAULT",   // TODO: 실제 파트 이름으로 교체 (예: "Frontend", "Backend", "PM")
+          count: maxMember,  // 기존 maxMember를 임시로 재활용
+        },
+      ],
 
+  imageUrls: null, // TODO: 이미지 업로드 기능 구현되면 배열로 대체
+};
     try {
       await updateProject(Number(id), payload);
       alert("수정이 완료되었습니다.");
@@ -60,7 +63,6 @@ export default function ProjectEdit() {
   };
 
   if (loading) return <div className="pt-36 text-center">⏳ 로딩 중...</div>;
-
   if (!project) return <div className="pt-36 text-center">존재하지 않는 프로젝트입니다.</div>;
 
   return (
