@@ -39,7 +39,7 @@ public class ProjectController {
             - `tags`: 태그 목록 (선택, 존재하는 태그만 가능)
             - `parts`: 모집 역할 및 인원 리스트 (필수)
 
-            ✔️ 로그인된 사용자만 작성 가능  
+            ✔️ 로그인된 사용자만 작성 가능
             ✔️ 성공 시 생성된 게시글의 URI를 Location 헤더로 반환
             """
     )
