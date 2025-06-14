@@ -38,7 +38,7 @@ export const checkPassword = async (payload: CheckPasswordPayload) => {
 // 회원 정보 조회 (GET)
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me", authHeader());
-  const BASE_URL = "http://121.178.113.153:6030";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   return {
     ...res.data,
