@@ -106,4 +106,23 @@ public class HistoryController {
         historyService.deleteHistories(memberId, historyIds);
         return ResponseEntity.noContent().build();
     }
+
+    // 9. 타인의 히스토리 조회
+    @Operation(
+        summary = "타인 히스토리 전체 조회",
+        description = """
+        특정 회원의 전체 히스토리 목록을 반환합니다.
+
+        🔒 로그인한 사용자만 요청할 수 있습니다.
+        🔓 현재는 공개 범위 제한은 없으며, 인증만 통과하면 전체 히스토리를 볼 수 있습니다.
+        ⚠️ 이후 공개/비공개 필터가 도입되면 서비스 단에서 분기 처리 예정입니다.
+        """
+    )
+    @GetMapping("/members/{memberId}/histories")
+    public ResponseEntity<List<HistoryResponseDto>> findHistoryListByMemberId(
+        @PathVariable Long memberId,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        return ResponseEntity.ok(historyService.getHistoriesByMember(memberId));
+    }
 }
