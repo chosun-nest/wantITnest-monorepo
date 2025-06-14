@@ -34,6 +34,7 @@ import PublicRoute from "./components/auth/public-route";
 import ResetPassword from "./routes/reset-password";
 import GlobalModal from "./components/global/global-modal";
 import ChatMain from "./routes/chat-main";
+import OtherProfile from "./routes/other-profile";
 
 const router = createBrowserRouter([
   {
