@@ -33,11 +33,11 @@ public class ChattingRoomMemberController {
         }
     )
     public ResponseEntity<Void> registerChattingRoomMember(
-        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRegisterOrRemoveRequestDto,
+        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRequestDto,
         @Parameter(hidden = true)
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         chattingRoomMemberService.registerChattingRoomMember(
-            chattingRoomMemberRegisterOrRemoveRequestDto);
+            chattingRoomMemberRequestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -51,11 +51,11 @@ public class ChattingRoomMemberController {
         }
     )
     public ResponseEntity<Void> removeChattingRoomMember(
-        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRegisterOrRemoveRequestDto,
+        @RequestBody ChattingRoomMemberRequestDto chattingRoomMemberRequestDto,
         @Parameter(hidden = true)
         @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         chattingRoomMemberService.removeChattingRoomMember(
-            chattingRoomMemberRegisterOrRemoveRequestDto);
+            chattingRoomMemberRequestDto);
         return ResponseEntity.ok().build();
     }
 }
