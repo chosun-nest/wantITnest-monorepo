@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import useResponsive from "../../hooks/responsive";
-import { getMemberProfile, MemberProfile } from "../../api/profile/ProfileAPI";
+import { getMemberProfile } from "../../api/profile/ProfileAPI";
+import { MemberProfile } from "../../types/chat";
 
 interface ChatRoomProps {
   isMobile: boolean;
