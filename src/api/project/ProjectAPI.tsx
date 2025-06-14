@@ -28,8 +28,9 @@ export const createProjectPost = async (
 ): Promise<CreateProjectPostResponse> => {
   const response = await API.post<CreateProjectPostResponse>(
     "/api/v1/projects/new",  // ✅ Swagger에 맞춰 경로 "/new"
-    payload,
-    authHeader()
+    payload,{
+    headers: { skipAuth: false },
+  }
   );
   return response.data;
 };
@@ -52,7 +53,9 @@ export const getProjects = async (
 export const getProjectById = async (
   projectId: number
 ): Promise<ProjectDetail> => {
-  const res = await API.get(`/api/v1/projects/${projectId}`, {headers: { skipAuth: false }},);
+  const res = await API.get(`/api/v1/projects/${projectId}`, {
+    headers: { skipAuth: false },
+  });
   return res.data;
 };
 
@@ -61,7 +64,9 @@ export const updateProject = async (
   projectId: number,
   payload: UpdateProjectPayload
 ): Promise<void> => {
-  await API.patch(`/api/v1/projects/${projectId}`, payload, authHeader());
+  await API.patch(`/api/v1/projects/${projectId}`, payload,{
+    headers: { skipAuth: false },
+  });
 };
 
 // 프로젝트 삭제 (DELETE)

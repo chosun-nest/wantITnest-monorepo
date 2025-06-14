@@ -91,12 +91,13 @@ export interface CreateProjectPostResponse {
 
 export interface UpdateProjectPayload {
   projectTitle: string;
-  projectDescription?: string;
-  tags?: string[];
-  partCounts?: {
-    [key: string]: number;
-  };
-  recruiting: boolean;
+  projectDescription: string;
+  tags: string[];
+  parts?: {
+    part: string; // ex) 프론트엔드
+    count: number; // ex) 2명
+  }[] | null; 
+  imageUrls?: string[] | null;
 }
 
 // ==================================

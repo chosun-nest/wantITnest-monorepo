@@ -21,7 +21,7 @@ import NoticeBoard from "./routes/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import InterestsDetail from "./routes/interests-detail"; //yeong-eun
 import InterestWrite from "./routes/interests-write"; //yeong-eun
-import ProjectWrite from "./routes/project-write";    //yeong-eun
+import ProjectWrite from "./routes/project-write"; //yeong-eun
 
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
 import { BackdropContext } from "./context/Backdropcontext";
@@ -32,6 +32,7 @@ import PublicRoute from "./components/auth/public-route";
 import ResetPassword from "./routes/reset-password";
 import GlobalModal from "./components/global/global-modal";
 import ChatMain from "./routes/chat-main";
+import OtherProfile from "./routes/other-profile";
 
 const router = createBrowserRouter([
   {
@@ -64,8 +65,29 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+<<<<<<< HEAD
       { path: "profile/", element: <Profile /> },
       { path: "profile-edit/", element: <ProfileEdit /> },
+=======
+      {
+        path: "profile/",
+        children: [
+          {
+            path: "", // /profile
+            element: <Profile />, // 내 프로필
+          },
+          {
+            path: ":id", // /profile/123
+            element: <OtherProfile />, // 타인 프로필
+          },
+        ],
+      },
+
+      {
+        path: "profile-edit/",
+        element: <ProfileEdit />,
+      },
+>>>>>>> origin/dev
       {
         path: "interests-write",
         element: (
