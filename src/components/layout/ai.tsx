@@ -31,6 +31,12 @@ export default function Ai() {
     setQuestion(e.target.value);
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && question && !loading) {
+      postChatAPI();
+    }
+  };
+
   async function postChatAPI() {
     setLoading(true);
 
@@ -66,7 +72,7 @@ export default function Ai() {
     <>
       {/* AI 도우미 버튼 */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsOpen((prev) => !prev)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="fixed bottom-6 right-6 w-[50px] h-[50px] bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition duration-300 z-50"
@@ -86,39 +92,7 @@ export default function Ai() {
             <h2 className="text-base font-semibold text-gray-800 dark:text-white">
               AI 도우미 위닛(WitN)
             </h2>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-300"
-              aria-label="닫기"
-            >
-              ✖️
-            </button>
           </div>
-
-          <div className="flex mb-2">
-            <input
-              className="px-3 py-2 text-sm shadow-sm rounded-md flex-grow ring-gray-300 dark:ring-gray-700 ring-1 ring-inset disabled:cursor-not-allowed bg-white dark:bg-gray-800 text-black dark:text-white"
-              placeholder="질문을 입력해주세요."
-              onChange={handleQuestion}
-              value={question}
-              disabled={loading}
-            />
-            <button
-              className="w-20 ml-1 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm rounded-md disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
-              onClick={postChatAPI}
-              disabled={!question || loading}
-            >
-              <ScaleLoader
-                color={color}
-                loading={loading}
-                cssOverride={override}
-                height={15}
-                aria-label="Loading Spinner"
-              />
-              {!loading && "질문"}
-            </button>
-          </div>
-
           <div className="overflow-y-auto flex-grow pr-1 space-y-2 custom-scroll transition-all duration-300 ease-in-out">
             {messages.map((message, index) => {
               const isUser = message.role === "user";
@@ -131,6 +105,11 @@ export default function Ai() {
                   key={index}
                   className="flex border-t border-gray-200 dark:border-gray-700 pt-3"
                 >
+                  {!isUser && (
+                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mb-1 border border-gray-200">
+                      <img src={ai} className="w-7 h-7 rounded-full" />
+                    </div>
+                  )}
                   <p className="w-1/6 py-2 px-2 font-semibold text-sm text-gray-600 dark:text-gray-300">
                     {displayName}
                   </p>
@@ -149,6 +128,30 @@ export default function Ai() {
                 </div>
               );
             })}
+          </div>
+          <div className="flex mb-2">
+            <input
+              className="px-3 py-2 text-sm shadow-sm rounded-md flex-grow ring-gray-300 dark:ring-gray-700 ring-1 ring-inset disabled:cursor-not-allowed bg-white dark:bg-gray-800 text-black dark:text-white"
+              placeholder="질문을 입력해주세요."
+              onChange={handleQuestion}
+              value={question}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+            />
+            <button
+              className="w-20 ml-1 bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm rounded-md disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
+              onClick={postChatAPI}
+              disabled={!question || loading}
+            >
+              <ScaleLoader
+                color={color}
+                loading={loading}
+                cssOverride={override}
+                height={15}
+                aria-label="Loading Spinner"
+              />
+              {!loading && "질문"}
+            </button>
           </div>
         </div>
       )}
