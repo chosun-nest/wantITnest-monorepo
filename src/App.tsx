@@ -65,10 +65,6 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-<<<<<<< HEAD
-      { path: "profile/", element: <Profile /> },
-      { path: "profile-edit/", element: <ProfileEdit /> },
-=======
       {
         path: "profile/",
         children: [
@@ -87,7 +83,6 @@ const router = createBrowserRouter([
         path: "profile-edit/",
         element: <ProfileEdit />,
       },
->>>>>>> origin/dev
       {
         path: "interests-write",
         element: (

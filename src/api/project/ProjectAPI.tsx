@@ -54,7 +54,7 @@ export const getProjectById = async (
   projectId: number
 ): Promise<ProjectDetail> => {
   const res = await API.get(`/api/v1/projects/${projectId}`, {
-    headers: { skipAuth: false },
+    headers: { skipAuth: true },
   });
   return res.data;
 };
