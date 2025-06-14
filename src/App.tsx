@@ -22,7 +22,7 @@ import InterestsBorad from "./routes/interests-borad"; //yeong-eun
 import InterestsDetail from "./routes/interests-detail"; //yeong-eun
 //import BoardWrite from "./routes/board-write"; //yeong-eun
 import InterestWrite from "./routes/interests-write"; //yeong-eun
-import ProjectWrite from "./routes/project-write";    //yeong-eun
+import ProjectWrite from "./routes/project-write"; //yeong-eun
 
 import { useState } from "react";
 import GlobalBackdrop from "./components/easter/GlobalBackdrop";
@@ -97,7 +97,16 @@ const router = createBrowserRouter([
     children: [
       {
         path: "profile/",
-        element: <Profile />,
+        children: [
+          {
+            path: "", // /profile
+            element: <Profile />, // 내 프로필
+          },
+          {
+            path: ":id", // /profile/123
+            element: <OtherProfile />, // 타인 프로필
+          },
+        ],
       },
 
       {
