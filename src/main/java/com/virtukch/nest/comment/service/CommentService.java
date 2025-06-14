@@ -109,11 +109,8 @@ public class CommentService {
         validatePostExistence(boardType, postId);
 
         // 1. 최상위 댓글만 페이징 조회
-        Page<Comment> rootCommentsPage = commentRepository.findRootCommentsPaged(
-                boardType, postId, pageable);
-
+        Page<Comment> rootCommentsPage = commentRepository.findRootCommentsPaged(boardType, postId, pageable);
         List<Comment> rootComments = rootCommentsPage.getContent();
-
         if (rootComments.isEmpty()) {
             return CommentDtoConverter.toCommentList(List.of(), rootCommentsPage);
         }
@@ -180,7 +177,7 @@ public class CommentService {
 
         List<CommentResponseDto> result = new ArrayList<>();
 
-        // 성능 최적를 위해 commentMap과 rootMapping을 미리 계산
+        // 성능 최적화를 위해 commentMap과 rootMapping을 미리 계산
         Map<Long, Long> commentToRootMap = calculateRootParentMapping(allComments);
 
         Set<Long> rootCommentIds = rootComments.stream()
