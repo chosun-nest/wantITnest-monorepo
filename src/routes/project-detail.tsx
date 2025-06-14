@@ -132,12 +132,20 @@ export default function ProjectDetail() {
     >
       {/* 왼쪽 영역 */}
       <div className="flex-1">
-        <h1 className={`font-bold text-blue-900 mb-2 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
+        <h1
+          className={`font-bold text-blue-900 mb-2 ${
+            isMobile ? "text-lg" : "text-xl md:text-2xl"
+          }`}
+        >
           {project.projectTitle}
         </h1>
 
         {/* 작성자 정보 */}
-        <div className={`flex ${isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"}`}>
+        <div
+          className={`flex ${
+            isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"
+          }`}
+        >
           <div className="flex items-center gap-2">
             <img
               src="/assets/images/manager-bird.png"
@@ -190,12 +198,16 @@ export default function ProjectDetail() {
           ))}
         </div>
 
-        {/* 아래 항목은 타입에 없으므로 주석 처리하거나 추후 확장 */}
-        {/* 
-        <div className="text-sm text-gray-500 mb-6">
-          모집 상태: <strong>{project.status}</strong> / 참여 인원: {project.currentMember} / {project.maxMember}
+        {/* 모집 상태 표시 및 버튼 처리 */}
+        <div className="mb-6">
+          {project.isRecruiting ? (
+            <button className="px-4 py-2 bg-blue-600 text-white rounded">지원하기</button>
+          ) : (
+            <button className="px-4 py-2 bg-gray-300 text-gray-600 rounded cursor-not-allowed" disabled>
+              모집 완료
+            </button>
+          )}
         </div>
-        */}
 
         <div className="px-5 py-4 mb-6 border rounded bg-gray-50">
           <CommentSection />
@@ -215,7 +227,7 @@ export default function ProjectDetail() {
       <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
         <ParticipantCardBox
           project={project}
-          participants={[]} // 서버 연동 시 대체 예정
+          participants={project.projectMembers}
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={() => {}}
           currentUserId={currentUserId!}

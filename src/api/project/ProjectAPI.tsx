@@ -34,7 +34,7 @@ export const createProjectPost = async (
   return response.data;
 };
 
-// 📌 프로젝트 목록 조회 (GET)
+// 📌 프로젝트 목록 조회 (GET) - 인증 불필요
 export const getProjects = async (
   params: {
     "pageable.page": number;
@@ -43,8 +43,7 @@ export const getProjects = async (
   }
 ): Promise<ProjectListResponse> => {
   const res = await API.get("/api/v1/projects", {
-    ...authHeader(),
-    params,
+    params, // ✅ 인증 없이 params만 전달
   });
   return res.data;
 };
