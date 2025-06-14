@@ -8,14 +8,17 @@ import { NoticeItem, NoticeListResponse } from "../../types/api/notice-board";
 // =======================
 // GET /api/v1/notices/{noticeType}
 // noticeType: "장학공지", "학사공지", "일반공지", ...
+// 페이지네이션, 정렬 지원
 
 export const fetchNotices = async (
-  noticeType: string
+  noticeType: string,
+  page: number,
+  size: number
 ): Promise<NoticeListResponse> => {
   const response = await API.get<NoticeListResponse>(
-    `/api/v1/notices/${noticeType}`,
+    `/api/v1/notices/${noticeType}?page=${page}&size=${size}&sort=postDate,desc`,
     {
-      headers: { skipAuth: true }, // 인증 없이 호출
+      headers: { skipAuth: true },
     }
   );
   return response.data;
