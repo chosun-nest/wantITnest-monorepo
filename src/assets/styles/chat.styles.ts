@@ -5,12 +5,13 @@ export const Container = styled.div<{ navbarHeight: number }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   width: 100%;
   padding-inline: 4px;
   height: calc(100vh - ${({ navbarHeight }) => navbarHeight}px);
 `;
 
-export const ChatContainer = styled.div<{ isMobile: boolean }>`
+export const ChatContainer = styled.div`
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid #ccc;
@@ -19,32 +20,16 @@ export const ChatContainer = styled.div<{ isMobile: boolean }>`
   overflow: hidden;
   width: 100%;
   height: 100%;
-
-  ${({ isMobile }) =>
-    isMobile
-      ? css`
-          flex-direction: column;
-          max-width: 100%;
-          padding: 0 15px;
-        `
-      : css`
-          flex-direction: row;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 1200px;
-          height: 80vh;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          padding: 0;
-        `}
+  padding: 4px;
+  flex-direction: row;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 0;
 `;
 
 export const MessagesContainer = styled.div<{ isMobile?: boolean }>`
   flex: 1;
-<<<<<<< HEAD
-  overflow-y: hidden; /* ✅ 스크롤 제거 */
-=======
   overflow-y: hidden;
->>>>>>> origin/dev
   background-color: #fff;
 
   ${({ isMobile }) =>
@@ -82,7 +67,10 @@ export const Underbar = styled.div`
   flex-direction: row;
   border-radius: 8px;
   border: 1px solid #002f6c;
-  width: 100%;
+  width: 66%;
+
+  max-width: 800px;
+  min-width: 400px;
   height: 60px;
   box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
   margin-top: 10px;

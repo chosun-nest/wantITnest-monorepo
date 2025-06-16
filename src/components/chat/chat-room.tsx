@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getMemberProfile } from "../../api/profile/ProfileAPI";
 import { MemberProfile } from "../../types/api/profile";
-import ChatBubble from "./chatbubble";
+import ChatBubble from "./chat-bubble";
 
 interface ChatMessage {
   text: string;
@@ -12,7 +12,7 @@ interface ChatMessage {
 
 interface ChatRoomProps {
   isMobile: boolean;
-  user: MemberProfile; // 대화 상대 정보
+  user: MemberProfile;
   onBack: () => void;
 }
 
@@ -20,17 +20,7 @@ const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL.replace(
   /^http:/,
   "ws:"
 );
-
 const FIXED_ROOM_NAME = "chat_1";
-
-const safeJsonStringify = (data: unknown): string => {
-  try {
-    return JSON.stringify(data);
-  } catch (e) {
-    console.error("JSON.stringify 오류:", e, data);
-    return "";
-  }
-};
 
 export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
   const [currentUser, setCurrentUser] = useState<MemberProfile | null>(null);
@@ -53,22 +43,18 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
 
   useEffect(() => {
     if (!currentUser) return;
-
-    // 기존 연결 종료
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.close();
-    }
+    if (wsRef.current?.readyState === WebSocket.OPEN) wsRef.current.close();
 
     const ws = new WebSocket(WS_SERVER_URL);
     wsRef.current = ws;
 
     ws.onopen = () => {
       ws.send(
-        safeJsonStringify({
+        JSON.stringify({
           type: "joinRoom",
           payload: {
             roomName: FIXED_ROOM_NAME,
-            userId: String(currentUser.memberId), // 식별자 명시
+            userId: String(currentUser.memberId),
           },
         })
       );
@@ -92,40 +78,33 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
   }, [currentUser]);
 
   const handleSend = () => {
-    const text = inputMessage.trim();
-    if (!text || !currentUser || wsRef.current?.readyState !== WebSocket.OPEN)
+    if (
+      !inputMessage.trim() ||
+      !currentUser ||
+      wsRef.current?.readyState !== WebSocket.OPEN
+    )
       return;
 
     const message: ChatMessage = {
-      text,
+      text: inputMessage.trim(),
       user: String(currentUser.memberId),
       userName: currentUser.memberName,
       userImage: currentUser.memberImageUrl || "",
     };
 
     wsRef.current.send(
-      safeJsonStringify({
-        type: "chatMessage",
-        payload: message,
-      })
+      JSON.stringify({ type: "chatMessage", payload: message })
     );
-
     setInputMessage("");
   };
 
-  if (!currentUser) {
+  if (!currentUser)
     return <div className="p-5 text-sm text-gray-500">로딩 중...</div>;
-  }
 
   return (
     <div
-      className={`flex flex-col ${
-        isMobile
-          ? "h-full"
-          : "h-[600px] max-w-xl mx-auto border border-gray-200 rounded-xl shadow-md overflow-hidden"
-      }`}
+      className={`flex flex-col ${isMobile ? "h-full" : "h-[600px] max-w-xl mx-auto border rounded-xl shadow-md overflow-hidden"}`}
     >
-      {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-100">
         <button
           onClick={onBack}
@@ -139,22 +118,23 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
         <div className="w-6" />
       </div>
 
-      {/* 메시지 리스트 */}
       <div className="flex-1 overflow-y-auto p-4 bg-white">
-        {messages.map((msg, index) => {
-          const isMe = msg.user === String(currentUser.memberId);
-          return <ChatBubble key={index} message={msg} isMe={isMe} />;
-        })}
+        {messages.map((msg, idx) => (
+          <ChatBubble
+            key={idx}
+            message={msg}
+            isMe={msg.user === String(currentUser.memberId)}
+          />
+        ))}
       </div>
 
-      {/* 입력 */}
       <div className="flex items-center gap-2 px-4 py-3 border-t bg-gray-50">
         <input
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="메시지를 입력하세요"
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleSend}
