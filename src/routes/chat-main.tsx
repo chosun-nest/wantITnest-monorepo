@@ -9,7 +9,7 @@ import { MemberProfile } from "../types/api/profile";
 
 export default function ChatMain() {
   const { navbarHeight } = useNavbarHeight();
-  const [mode, setMode] = useState<"friend" | "chat" | "room">("friend");
+  const [mode, setMode] = useState<ChatMode>("following");
   const [selectedUser, setSelectedUser] = useState<MemberProfile | null>(null);
 
   const handleSelectUser = (user: MemberProfile) => {
@@ -24,7 +24,7 @@ export default function ChatMain() {
 
   return (
     <S.Container navbarHeight={navbarHeight + 20}>
-      {mode === "friend" && (
+      {mode === "following" && (
         <FollowingList isMobile onSelectUser={handleSelectUser} />
       )}
       {mode === "chat" && selectedUser && (

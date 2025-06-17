@@ -12,7 +12,7 @@ const dummyFriends: MemberProfile[] = [
 export default function FollowingList({ onSelectUser }: FollowingListProps) {
   return (
     <div className="p-5 w-[66%] max-w-[800px] min-w-[400px] border border-[#002f6c] rounded-lg shadow-sm">
-      <h2 className="font-bold text-xl">내 친구 목록</h2>
+      <h2 className="font-bold text-xl">내 팔로잉 목록</h2>
       <ul className="mt-4">
         {dummyFriends.map((friend) => (
           <li
