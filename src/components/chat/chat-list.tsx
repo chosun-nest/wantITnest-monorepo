@@ -1,12 +1,28 @@
-import { MemberProfile } from "../../types/api/profile";
+import { ChatRoomProfile } from "../../types/chat/chat";
 
 interface ChatListProps {
-  onSelectUser: (user: MemberProfile) => void;
+  onSelectUser: (room: ChatRoomProfile) => void;
   isMobile: boolean;
 }
 
-const dummyChatUsers: MemberProfile[] = [
-  /* ...더미 유저 생략... */
+const openChatRoom: ChatRoomProfile = {
+  roomId: "open-room",
+  roomName: "🔥 오픈채팅방",
+  roomImageUrl: "/openchat.png",
+};
+
+const dummyChatRooms: ChatRoomProfile[] = [
+  openChatRoom,
+  {
+    roomId: "room-123",
+    roomName: "유니티 프로젝트팀",
+    roomImageUrl: "/room1.png",
+  },
+  {
+    roomId: "room-456",
+    roomName: "면접 스터디",
+    roomImageUrl: "/room2.png",
+  },
 ];
 
 export default function ChatList({ onSelectUser }: ChatListProps) {
@@ -14,18 +30,18 @@ export default function ChatList({ onSelectUser }: ChatListProps) {
     <div className="w-[66%] max-w-[800px] min-w-[400px] p-5 border border-[#002f6c] rounded-lg shadow-sm">
       <h2 className="font-bold text-xl">대화 중인 채팅방</h2>
       <ul className="mt-4">
-        {dummyChatUsers.map((user) => (
+        {dummyChatRooms.map((room) => (
           <li
-            key={user.memberId}
-            onClick={() => onSelectUser(user)}
+            key={room.roomId}
+            onClick={() => onSelectUser(room)}
             className="flex items-center p-3 border rounded-lg mb-3 cursor-pointer bg-gray-100 hover:bg-gray-200"
           >
             <img
-              src={user.memberImageUrl}
-              alt={`${user.memberName} 프로필`}
-              className="w-10 h-10 rounded-full mr-3"
+              src={room.roomImageUrl}
+              alt={`${room.roomName} 이미지`}
+              className="w-10 h-10 rounded-full mr-3 object-cover"
             />
-            <span>{user.memberName}</span>
+            <span className="font-semibold">{room.roomName}</span>
           </li>
         ))}
       </ul>

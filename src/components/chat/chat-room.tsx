@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getMemberProfile } from "../../api/profile/ProfileAPI";
-import { MemberProfile } from "../../types/api/profile";
+import { SimpleMemberProfile } from "../../types/chat/chat";
 import ChatBubble from "./chat-bubble";
 
 interface ChatMessage {
@@ -12,7 +12,7 @@ interface ChatMessage {
 
 interface ChatRoomProps {
   isMobile: boolean;
-  user: MemberProfile;
+  user: SimpleMemberProfile;
   onBack: () => void;
 }
 
@@ -20,10 +20,11 @@ const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL.replace(
   /^http:/,
   "ws:"
 );
-const FIXED_ROOM_NAME = "chat_1";
 
 export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
-  const [currentUser, setCurrentUser] = useState<MemberProfile | null>(null);
+  const [currentUser, setCurrentUser] = useState<SimpleMemberProfile | null>(
+    null
+  );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const wsRef = useRef<WebSocket | null>(null);
@@ -45,6 +46,13 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
     if (!currentUser) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) wsRef.current.close();
 
+    const roomName =
+      user.memberId === -1
+        ? "room_openchat"
+        : user.memberId === -2
+          ? `room_project_${user.memberName}`
+          : `room_user_${[currentUser.memberId, user.memberId].sort().join("_")}`;
+
     const ws = new WebSocket(WS_SERVER_URL);
     wsRef.current = ws;
 
@@ -53,7 +61,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
         JSON.stringify({
           type: "joinRoom",
           payload: {
-            roomName: FIXED_ROOM_NAME,
+            roomName,
             userId: String(currentUser.memberId),
           },
         })
@@ -75,7 +83,7 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
       ws.close();
       setMessages([]);
     };
-  }, [currentUser]);
+  }, [currentUser, user.memberId, user.memberName]);
 
   const handleSend = () => {
     if (
@@ -93,8 +101,12 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
     };
 
     wsRef.current.send(
-      JSON.stringify({ type: "chatMessage", payload: message })
+      JSON.stringify({
+        type: "chatMessage",
+        payload: message,
+      })
     );
+
     setInputMessage("");
   };
 
@@ -103,7 +115,11 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
 
   return (
     <div
-      className={`flex flex-col ${isMobile ? "h-full" : "h-[600px] max-w-xl mx-auto border rounded-xl shadow-md overflow-hidden"}`}
+      className={`flex flex-col ${
+        isMobile
+          ? "h-full"
+          : "h-[600px] max-w-xl mx-auto border rounded-xl shadow-md overflow-hidden"
+      }`}
     >
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-100">
         <button

@@ -1,4 +1,5 @@
 import { API } from "..";
+import { FollowListResponse } from "../../types/follow/follow";
 
 export const follow = async (followingId: string) => {
   const res = await API.post(
@@ -23,8 +24,8 @@ export const checkOthersFollowings = async (memberId: string) => {
   return res.data;
 };
 
-export const checkMyFollowings = async () => {
-  const res = await API.get(`/api/v1/follow/following`, {
+export const checkMyFollowings = async (): Promise<FollowListResponse> => {
+  const res = await API.get<FollowListResponse>(`/api/v1/follow/following`, {
     headers: { skipAuth: false },
   });
   return res.data;
