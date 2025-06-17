@@ -9,7 +9,9 @@ export interface SimpleMemberProfile {
 }
 
 export interface ChatRoomProfile {
+  roomType: unknown;
   roomId: string;
   roomName: string;
   roomImageUrl?: string;
+  lastActivity: string;
 }
