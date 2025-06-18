@@ -259,6 +259,9 @@ config.local.*
 .env.local
 .env.production.local
 .env.development.local
+.env.common
+.env.frontend
+.env.backend
 
 # ==================================================
 # 7. 프로젝트별 특수 파일

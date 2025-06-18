@@ -9,12 +9,12 @@ load_dotenv()
 SCHEDULE_CONFIG = {
     "enabled": os.getenv("SCHEDULE_ENABLED", "true").lower() == "true",
     "schedules": [
-        {"type": "interval", "minutes": 1} # test 시 활성화
-        # {"type": "cron", "hour": 9, "minute": 0},
-        # {"type": "cron", "hour": 11, "minute": 0},
-        # {"type": "cron", "hour": 13, "minute": 0},
-        # {"type": "cron", "hour": 15, "minute": 0},
-        # {"type": "cron", "hour": 17, "minute": 0},
+        # {"type": "interval", "minutes": 1} # test 시 활성화
+        {"type": "cron", "hour": 9, "minute": 0},
+        {"type": "cron", "hour": 11, "minute": 0},
+        {"type": "cron", "hour": 13, "minute": 0},
+        {"type": "cron", "hour": 15, "minute": 0},
+        {"type": "cron", "hour": 17, "minute": 0},
     ],
     "timezone": os.getenv("SCHEDULE_TIMEZONE", "Asia/Seoul")
 }

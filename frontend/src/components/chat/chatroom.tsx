@@ -8,7 +8,8 @@ interface ChatRoomProps {
   onBack: () => void;
 }
 
-const WS_SERVER_URL = "ws://localhost:4000";
+// 환경변수에서 WebSocket URL 가져오기
+const WS_SERVER_URL = import.meta.env.VITE_WS_SERVER_URL || "ws://localhost:4000";
 
 const safeJsonStringify = (data: unknown): string => {
   try {

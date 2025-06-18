@@ -1,0 +1,69 @@
+services:
+  # React Frontend Build
+  react-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react-frontend
+    volumes:
+      - react-dist:/app/dist
+    networks:
+      - frontend-network
+
+  # Python 크롤링 서버
+  python-crawler:
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile
+    container_name: python-crawler
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env.common
+      - ./.env.frontend
+    volumes:
+      - ./scheduler/logs:/app/logs
+      - ./scheduler/data:/app/data
+    networks:
+      - frontend-network
+    restart: unless-stopped
+
+  # Nginx 웹 서버
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # React 빌드 파일 마운트
+      - react-dist:/usr/share/nginx/html
+      # 업로드된 이미지 공유 (Backend와 공유될 볼륨)
+      - uploaded-images:/usr/share/nginx/uploaded-images
+      # SSL 인증서 저장소
+      - ./volume/ssl:/etc/ssl/certs
+      - ./volume/letsencrypt:/etc/letsencrypt
+    networks:
+      - frontend-network
+    depends_on:
+      - react-frontend
+      - python-crawler
+    restart: unless-stopped
+
+volumes:
+  # React 빌드 파일 볼륨 (재배포시 삭제됨)
+  react-dist:
+    driver: local
+
+  # 업로드된 이미지 볼륨 (영구 보존 필요)
+  uploaded-images:
+    driver: local
+
+networks:
+  frontend-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16

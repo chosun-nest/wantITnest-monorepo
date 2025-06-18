@@ -1,11 +1,10 @@
 # Port Number
 server:
-  port: 6030 # Conflict occurred with Tomcat in JSP...ㅠㅠ
+  port: ${SERVER_PORT:6030} # Conflict occurred with Tomcat in JSP...ㅠㅠ
 
-# mysql -h 119.219.30.209 -P 6040 -u VIRTUKCH -p --default-character-set=utf8 nest_db
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/nest_db?serverTimezone=UTC&characterEncoding=UTF-8}
+    url: jdbc:mysql://${DB_HOST:host.docker.internal}:${DB_PORT:3306}/${DB_NAME:nest_db}?serverTimezone=UTC&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:VIRTUKCH}
     password: ${DB_PASSWORD:VIRTUKCH}
 
@@ -21,17 +20,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:create}
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${JPA_FORMAT_SQL:true}
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: ${JPA_SHOW_SQL:true}
 
 jwt:
   secret: ${JWT_SECRET:VUkwMS0xMjM0LTU2NzgtOWFiYy1kZWZnaGk=}
-  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}  # 1 hour (in milliseconds)
-  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}  # 7 days (in milliseconds)
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
 
 springdoc:
   api-docs:
@@ -43,3 +42,19 @@ springdoc:
     url: /v3/api-docs
     csrf:
       enabled: false  # ✅ CSRF 설정이 Swagger 요청을 차단할 수 있으므로 비활성화
+
+logging:
+  level:
+    com.virtukch.nest: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    path: /app/logs
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 30
