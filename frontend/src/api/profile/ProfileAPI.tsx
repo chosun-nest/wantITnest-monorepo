@@ -8,7 +8,7 @@ import {
 import { API } from "..";
 import { getAccessToken } from "../../utils/auth";
 
-// ✅ 공통 인증 헤더
+// 공통 인증 헤더
 const authHeader = () => ({
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,
@@ -16,7 +16,7 @@ const authHeader = () => ({
 });
 
 //
-// ✅ 프로필 관련 API
+// 프로필 관련 API
 //
 
 // 프로필 이미지 업로드 (POST)

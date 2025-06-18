@@ -1,27 +1,17 @@
-// src/components/chat/FriendList.tsx
-import { MemberProfile } from "../../api/profile/ProfileAPI";
+import { MemberProfile } from "../../types/api/profile";
 
-interface FriendListProps {
+interface FollowingListProps {
   isMobile: boolean;
   onSelectUser: (user: MemberProfile) => void;
 }
 
 const dummyFriends: MemberProfile[] = [
-  {
-    memberId: 1,
-    memberName: "김코딩",
-    memberImageUrl: "/images/user1.png",
-  },
-  {
-    memberId: 2,
-    memberName: "이자바",
-    memberImageUrl: "/images/user2.png",
-  },
+  /* ...더미 친구 생략... */
 ];
 
-export default function FriendList({ onSelectUser }: FriendListProps) {
+export default function FollowingList({ onSelectUser }: FollowingListProps) {
   return (
-    <div className="p-5 border border-[#002f6c] rounded-lg shadow-sm">
+    <div className="p-5 w-[66%] max-w-[800px] min-w-[400px] border border-[#002f6c] rounded-lg shadow-sm">
       <h2 className="font-bold text-xl">내 친구 목록</h2>
       <ul className="mt-4">
         {dummyFriends.map((friend) => (

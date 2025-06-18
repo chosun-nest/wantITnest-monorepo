@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import useResponsive from "../../hooks/responsive";
-import { getMemberProfile, MemberProfile } from "../../api/profile/ProfileAPI";
+import { getMemberProfile } from "../../api/profile/ProfileAPI";
+import { MemberProfile } from "../../types/api/profile";
+import ChatBubble from "./chat-bubble";
+
+interface ChatMessage {
+  text: string;
+  user: string;
+  userName: string;
+  userImage?: string;
+}
 
 interface ChatRoomProps {
   isMobile: boolean;
@@ -25,8 +33,6 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const wsRef = useRef<WebSocket | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const prevIsMobileRef = useRef<boolean>(isMobile);
 
   const fetchUserProfile = useCallback(async () => {
     try {
@@ -41,25 +47,21 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
     fetchUserProfile();
   }, [fetchUserProfile]);
 
-  const roomId = currentUser
-    ? [currentUser.memberId, user.memberId].sort().join("_")
-    : null;
-
   useEffect(() => {
-    if (!roomId) return;
-
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.close();
-    }
+    if (!currentUser) return;
+    if (wsRef.current?.readyState === WebSocket.OPEN) wsRef.current.close();
 
     const ws = new WebSocket(WS_SERVER_URL);
     wsRef.current = ws;
 
     ws.onopen = () => {
       ws.send(
-        safeJsonStringify({
+        JSON.stringify({
           type: "joinRoom",
-          payload: { roomName: `chat_${roomId}` },
+          payload: {
+            roomName: FIXED_ROOM_NAME,
+            userId: String(currentUser.memberId),
+          },
         })
       );
     };
@@ -79,33 +81,36 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
       ws.close();
       setMessages([]);
     };
-  }, [roomId]);
+  }, [currentUser]);
 
   const handleSend = () => {
-    const text = inputMessage.trim();
-    if (!text || !currentUser || wsRef.current?.readyState !== WebSocket.OPEN)
+    if (
+      !inputMessage.trim() ||
+      !currentUser ||
+      wsRef.current?.readyState !== WebSocket.OPEN
+    )
       return;
 
-    const message = {
-      type: "chatMessage",
-      payload: {
-        text,
-        user: String(currentUser.memberId),
-      },
+    const message: ChatMessage = {
+      text: inputMessage.trim(),
+      user: String(currentUser.memberId),
+      userName: currentUser.memberName,
+      userImage: currentUser.memberImageUrl || "",
     };
-    wsRef.current.send(safeJsonStringify(message));
+
+    wsRef.current.send(
+      JSON.stringify({ type: "chatMessage", payload: message })
+    );
     setInputMessage("");
   };
 
-  if (!currentUser) {
+  if (!currentUser)
     return <div className="p-5 text-sm text-gray-500">로딩 중...</div>;
-  }
 
   return (
     <div
-      className={`flex flex-col ${isMobile ? "h-full" : "h-[600px] max-w-xl mx-auto border border-gray-200 rounded-xl shadow-md overflow-hidden"}`}
+      className={`flex flex-col ${isMobile ? "h-full" : "h-[600px] max-w-xl mx-auto border rounded-xl shadow-md overflow-hidden"}`}
     >
-      {/* 상단 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-100">
         <button
           onClick={onBack}
@@ -116,39 +121,26 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
         <div className="flex-1 text-center font-semibold">
           {user.memberName}
         </div>
-        <div className="w-6" /> {/* 빈 공간으로 정렬 맞춤 */}
+        <div className="w-6" />
       </div>
 
-      {/* 메시지 영역 */}
       <div className="flex-1 overflow-y-auto p-4 bg-white">
-        {messages.map((msg, index) => {
-          const isMe = msg.user === String(currentUser.memberId);
-          return (
-            <div
-              key={index}
-              className={`mb-3 flex ${isMe ? "justify-end" : "justify-start"}`}
-            >
-              <span
-                className={`px-4 py-2 rounded-2xl max-w-[70%] text-sm break-words ${
-                  isMe ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                {msg.text}
-              </span>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+        {messages.map((msg, idx) => (
+          <ChatBubble
+            key={idx}
+            message={msg}
+            isMe={msg.user === String(currentUser.memberId)}
+          />
+        ))}
       </div>
 
-      {/* 입력 영역 */}
       <div className="flex items-center gap-2 px-4 py-3 border-t bg-gray-50">
         <input
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="메시지를 입력하세요"
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleSend}

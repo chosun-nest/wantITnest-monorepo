@@ -8,11 +8,16 @@ export default function HomeNotice() {
   const [isLoading, setIsLoading] = useState(false);
 
   const CATEGORY_LIST = [
+    "전체",
     "일반공지",
     "학사공지",
     "장학공지",
-    "IT융합대학 공지",
-    "컴퓨터공학과 공지",
+    "SW중심대학사업단",
+    "IT융합대학",
+    "컴퓨터공학전공",
+    "정보통신공학전공",
+    "인공지능공학전공",
+    "모빌리티SW전공",
   ];
 
   const fetchData = async () => {
@@ -20,7 +25,7 @@ export default function HomeNotice() {
       setIsLoading(true);
 
       const results = await Promise.all(
-        CATEGORY_LIST.map((cat) => fetchNotices(cat))
+        CATEGORY_LIST.map((cat) => fetchNotices(cat, 0, 100))
       );
       const merged: Notice[] = results.flatMap((res, i) =>
         (res.notices ?? []).map((n) => ({ ...n, category: CATEGORY_LIST[i] }))
