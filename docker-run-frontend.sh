@@ -42,15 +42,15 @@ fi
 
 # 이전 컨테이너 정리
 echo "🧹 이전 컨테이너를 정리합니다..."
-docker-compose -f docker-compose.frontend.yml down
+docker-compose -p want-it-nest-frontend -f docker-compose.frontend.yml down
 
 # React 빌드 볼륨만 삭제 (업로드 이미지는 보존)
 echo "🗑️  이전 React 빌드 볼륨을 삭제합니다..."
-docker volume rm capstone-design-aws_react-dist 2>/dev/null || echo "   React 볼륨이 없거나 이미 삭제되었습니다."
+docker volume rm want-it-nest-frontend_react-dist 2>/dev/null || echo "   React 볼륨이 없거나 이미 삭제되었습니다."
 
 # 이미지 빌드
 echo "🔨 Docker 이미지를 빌드합니다..."
-docker-compose -f docker-compose.frontend.yml build --no-cache
+docker-compose -p want-it-nest-frontend -f docker-compose.frontend.yml build --no-cache
 
 # 서비스 시작
 echo "🎯 Frontend 서비스를 시작합니다..."
@@ -59,11 +59,11 @@ docker-compose -p want-it-nest-frontend -f docker-compose.frontend.yml up -d
 # 상태 확인
 echo "📊 서비스 상태를 확인합니다..."
 sleep 10
-docker-compose -f docker-compose.frontend.yml ps
+docker-compose -p want-it-nest-frontend -f docker-compose.frontend.yml ps
 
 # 로그 확인
 echo "📝 서비스 로그를 확인합니다..."
-docker-compose -f docker-compose.frontend.yml logs --tail=20
+docker-compose -p want-it-nest-frontend -f docker-compose.frontend.yml logs --tail=20
 
 echo ""
 echo "✅ Frontend Server 배포가 완료되었습니다!"

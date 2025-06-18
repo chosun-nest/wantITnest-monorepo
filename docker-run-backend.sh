@@ -52,10 +52,10 @@ fi
 
 # 이전 컨테이너 정리
 echo "🧹 이전 컨테이너를 정리합니다..."
-docker-compose -f docker-compose.backend.yml down
+docker-compose -p want-it-nest-backend -f docker-compose.backend.yml down
 # 이미지 빌드
 echo "🔨 Docker 이미지를 빌드합니다..."
-docker-compose -f docker-compose.backend.yml build --no-cache
+docker-compose -p want-it-nest-backend -f docker-compose.backend.yml build --no-cache
 
 # Backend 서비스 시작
 echo "🎯 Backend 서비스를 시작합니다..."
