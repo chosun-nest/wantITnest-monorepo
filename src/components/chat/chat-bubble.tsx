@@ -22,7 +22,6 @@ export default function ChatBubble({ message, isMe }: ChatBubbleProps) {
           className="w-8 h-8 rounded-full mr-2"
         />
       )}
-
       <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
         {!isMe && (
           <span className="text-xs text-gray-500 mb-1">{message.userName}</span>
@@ -35,7 +34,6 @@ export default function ChatBubble({ message, isMe }: ChatBubbleProps) {
           {message.text}
         </span>
       </div>
-
       {isMe && (
         <img
           src={message.userImage || "/default-profile.png"}
