@@ -1,193 +1,300 @@
 # 통합 프로젝트 .gitignore
-# Backend (Spring Boot) + Frontend (Vite) + AI (Python)
-# ==================================================
+# Backend (Spring Boot) + Frontend (Vite) + Scheduler (Python) + Node Backend + Chatbot API
+# ==========================================================================================
 
-# ==================================================
-# 1. BACKEND (Spring Boot/Gradle) - be/ 디렉토리
-# ==================================================
+# ==========================================================================================
+# 1. BACKEND (Spring Boot/Gradle) - backend/ 디렉토리
+# ==========================================================================================
 
 # Gradle
-be/.gradle/
-be/build/
-be/gradle-app.setting
-be/!gradle/wrapper/gradle-wrapper.jar
-be/!**/src/main/**/build/
-be/!**/src/test/**/build/
+backend/.gradle/
+backend/build/
+backend/gradle-app.setting
+backend/!gradle/wrapper/gradle-wrapper.jar
+backend/!**/src/main/**/build/
+backend/!**/src/test/**/build/
 
 # Spring Boot
-be/HELP.md
-be/target/
-be/*.jar
-be/*.war
-be/*.nar
-be/*.ear
-be/*.zip
-be/*.tar.gz
-be/*.rar
+backend/HELP.md
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.nar
+backend/*.ear
+backend/*.zip
+backend/*.tar.gz
+backend/*.rar
 
 # IDE - Backend
-be/.idea/
-be/*.iws
-be/*.iml
-be/*.ipr
-be/out/
-be/!**/src/main/**/out/
-be/!**/src/test/**/out/
+backend/.idea/
+backend/*.iws
+backend/*.iml
+backend/*.ipr
+backend/out/
+backend/!**/src/main/**/out/
+backend/!**/src/test/**/out/
 
 # Eclipse/STS
-be/.apt_generated
-be/.classpath
-be/.factorypath
-be/.project
-be/.settings/
-be/.springBeans
-be/.sts4-cache
-be/bin/
-be/!**/src/main/**/bin/
-be/!**/src/test/**/bin/
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings/
+backend/.springBeans
+backend/.sts4-cache
+backend/bin/
+backend/!**/src/main/**/bin/
+backend/!**/src/test/**/bin/
 
 # NetBeans
-be/nbproject/private/
-be/nbbuild/
-be/dist/
-be/nbdist/
-be/.nb-gradle/
+backend/nbproject/private/
+backend/nbbuild/
+backend/dist/
+backend/nbdist/
+backend/.nb-gradle/
 
-# ==================================================
-# 2. FRONTEND (Vite/Node.js) - fe/ 디렉토리
-# ==================================================
+# ==========================================================================================
+# 2. FRONTEND (Vite/Node.js) - frontend/ 디렉토리
+# ==========================================================================================
 
 # Dependencies
-fe/node_modules/
-fe/.pnp
-fe/.pnp.js
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
 
 # Build outputs
-fe/dist/
-fe/dist-ssr/
-fe/build/
-fe/.next/
-fe/out/
+frontend/dist/
+frontend/dist-ssr/
+frontend/build/
+frontend/.next/
+frontend/out/
 
 # Environment variables
-fe/.env
-fe/.env.*
-fe/!.env.example
+frontend/.env
+frontend/.env.*
+frontend/!.env.example
 
 # Logs
-fe/logs/
-fe/*.log
-fe/npm-debug.log*
-fe/yarn-debug.log*
-fe/yarn-error.log*
-fe/pnpm-debug.log*
-fe/lerna-debug.log*
+frontend/logs/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
 
 # Runtime data
-fe/pids/
-fe/*.pid
-fe/*.seed
-fe/*.pid.lock
+frontend/pids/
+frontend/*.pid
+frontend/*.seed
+frontend/*.pid.lock
 
 # Coverage directory used by tools like istanbul
-fe/coverage/
-fe/*.lcov
+frontend/coverage/
+frontend/*.lcov
 
 # nyc test coverage
-fe/.nyc_output
+frontend/.nyc_output
 
 # ESLint cache
-fe/.eslintcache
+frontend/.eslintcache
 
 # Optional npm cache directory
-fe/.npm
+frontend/.npm
 
 # Optional REPL history
-fe/.node_repl_history
+frontend/.node_repl_history
 
 # Output of 'npm pack'
-fe/*.tgz
+frontend/*.tgz
 
 # Yarn Integrity file
-fe/.yarn-integrity
+frontend/.yarn-integrity
 
 # parcel-bundler cache (https://parceljs.org/)
-fe/.cache
-fe/.parcel-cache
+frontend/.cache
+frontend/.parcel-cache
 
 # Vite
-fe/*.local
-fe/.vite/
+frontend/*.local
+frontend/.vite/
 
 # Rollup cache
-fe/.rpt2_cache/
-fe/.rts2_cache_cjs/
-fe/.rts2_cache_es/
-fe/.rts2_cache_umd/
+frontend/.rpt2_cache/
+frontend/.rts2_cache_cjs/
+frontend/.rts2_cache_es/
+frontend/.rts2_cache_umd/
 
-# ==================================================
-# 3. AI/ML (Python) - ai/ 디렉토리
-# ==================================================
+# ==========================================================================================
+# 3. NODE BACKEND (Node.js/Express) - node-backend/ 디렉토리  
+# ==========================================================================================
 
-# Python
-ai/__pycache__/
-ai/*.py[cod]
-ai/*$py.class
-ai/*.so
+# Dependencies
+node-backend/node_modules/
+node-backend/.pnp
+node-backend/.pnp.js
 
-# Distribution / packaging
-ai/.Python
-ai/build/
-ai/develop-eggs/
-ai/dist/
-ai/downloads/
-ai/eggs/
-ai/.eggs/
-ai/lib/
-ai/lib64/
-ai/parts/
-ai/sdist/
-ai/var/
-ai/wheels/
-ai/share/python-wheels/
-ai/*.egg-info/
-ai/.installed.cfg
-ai/*.egg
-ai/MANIFEST
+# Build outputs
+node-backend/dist/
+node-backend/build/
+
+# Environment variables
+node-backend/.env
+node-backend/.env.*
+node-backend/!.env.example
+
+# Logs
+node-backend/logs/
+node-backend/*.log
+node-backend/npm-debug.log*
+node-backend/yarn-debug.log*
+node-backend/yarn-error.log*
+node-backend/pnpm-debug.log*
+node-backend/lerna-debug.log*
+
+# Runtime data
+node-backend/pids/
+node-backend/*.pid
+node-backend/*.seed
+node-backend/*.pid.lock
+
+# Coverage directory
+node-backend/coverage/
+node-backend/*.lcov
+node-backend/.nyc_output
+
+# ESLint cache
+node-backend/.eslintcache
+
+# Optional npm cache directory
+node-backend/.npm
+
+# Optional REPL history
+node-backend/.node_repl_history
+
+# Output of 'npm pack'
+node-backend/*.tgz
+
+# Yarn Integrity file
+node-backend/.yarn-integrity
+
+# Cache directories
+node-backend/.cache
+node-backend/.parcel-cache
+
+# ==========================================================================================
+# 4. CHATBOT API (Node.js/Python) - chatbot-api/ 디렉토리
+# ==========================================================================================
+
+# Node.js related (if applicable)
+chatbot-api/node_modules/
+chatbot-api/.pnp
+chatbot-api/.pnp.js
+chatbot-api/dist/
+chatbot-api/build/
+
+# Python related
+chatbot-api/__pycache__/
+chatbot-api/*.py[cod]
+chatbot-api/*$py.class
+chatbot-api/*.so
 
 # Virtual environments
-ai/venv/
-ai/ENV/
-ai/env/
-ai/.venv/
-ai/.ENV/
-ai/.env/
+chatbot-api/venv/
+chatbot-api/ENV/
+chatbot-api/env/
+chatbot-api/.venv/
+chatbot-api/.ENV/
+chatbot-api/.env/
+
+# Environment variables
+chatbot-api/.env
+chatbot-api/.env.*
+chatbot-api/!.env.example
+
+# Logs
+chatbot-api/logs/
+chatbot-api/*.log
+chatbot-api/npm-debug.log*
+chatbot-api/yarn-debug.log*
+
+# AI/ML models and data
+chatbot-api/models/
+chatbot-api/checkpoints/
+chatbot-api/data/
+chatbot-api/*.pkl
+chatbot-api/*.h5
+chatbot-api/*.pth
+chatbot-api/*.ckpt
+
+# API keys and credentials
+chatbot-api/credentials/
+chatbot-api/secrets/
+chatbot-api/config/local.*
+
+# ==========================================================================================
+# 5. SCHEDULER (Python) - scheduler/ 디렉토리
+# ==========================================================================================
+
+# Python
+scheduler/__pycache__/
+scheduler/*.py[cod]
+scheduler/*$py.class
+scheduler/*.so
+
+# Distribution / packaging
+scheduler/.Python
+scheduler/build/
+scheduler/develop-eggs/
+scheduler/dist/
+scheduler/downloads/
+scheduler/eggs/
+scheduler/.eggs/
+scheduler/lib/
+scheduler/lib64/
+scheduler/parts/
+scheduler/sdist/
+scheduler/var/
+scheduler/wheels/
+scheduler/share/python-wheels/
+scheduler/*.egg-info/
+scheduler/.installed.cfg
+scheduler/*.egg
+scheduler/MANIFEST
+
+# Virtual environments
+scheduler/venv/
+scheduler/ENV/
+scheduler/env/
+scheduler/.venv/
+scheduler/.ENV/
+scheduler/.env/
 
 # Jupyter Notebook
-ai/.ipynb_checkpoints
+scheduler/.ipynb_checkpoints
 
 # IPython
-ai/profile_default/
-ai/ipython_config.py
+scheduler/profile_default/
+scheduler/ipython_config.py
 
 # ML/AI specific
-ai/models/
-ai/checkpoints/
-ai/data/
-ai/datasets/
-ai/*.pkl
-ai/*.h5
-ai/*.hdf5
-ai/*.pb
-ai/*.pth
-ai/*.ckpt
-ai/wandb/
-ai/mlruns/
-ai/.tensorboard/
+scheduler/models/
+scheduler/checkpoints/
+scheduler/data/
+scheduler/datasets/
+scheduler/*.pkl
+scheduler/*.h5
+scheduler/*.hdf5
+scheduler/*.pb
+scheduler/*.pth
+scheduler/*.ckpt
+scheduler/wandb/
+scheduler/mlruns/
+scheduler/.tensorboard/
 
-# ==================================================
-# 4. 공통 개발 환경
-# ==================================================
+# ==========================================================================================
+# 6. 공통 개발 환경
+# ==========================================================================================
 
 # Operating System
 .DS_Store
@@ -213,13 +320,27 @@ Thumbs.db
 # Visual Studio
 *.suo
 *.ntvs*
-*.njsproj
+*.njsproj*
 *.sln
 *.sw?
 
-# ==================================================
-# 5. Docker & DevOps
-# ==================================================
+# ==========================================================================================
+# 7. AWS & DevOps
+# ==========================================================================================
+
+# AWS
+.aws/
+aws-exports.js
+amplify/
+.amplify/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
 
 # Docker
 **/.dockerignore
@@ -229,9 +350,9 @@ Thumbs.db
 .github/
 .gitlab-ci.yml
 
-# ==================================================
-# 6. 기타 임시/백업 파일
-# ==================================================
+# ==========================================================================================
+# 8. 기타 임시/백업 파일
+# ==========================================================================================
 
 # Temporary files
 *.tmp
@@ -262,13 +383,33 @@ config.local.*
 .env.common
 .env.frontend
 .env.backend
+.env.node-backend
+.env.chatbot-api
+.env.scheduler
 
-# ==================================================
-# 7. 프로젝트별 특수 파일
-# ==================================================
+# API keys and secrets
+api-keys.json
+secrets.json
+credentials.json
+*.key
+*.pem
+*.crt
+*.p12
+
+# ==========================================================================================
+# 9. 프로젝트별 특수 파일
+# ==========================================================================================
 
 # drawio backup files
 **/*.$*.drawio.bkp
+
+# Documentation outputs
+docs/build/
+docs/_build/
+
+# Test outputs
+test-results/
+coverage-reports/
 
 # README files (프로젝트마다 다를 수 있으므로)
 # README.md  # 주석 처리 - 필요시 활성화

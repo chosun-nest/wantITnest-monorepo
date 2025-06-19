@@ -8,7 +8,6 @@ services:
     ports:
       - "6030:6030"
     env_file:
-      - ./.env.common
       - ./.env.backend
     volumes:
       # 업로드된 이미지 공유 (Frontend와 공유)
@@ -30,7 +29,6 @@ services:
     ports:
       - "8001:8001"
     env_file:
-      - ./.env.common
       - ./.env.backend
     volumes:
       # 로그 파일 저장
@@ -45,14 +43,31 @@ services:
       retries: 3
       start_period: 30s
 
+  # Node.js 실시간 채팅 서버
+  node-chat-backend:
+    build:
+      context: ./node-backend
+      dockerfile: Dockerfile
+    container_name: node-chat-backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./.env.backend
+    volumes:
+      # 로그 파일 저장
+      - ./node-backend/logs:/app/logs
+    networks:
+      - backend-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+
 volumes:
   # 업로드된 이미지 볼륨 (Frontend와 공유)
   uploaded-images:
     driver: local
 
 networks:
-  app-network:
-    external: true
   backend-network:
     driver: bridge
     ipam:

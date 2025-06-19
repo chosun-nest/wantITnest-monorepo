@@ -7,7 +7,7 @@ load_dotenv()
 
 # 스케줄링 설정
 SCHEDULE_CONFIG = {
-    "enabled": os.getenv("SCHEDULE_ENABLED", "true").lower() == "true",
+    "enabled": True,
     "schedules": [
         # {"type": "interval", "minutes": 1} # test 시 활성화
         {"type": "cron", "hour": 9, "minute": 0},
@@ -16,7 +16,7 @@ SCHEDULE_CONFIG = {
         {"type": "cron", "hour": 15, "minute": 0},
         {"type": "cron", "hour": 17, "minute": 0},
     ],
-    "timezone": os.getenv("SCHEDULE_TIMEZONE", "Asia/Seoul")
+    "timezone": "Asia/Seoul"
 }
 
 # 크롤링 대상 카테고리
@@ -32,17 +32,17 @@ CATEGORIES = {
 # API 설정
 API_CONFIG = {
     # Docker Compose의 SPRING_SERVER_URL을 우선 사용, 없으면 .env의 SPRING_SERVER_BASE_URL 사용
-    "base_url": os.getenv("SPRING_SERVER_URL") or os.getenv("SPRING_SERVER_BASE_URL", "http://localhost:6030"),
+    "base_url": os.getenv("API_SERVER_URL"),
     "endpoint_template": "/api/v1/notices/{category}",
-    "timeout": int(os.getenv("API_TIMEOUT_SECONDS", "30")),
-    "retry_count": int(os.getenv("API_RETRY_COUNT", "3")),
-    "retry_delay": int(os.getenv("API_RETRY_DELAY_SECONDS", "5"))  # seconds
+    "timeout": 30,
+    "retry_count": 3,
+    "retry_delay": 5  # seconds
 }
 
 # 크롤링 설정
 CRAWL_CONFIG = {
-    "delay_between_requests": int(os.getenv("CRAWL_DELAY_SECONDS", "2")),  # seconds
-    "year_filter": os.getenv("CRAWL_YEAR_FILTER", "2025"),  # 크롤링할 연도
+    "delay_between_requests": 2,  # seconds
+    "year_filter": 2025,  # 크롤링할 연도
     "selenium_options": [
         "--headless",
         "--no-sandbox", 
@@ -53,15 +53,15 @@ CRAWL_CONFIG = {
 
 # 로깅 설정
 LOG_CONFIG = {
-    "level": os.getenv("LOG_LEVEL", "INFO"),
-    "file_path": os.getenv("LOG_FILE_PATH", "src/logs/crawler.log"),
-    "max_file_size": int(os.getenv("LOG_MAX_FILE_SIZE_MB", "10")) * 1024 * 1024,  # MB를 bytes로 변환
-    "backup_count": int(os.getenv("LOG_BACKUP_COUNT", "5")),
+    "level": "INFO",
+    "file_path": "src/logs/crawler.log",
+    "max_file_size": 10 * 1024 * 1024,
+    "backup_count": 5,
     "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 }
 
 # 기타 설정
 MISC_CONFIG = {
-    "duplicate_check_hours": int(os.getenv("DUPLICATE_CHECK_HOURS", "24")),  # 중복 체크할 시간 범위
-    "max_notices_per_category": int(os.getenv("MAX_NOTICES_PER_CATEGORY", "100"))
+    "duplicate_check_hours": 24,  # 중복 체크할 시간 범위
+    "max_notices_per_category": 100
 }
