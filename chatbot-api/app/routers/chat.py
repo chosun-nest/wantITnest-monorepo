@@ -11,7 +11,7 @@ from app.services.openai_service import openai_service
 router = APIRouter()
 
 @router.post(
-    "/api/chat",
+    "/api/ai/chatbot",
     response_model=ChatResponse,
     responses={
         400: {"model": ErrorResponse, "description": "잘못된 요청"},
@@ -110,7 +110,7 @@ async def generate_stream_response(
 
 # 헬스체크용 엔드포인트
 @router.get(
-    "/api/chat/health",
+    "/api/ai/chatbot/health",
     summary="챗봇 서비스 상태 확인",
     description="챗봇 서비스와 OpenAI API 연결 상태를 확인합니다."
 )

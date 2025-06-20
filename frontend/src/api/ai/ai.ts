@@ -5,7 +5,7 @@ export async function fetchOpenAIStream({
   messages: { role: string; content: string }[];
   onMessage: (content: string) => void;
 }) {
-  const res = await fetch("/api/chat", {
+  const res = await fetch("/api/ai/chatbot", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

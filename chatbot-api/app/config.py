@@ -14,7 +14,7 @@ class Settings:
     OPENAI_MAX_TOKENS: Optional[int] = None if not os.getenv("OPENAI_MAX_TOKENS") else int(os.getenv("OPENAI_MAX_TOKENS"))
     
     # 채팅 설정
-    MAX_MESSAGES_HISTORY: int = int(os.getenv("CHATBOT_MAX_MESSAGES_HISTORY", "20"))
+    MAX_MESSAGES_HISTORY: int = int(os.getenv("CHATBOT_MAX_MESSAGES_HISTORY", "8"))
     
     def validate_settings(self) -> bool:
         """필수 설정 검증"""
