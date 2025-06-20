@@ -1,0 +1,247 @@
+# wantITnest 프로젝트 .gitattributes
+# ===========================================================
+# 줄 바꿈 문자와 인코딩을 일관되게 관리하기 위한 설정
+# ===========================================================
+
+# 기본 설정: 모든 텍스트 파일을 LF로 정규화
+* text=auto eol=lf
+
+# ===========================================================
+# Frontend (React/TypeScript/Vite)
+# ===========================================================
+
+# JavaScript/TypeScript 파일들
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+
+# 설정 파일들
+*.json text eol=lf
+*.jsonc text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf
+tsconfig.json text eol=lf
+*.config.js text eol=lf
+*.config.ts text eol=lf
+vite.config.ts text eol=lf
+tailwind.config.js text eol=lf
+postcss.config.js text eol=lf
+eslint.config.js text eol=lf
+
+# 스타일 파일들
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+*.styl text eol=lf
+
+# HTML/템플릿 파일들
+*.html text eol=lf
+*.htm text eol=lf
+*.xml text eol=lf
+*.svg text eol=lf
+
+# ===========================================================
+# Backend (Spring Boot/Java)
+# ===========================================================
+
+# Java 소스 파일들
+*.java text eol=lf
+*.kt text eol=lf
+*.kts text eol=lf
+*.groovy text eol=lf
+*.gradle text eol=lf
+gradle.properties text eol=lf
+gradlew text eol=lf
+
+# Spring 설정 파일들
+*.properties text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+application*.properties text eol=lf
+application*.yml text eol=lf
+
+# Maven 관련 (혹시 사용할 경우)
+pom.xml text eol=lf
+*.pom text eol=lf
+
+# ===========================================================
+# Node Backend (Express)
+# ===========================================================
+
+# Node.js 파일들은 위의 JavaScript 설정과 동일
+
+# ===========================================================
+# Python (Chatbot API/Scheduler)
+# ===========================================================
+
+# Python 소스 파일들
+*.py text eol=lf
+*.pyx text eol=lf
+*.pxd text eol=lf
+*.pxi text eol=lf
+
+# Python 설정 파일들
+*.cfg text eol=lf
+*.ini text eol=lf
+requirements.txt text eol=lf
+requirements*.txt text eol=lf
+Pipfile text eol=lf
+Pipfile.lock text eol=lf
+pyproject.toml text eol=lf
+setup.py text eol=lf
+setup.cfg text eol=lf
+
+# ===========================================================
+# 문서 파일들
+# ===========================================================
+
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+*.rtf text eol=lf
+*.adoc text eol=lf
+README* text eol=lf
+CHANGELOG* text eol=lf
+LICENSE* text eol=lf
+CONTRIBUTING* text eol=lf
+
+# ===========================================================
+# 데이터베이스 관련
+# ===========================================================
+
+*.sql text eol=lf
+*.ddl text eol=lf
+*.dml text eol=lf
+
+# ===========================================================
+# DevOps/인프라 설정
+# ===========================================================
+
+# Docker 관련
+Dockerfile text eol=lf
+*.dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf
+
+# Nginx 설정
+*.conf text eol=lf
+
+# 쉘 스크립트 (Unix/Linux)
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.fish text eol=lf
+
+# 환경 설정
+*.env text eol=lf
+.env* text eol=lf
+*.envrc text eol=lf
+
+# CI/CD 설정
+*.yml text eol=lf
+*.yaml text eol=lf
+.github/**/* text eol=lf
+.gitlab-ci.yml text eol=lf
+
+# ===========================================================
+# Windows 전용 파일들 (CRLF 유지)
+# ===========================================================
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+gradlew.bat text eol=crlf
+
+# ===========================================================
+# 바이너리 파일들 (변환하지 않음)
+# ===========================================================
+
+# 이미지 파일들
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.tiff binary
+*.tif binary
+*.ico binary
+*.svg binary
+*.webp binary
+
+# 폰트 파일들
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# 오디오/비디오 파일들
+*.mp3 binary
+*.mp4 binary
+*.wav binary
+*.avi binary
+*.mov binary
+*.webm binary
+
+# 압축 파일들
+*.zip binary
+*.7z binary
+*.tar binary
+*.gz binary
+*.bz2 binary
+*.rar binary
+
+# 실행 파일들
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.app binary
+
+# 문서 파일들 (바이너리)
+*.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+
+# Java 관련 바이너리
+*.jar binary
+*.war binary
+*.ear binary
+*.class binary
+
+# Node.js 관련 바이너리
+*.node binary
+
+# 기타 바이너리
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# ===========================================================
+# Git 관련 특수 설정
+# ===========================================================
+
+# Git hooks는 실행 가능해야 함
+.git/hooks/* text eol=lf
+
+# .gitignore와 .gitattributes는 LF
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# ===========================================================
+# 특수한 파일들
+# ===========================================================
+
+# package-lock.json은 건드리지 않기
+package-lock.json -diff
+
+# 바이너리로 취급할 특정 확장자 (필요시 추가)
+# *.특정확장자 binary
