@@ -363,6 +363,7 @@ terraform.tfvars.json
 
 # Log files
 *.log
+logs/
 
 # Archive files
 *.zip

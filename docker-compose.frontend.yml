@@ -50,7 +50,7 @@ services:
       - frontend-network
     depends_on:
       - react-frontend
-      - python-crawler
+      - crawler
     restart: unless-stopped
 
 volumes:
