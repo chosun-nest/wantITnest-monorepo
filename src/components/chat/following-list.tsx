@@ -1,20 +1,20 @@
-import { MemberProfile } from "../../types/api/profile";
+import { SimpleMemberProfile } from "../../types/chat/chat";
 
 interface FollowingListProps {
   isMobile: boolean;
-  onSelectUser: (user: MemberProfile) => void;
+  users: SimpleMemberProfile[];
+  onSelectUser: (user: SimpleMemberProfile) => void;
 }
 
-const dummyFriends: MemberProfile[] = [
-  /* ...더미 친구 생략... */
-];
-
-export default function FollowingList({ onSelectUser }: FollowingListProps) {
+export default function FollowingList({
+  users,
+  onSelectUser,
+}: FollowingListProps) {
   return (
     <div className="p-5 w-[66%] max-w-[800px] min-w-[400px] border border-[#002f6c] rounded-lg shadow-sm">
-      <h2 className="font-bold text-xl">내 친구 목록</h2>
+      <h2 className="font-bold text-xl">내 팔로잉 목록</h2>
       <ul className="mt-4">
-        {dummyFriends.map((friend) => (
+        {users.map((friend) => (
           <li
             key={friend.memberId}
             onClick={() => onSelectUser(friend)}
