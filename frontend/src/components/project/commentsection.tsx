@@ -1,7 +1,12 @@
 import { useState } from "react";
 import styled from "styled-components";
 
-export default function CommentSection() {
+interface CommentSectionProps {
+  boardType: "INTEREST" | "PROJECT"; // 게시판 타입
+  postId: number;                    // 게시글 ID
+}
+
+export default function CommentSection(_: CommentSectionProps) {
   const [comments, setComments] = useState<string[]>([]);
   const [input, setInput] = useState("");
 
@@ -15,6 +20,7 @@ export default function CommentSection() {
   return (
     <Container>
       <Title>댓글 {comments.length}</Title>
+
       <InputWrapper>
         <CommentInput
           placeholder="댓글을 작성해보세요."
@@ -40,7 +46,7 @@ export default function CommentSection() {
   );
 }
 
-// 스타일 컴포넌트
+// ===== 스타일 컴포넌트 =====
 
 const Container = styled.div`
   margin-top: 20px;

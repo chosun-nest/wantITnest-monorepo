@@ -166,9 +166,16 @@ export default function InterestsDetail() {
             isAuthor={isAuthor}
             viewCount={post.viewCount}
             createdAt={post.createdAt}
+            onAuthorClick={() => {
+              if (isAuthor) {
+                navigate("/profile");
+              } else if (post.author.id) {  // 중복 리랜더링 방지
+                navigate(`/profile/${post.author.id}`);
+              }
+            }}
           />
           <div className="flex items-center gap-2">
-            {!isAuthor && <FollowButton />}
+            {!isAuthor && <FollowButton memberId={post.author.id} />}
             <PostDetailHeader
               isAuthor={isAuthor}
               onEdit={() => navigate("/interests-write", { state: { post } })}
@@ -176,6 +183,9 @@ export default function InterestsDetail() {
             />
           </div>
         </div>
+
+        {/* 구분선 */}
+        <hr className="my-6 border-gray-200" />
 
         {/* 게시글 본문 */}
         <PostDetailContent content={post.content} />

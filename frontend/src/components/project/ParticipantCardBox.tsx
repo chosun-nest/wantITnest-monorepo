@@ -1,12 +1,11 @@
-import { Participant } from "../../types/participant";
 import { useNavigate } from "react-router-dom";
-import type { ProjectDetail } from "../../types/api/project-board";
+import type { ProjectDetail, ProjectMember } from "../../types/api/project-board";
 
 interface Props {
   project: ProjectDetail;
-  participants: Participant[];
+  participants: ProjectMember[];
   onOpenModal: () => void;
-  onAccept: (user: Participant) => void;
+  onAccept: (user: ProjectMember) => void;
   currentUserId: number;
 }
 
@@ -58,27 +57,30 @@ export default function ParticipantCardBox({
         )}
       </div>
 
-      {/* 모바일: 2열, md 이상: 1열 */}
       <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
         {participants.map((user) => (
           <div
-            key={user.id}
+            key={user.memberId ?? `${user.part}-${user.role}`}
             className="relative flex items-center justify-between p-3 bg-white rounded-lg border shadow-sm"
           >
             <div>
               <div className="flex items-center gap-2">
                 <img
-                  src={user.imageUrl || "/assets/images/default-profile.png"}
+                  src="/assets/images/default-profile.png"
                   alt="프로필"
                   className="w-6 h-6 rounded-full object-cover"
                 />
-                <p className="font-semibold text-sm text-gray-800">{user.name}</p>
+                <p className="font-semibold text-sm text-gray-800">
+                  {user.memberName ?? "미정"}
+                </p>
               </div>
-              <p className="text-xs text-gray-500">{user.role}</p>
+              <p className="text-xs text-gray-500">{user.part}</p>
             </div>
-            <p className="absolute top-3 right-3 text-xs text-gray-500">
-              팔로워 {user.followers ?? 0}
-            </p>
+            {user.memberId && (
+              <p className="absolute top-3 right-3 text-xs text-gray-500">
+                리더: {user.role === "LEADER" ? "✅" : "❌"}
+              </p>
+            )}
           </div>
         ))}
       </div>

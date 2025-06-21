@@ -1,26 +1,35 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useResponsive from "../hooks/responsive";
-import { applyToProject } from "../api/project/ProjectAPI";
+import { applyToProject, getProjectById } from "../api/project/ProjectAPI";
+import type { ProjectDetail } from "../types/api/project-board";
 
 export default function ProjectApply() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { project } = location.state || {};
+  const { id } = useParams();
+  const isMobile = useResponsive();
 
+  const [project, setProject] = useState<ProjectDetail | null>(null);
   const [message, setMessage] = useState("");
   const [selectedField, setSelectedField] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isMobile = useResponsive();
 
   const fieldOptions = ["프론트엔드", "백엔드", "디자이너", "AI / 데이터 분석"];
 
   useEffect(() => {
-    if (!project) {
-      alert("잘못된 접근입니다.");
-      navigate(-1);
-    }
-  }, [project, navigate]);
+    const fetchProject = async () => {
+      try {
+        const data = await getProjectById(Number(id));
+        setProject(data);
+      } catch (err) {
+        alert("잘못된 접근입니다.");
+        navigate(-1);
+      }
+    };
+
+    if (id) fetchProject();
+    else navigate(-1);
+  }, [id, navigate]);
 
   const handleSubmit = async () => {
     if (!message.trim()) {
@@ -35,9 +44,9 @@ export default function ProjectApply() {
     try {
       setIsSubmitting(true);
       await applyToProject({
-        projectId: project.projectId,
+        projectId: Number(id),
         field: selectedField,
-        message: message,
+        message,
       });
 
       alert(`'${selectedField}' 분야로 지원이 완료되었습니다!`);
@@ -50,6 +59,10 @@ export default function ProjectApply() {
     }
   };
 
+  if (!project) {
+    return <div className="pt-36 text-center text-gray-500">로딩 중...</div>;
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 pt-36 pb-20">
       <div className="bg-gray-50 shadow-md rounded-lg p-10">
@@ -58,7 +71,7 @@ export default function ProjectApply() {
             isMobile ? "text-xl" : "text-2xl"
           }`}
         >
-          {project?.title || "프로젝트 인원 구해요"}에 지원 동기 작성
+          {project.projectTitle}에 지원 동기 작성
         </h2>
 
         <h3 className="text-base font-semibold mb-2">

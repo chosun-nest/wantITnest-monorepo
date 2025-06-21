@@ -1,3 +1,5 @@
+// 프로필 api 타입
+
 // 회원 정보 전체
 export interface MemberProfile {
   memberId: number;
@@ -24,13 +26,13 @@ export interface MemberDepartment {
   departmentName: string;
 }
 
-// // 관심 분야 정보
-// export interface MemberInterest {
-//   memberInterestId: number;
-//   memberId: number;
-//   interestId: number;
-//   interestName: string;
-// }
+// 관심 분야 정보
+export interface MemberInterest {
+  memberInterestId: number;
+  memberId: number;
+  interestId: number;
+  interestName: string;
+}
 
 // 기술 스택 정보
 export interface MemberTechStack {
@@ -40,7 +42,7 @@ export interface MemberTechStack {
   techStackName: string;
 }
 
-// 회원 정보 수정 요청
+// 회원 정보 수정 요청 (PATCH)
 export interface UpdateMemberProfilePayload {
   memberName?: string;
   memberImageUrl?: string;
@@ -54,14 +56,33 @@ export interface UpdateMemberProfilePayload {
   memberTechStackUpdateRequestIdList?: number[];
 }
 
-// 비밀번호 확인 요청
+// 비밀번호 확인 요청 (POST)
 export interface CheckPasswordPayload {
   password: string;
 }
 
-// 비밀번호 변경 요청
+// 비밀번호 변경 요청 (PATCH)
 export interface UpdateMemberPasswordPayload {
   currentPassword?: string;
   newPassword?: string;
   newPasswordConfirm?: string;
+}
+
+// 특정 회원 프로필 조회 - 로그인 필요(GET)
+export interface MemberProfile {
+  memberId: number;
+  memberEmail: string;
+  memberRole: string;
+  memberName: string;
+  memberSnsUrl1: string;
+  memberSnsUrl2: string;
+  memberSnsUrl3: string;
+  memberSnsUrl4: string;
+  memberIsStudent: boolean;
+  memberIntroduce: string;
+  memberImageUrl: string;
+  memberPasswordLength: number;
+  memberDepartmentResponseDtoList: MemberDepartment[];
+  memberTechStackResponseDtoList: MemberTechStack[];
+  memberInterestResponseDtoList: MemberInterest[];
 }

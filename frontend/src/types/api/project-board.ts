@@ -41,6 +41,13 @@ export interface ProjectListResponse {
 // 🔍 GET /api/projects/{projectId} - 상세 조회
 // ==================================
 
+export interface ProjectMember {
+  part: "FRONTEND" | "BACKEND" | "PM";
+  role: "MEMBER" | "LEADER";
+  memberId: number | null;
+  memberName: string | null;
+}
+
 export interface ProjectDetail {
   projectId: number;
   projectTitle: string;
@@ -53,17 +60,12 @@ export interface ProjectDetail {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
-  projectMembers: {
-    part: string;
-    role: string;
-    memberId: number;
-    memberName: string;
-  }[];
+  projectMembers: ProjectMember[];
   isRecruiting: boolean;
 }
 
 // ==================================
-// 🟢 POST /api/projects/new - 프로젝트 생성 (Swagger 기준)
+// 🟢 POST /api/projects/new - 프로젝트 생성
 // ==================================
 
 export interface CreateProjectPayload {

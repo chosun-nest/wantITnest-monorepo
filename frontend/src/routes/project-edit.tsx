@@ -43,6 +43,7 @@ export default function ProjectEdit() {
     const payload: UpdateProjectPayload = {
       projectTitle: title,
       projectDescription: description,
+
       tags: [], // TODO: 추후 태그 연결
       parts: [
         {

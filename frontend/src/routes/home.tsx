@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import * as S from "../assets/styles/home.styles";
-import ProfileComponent from "../components/profile/card/ProfileCard";
+//import ProfileComponent from "../components/profile/card/ProfileCard";
+import ProfileCardWrapper from "../components/profile/card/ProfileCardWrapper";   // 프로필 카드 대신에 wrapper로 profile 컴포넌트 정보 불러옴.
 import useResponsive from "../hooks/responsive";
 import GuestCard from "../components/profile/card/ProfileCardGuest";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
@@ -23,7 +24,7 @@ export default function Home() {
           <GuestCard />
         ) : (
           <S.ProfileContainer>
-            <ProfileComponent />
+              <ProfileCardWrapper />
           </S.ProfileContainer>
         )}
       </S.GridItem>

@@ -5,6 +5,7 @@ import { selectAccessToken } from "../store/slices/authSlice";
 import { setUser, selectCurrentUserId } from "../store/slices/userSlice";
 import { getMemberProfile } from "../api/profile/ProfileAPI";
 import { getProjectById, deleteProject } from "../api/project/ProjectAPI";
+
 import CommentSection from "../components/project/commentsection";
 import ParticipantCardBox from "../components/project/ParticipantCardBox";
 import ApplicationModal from "../components/project/ApplicationModal";
@@ -15,12 +16,11 @@ import type { ProjectDetail } from "../types/api/project-board";
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isMobile = useResponsive();
   const dispatch = useDispatch();
+  const isMobile = useResponsive();
 
   const accessToken = useSelector(selectAccessToken);
   const currentUserId = useSelector(selectCurrentUserId);
-  const isAuthenticated = !!accessToken;
 
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,53 +28,41 @@ export default function ProjectDetail() {
   const [notFound, setNotFound] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setAuthError(true);
-      setLoading(false);
-      return;
-    }
-
-    getMemberProfile()
-      .then((user) => {
-        dispatch(
-          setUser({
-            memberId: user.memberId,
-            memberName: user.memberName,
-            memberRole: user.memberRole,
-          })
-        );
-      })
-      .catch((err) => console.error("유저 정보 불러오기 실패", err));
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    const fetchProject = async () => {
-      if (!id) return;
+    const initialize = async () => {
+      if (!accessToken) {
+        setAuthError(true);
+        setLoading(false);
+        return;
+      }
 
       try {
+        const user = await getMemberProfile();
+        dispatch(setUser({
+          memberId: user.memberId,
+          memberName: user.memberName,
+          memberRole: user.memberRole,
+        }));
+
         const data = await getProjectById(Number(id));
         setProject(data);
-      } catch (error: any) {
-        if (error.response?.status === 404) {
+      } catch (err: any) {
+        if (err.response?.status === 404) {
           setNotFound(true);
         } else {
-          console.error("프로젝트 상세 조회 실패:", error);
+          console.error("프로젝트 상세 조회 실패:", err);
         }
       } finally {
         setLoading(false);
       }
     };
 
-    if (isAuthenticated) {
-      fetchProject();
-    }
-  }, [id, isAuthenticated]);
+    initialize();
+  }, [id, accessToken]);
 
-  const handleEdit = () => {
-    navigate(`/project-edit/${id}`);
-  };
+  const handleEdit = () => navigate(`/project/${id}/edit`);
 
   const handleDelete = async () => {
     try {
@@ -90,7 +78,7 @@ export default function ProjectDetail() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center">
+      <div className="max-w-4xl px-4 pb-10 mx-auto text-center pt-36">
         ⏳ 로딩 중입니다...
       </div>
     );
@@ -98,7 +86,7 @@ export default function ProjectDetail() {
 
   if (authError) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center text-red-500 font-semibold">
+      <div className="max-w-4xl px-4 pb-10 mx-auto font-semibold text-center text-red-500 pt-36">
         🔒 로그인 후 프로젝트 정보를 확인할 수 있습니다.
       </div>
     );
@@ -106,7 +94,7 @@ export default function ProjectDetail() {
 
   if (notFound) {
     return (
-      <div className="max-w-4xl px-4 pb-10 mx-auto pt-36 text-center text-gray-600">
+      <div className="max-w-4xl px-4 pb-10 mx-auto text-center text-gray-600 pt-36">
         ❌ 해당 프로젝트를 찾을 수 없습니다.
         <div className="mt-4">
           <button
@@ -125,12 +113,8 @@ export default function ProjectDetail() {
   const isAuthor = project.author.id === currentUserId;
 
   return (
-    <div
-      className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${
-        isMobile ? "flex-col gap-4" : "flex-row gap-8"
-      }`}
-    >
-      {/* 왼쪽 영역 */}
+    <div className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${isMobile ? "flex-col gap-4" : "flex-row gap-8"}`}>
+      {/* 왼쪽: 본문 영역 */}
       <div className="flex-1">
         <h1 className={`font-bold text-blue-900 mb-2 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
           {project.projectTitle}
@@ -139,21 +123,15 @@ export default function ProjectDetail() {
         {/* 작성자 정보 */}
         <div className={`flex ${isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"}`}>
           <div className="flex items-center gap-2">
-            <img
-              src="/assets/images/manager-bird.png"
-              alt="프로필"
-              className="w-8 h-8 rounded-full"
-            />
-            <span className="font-semibold text-[16px] text-gray-900">
-              {project.author.name}
-            </span>
+            <img src="/assets/images/manager-bird.png" alt="프로필" className="w-8 h-8 rounded-full" />
+            <span className="font-semibold text-[16px] text-gray-900">{project.author.name}</span>
           </div>
           <button className="px-3 py-1 text-sm border rounded hover:bg-gray-100 w-fit">
             + 팔로우
           </button>
         </div>
 
-        <div className="mt-1 text-[15px] text-gray-600 flex gap-2 flex-wrap">
+        <div className="mt-2 text-[15px] text-gray-600 flex gap-2 flex-wrap">
           <span>생성일: {project.createdAt}</span>
           <span>수정일: {project.updatedAt}</span>
         </div>
@@ -163,13 +141,13 @@ export default function ProjectDetail() {
           <div className="flex gap-2 mt-4">
             <button
               onClick={handleEdit}
-              className="px-3 py-1 text-sm bg-yellow-400 text-white rounded hover:bg-yellow-500"
+              className="px-3 py-1 text-sm text-white bg-yellow-400 rounded hover:bg-yellow-500"
             >
               ✏️ 수정
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
             >
               🗑 삭제
             </button>
@@ -178,13 +156,14 @@ export default function ProjectDetail() {
 
         <hr className="my-4 border-gray-300" />
 
+        {/* 설명, 태그 */}
         <div className="mb-6 leading-relaxed text-gray-700 whitespace-pre-line">
           {project.projectDescription}
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-6">
           {project.tags.map((tag) => (
-            <span key={tag} className="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded">
+            <span key={tag} className="px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded">
               {tag}
             </span>
           ))}
@@ -192,26 +171,23 @@ export default function ProjectDetail() {
 
         {/* 아래 항목은 타입에 없으므로 주석 처리하거나 추후 확장 */}
         {/* 
-        <div className="text-sm text-gray-500 mb-6">
+        <div className="mb-6 text-sm text-gray-500">
           모집 상태: <strong>{project.status}</strong> / 참여 인원: {project.currentMember} / {project.maxMember}
         </div>
         */}
 
         <div className="px-5 py-4 mb-6 border rounded bg-gray-50">
-          <CommentSection />
+          <CommentSection boardType="PROJECT" postId={project.projectId} />
         </div>
 
         <div className="mt-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 text-sm text-white rounded bg-slate-800"
-          >
+          <button onClick={() => navigate(-1)} className="px-4 py-2 text-sm text-white rounded bg-slate-800">
             ← 뒤로 가기
           </button>
         </div>
       </div>
 
-      {/* 오른쪽 참여자 카드 */}
+      {/* 오른쪽: 참여자 카드 or 지원 버튼 */}
       <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
         <ParticipantCardBox
           project={project}
@@ -222,7 +198,7 @@ export default function ProjectDetail() {
         />
       </div>
 
-      {/* 지원자 모달 */}
+      {/* 모달들 */}
       {isModalOpen && (
         <ApplicationModal
           onClose={() => setIsModalOpen(false)}
@@ -230,7 +206,6 @@ export default function ProjectDetail() {
         />
       )}
 
-      {/* 삭제 확인 모달 */}
       {showDeleteConfirm && (
         <ConfirmModal
           title="프로젝트 삭제"

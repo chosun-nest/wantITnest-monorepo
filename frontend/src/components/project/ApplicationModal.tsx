@@ -54,12 +54,12 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
   // 3. 수락 버튼 클릭 시 (API 호출 + 상태 변경 + 참여자 반영)
   const handleAccept = async (app: ApplicationWithStatus) => {
     try {
-      await updateApplicationStatus(app.applicantId, "accepted");
+      await updateApplicationStatus(app.id, "accepted");
       setApplications((prev) =>
-        prev.map((a) => (a.applicantId === app.applicantId ? { ...a, status: "accepted" } : a))
+        prev.map((a) => (a.id === app.id ? { ...a, status: "accepted" } : a))
       );
       onAccept({
-        id: app.applicantId,
+        id: app.id,
         name: app.name,
         role: app.role as "Frontend" | "Backend" | "PM",
         followers: 0,
@@ -75,7 +75,7 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
     try {
       await updateApplicationStatus(applicantId, "rejected");
       setApplications((prev) =>
-        prev.map((app) => (app.applicantId === applicantId ? { ...app, status: "rejected" } : app))
+        prev.map((app) => (app.id === applicantId ? { ...app, status: "rejected" } : app))
       );
     } catch (err) {
       console.error("거절 처리 실패", err);
@@ -109,7 +109,7 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
           ) : (
             applications.map((app) => (
               <div
-                key={app.applicantId}
+                key={app.id}
                 className="border rounded-md p-3 bg-gray-50 shadow-sm"
               >
                 <div className="flex justify-between items-center mb-1">
@@ -130,7 +130,7 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
                       수락
                     </button>
                     <button
-                      onClick={() => handleReject(app.applicantId)}
+                      onClick={() => handleReject(app.id)}
                       className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                     >
                       거절
