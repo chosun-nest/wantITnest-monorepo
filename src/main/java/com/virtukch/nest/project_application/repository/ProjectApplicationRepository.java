@@ -11,4 +11,5 @@ public interface ProjectApplicationRepository extends JpaRepository<ProjectAppli
     List<ProjectApplication> findByProjectId(Long projectId);
     List<ProjectApplication> findByMemberId(Long memberId);
     Optional<ProjectApplication> findByProjectIdAndMemberIdAndPart(Long projectId, Long memberId, ProjectMember.Part part);
+    long countByProjectIdAndStatus(Long projectId, ProjectApplication.ApplicationStatus status);
 }

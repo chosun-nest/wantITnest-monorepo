@@ -55,4 +55,41 @@ public class ProjectApplicationController {
     }
 
 
+    @Operation(
+        summary = "프로젝트 지원 수락",
+        description = """
+            프로젝트 작성자가 특정 지원자의 지원을 수락합니다.
+            ✔️ 수락 시 프로젝트 멤버로 등록
+            ✔️ 모집 인원 초과 시 수락 불가
+            """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PostMapping("/{projectId}/applications/{applicationId}/accept")
+    public ResponseEntity<ProjectApplicationResponseDto> acceptApplication(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long projectId,
+            @PathVariable Long applicationId) {
+        Long memberId = user.getMember().getMemberId();
+        ProjectApplicationResponseDto responseDto = projectApplicationService.acceptApplication(projectId, applicationId, memberId);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+        summary = "프로젝트 지원 거절",
+        description = """
+            프로젝트 작성자가 특정 지원자의 지원을 거절합니다.
+            ✔️ 지원 상태를 'REJECTED'로 변경
+            """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PostMapping("/{projectId}/applications/{applicationId}/reject")
+    public ResponseEntity<ProjectApplicationResponseDto> rejectApplication(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long projectId,
+            @PathVariable Long applicationId) {
+        Long memberId = user.getMember().getMemberId();
+        ProjectApplicationResponseDto responseDto = projectApplicationService.rejectApplication(projectId, applicationId, memberId);
+        return ResponseEntity.ok(responseDto);
+    }
+
 }

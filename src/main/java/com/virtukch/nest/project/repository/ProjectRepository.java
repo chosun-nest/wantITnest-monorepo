@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findAll(Pageable pageable);
@@ -29,4 +30,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByProjectIdInAndProjectTitleContainingIgnoreCaseOrProjectIdInAndProjectDescriptionContainingIgnoreCase(Collection<Long> ids, String title, Collection<Long> ids1, String description, Pageable pageable);
 
     Page<Project> findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContainingIgnoreCase(String title, String description, Pageable pageable);
+
+    @Query("SELECT p.memberId FROM Project p WHERE p.projectId = :projectId")
+    Optional<Long> findWriterIdByProjectId(@Param("projectId") Long projectId);
 }

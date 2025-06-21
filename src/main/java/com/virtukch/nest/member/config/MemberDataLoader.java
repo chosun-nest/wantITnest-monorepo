@@ -88,6 +88,23 @@ public class MemberDataLoader implements ApplicationRunner {
 
         memberRepository.save(member3);
 
+        Member member4 = Member.builder()
+                .memberEmail("dlwlgur02@gmail.com")
+                .memberPassword(passwordEncoder.encode("dlwlgur02@gmail.com")) // 실제로는 BCrypt 등으로 암호화 필요
+                .memberRole(Role.ROLE_USER)
+                .memberName("이지혁")
+                .memberSnsUrl1("https://github.com/PotatoDevel0per/")
+                .memberSnsUrl2(null)
+                .memberSnsUrl3(null)
+                .memberSnsUrl4(null)
+                .memberIsStudent(true)
+                .memberIntroduce("안녕하세요! 컴퓨터공학 전공 중입니다.")
+                .memberImageUrl(null)
+                .memberPasswordLength("dlwlgur02@gmail.com".length())
+                .build();
+
+        memberRepository.save(member4);
+
         List<MemberDepartment> memberDepartmentList = List.of(
             MemberDepartment.builder().memberId(member.getMemberId()).departmentId(1L).build(),
             MemberDepartment.builder().memberId(member.getMemberId()).departmentId(2L).build(),
