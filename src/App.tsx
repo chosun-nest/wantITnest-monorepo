@@ -84,6 +84,14 @@ const router = createBrowserRouter([
         element: <ProfileEdit />,
       },
       {
+        path: "project-apply/:id",
+        element: (
+          <ProtectedRoute>
+            <ProjectApply />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "interests-write",
         element: (
           <ProtectedRoute>

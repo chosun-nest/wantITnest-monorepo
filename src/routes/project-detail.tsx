@@ -28,6 +28,7 @@ export default function ProjectDetail() {
   const [notFound, setNotFound] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -61,7 +62,7 @@ export default function ProjectDetail() {
     initialize();
   }, [id, accessToken]);
 
-  const handleEdit = () => navigate(`/project-edit/${id}`);
+  const handleEdit = () => navigate(`/project/${id}/edit`);
 
   const handleDelete = async () => {
     try {
@@ -112,46 +113,63 @@ export default function ProjectDetail() {
   const isAuthor = project.author.id === currentUserId;
 
   return (
-    <div
-      className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${
-        isMobile ? "flex-col gap-4" : "flex-row gap-8"
-      }`}
-    >
+    <div className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${isMobile ? "flex-col gap-4" : "flex-row gap-8"}`}>
       {/* 왼쪽: 본문 영역 */}
       <div className="flex-1">
         <h1 className={`font-bold text-blue-900 mb-2 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
           {project.projectTitle}
         </h1>
 
-        {/* 작성자 정보 */}
-        <div className={`flex ${isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"}`}>
+        {/* 작성자 정보 줄 */}
+        <div className="flex justify-between items-center mt-1">
+          {/* 왼쪽: 프로필 + 작성자 */}
           <div className="flex items-center gap-2">
             <img src="/assets/images/manager-bird.png" alt="프로필" className="w-8 h-8 rounded-full" />
             <span className="font-semibold text-[16px] text-gray-900">{project.author.name}</span>
           </div>
-          <button className="px-3 py-1 text-sm border rounded hover:bg-gray-100 w-fit">+ 팔로우</button>
+
+          {/* 오른쪽: 팔로우 버튼 + ⋯ */}
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700">
+              팔로우
+            </button>
+            {isAuthor && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="text-gray-500 hover:text-gray-700 text-xl"
+                >
+                  ⋯
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 bg-white border rounded shadow-md z-10">
+                    <button
+                      onClick={handleEdit}
+                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="block w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="mt-1 text-[15px] text-gray-600 flex gap-2 flex-wrap">
+        <div className="mt-2 text-[15px] text-gray-600 flex gap-2 flex-wrap">
           <span>생성일: {project.createdAt}</span>
           <span>수정일: {project.updatedAt}</span>
         </div>
 
-        {/* 수정 / 삭제 */}
-        {isAuthor && (
-          <div className="flex gap-2 mt-4">
-            <button onClick={handleEdit} className="px-3 py-1 text-sm bg-yellow-400 text-white rounded hover:bg-yellow-500">
-              ✏️ 수정
-            </button>
-            <button onClick={() => setShowDeleteConfirm(true)} className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">
-              🗑 삭제
-            </button>
-          </div>
-        )}
-
         <hr className="my-4 border-gray-300" />
 
-        {/* 설명, 태그, 지원 상태 */}
+        {/* 설명, 태그 */}
         <div className="mb-6 leading-relaxed text-gray-700 whitespace-pre-line">
           {project.projectDescription}
         </div>
@@ -164,17 +182,7 @@ export default function ProjectDetail() {
           ))}
         </div>
 
-        <div className="mb-6">
-          {project.isRecruiting ? (
-            <button className="px-4 py-2 bg-blue-600 text-white rounded">지원하기</button>
-          ) : (
-            <button className="px-4 py-2 bg-gray-300 text-gray-600 rounded cursor-not-allowed" disabled>
-              모집 완료
-            </button>
-          )}
-        </div>
-
-        {/* ✅ 댓글 섹션에 postId 전달 */}
+        {/* 댓글 섹션 */}
         <div className="px-5 py-4 mb-6 border rounded bg-gray-50">
           <CommentSection boardType="PROJECT" postId={project.projectId} />
         </div>
@@ -186,15 +194,27 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      {/* 오른쪽: 참여자 카드 영역 */}
+      {/* 오른쪽: 참여자 카드 or 지원 버튼 */}
       <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
-        <ParticipantCardBox
-          project={project}
-          participants={project.projectMembers}
-          onOpenModal={() => setIsModalOpen(true)}
-          onAccept={() => {}}
-          currentUserId={currentUserId!}
-        />
+        {isAuthor ? (
+          <ParticipantCardBox
+            project={project}
+            participants={project.projectMembers}
+            onOpenModal={() => setIsModalOpen(true)}
+            onAccept={() => {}}
+            currentUserId={currentUserId!}
+          />
+        ) : (
+          <div className="flex flex-col gap-2 items-start border rounded px-4 py-3">
+            <div className="text-sm font-semibold text-gray-800">프로젝트에 관심이 있나요?</div>
+            <button
+              onClick={() => navigate(`/project-apply/${project.projectId}`)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              지원하기
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 모달들 */}
