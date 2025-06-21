@@ -1,50 +1,42 @@
 // 프로필 카드 - 본인 : 프로필 수정 버튼 & 타인 : 팔로잉/팔로우 버튼
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { showModal } from "../../../store/slices/modalSlice";
-import useFollowStatus from "../../../hooks/useFollowStatus";   // 팔로우 상태 여부 체크 컴포넌트
+import useFollowStatus from "../../../hooks/useFollowStatus";
 
 interface ProfileFollowButtonProps {
   isMine: boolean;
   memberId: number;
 }
 
-export default function ProfileActionButton({
-  isMine,
-  memberId,
-}: ProfileFollowButtonProps) {
+export default function ProfileActionButton({ isMine, memberId }: ProfileFollowButtonProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isFollowing, follow, unfollow } = useFollowStatus(memberId);  // 초기 팔로우 상태 API로부터 받아옴
+  const commonButtonClasses = "w-[210px] py-2 rounded-md whitespace-nowrap font-bold transition border";
+  const { isFollowing, follow, unfollow } = useFollowStatus(memberId);
+  const [loading, setLoading] = useState(false); // 요청 중 여부
 
   const handleFollowToggle = async () => {
-    if (isFollowing) {
-      dispatch(showModal({
-        title: "언팔로우 확인",
-        message: "정말 이 사용자를 언팔로우 하시겠습니까?",
-        type: "info",
-        onClose: async () => {
-          try {
-            await unfollow();
-          } catch {
-            dispatch(showModal({
-              title: "오류",
-              message: "언팔로우 실패. 다시 시도해주세요.",
-              type: "error",
-            }));
-          }
-        },
-      }));
-    } else {
-      try {
+    if (loading) return; // 중복 방지
+    setLoading(true);
+
+    try {
+      if (isFollowing) {
+        await unfollow(); // 실패 시 상태 복구는 훅 내부에서 처리됨
+      } else {
         await follow();
-      } catch {
-        dispatch(showModal({
-          title: "오류",
-          message: "팔로우 실패. 다시 시도해주세요.",
-          type: "error",
-        }));
       }
+    } catch {
+      dispatch(
+        showModal({
+          title: "오류",
+          message: "요청 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
+          type: "error",
+        })
+      );
+    } finally {
+      setLoading(false); // 항상 해제
     }
   };
 
@@ -53,21 +45,24 @@ export default function ProfileActionButton({
       {isMine ? (
         <button
           onClick={() => navigate("/profile-edit")}
-          className="px-20 py-2 text-white bg-blue-900 rounded-md whitespace-nowrap"
+          className={`text-white bg-blue-900 ${commonButtonClasses}`}
         >
           프로필 수정
         </button>
       ) : (
         <button
           onClick={handleFollowToggle}
-          className={`px-20 py-2 rounded-md whitespace-nowrap font-bold transition border
+          disabled={loading} // 처리 중 버튼 비활성화
+          className={`
+            ${commonButtonClasses}
             ${
               isFollowing
-                ? "bg-white text-blue-900 border-blue-900 hover:bg-gray-100"
-                : "bg-blue-900 text-white border-transparent hover:bg-[#5f7fce]"
-            }`}
+          ? "bg-white text-blue-900 border-blue-900 hover:bg-gray-100"
+          : "bg-blue-900 text-white border-transparent hover:bg-[#5f7fce]"
+            }
+            ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          {isFollowing ? "팔로잉" : "팔로우"}
+          {loading ? "처리 중..." : isFollowing ? "UnFollow" : "Follow"}
         </button>
       )}
     </div>
