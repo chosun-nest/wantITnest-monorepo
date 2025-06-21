@@ -1,9 +1,7 @@
 // 프로필 카드 - 본인 : 프로필 수정 버튼 & 타인 : 팔로잉/팔로우 버튼
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
 import { showModal } from "../../../store/slices/modalSlice";
-import { getMyFollowing, followUser, unfollowUser } from "../../../api/profile/FollowAPI"
 import useFollowStatus from "../../../hooks/useFollowStatus";   // 팔로우 상태 여부 체크 컴포넌트
 
 interface ProfileFollowButtonProps {
@@ -17,62 +15,38 @@ export default function ProfileActionButton({
 }: ProfileFollowButtonProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isFollowing, setIsFollowing] = useFollowStatus(memberId);  // 초기 팔로우 상태 API로부터 받아옴
+  const { isFollowing, follow, unfollow } = useFollowStatus(memberId);  // 초기 팔로우 상태 API로부터 받아옴
 
-  const handleFollowToggle = () => {
+  const handleFollowToggle = async () => {
     if (isFollowing) {
-      dispatch(
-        showModal({
-          title: "언팔로우 확인",
-          message: "정말 이 사용자를 언팔로우 하시겠습니까?",
-          type: "info",
-          onClose: async () => {
-            try {
-              await unfollowUser(memberId);
-              setIsFollowing(false);
-            } catch {
-              dispatch(
-                showModal({
-                  title: "error",
-                  message: "언팔로우 처리 중 오류가 발생했습니다.",
-                  type: "error",
-                })
-              );
-            }
-          },
-        })
-      );
-    } else {
-      (async () => {
-        try {
-          await followUser(memberId);
-          setIsFollowing(true);
-        } catch {
-          dispatch(
-            showModal({
+      dispatch(showModal({
+        title: "언팔로우 확인",
+        message: "정말 이 사용자를 언팔로우 하시겠습니까?",
+        type: "info",
+        onClose: async () => {
+          try {
+            await unfollow();
+          } catch {
+            dispatch(showModal({
               title: "오류",
-              message: "팔로우 처리 중 오류가 발생했습니다.",
+              message: "언팔로우 실패. 다시 시도해주세요.",
               type: "error",
-            })
-          );
-        }
-      })();
+            }));
+          }
+        },
+      }));
+    } else {
+      try {
+        await follow();
+      } catch {
+        dispatch(showModal({
+          title: "오류",
+          message: "팔로우 실패. 다시 시도해주세요.",
+          type: "error",
+        }));
+      }
     }
   };
-
-  useEffect(() => {
-  const checkFollowingStatus = async () => {
-    try {
-      const res = await getMyFollowing();
-      const isUserFollowed = res.users.some((user) => user.memberId === memberId);
-      setIsFollowing(isUserFollowed);
-    } catch (e) {
-      console.error("팔로잉 상태 확인 실패", e);
-    }
-  };
-
-  checkFollowingStatus();
-}, [memberId]);
 
   return (
     <div className="flex justify-center gap-2 mt-10">
