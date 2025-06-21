@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { ChatRoomProfile } from "../../types/chat/chat";
+import { checkMyChatRooms } from "../../api/following/chat";
 
 interface ChatListProps {
   onSelectUser: (room: ChatRoomProfile) => void;
   isMobile: boolean;
-  socket: any; // 실제 프로젝트에서는 Socket 타입 명시 추천
+  socket: any;
   currentUserId: string;
 }
 
@@ -13,7 +14,7 @@ interface ChatRoomData {
   roomId: string;
   roomName: string;
   roomType: "dm" | "project" | "open" | "general";
-  memberCount: number;
+  memberCount?: number;
   lastMessage?: {
     text: string;
     timestamp: string;
@@ -29,6 +30,45 @@ export default function ChatList({
 }: ChatListProps) {
   const [chatRooms, setChatRooms] = useState<ChatRoomData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMyRooms = async () => {
+      try {
+        const myRooms = await checkMyChatRooms();
+
+        const mappedRooms: ChatRoomData[] = myRooms.map((room: any) => ({
+          roomId: String(room.chattingRoomId),
+          roomName: room.chattingRoomName,
+          roomType: "dm",
+          memberCount: 2,
+          lastMessage: undefined,
+          lastActivity: room.lastChattedAt || room.createdAt,
+        }));
+
+        const tempRoom = createTempOpenChatRoom();
+        const allRooms = [tempRoom, ...mappedRooms].sort(
+          (a, b) =>
+            new Date(b.lastActivity).getTime() -
+            new Date(a.lastActivity).getTime()
+        );
+
+        setChatRooms(allRooms);
+        setLoading(false);
+      } catch (err) {
+        console.error("채팅방 불러오기 실패:", err);
+        setLoading(false);
+      }
+    };
+
+    if (!socket || !currentUserId) {
+      const tempRoom = createTempOpenChatRoom();
+      setChatRooms([tempRoom]);
+      setLoading(false);
+      return;
+    }
+
+    loadMyRooms();
+  }, [socket, currentUserId]);
 
   // 임시 오픈채팅방 데이터
   const createTempOpenChatRoom = (): ChatRoomData => ({

@@ -70,10 +70,10 @@ export default function ChatRoom({
 
     socket.on("connect", () => {
       setIsConnected(true);
-      socket.emit("register", String(currentUser.memberId));
+      socket.emit("register", currentUser.memberId);
       socket.emit("joinRoom", {
         roomId: chatRoom.roomId,
-        userId: String(currentUser.memberId),
+        userId: currentUser.memberId,
         roomType: chatRoom.roomType || "general",
       });
     });
@@ -126,8 +126,9 @@ export default function ChatRoom({
     return () => {
       socket.emit("leaveRoom", {
         roomId: chatRoom.roomId,
-        userId: String(currentUser.memberId),
+        userId: currentUser.memberId,
       });
+
       socket.disconnect();
       setMessages([]);
       setIsConnected(false);
@@ -146,7 +147,7 @@ export default function ChatRoom({
     socketRef.current.emit("sendMessage", {
       roomId: chatRoom.roomId,
       message: inputMessage.trim(),
-      userId: String(currentUser.memberId),
+      userId: currentUser.memberId,
       userName: currentUser.memberName,
       userImage: currentUser.memberImageUrl || "",
     });
