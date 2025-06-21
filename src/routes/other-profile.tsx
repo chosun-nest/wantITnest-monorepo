@@ -20,8 +20,8 @@ import {
 import { CaretDown, CaretUp } from "phosphor-react";
 import useResponsive from "../hooks/responsive";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
-import HistoryTimeline from "../components/profile/history/historytimeline";
-import MyPin from "../components/profile/history/mypins";
+import OthersPin from "../components/profile/history/others-pins";
+import OthersHistoryTimeline from "../components/profile/history/others-historytimeline";
 
 export default function OtherProfile() {
   const { navbarHeight } = useNavbarHeight();
@@ -32,10 +32,11 @@ export default function OtherProfile() {
   const [loading, setLoading] = useState(true);
 
   const { id } = useParams();
-  
+
+  const numericId = id ? parseInt(id, 10) : null;
   //const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -74,8 +75,8 @@ export default function OtherProfile() {
 
     const fetchProfile = async () => {
       try {
-        const data = await getMemberProfileById(Number(id));   // 잘못된 id 방지
-        
+        const data = await getMemberProfileById(Number(id)); // 잘못된 id 방지
+
         const converted = convertToProfileType(data);
         setProfile(converted);
       } catch {
@@ -115,12 +116,14 @@ export default function OtherProfile() {
               <p className="text-sm text-gray-500">🛜 불러오는 중...</p>
             </div>
           ) : profile ? (
-            <ProfileCard 
-              profile={profile} 
+            <ProfileCard
+              profile={profile}
               isOwnProfile={Number(id) === currentUserId} // ProfileCard로 isOwnProfile만 넘기면 내부에서 자동 처리됨
             />
           ) : (
-            <div className="p-4 text-red-500">프로필을 불러오지 못했습니다.</div>
+            <div className="p-4 text-red-500">
+              프로필을 불러오지 못했습니다.
+            </div>
           )}
         </GridItem>
 
@@ -141,9 +144,9 @@ export default function OtherProfile() {
             )}
           </ItemTitle>
 
-          {historyOpen && (
+          {historyOpen && numericId !== null && (
             <div style={{ padding: 16 }}>
-              <MyPin title={""} editable />
+              <OthersPin title={""} editable memberId={numericId} />
             </div>
           )}
         </GridItem>
@@ -151,7 +154,9 @@ export default function OtherProfile() {
         {/* 2행: 활동 로그 */}
         <GridItem $isMobile={isMobile} $row="2" $col="2" $colSpan="2">
           <ItemTitle>History</ItemTitle>
-          <HistoryTimeline />
+          {numericId !== null ? (
+            <OthersHistoryTimeline memberId={numericId} />
+          ) : null}
         </GridItem>
       </GridContainer>
     </>

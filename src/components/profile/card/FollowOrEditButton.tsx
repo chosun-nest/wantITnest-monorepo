@@ -57,8 +57,8 @@ export default function ProfileActionButton({ isMine, memberId }: ProfileFollowB
             ${commonButtonClasses}
             ${
               isFollowing
-          ? "bg-white text-blue-900 border-blue-900 hover:bg-gray-100"
-          : "bg-blue-900 text-white border-transparent hover:bg-[#5f7fce]"
+          ? "bg-white text-[#1E3A8A] border-[#1E3A8A] hover:bg-[#f4f6fa]"
+          : "bg-[#1E3A8A] text-white border-transparent hover:bg-[#5f7fce]"
             }
             ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
