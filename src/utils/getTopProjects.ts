@@ -1,45 +1,38 @@
-import { mockProjects } from "../constants/mock-projects";
+import { getProjects } from "../api/project/ProjectAPI";
+import type { ProjectSummary } from "../types/api/project-board";
+
 interface Params {
-  selectedTags?: string[];
-  searchTerm?: string;
-  filter?: "전체" | "모집중" | "모집완료";
-  size?: number; // 최대 가져올 개수
+  size?: number;
 }
 
-export const getTopProjects = ({
-  selectedTags = [],
-  searchTerm = "",
-  filter = "전체",
-  size = 5,
-}: Params) => {
-  const fixedProjects = mockProjects.map((project) => {
-    if (project.status === "모집완료") {
-      const [curr, max] = project.participants.split("/");
-      if (curr !== max) {
-        return { ...project, participants: `${max}/${max}` };
-      }
-    }
-    return project;
-  });
+// 클라이언트용 확장 타입 (status 문자열 포함)
+export interface ProjectWithStatus extends ProjectSummary {
+  status: "모집중" | "모집완료";
+}
 
-  const filteredProjects = [...fixedProjects]
-    .sort(
-      (a, b) =>
-        new Date(b.date.replace(/\./g, "-")).getTime() -
-        new Date(a.date.replace(/\./g, "-")).getTime()
-    )
-    .filter(
-      (p) => p.title.includes(searchTerm) || p.content.includes(searchTerm)
-    )
-    .filter((p) => {
-      if (
-        selectedTags.length > 0 &&
-        !p.tags?.some((tag) => selectedTags.includes(tag))
-      )
-        return false;
-      if (filter !== "전체" && p.status !== filter) return false;
-      return true;
+/**
+ * 모든 프로젝트를 최신순으로 size개 가져오기 (필터 없음, 모집 상태 포함)
+ */
+export const getTopProjects = async ({
+  size = 5,
+}: Params): Promise<ProjectWithStatus[]> => {
+  try {
+    const res = await getProjects({
+      "pageable.page": 0,
+      "pageable.size": size,
+      "pageable.sort": "createdAt,desc",
     });
 
-  return filteredProjects.slice(0, size);
+    const result: ProjectWithStatus[] = res.projects
+      .slice(0, size)
+      .map((project) => ({
+        ...project,
+        status: project.isRecruiting ? "모집중" : "모집완료",
+      }));
+
+    return result;
+  } catch (error) {
+    console.error("❌ getTopProjects 실패:", error);
+    return [];
+  }
 };
