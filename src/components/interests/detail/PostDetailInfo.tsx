@@ -7,17 +7,20 @@ interface PostDetailInfoProps {
   isAuthor: boolean;
   createdAt: string;
   viewCount: number;
+  onAuthorClick: () => void;    // 프로필 클릭 시, 다른 사용자 프로필로 이동하기 위함
 }
 
 export default function PostDetailInfo({
   author,
-  createdAt,
+  //isAuthor,
   viewCount,
+  createdAt,
+  onAuthorClick,
 }: PostDetailInfoProps) {
   return (
     <div className="flex flex-col gap-2 text-sm text-gray-600">
       {/* 프로필 이미지 + 이름 */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 cursor-pointer" onClick={onAuthorClick}>
         <img
           src={author.profileImageUrl || "/assets/images/manager-bird.png"}
           alt="프로필"

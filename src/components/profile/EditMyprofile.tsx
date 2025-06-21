@@ -106,7 +106,7 @@ export default function MyProfile() {
   };
 
   const handleChange = (field: string, value: string) => {
-    setProfile((prev) => ({ ...prev, [field]: value }));
+    setProfile((prev: ProfileFormData) => ({ ...prev, [field]: value }));
   };
 
   const handleDepartmentChange = (value: string) => {
@@ -120,7 +120,7 @@ export default function MyProfile() {
 
   const handleSelectDepartment = (item: Item) => {
     setDepartmentInput(item.name);
-    setProfile((prev) => ({ ...prev, major: item.name }));
+    setProfile((prev: ProfileFormData) => ({ ...prev, major: item.name }));
     setFilteredDepartments([]);
   };
 
@@ -135,7 +135,7 @@ export default function MyProfile() {
 
   const handleSelectTech = (item: Item) => {
     if (!profile.techStacks.includes(item.name)) {
-      setProfile((prev) => ({
+      setProfile((prev: ProfileFormData) => ({
         ...prev,
         techStacks: [...prev.techStacks, item.name],
       }));
@@ -145,7 +145,7 @@ export default function MyProfile() {
   };
 
   const handleDeleteTech = (index: number) => {
-    setProfile((prev) => ({
+    setProfile((prev: ProfileFormData) => ({
       ...prev,
       techStacks: prev.techStacks.filter((_, i) => i !== index),
     }));
@@ -165,11 +165,10 @@ export default function MyProfile() {
 
     try {
       const uploadedImageUrl = await uploadProfileImage(file);
-      const sanitizedUrl = uploadedImageUrl.replace(/(https?:\/\/[^/]+)+/, "$1");
-      setProfile((prev) => ({
+      setProfile((prev: ProfileFormData) => ({
         ...prev,
-        image: sanitizedUrl,
-        uploadedImagePath: sanitizedUrl,
+        image: uploadedImageUrl,
+        uploadedImagePath: uploadedImageUrl,
       }));
     } catch (err) {
       console.error("이미지 업로드 실패", err);
@@ -282,7 +281,7 @@ export default function MyProfile() {
       <EditSNS
         sns={profile.sns}
         isEditing={isEditing}
-        onChange={(newSNS) => setProfile((prev) => ({ ...prev, sns: newSNS }))}
+        onChange={(newSNS) => setProfile((prev: ProfileFormData) => ({ ...prev, sns: newSNS }))}
       />
 
       <EditProfileButtons
