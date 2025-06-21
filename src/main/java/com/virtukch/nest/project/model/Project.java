@@ -1,19 +1,11 @@
 package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
-import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.post.exception.InvalidPostTitleException;
-import com.virtukch.nest.post.model.Post;
-import com.virtukch.nest.project.dto.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.exception.InvalidProjectTitleException;
-import com.virtukch.nest.project_member.model.ProjectMember;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

@@ -17,4 +17,5 @@ public class ProjectRequestDto {
     private Map<ProjectMember.Part, Integer> partCounts;
     private ProjectMember.Part creatorPart; // 작성자가 들어갈 파트
     private ProjectMember.Role creatorRole = ProjectMember.Role.LEADER; // 기본값 LEADER
+    private List<Long> membersToRemove;
 }

@@ -106,26 +106,26 @@ public class ProjectController {
 
     //프로젝트 업데이트
     @Operation(
-        summary = "프로젝트 모집글 수정",
-        description = """
-            기존 프로젝트 모집글의 내용을 수정합니다.
+            summary = "프로젝트 모집글 수정",
+            description = """
+        기존 프로젝트 모집글의 내용을 수정합니다.
 
-            ## 요청 필드 처리 방식
-            - `projectTitle`: null 또는 생략 시 제목 변경 없음 / 빈 문자열은 허용하지 않음
-            - `projectDescription`: null 또는 생략 시 본문 변경 없음 / 빈 문자열 입력 시 본문 삭제 처리
-            - `tags`: null 또는 생략 시 태그 변경 없음 / 빈 배열 입력 시 모든 태그 제거
-            - `parts`: null 또는 생략 시 모집 인원 및 역할 변경 없음 / 새 배열 입력 시 전체 교체
-            - `imageUrlsToDelete`: 삭제할 이미지 URL 리스트 / 존재하지 않는 이미지 URL 전달 시 무시
+        ## 요청 필드 처리 방식
+        - `projectTitle`: null 또는 생략 시 제목 변경 없음 / 빈 문자열은 허용하지 않음
+        - `projectDescription`: null 또는 생략 시 본문 변경 없음 / 빈 문자열 입력 시 본문 삭제 처리
+        - `tags`: null 또는 생략 시 태그 변경 없음 / 빈 배열 입력 시 모든 태그 제거
+        - `partCounts`: null 또는 생략 시 모집 인원 및 역할 변경 없음 / Map<String, Integer> 형식으로 역할별 인원 지정
 
-            ✔️ 작성자 본인만 수정 가능  
-            ✔️ 수정 가능한 필드는 `ProjectRequestDto` 참고
-            """
+        ✔️ 작성자 본인만 수정 가능  
+        ✔️ 수정 가능한 필드는 `ProjectUpdateRequestDto` 참고
+        """
     )
     @PatchMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDto> updateProject(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long projectId,
             @Valid @RequestBody ProjectRequestDto requestDto) {
+
         Long memberId = user.getMember().getMemberId();
         log.info("[모집글 수정 요청] projectId={}, memberId={}", projectId, memberId);
         ProjectResponseDto responseDto = projectService.updateProject(projectId, memberId, requestDto);

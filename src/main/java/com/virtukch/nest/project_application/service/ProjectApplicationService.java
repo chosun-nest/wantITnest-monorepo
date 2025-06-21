@@ -104,7 +104,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
         int maxMember = projectMemberRepository.findByProjectId(projectId).size();
 
         if (acceptedCount >= maxMember) {
-            throw new ProjectFullException();
+            throw new ProjectFullException("프로젝트 모집 인원을 초과하여 승인할 수 없습니다.");
         }
 
         application.setStatus(ProjectApplication.ApplicationStatus.ACCEPTED);
@@ -119,6 +119,12 @@ public class ProjectApplicationService extends BaseTimeEntity {
             vacant.setApproved(true);
             projectMemberRepository.save(vacant);
         } else {
+            // 파트별 모집 인원 초과 방지
+            long maxCount = projectMemberRepository.countByProjectIdAndPart(projectId, application.getPart());
+            long approvedCount = projectMemberRepository.countByProjectIdAndPartAndMemberIdIsNotNull(projectId, application.getPart());
+            if (approvedCount >= maxCount) {
+                throw new ProjectFullException(application.getPart() + " 파트의 모집 인원을 초과할 수 없습니다.");
+            }
             projectMemberRepository.save(ProjectMember.builder()
                     .projectId(projectId)
                     .memberId(application.getMemberId())

@@ -6,8 +6,7 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
-import com.virtukch.nest.project.exception.NoProjectAuthorityException;
-import com.virtukch.nest.project.exception.ProjectNotFoundException;
+import com.virtukch.nest.project.exception.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project_member.model.ProjectMember;
@@ -146,14 +145,32 @@ public class ProjectService {
     @Transactional
     public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectRequestDto requestDto) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
-        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
+
         project.updateProject(requestDto.getProjectTitle(),
                 requestDto.getProjectDescription(),
                 requestDto.getIsRecruiting());
 
+        // Remove members if specified in requestDto before updating part counts
+        if (requestDto.getMembersToRemove() != null && !requestDto.getMembersToRemove().isEmpty()) {
+            removeProjectMembers(projectId, requestDto.getMembersToRemove());
+        }
+
+        // Update creator's part if creatorPart is present
+        if (requestDto.getCreatorPart() != null) {
+            ProjectMember.Part newPart = requestDto.getCreatorPart();
+            ProjectMember creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+                .orElseThrow(CanNotRemoveCreatorException::new);
+            creator.setPart(newPart);
+            projectMemberRepository.save(creator);
+        }
+
         projectTagRepository.deleteAllByProjectId(projectId);
 
         saveProjectTags(project, requestDto.getTags());
+
+        if (requestDto.getPartCounts() != null && !requestDto.getPartCounts().isEmpty()) {
+            updatePartCounts(projectId, requestDto.getPartCounts());
+        }
 
         return ProjectDtoConverter.toUpdateResponseDto(project);
     }
@@ -166,10 +183,85 @@ public class ProjectService {
         project.updateProject(project.getProjectTitle(), project.getProjectDescription(),
                 project.getIsRecruiting(), imageUrls);
 
+        // Remove members if specified in requestDto before updating part counts
+        if (requestDto.getMembersToRemove() != null && !requestDto.getMembersToRemove().isEmpty()) {
+            removeProjectMembers(projectId, requestDto.getMembersToRemove());
+        }
+
+        // Update creator's part if creatorPart is present
+        if (requestDto.getCreatorPart() != null) {
+            ProjectMember.Part newPart = requestDto.getCreatorPart();
+            ProjectMember creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+                .orElseThrow(CanNotRemoveCreatorException::new);
+            creator.setPart(newPart);
+            projectMemberRepository.save(creator);
+        }
+
         projectTagRepository.deleteAllByProjectId(project.getProjectId());
         saveProjectTags(project, requestDto.getTags());
 
+        if (requestDto.getPartCounts() != null && !requestDto.getPartCounts().isEmpty()) {
+            updatePartCounts(projectId, requestDto.getPartCounts());
+        }
+
         return ProjectDtoConverter.toUpdateResponseDto(project);
+    }
+
+    @Transactional
+    public void updatePartCounts(Long projectId, Map<ProjectMember.Part, Integer> partCounts) {
+        for (Map.Entry<ProjectMember.Part, Integer> entry : partCounts.entrySet()) {
+            ProjectMember.Part part = entry.getKey();
+            int targetCount = entry.getValue();
+
+            List<ProjectMember> members = projectMemberRepository.findByProjectIdAndPart(projectId, part);
+            // Separate filled and vacant slots
+            List<ProjectMember> filled = members.stream()
+                    .filter(pm -> pm.getMemberId() != null)
+                    .toList();
+            List<ProjectMember> vacant = members.stream()
+                    .filter(pm -> pm.getMemberId() == null)
+                    .toList();
+            int filledCount = filled.size();
+            int vacantCount = vacant.size();
+            int totalCount = filledCount + vacantCount;
+
+            if (targetCount < filledCount) {
+                throw new ProjectMemberRemoveException(part, filledCount, targetCount);
+            }
+
+            int toAdd = targetCount - totalCount;
+            if (toAdd > 0) {
+                // Add new vacant slots
+                for (int i = 0; i < toAdd; i++) {
+                    projectMemberRepository.save(ProjectMember.builder()
+                            .projectId(projectId)
+                            .part(part)
+                            .role(ProjectMember.Role.MEMBER)
+                            .isApproved(false)
+                            .build());
+                }
+            } else if (toAdd < 0) {
+                // Remove up to -toAdd vacant (memberId == null) slots only
+                int toRemove = -toAdd;
+                // Only remove vacant slots, never filled
+                if (toRemove > 0 && vacantCount > 0) {
+                    List<ProjectMember> toDelete = vacant.stream().limit(toRemove).toList();
+                    projectMemberRepository.deleteAll(toDelete);
+                }
+                // If not enough vacant slots, do not remove filled slots
+            }
+            // If toAdd == 0, nothing to do
+        }
+    }
+
+    @Transactional
+    public void removeProjectMembers(Long projectId, List<Long> memberIds) {
+        for (Long memberId : memberIds) {
+            ProjectMember member = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+                    .orElseThrow(() -> new ProjectMemberNotFoundException(projectId, memberId));
+            member.removeMember();
+            projectMemberRepository.save(member);
+        }
     }
 
     @Transactional
