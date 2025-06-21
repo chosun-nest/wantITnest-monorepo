@@ -21,7 +21,7 @@ interface ChatRoomProps {
   onBack: () => void;
 }
 
-const WS_SERVER_URL = "http://localhost:4000";
+const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL;
 
 export default function ChatRoom({
   isMobile,
