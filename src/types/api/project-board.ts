@@ -32,7 +32,7 @@ export interface PageInfo {
 }
 
 export interface ProjectListResponse {
-  projects: ProjectSummary[];
+  projects: ProjectSummary[]; // ✅ Swagger 응답 필드 명세 반영
   totalCount: number;
   pageInfo: PageInfo;
 }
@@ -94,9 +94,9 @@ export interface UpdateProjectPayload {
   projectDescription: string;
   tags: string[];
   parts?: {
-    part: string; // ex) 프론트엔드
-    count: number; // ex) 2명
-  }[] | null; 
+    part: string;
+    count: number;
+  }[] | null;
   imageUrls?: string[] | null;
 }
 
@@ -125,5 +125,5 @@ export interface Applicant {
   major: string;
   message: string;
   role: string;
-  status: string; // accepted | rejected | pending
+  status: "accepted" | "rejected" | "pending";
 }

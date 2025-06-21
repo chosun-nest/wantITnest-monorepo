@@ -2,7 +2,7 @@
 interface Props {
   selectedTags: string[];
   onRemoveTag: (tag: string) => void;
-  onOpenFilter: () => void;
+  onOpenFilter?: () => void; // ✅ 선택적 props
 }
 
 export default function BoardTagFilterButton({
@@ -12,15 +12,17 @@ export default function BoardTagFilterButton({
 }: Props) {
   return (
     <div className="mb-6">
-      {/* 버튼 */}
-      <div className="mb-3">
-        <button
-          onClick={onOpenFilter}
-          className="px-3 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-        >
-          🔎 태그 선택
-        </button>
-      </div>
+      {/* ✅ onOpenFilter가 존재할 때만 버튼 렌더링 */}
+      {onOpenFilter && (
+        <div className="mb-3">
+          <button
+            onClick={onOpenFilter}
+            className="px-3 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+          >
+            🔎 태그 선택
+          </button>
+        </div>
+      )}
 
       {/* 태그 리스트 */}
       <div className="flex flex-wrap gap-2">

@@ -16,6 +16,7 @@ import { updatePost } from "../api/interests/InterestsAPI";
 import { createProjectPost } from "../api/project/ProjectAPI";
 import type { PostDetail } from "../types/api/interest-board";
 import RecruitRoleList from "../components/project/RecruitRoleList";
+import { getMemberProfile } from "../api/profile/ProfileAPI";
 
 interface RecruitCardData {
   id: number;
@@ -26,7 +27,21 @@ interface RecruitCardData {
 export default function ProjectWrite() {
   const navigate = useNavigate();
   const location = useLocation();
-  const authorName = useSelector(selectCurrentUserName);
+  const reduxAuthorName = useSelector(selectCurrentUserName);
+
+  const [finalAuthorName, setFinalAuthorName] = useState("모집중");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getMemberProfile();
+        if (user.memberName) setFinalAuthorName(user.memberName);
+      } catch {
+        setFinalAuthorName("모집중");
+      }
+    };
+    fetchUser();
+  }, []);
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const postToEdit = location.state?.post as PostDetail | undefined;
@@ -44,14 +59,6 @@ export default function ProjectWrite() {
     message: "",
     type: "info",
   });
-
-  // ✅ authorName이 준비될 때까지 기다리기
-  const [isUserReady, setIsUserReady] = useState(false);
-  useEffect(() => {
-    if (authorName && authorName.trim() !== "") {
-      setIsUserReady(true);
-    }
-  }, [authorName]);
 
   const defaultContent = `[개발 프로젝트 모집 예시]
 
@@ -88,8 +95,12 @@ export default function ProjectWrite() {
       return;
     }
 
+    const validRoles = ["BACKEND", "FRONTEND", "PM", "DESIGN", "AI", "ETC"];
+
     const partCounts: { [key: string]: number } = recruitCards.reduce((acc, card) => {
-      acc[card.role] = (acc[card.role] || 0) + 1;
+      if (validRoles.includes(card.role)) {
+        acc[card.role] = (acc[card.role] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
 
@@ -195,14 +206,10 @@ export default function ProjectWrite() {
 
           {/* 오른쪽 모집 카드 */}
           <div className="w-full md:w-[300px]">
-            {isUserReady ? (
-              <RecruitRoleList
-                onChange={setRecruitCards}
-                authorName={authorName}
-              />
-            ) : (
-              <div className="text-sm text-gray-500">작성자 정보를 불러오는 중...</div>
-            )}
+            <RecruitRoleList
+              onChange={setRecruitCards}
+              authorName={finalAuthorName}
+            />
           </div>
         </div>
       </div>
