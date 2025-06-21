@@ -6,7 +6,7 @@ import { ModalContent } from "../../../types/modal";
 import { ProfileCardProps } from "../../../types/profile";
 import Modal from "../../common/modal";
 import techColorMap from "../../../utils/tech-corlor-map";
-import ProfileActionButton from "./ProfileActionButton";
+import ProfileActionButton from "./FollowOrEditButton";
 
 export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps) {
   const navigate = useNavigate();
