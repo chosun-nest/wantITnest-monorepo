@@ -85,7 +85,7 @@ function Navbar(_: unknown, ref: ForwardedRef<HTMLDivElement>) {
         <S.NavbarContent>
           <S.NavLeft>
             <S.Logo to="/">
-              <img src="assets/images/logo.png" alt="Logo" />
+              <img src="/assets/images/logo.png" alt="Logo" />
               WantIT-NEST
               {/*이스터에그*/}
               <div
