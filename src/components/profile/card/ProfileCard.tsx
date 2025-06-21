@@ -42,32 +42,40 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
           <img
             src={profile.image || "/assets/images/user.png"}
             alt="Profile"
-            className="w-20 h-20 border rounded-full cursor-pointer sm:h-24 sm:w-24 md:h-28 md:w-28"
-            onClick={() => navigate("/profile")}
+            className={`w-20 h-20 border rounded-full sm:h-24 sm:w-24 md:h-28 md:w-28
+              cursor-pointer hover:opacity-80`}
+            onClick={() => {
+              if (isOwnProfile) {
+                navigate("/profile");
+              } else {
+                navigate(`/profile/${profile.memberId}`);
+              }
+            }}
           />
         </div>
 
-        {/* 이름, 전공, 인증 */}
-        <div className="flex items-center gap-2 mt-2">
-          <h2
-            className="text-lg font-bold cursor-pointer hover:underline"
-            onClick={() => navigate("/profile")}
-          >
-            {profile.name}
-          </h2>
-          <div className="flex items-center gap-1">
-            <p className="text-gray-500">{profile.major}</p>
-            {(profile.email.endsWith("@chosun.ac.kr") ||
-              profile.email.endsWith("@chosun.kr")) && (
-              <img
-                src="/assets/images/verified-badge.png"
-                alt="인증"
-                title="조선대 인증 이메일"
-                className="w-4 h-4"
-              />
-            )}
-          </div>
+      {/* 이름, 전공, 인증 */}
+      <div className="flex items-center gap-2 mt-2">
+        <h2
+          className="text-lg font-bold cursor-pointer hover:underline"
+          onClick={isOwnProfile ? () => navigate("/profile") : undefined}
+        >
+          {profile.name}
+        </h2>
+        <div className="flex items-center gap-1">
+          <p className="text-gray-500">{profile.major}</p>
+
+          {/* 내 계정이든 타인이든 chosun 이메일이면 인증 뱃지 */}
+          {(profile.email?.endsWith("@chosun.ac.kr") || profile.email?.endsWith("@chosun.kr")) && (
+            <img
+              src="/assets/images/verified-badge.png"
+              alt="인증"
+              title="조선대 인증 이메일"
+              className="w-4 h-4"
+            />
+          )}
         </div>
+      </div>
 
         {/* 한 줄 소개 */}
         <p className="mt-2 text-sm text-left">{profile.introduce}</p>
