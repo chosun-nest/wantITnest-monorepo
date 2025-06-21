@@ -1,4 +1,4 @@
-// 팔로우 버튼
+// 관심분야 게시판 - 팔로우 버튼
 import { useState } from "react";
 
 export default function FollowButton() {

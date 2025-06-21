@@ -1,3 +1,4 @@
+// 프로필 컴포넌트 관련 타입
 export interface Item {
   id: number;
   name: string;
@@ -13,7 +14,8 @@ export interface TechStackResponse {
   techStackName: string;
 }
 
-export interface ProfileFormData {
+export interface ProfileType {
+  memberId: number;
   name: string;
   email: string;
   major: string;
@@ -21,6 +23,23 @@ export interface ProfileFormData {
   //interests: string[];
   sns: string[];
   image: string;
+  uploadedImagePath?: string;
+  techStacks: string[];
+}
+
+export interface ProfileFormData {    
+  name: string;
+  email: string;
+  major: string;
+  introduce: string;
+  sns: string[];
+  image: string;
   uploadedImagePath: string;
   techStacks: string[];
+}
+
+export interface ProfileCardProps {
+  profile: ProfileType;
+  isOwnProfile: boolean;
+  //targetUserId: number; // 다른 사용자 id 가져옴.
 }
