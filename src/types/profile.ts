@@ -1,3 +1,4 @@
+// 프로필 컴포넌트 관련 타입
 export interface Item {
   id: number;
   name: string;
@@ -23,6 +24,17 @@ export interface ProfileType {
   sns: string[];
   image: string;
   uploadedImagePath?: string;
+  techStacks: string[];
+}
+
+export interface ProfileFormData {    
+  name: string;
+  email: string;
+  major: string;
+  introduce: string;
+  sns: string[];
+  image: string;
+  uploadedImagePath: string;
   techStacks: string[];
 }
 

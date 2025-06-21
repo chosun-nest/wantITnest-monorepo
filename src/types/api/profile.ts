@@ -1,3 +1,5 @@
+// 프로필 api 타입
+
 // 회원 정보 전체
 export interface MemberProfile {
   memberId: number;

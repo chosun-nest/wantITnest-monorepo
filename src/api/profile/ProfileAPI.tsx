@@ -39,6 +39,7 @@ export const checkPassword = async (payload: CheckPasswordPayload) => {
 export const getMemberProfile = async (): Promise<MemberProfile> => {
   const res = await API.get("/api/v1/members/me", authHeader());
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;   // baseurl .env 파일 변수로 변경
+  
 
   return {
     ...res.data,

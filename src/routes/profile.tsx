@@ -1,3 +1,4 @@
+// 사용자 본인 프로필 페이지
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";

@@ -1,3 +1,4 @@
+// 다른 사용자 프로필 페이지 조회용
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
