@@ -111,7 +111,7 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
         </div>
 
         {/* 버튼 영역: 팔로우/수정 버튼 통합 */}
-        <ProfileActionButton isMine={isOwnProfile} targetUserId={profile.memberId} />
+        <ProfileActionButton isMine={isOwnProfile} memberId={profile.memberId} />
         {/* 추후 targetUserId는 외부에서 받아오도록 구조 개선 */}
       </div>
 

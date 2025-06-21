@@ -29,5 +29,5 @@ export interface ProfileType {
 export interface ProfileCardProps {
   profile: ProfileType;
   isOwnProfile: boolean;
-  targetUserId: number; // 다른 사용자 id 가져옴.
+  //targetUserId: number; // 다른 사용자 id 가져옴.
 }

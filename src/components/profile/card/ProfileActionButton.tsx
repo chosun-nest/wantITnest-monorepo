@@ -1,31 +1,23 @@
 // 프로필 카드 - 본인 : 프로필 수정 버튼 & 타인 : 팔로잉/팔로우 버튼
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useEffect } from "react";
 import { showModal } from "../../../store/slices/modalSlice";
-
-// TODO: 실제 API로 교체하기
-const follow = async (userId: number) => {
-  console.log("follow", userId);
-  // await API.post(`/api/v1/follow/${userId}`);
-};
-const unfollow = async (userId: number) => {
-  console.log("unfollow", userId);
-  // await API.delete(`/api/v1/follow/${userId}`);
-};
+import { getMyFollowing, followUser, unfollowUser } from "../../../api/profile/FollowAPI"
+import useFollowStatus from "../../../hooks/useFollowStatus";   // 팔로우 상태 여부 체크 컴포넌트
 
 interface ProfileFollowButtonProps {
   isMine: boolean;
-  targetUserId: number;
+  memberId: number;
 }
 
 export default function ProfileActionButton({
   isMine,
-  targetUserId,
+  memberId,
 }: ProfileFollowButtonProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isFollowing, setIsFollowing] = useState(false); // 추후 API 연동 필요
+  const [isFollowing, setIsFollowing] = useFollowStatus(memberId);  // 초기 팔로우 상태 API로부터 받아옴
 
   const handleFollowToggle = () => {
     if (isFollowing) {
@@ -36,12 +28,12 @@ export default function ProfileActionButton({
           type: "info",
           onClose: async () => {
             try {
-              await unfollow(targetUserId);
+              await unfollowUser(memberId);
               setIsFollowing(false);
             } catch {
               dispatch(
                 showModal({
-                  title: "오류",
+                  title: "error",
                   message: "언팔로우 처리 중 오류가 발생했습니다.",
                   type: "error",
                 })
@@ -53,7 +45,7 @@ export default function ProfileActionButton({
     } else {
       (async () => {
         try {
-          await follow(targetUserId);
+          await followUser(memberId);
           setIsFollowing(true);
         } catch {
           dispatch(
@@ -67,6 +59,20 @@ export default function ProfileActionButton({
       })();
     }
   };
+
+  useEffect(() => {
+  const checkFollowingStatus = async () => {
+    try {
+      const res = await getMyFollowing();
+      const isUserFollowed = res.users.some((user) => user.memberId === memberId);
+      setIsFollowing(isUserFollowed);
+    } catch (e) {
+      console.error("팔로잉 상태 확인 실패", e);
+    }
+  };
+
+  checkFollowingStatus();
+}, [memberId]);
 
   return (
     <div className="flex justify-center gap-2 mt-10">

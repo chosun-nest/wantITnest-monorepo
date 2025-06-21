@@ -112,7 +112,7 @@ export default function Profile() {
             <ProfileCard 
               profile={profile} 
               isOwnProfile={true}
-              targetUserId={profile.memberId}
+              //targetUserId={profile.memberId}
              />
           )}
         </GridItem>

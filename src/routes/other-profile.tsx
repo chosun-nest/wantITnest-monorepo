@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
 import { selectCurrentUserId } from "../store/slices/userSlice";
-import { getMemberProfileById } from "../api/profile/ProfileAPI";
+import { getMemberProfile, getMemberProfileById } from "../api/profile/ProfileAPI";
 
 import type { MemberProfile } from "../types/api/profile";
 import type { ProfileType } from "../types/profile";
@@ -31,9 +31,7 @@ export default function OtherProfile() {
   const currentUserId = useSelector(selectCurrentUserId);
   const [loading, setLoading] = useState(true);
 
-  // 타인 구분하기
-  const { id } = useParams(); // /profile/:id 의 id 받아서
-  const isMine = Number(id) === currentUserId;    // currentUserId 비교
+  const { id } = useParams();
   
   //const [memberProfile, setMemberProfile] = useState<MemberProfile | null>(null);
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -61,11 +59,25 @@ export default function OtherProfile() {
       return;
     }
 
-    if (!id || isMine) return;
+    if (!id || isNaN(Number(id))) {
+      setModalContent({
+        title: "잘못된 요청",
+        message: "사용자 ID가 유효하지 않습니다.",
+        type: "error",
+        onClose: () => navigate("/"),
+      });
+      setShowModal(true);
+      return;
+    }
+
+    const isMine = Number(id) === currentUserId;    // 내 프로필 확인
     
     const fetchProfile = async () => {
       try {
-        const data: MemberProfile = await getMemberProfileById(Number(id));
+        const data: MemberProfile = isMine
+        ? await getMemberProfile()
+        : await getMemberProfileById(Number(id));   // 잘못된 id 방지
+        
         const converted = convertToProfileType(data);
         setProfile(converted);
       } catch {
@@ -81,7 +93,7 @@ export default function OtherProfile() {
     };
 
     fetchProfile();
-  }, [id, isMine, isLoggedIn, navigate]);
+  }, [id, isLoggedIn, currentUserId, navigate]);
 
   return (
     <>
@@ -105,7 +117,10 @@ export default function OtherProfile() {
               <p className="text-sm text-gray-500">🛜 불러오는 중...</p>
             </div>
           ) : profile ? (
-            <ProfileCard profile={profile} isOwnProfile={false} />
+            <ProfileCard 
+              profile={profile} 
+              isOwnProfile={Number(id) === currentUserId} // ProfileCard로 isOwnProfile만 넘기면 내부에서 자동 처리됨
+            />
           ) : (
             <div className="p-4 text-red-500">프로필을 불러오지 못했습니다.</div>
           )}
