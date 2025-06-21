@@ -2,19 +2,26 @@ package com.virtukch.nest.member.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.member.dto.MemberCheckPasswordRequestDto;
+import com.virtukch.nest.member.dto.MemberCheckPasswordResponseDto;
 import com.virtukch.nest.member.dto.MemberImageUploadResponseDto;
 import com.virtukch.nest.member.dto.MemberPasswordChangeRequestDto;
 import com.virtukch.nest.member.dto.MemberResponseDto;
 import com.virtukch.nest.member.dto.MemberUpdateRequestDto;
-import com.virtukch.nest.member.dto.MemberCheckPasswordResponseDto;
 import com.virtukch.nest.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
