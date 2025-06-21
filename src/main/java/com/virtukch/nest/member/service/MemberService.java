@@ -11,7 +11,6 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.member_department.dto.MemberDepartmentResponseDto;
 import com.virtukch.nest.member_department.service.MemberDepartmentService;
-import com.virtukch.nest.member_interest.dto.MemberInterestResponseDto;
 import com.virtukch.nest.member_interest.service.MemberInterestService;
 import com.virtukch.nest.member_tech_stack.dto.MemberTechStackResponseDto;
 import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
@@ -287,5 +286,28 @@ public class MemberService {
             .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
 
         return passwordEncoder.matches(inputPassword, member.getMemberPassword());
+    }
+
+    public List<MemberResponseDto> findAllByMemberIdList(List<Long> memberIdList) {
+        return memberRepository.findAllById(memberIdList)
+            .stream()
+            .map(member -> MemberResponseDto.builder()
+                .memberId(member.getMemberId())
+                .memberEmail(member.getMemberEmail())
+                .memberRole(member.getMemberRole())
+                .memberName(member.getMemberName())
+                .memberSnsUrl1(member.getMemberSnsUrl1())
+                .memberSnsUrl2(member.getMemberSnsUrl2())
+                .memberSnsUrl3(member.getMemberSnsUrl3())
+                .memberSnsUrl4(member.getMemberSnsUrl4())
+                .memberIsStudent(member.getMemberIsStudent())
+                .memberIntroduce(member.getMemberIntroduce())
+                .memberImageUrl(member.getMemberImageUrl())
+                .memberPasswordLength(member.getMemberPasswordLength())
+//                .memberInterestResponseDtoList(memberInterestResponseDtoList)
+//                .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
+//                .memberTechStackResponseDtoList(memberTechStackResponseDtoList)
+                .build())
+            .toList();
     }
 }
