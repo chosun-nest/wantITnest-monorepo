@@ -184,6 +184,9 @@ export default function InterestsDetail() {
           </div>
         </div>
 
+        {/* 구분선 */}
+        <hr className="my-6 border-gray-200" />
+
         {/* 게시글 본문 */}
         <PostDetailContent content={post.content} />
 

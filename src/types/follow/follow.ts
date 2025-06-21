@@ -12,3 +12,7 @@ export interface FollowListResponse {
   totalCount: number;
   message: string;
 }
+
+export interface FollowRequestPayload {
+  followingId: number;
+}
