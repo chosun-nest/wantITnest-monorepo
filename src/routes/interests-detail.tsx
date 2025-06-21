@@ -175,7 +175,7 @@ export default function InterestsDetail() {
             }}
           />
           <div className="flex items-center gap-2">
-            {!isAuthor && <FollowButton />}
+            {!isAuthor && <FollowButton memberId={post.author.id} />}
             <PostDetailHeader
               isAuthor={isAuthor}
               onEdit={() => navigate("/interests-write", { state: { post } })}
