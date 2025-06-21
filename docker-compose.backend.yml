@@ -10,8 +10,6 @@ services:
     env_file:
       - ./.env.backend
     volumes:
-      # 업로드된 이미지 공유 (nginx와 공유)
-      - uploaded-images:/app/uploaded-images
       # 로그 파일 저장
       - ./backend/logs:/app/logs
     networks:

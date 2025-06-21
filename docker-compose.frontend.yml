@@ -41,8 +41,6 @@ services:
     volumes:
       # React 빌드 파일 마운트
       - react-dist:/usr/share/nginx/html
-      # 업로드된 이미지 공유 (Backend와 공유될 볼륨)
-      - uploaded-images:/usr/share/nginx/uploaded-images
       # SSL 인증서 저장소
       - ./volume/ssl:/etc/ssl/certs
       - ./volume/letsencrypt:/etc/letsencrypt
