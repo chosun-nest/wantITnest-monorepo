@@ -166,6 +166,8 @@ function App() {
     const initUser = async () => {
       try {
         const user = await getMemberProfile();
+        console.log("🔥 getMemberProfile 응답:", user); // ✅ 여기
+
         dispatch(
           setUser({
             memberId: user.memberId,

@@ -1,12 +1,13 @@
 // 프로젝트 모집 글쓰기 페이지
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectCurrentUserName } from "../store/slices/userSlice";
 import Navbar from "../components/layout/navbar";
 import BoardTypeSelector from "../components/board/write/BoardTypeSelector";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
 import TitleInput from "../components/board/write/TitleInput";
-import ParticipantsInput from "../components/board/write/ParticipantsInput";
 import MarkdownEditor from "../components/board/write/MarkdownEditor";
 import SubmitButtons from "../components/board/write/SubmitButtons";
 import Modal from "../components/common/modal";
@@ -14,28 +15,43 @@ import { ModalContent } from "../types/modal";
 import { updatePost } from "../api/interests/InterestsAPI";
 import { createProjectPost } from "../api/project/ProjectAPI";
 import type { PostDetail } from "../types/api/interest-board";
+import RecruitRoleList from "../components/project/RecruitRoleList";
+
+interface RecruitCardData {
+  id: number;
+  role: string;
+  authorName: string;
+}
 
 export default function ProjectWrite() {
   const navigate = useNavigate();
   const location = useLocation();
-  const navbarRef = useRef<HTMLDivElement>(null);
+  const authorName = useSelector(selectCurrentUserName);
 
+  const navbarRef = useRef<HTMLDivElement>(null);
   const postToEdit = location.state?.post as PostDetail | undefined;
   const isEditMode = !!postToEdit;
 
   const [navHeight, setNavHeight] = useState(0);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<string | undefined>("");
-  const [participants, setParticipants] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilterModal, setShowFilterModal] = useState(false);
-
+  const [recruitCards, setRecruitCards] = useState<RecruitCardData[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
     message: "",
     type: "info",
   });
+
+  // ✅ authorName이 준비될 때까지 기다리기
+  const [isUserReady, setIsUserReady] = useState(false);
+  useEffect(() => {
+    if (authorName && authorName.trim() !== "") {
+      setIsUserReady(true);
+    }
+  }, [authorName]);
 
   const defaultContent = `[개발 프로젝트 모집 예시]
 
@@ -72,16 +88,10 @@ export default function ProjectWrite() {
       return;
     }
 
-    const parsedMax = parseInt(participants, 10);
-    if (!isEditMode && isNaN(parsedMax)) {
-      setModalContent({
-        title: "입력 오류",
-        message: "참여 인원은 숫자로 입력해주세요.",
-        type: "error",
-      });
-      setShowModal(true);
-      return;
-    }
+    const partCounts: { [key: string]: number } = recruitCards.reduce((acc, card) => {
+      acc[card.role] = (acc[card.role] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
     try {
       if (isEditMode && postToEdit) {
@@ -103,11 +113,12 @@ export default function ProjectWrite() {
         await createProjectPost({
           projectTitle: title,
           projectDescription: content || "",
-          maxMember: parsedMax,
           tags: selectedTags,
           recruiting: true,
+          partCounts,
+          creatorPart: "BACKEND",
+          creatorRole: "LEADER",
         });
-
         setModalContent({
           title: "게시 완료",
           message: "게시글이 등록되었습니다. 프로젝트 게시판에서 확인하세요.",
@@ -134,51 +145,66 @@ export default function ProjectWrite() {
   return (
     <>
       <Navbar ref={navbarRef} />
-      <div className="max-w-4xl mx-auto px-4 mt-[40px]" style={{ paddingTop: navHeight }}>
+      <div className="max-w-6xl mx-auto px-4 mt-[40px]" style={{ paddingTop: navHeight }}>
         <BoardTypeSelector boardType="projects" />
-      
-        <div className="p-3 mb-4 text-sm border-l-4 border-blue-600 rounded bg-blue-50">
-          <strong>프로젝트 모집 예시를 참고해 작성해주세요.</strong><br />
-          꼼꼼히 작성하면 멋진 프로젝트 팀원을 만날 수 있을 거예요.
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* 왼쪽 입력 영역 */}
+          <div className="flex-1">
+            <div className="p-3 mb-4 text-sm border-l-4 border-blue-600 rounded bg-blue-50">
+              <strong>프로젝트 모집 예시를 참고해 작성해주세요.</strong><br />
+              꼼꼼히 작성하면 멋진 프로젝트 팀원을 만날 수 있을 거예요.
+            </div>
+
+            <TitleInput title={title} setTitle={setTitle} boardType="projects" />
+            <MarkdownEditor content={content} setContent={setContent} />
+
+            <div className="mb-6">
+              <BoardTagFilterButton
+                selectedTags={selectedTags}
+                onRemoveTag={(tag) => setSelectedTags((prev) => prev.filter((t) => t !== tag))}
+                onOpenFilter={() => setShowFilterModal(true)}
+              />
+            </div>
+
+            {showFilterModal && (
+              <TagFilterModal
+                onClose={() => setShowFilterModal(false)}
+                onApply={(tags) => {
+                  setSelectedTags(tags);
+                  setShowFilterModal(false);
+                }}
+              />
+            )}
+
+            {showModal && (
+              <Modal
+                {...modalContent}
+                onClose={() => {
+                  setShowModal(false);
+                  modalContent.onClose?.();
+                }}
+              />
+            )}
+
+            <SubmitButtons
+              onCancel={() => navigate(-1)}
+              onSubmit={handleSubmit}
+              submitLabel={isEditMode ? "수정 완료" : undefined}
+            />
+          </div>
+
+          {/* 오른쪽 모집 카드 */}
+          <div className="w-full md:w-[300px]">
+            {isUserReady ? (
+              <RecruitRoleList
+                onChange={setRecruitCards}
+                authorName={authorName}
+              />
+            ) : (
+              <div className="text-sm text-gray-500">작성자 정보를 불러오는 중...</div>
+            )}
+          </div>
         </div>
-
-        <TitleInput title={title} setTitle={setTitle} boardType="projects" />
-        <ParticipantsInput participants={participants} setParticipants={setParticipants} />
-        <MarkdownEditor content={content} setContent={setContent} />
-
-        <div className="mb-6">
-          <BoardTagFilterButton
-            selectedTags={selectedTags}
-            onRemoveTag={(tag) => setSelectedTags((prev) => prev.filter((t) => t !== tag))}
-            onOpenFilter={() => setShowFilterModal(true)}
-          />
-        </div>
-
-        {showFilterModal && (
-          <TagFilterModal
-            onClose={() => setShowFilterModal(false)}
-            onApply={(tags) => {
-              setSelectedTags(tags);
-              setShowFilterModal(false);
-            }}
-          />
-        )}
-
-        {showModal && (
-          <Modal
-            {...modalContent}
-            onClose={() => {
-              setShowModal(false);
-              modalContent.onClose?.();
-            }}
-          />
-        )}
-
-        <SubmitButtons
-          onCancel={() => navigate(-1)}
-          onSubmit={handleSubmit}
-          submitLabel={isEditMode ? "수정 완료" : undefined}
-        />
       </div>
     </>
   );
