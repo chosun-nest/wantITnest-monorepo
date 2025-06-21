@@ -1,13 +1,13 @@
 // 팔로우 상태 확인용
 import { useEffect, useState, useCallback } from "react";
-import { getMyFollowing, followUser, unfollowUser } from "../api/profile/FollowAPI";
+import { checkMyFollowings, follow as followUser, unfollow as unfollowUser, } from "../api/following/follow";
 
 export default function useFollowStatus(targetUserId: number) {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const fetchStatus = useCallback(async () => {
     try {
-      const res = await getMyFollowing();
+      const res = await checkMyFollowings();
       const followed = res.users.some((user) => user.memberId === targetUserId);
       setIsFollowing(followed);
     } catch (e) {
@@ -16,12 +16,12 @@ export default function useFollowStatus(targetUserId: number) {
   }, [targetUserId]);
 
   const follow = async () => {
-    setIsFollowing(true); // 즉시 반영
+    setIsFollowing(true);
     try {
-      await followUser(targetUserId);
+      await followUser(String(targetUserId));
     } catch (e) {
       console.error("팔로우 실패", e);
-      setIsFollowing(false); // 실패시 되돌리기
+      setIsFollowing(false);
       throw e;
     }
   };
@@ -29,7 +29,7 @@ export default function useFollowStatus(targetUserId: number) {
   const unfollow = async () => {
     setIsFollowing(false); // 즉시 반영
     try {
-      await unfollowUser(targetUserId);
+      await unfollowUser(String(targetUserId));
     } catch (e) {
       console.error("언팔로우 실패", e);
       setIsFollowing(true); // 실패시 되돌리기
