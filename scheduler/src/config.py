@@ -24,9 +24,12 @@ CATEGORIES = {
     "일반공지": "https://www3.chosun.ac.kr/chosun/217/subview.do",
     "학사공지": "https://www4.chosun.ac.kr/acguide/9326/subview.do?layout=unknown",
     "장학공지": "https://www3.chosun.ac.kr/scho/2138/subview.do",
-    "IT융합대학 공지": "https://eie.chosun.ac.kr/eie/5563/subview.do",
-    "컴퓨터공학과 공지": "https://eie.chosun.ac.kr/ce/5670/subview.do",
-    "SW중심대학사업단 공지": "https://sw.chosun.ac.kr/main/menu?gc=605XOAS"
+    "IT융합대학": "https://eie.chosun.ac.kr/eie/5563/subview.do",
+    "컴퓨터공학전공": "https://eie.chosun.ac.kr/ce/5670/subview.do",
+    "정보통신공학전공": "https://eie.chosun.ac.kr/ice/7953/subview.do",
+    "인공지능공학전공": "https://eie.chosun.ac.kr/aie/7977/subview.do",
+    "모빌리티SW전공": "https://mobility.chosun.ac.kr/mobility/12563/subview.do",
+    "SW중심대학사업단": "https://sw.chosun.ac.kr/main/menu?gc=605XOAS"
 }
 
 # API 설정

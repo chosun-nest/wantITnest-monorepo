@@ -35,7 +35,6 @@ cp .env.example .env
 ### 2. 패키지 설치
 
 ```bash
-cd src
 pip install -r requirements.txt
 ```
 
@@ -78,8 +77,8 @@ uvicorn notice_crawler:app --reload
 1. 일반공지
 2. 학사공지
 3. 장학공지
-4. IT융합대학 공지
-5. 컴퓨터공학과 공지
+4. IT융합대학
+5. 컴퓨터공학전공
 
 ## 🔧 주요 기능
 
@@ -98,7 +97,6 @@ tail -f src/logs/crawler.log
 ## 🛠️ API 엔드포인트 (Spring 서버)
 
 - POST `/api/v1/notices/{category}`
-- 기본 서버 주소: `http://localhost:6030`
 
 ## ⚠️ 주의사항
 
