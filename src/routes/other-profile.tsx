@@ -4,9 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectIsLoggedIn } from "../store/slices/authSlice";
 import { selectCurrentUserId } from "../store/slices/userSlice";
-import { getMemberProfile, getMemberProfileById } from "../api/profile/ProfileAPI";
+import { getMemberProfileById } from "../api/profile/ProfileAPI";
 
-import type { MemberProfile } from "../types/api/profile";
 import type { ProfileType } from "../types/profile";
 import { convertToProfileType } from "../utils/profileType";
 
@@ -71,13 +70,11 @@ export default function OtherProfile() {
       return;
     }
 
-    const isMine = Number(id) === currentUserId;    // 내 프로필 확인
-    
+    //const isMine = Number(id) === currentUserId;    // 이미 이미 App.tsx에서 분기됨
+
     const fetchProfile = async () => {
       try {
-        const data: MemberProfile = isMine
-        ? await getMemberProfile()
-        : await getMemberProfileById(Number(id));   // 잘못된 id 방지
+        const data = await getMemberProfileById(Number(id));   // 잘못된 id 방지
         
         const converted = convertToProfileType(data);
         setProfile(converted);
