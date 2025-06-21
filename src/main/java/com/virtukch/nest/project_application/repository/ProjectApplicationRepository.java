@@ -4,6 +4,7 @@ import com.virtukch.nest.project_application.model.ProjectApplication;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,4 +13,6 @@ public interface ProjectApplicationRepository extends JpaRepository<ProjectAppli
     List<ProjectApplication> findByMemberId(Long memberId);
     Optional<ProjectApplication> findByProjectIdAndMemberIdAndPart(Long projectId, Long memberId, ProjectMember.Part part);
     long countByProjectIdAndStatus(Long projectId, ProjectApplication.ApplicationStatus status);
+
+    boolean existsByProjectIdAndMemberIdAndStatusNot(Long projectId, Long memberId, ProjectApplication.ApplicationStatus status);
 }

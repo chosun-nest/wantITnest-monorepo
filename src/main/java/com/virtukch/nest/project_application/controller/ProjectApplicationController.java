@@ -49,8 +49,10 @@ public class ProjectApplicationController {
         security = {@SecurityRequirement(name = "bearer-key")}
     )
     @GetMapping("/{projectId}/applications")
-    public ResponseEntity<List<ProjectApplicationResponseDto>> getProjectApplications(@PathVariable Long projectId) {
-        List<ProjectApplicationResponseDto> applications = projectApplicationService.getApplicationsByProject(projectId);
+    public ResponseEntity<List<ProjectApplicationResponseDto>> getProjectApplications(@AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long projectId) {
+        Long requestId = user.getMember().getMemberId();
+        List<ProjectApplicationResponseDto> applications = projectApplicationService.getApplicationsByProject(projectId, requestId);
         return ResponseEntity.ok(applications);
     }
 

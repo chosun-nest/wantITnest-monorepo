@@ -1,6 +1,7 @@
 package com.virtukch.nest.project_application.service;
 
-import com.virtukch.nest.project.exception.ProjectNotFoundException;
+import com.virtukch.nest.common.model.BaseTimeEntity;
+import com.virtukch.nest.project_application.exception.ProjectNotFoundException;
 import com.virtukch.nest.project_application.dto.ProjectApplicationRequestDto;
 import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
@@ -13,6 +14,7 @@ import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
 import com.virtukch.nest.project_application.exception.AlreadyProcessedApplicationException;
+import com.virtukch.nest.project.model.Project;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +22,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ProjectApplicationService {
+public class ProjectApplicationService extends BaseTimeEntity {
 
     private final ProjectApplicationRepository projectApplicationRepository;
     private final MemberRepository memberRepository;
@@ -33,8 +36,19 @@ public class ProjectApplicationService {
 
     @Transactional
     public ProjectApplicationResponseDto applyToProject(Long projectId, Long memberId, ProjectApplicationRequestDto requestDto) {
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (project.getMemberId().equals(memberId)) {
+            throw new ProjectOwnerCannotApplyException(); // 또는 IllegalStateException
+        }
+
+        projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
         // 중복 지원 방지
-        if (projectApplicationRepository.findByProjectIdAndMemberIdAndPart(projectId, memberId, requestDto.getPart()).isPresent()) {
+        if (projectApplicationRepository.existsByProjectIdAndMemberIdAndStatusNot(projectId, memberId, ProjectApplication.ApplicationStatus.REJECTED)) {
             throw new DuplicateApplicationException();
         }
 
@@ -54,7 +68,17 @@ public class ProjectApplicationService {
     }
 
     @Transactional
-    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId) {
+    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId, Long requesterId) {
+
+        // 존재 확인
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        // 작성자 확인
+        if (!project.getMemberId().equals(requesterId)) {
+            throw new NotProjectOwnerException();
+        }
+
         List<ProjectApplication> applications = projectApplicationRepository.findByProjectId(projectId);
 
         return applications.stream().map(app -> {
@@ -76,10 +100,8 @@ public class ProjectApplicationService {
         long acceptedCount = projectApplicationRepository.countByProjectIdAndStatus(
                 projectId, ProjectApplication.ApplicationStatus.ACCEPTED);
 
-        // 프로젝트 최대 인원 수 확인
-        int maxMember = projectRepository.findById(projectId)
-                .orElseThrow(ApplicationNotFoundException::new)
-                .getMaxMember();
+        // 프로젝트 최대 인원 수를 동적으로 계산
+        int maxMember = projectMemberRepository.findByProjectId(projectId).size();
 
         if (acceptedCount >= maxMember) {
             throw new ProjectFullException();
@@ -88,13 +110,23 @@ public class ProjectApplicationService {
         application.setStatus(ProjectApplication.ApplicationStatus.ACCEPTED);
         projectApplicationRepository.save(application);
 
-        projectMemberRepository.save(ProjectMember.builder()
-                .projectId(projectId)
-                .memberId(application.getMemberId())
-                .role(ProjectMember.Role.MEMBER)
-                .part(application.getPart())
-                .isApproved(true)
-                .build());
+        List<ProjectMember> vacantList = projectMemberRepository
+                .findByProjectIdAndPartAndMemberIdIsNull(projectId, application.getPart());
+
+        if (!vacantList.isEmpty()) {
+            ProjectMember vacant = vacantList.get(0);
+            vacant.setMemberId(application.getMemberId());
+            vacant.setApproved(true);
+            projectMemberRepository.save(vacant);
+        } else {
+            projectMemberRepository.save(ProjectMember.builder()
+                    .projectId(projectId)
+                    .memberId(application.getMemberId())
+                    .role(ProjectMember.Role.MEMBER)
+                    .part(application.getPart())
+                    .isApproved(true)
+                    .build());
+        }
 
         Member member = memberRepository.findById(application.getMemberId()).orElse(null);
         return ProjectApplicationDtoConverter.toResponseDto(application, member != null ? member.getMemberName() : "알 수 없음");

@@ -9,7 +9,6 @@ public class ProjectUpdateRequestDto {
     @NotBlank(message = "모집글 제목은 비어 있을 수 없습니다.")
     private String projectTitle;
     private String projectDescription;
-    private int maxMember;
-    private boolean isRecruiting;
+    private Boolean isRecruiting;
     private List<String> tags;
 }

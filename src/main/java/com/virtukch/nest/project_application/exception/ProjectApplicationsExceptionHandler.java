@@ -31,4 +31,14 @@ public class ProjectApplicationsExceptionHandler {
     public ResponseEntity<String> handleDuplicateApplication(DuplicateApplicationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<String> handleProjectNotFound(ProjectNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ProjectOwnerCannotApplyException.class)
+    public ResponseEntity<String> handleProjectOwnerCannotApply(ProjectOwnerCannotApplyException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }

@@ -49,8 +49,7 @@ public class ProjectService {
         String projectTitle = requestDto.getProjectTitle();
         log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
-        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
-        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription(), maxMember));
+        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription()));
 
         saveProjectTags(project, requestDto.getTags());
 
@@ -69,8 +68,7 @@ public class ProjectService {
     public ProjectResponseDto createProject(Long memberId, ProjectWithImagesRequestDto requestDto) {
         String title = requestDto.getProjectTitle();
         log.info("[모집글 생성 시작] title={}, memberId={}", title, memberId);
-        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
-        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription(), maxMember));
+        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription()));
 
         saveProjectTags(project, requestDto.getTags());
 
@@ -84,7 +82,7 @@ public class ProjectService {
         List<String> imageUrls;
         if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()){
             imageUrls = imageService.uploadImages(requestDto.getImages(), prefix, project.getProjectId());
-            project.updateProject(project.getProjectTitle(), project.getProjectDescription(), project.getMaxMember(), project.isRecruiting(), imageUrls);
+            project.updateProject(project.getProjectTitle(), project.getProjectDescription(), project.getIsRecruiting(), imageUrls);
          }
 
         log.info("[모집글 생성 완료] projectId={}", project.getProjectId());
@@ -101,6 +99,9 @@ public class ProjectService {
 
         List<ProjectMember> projectMembers = projectMemberRepository.findByProjectId(projectId);
 
+        int currentNumberOfMembers = (int) projectMembers.stream().filter(pm -> pm.getMemberId() != null).count();
+        int maximumNumberOfMembers = projectMembers.size();
+
         Map<Long, String> memberIdToName = projectMembers.stream()
                 .map(ProjectMember::getMemberId)
                 .filter(Objects::nonNull)
@@ -111,9 +112,18 @@ public class ProjectService {
                                 .map(Member::getMemberName)
                                 .orElse("탈퇴한 사용자")
                 ));
-        Boolean isRecruiting = project.isRecruiting();
+        Boolean isRecruiting = project.getIsRecruiting();
 
-        return ProjectDtoConverter.toDetailResponseDto(project, creator, tagNames, projectMembers, memberIdToName, isRecruiting);
+        return ProjectDtoConverter.toDetailResponseDto(
+            project,
+            creator,
+            tagNames,
+            projectMembers,
+            memberIdToName,
+            isRecruiting,
+            currentNumberOfMembers,
+            maximumNumberOfMembers
+        );
     }
 
     // 게시글 목록 조회
@@ -139,8 +149,7 @@ public class ProjectService {
         int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
         project.updateProject(requestDto.getProjectTitle(),
                 requestDto.getProjectDescription(),
-                maxMember,
-                requestDto.isRecruiting());
+                requestDto.getIsRecruiting());
 
         projectTagRepository.deleteAllByProjectId(projectId);
 
@@ -155,7 +164,7 @@ public class ProjectService {
 
         List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, projectId, project.getImageUrlList());
         project.updateProject(project.getProjectTitle(), project.getProjectDescription(),
-                project.getMaxMember(), project.isRecruiting(), imageUrls);
+                project.getIsRecruiting(), imageUrls);
 
         projectTagRepository.deleteAllByProjectId(project.getProjectId());
         saveProjectTags(project, requestDto.getTags());
@@ -177,15 +186,6 @@ public class ProjectService {
     public com.virtukch.nest.project.model.Project findByIdOrThrow(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
-
-//    @Transactional(readOnly = true)
-//    public com.virtukch.nest.project.model.Project findOwnedProjectOrThrow(Long projectId, Long memberId) {
-//        com.virtukch.nest.project.model.Project project = findByIdOrThrow(projectId);
-//        if(!Objects.equals(project.getProjectLeader(), memberId)) {
-//            throw new NoProjectAuthorityException(projectId, memberId);
-//        }
-//        return project;
-//    }
 
     @Transactional
     public Project validateProjectOwnershipAndGet(Long projectId, Long memberId) {
@@ -339,9 +339,14 @@ public class ProjectService {
             imageUrl = imageUrlList.get(0);
         }
 
-        Boolean isRecruiting = project.isRecruiting();
+        Boolean isRecruiting = project.getIsRecruiting();
 
-        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting);
+        // Calculate current and maximum number of members
+        List<ProjectMember> members = projectMemberRepository.findByProjectId(project.getProjectId());
+        int currentNumberOfMembers = (int) members.stream().filter(pm -> pm.getMemberId() != null).count();
+        int maximumNumberOfMembers = members.size();
+
+        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting, currentNumberOfMembers, maximumNumberOfMembers);
     }
 
     private Map<Long, Long> fetchCommentCountMap(List<Project> projects) {

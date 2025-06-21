@@ -14,9 +14,11 @@ public class ProjectSummaryDto {
     private Long projectId;
     private String projectTitle;
     private String previewContent;
+    private Integer currentNumberOfMembers;
+    private Integer maximumNumberOfMembers;
     private AuthorDto author;
     private List<String> tags;
-    private int viewCount;
+    private Integer viewCount;
     private String createdAt;
     private Long commentCount;
     private String imageUrl;
