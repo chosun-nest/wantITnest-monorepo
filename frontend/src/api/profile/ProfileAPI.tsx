@@ -23,11 +23,7 @@ const authHeader = () => ({
 export const uploadProfileImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await API.post(
-    "/api/v1/members/me/image",
-    formData,
-    authHeader()
-  );
+  const res = await API.post("/api/v1/members/me/image", formData, authHeader());
   return res.data.imageUrl;
 };
 
@@ -69,11 +65,7 @@ export const updateMemberProfile = async (
 export const updateMemberPassword = async (
   payload: UpdateMemberPasswordPayload
 ): Promise<{ message: string }> => {
-  const res = await API.patch(
-    "/api/v1/members/me/password",
-    payload,
-    authHeader()
-  );
+  const res = await API.patch("/api/v1/members/me/password", payload, authHeader());
   return res.data;
 };
 

@@ -17,7 +17,8 @@ interface ChatRoomProps {
 }
 
 // 환경변수에서 WebSocket URL 가져오기
-const WS_SERVER_URL = import.meta.env.VITE_WS_SERVER_URL || "ws://localhost:4000";
+const WS_SERVER_URL =
+  import.meta.env.VITE_WS_SERVER_URL || "ws://localhost:4000";
 
 const safeJsonStringify = (data: unknown): string => {
   try {
@@ -109,7 +110,11 @@ export default function ChatRoom({ isMobile, user, onBack }: ChatRoomProps) {
 
   return (
     <div
-      className={`flex flex-col ${isMobile ? "h-full" : "h-[600px] max-w-xl mx-auto border rounded-xl shadow-md overflow-hidden"}`}
+      className={`flex flex-col ${
+        isMobile
+          ? "h-full"
+          : "h-[600px] max-w-xl mx-auto border rounded-xl shadow-md overflow-hidden"
+      }`}
     >
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-100">
         <button
