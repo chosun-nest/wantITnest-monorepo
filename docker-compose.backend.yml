@@ -19,7 +19,7 @@ services:
     depends_on:
       - chatbot-api
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # 호스트 연결 설정
+      - "host.docker.internal:host-gateway" # 호스트 연결 설정
     restart: unless-stopped
 
   # FastAPI 챗봇 API 서버
