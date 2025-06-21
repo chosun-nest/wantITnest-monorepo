@@ -67,6 +67,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "profile/",
+        element: <ProtectedRoute><Layout /></ProtectedRoute>,   // 라우트 명확히 분리
         children: [
           {
             path: "", // /profile
