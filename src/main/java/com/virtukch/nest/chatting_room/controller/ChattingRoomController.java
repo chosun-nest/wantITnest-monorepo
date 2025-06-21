@@ -32,6 +32,21 @@ public class ChattingRoomController {
     private final ChattingRoomService chattingRoomService;
     private final ChattingRoomMemberService chattingRoomMemberService;
 
+    @Operation(
+        summary = "내 채팅방 목록 조회",
+        description = "인증된 사용자가 속한 채팅방의 ID 리스트를 기준으로, 각 채팅방 정보를 반환합니다.",
+        security = @SecurityRequirement(name = "bearerAuth"),
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "채팅방 목록 조회 성공",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ChattingRoomResponseDto.class)
+                )
+            )
+        }
+    )
     // 내가 속한 채팅방(ChattingRoom.java)을 모두 가져옵니다
     @GetMapping("/me")
     public ResponseEntity<List<ChattingRoomResponseDto>> findMyChattingRoomAndChattingRoomMemberList(
