@@ -11,7 +11,13 @@ export interface HistoryProps {
   important: boolean;
 }
 
-export default function HistoryTimeline(memberId: number) {
+interface OthersHistoryTimelineProps {
+  memberId: number;
+}
+
+export default function OthersHistoryTimeline({
+  memberId,
+}: OthersHistoryTimelineProps) {
   const [groupedData, setGroupedData] = useState<
     Record<number, HistoryProps[]>
   >({});
