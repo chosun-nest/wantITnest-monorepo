@@ -4,16 +4,19 @@ import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.chatting_room.dto.ChattingRoomRequestDto;
 import com.virtukch.nest.chatting_room.dto.ChattingRoomResponseDto;
 import com.virtukch.nest.chatting_room.service.ChattingRoomService;
+import com.virtukch.nest.chatting_room_member.service.ChattingRoomMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +30,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChattingRoomController {
 
     private final ChattingRoomService chattingRoomService;
+    private final ChattingRoomMemberService chattingRoomMemberService;
+
+    // 내가 속한 채팅방(ChattingRoom.java)을 모두 가져옵니다
+    @GetMapping("/me")
+    public ResponseEntity<List<ChattingRoomResponseDto>> findMyChattingRoomAndChattingRoomMemberList(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long memberId = customUserDetails.getMember().getMemberId();
+
+        List<Long> chattingRoomIdList = chattingRoomMemberService.findChattingRoomIdListByMemberId(
+            memberId);
+
+        List<ChattingRoomResponseDto> chattingRoomResponseDtoList = chattingRoomService.findChattingRoomByChattingRoomIdList(
+            chattingRoomIdList);
+
+        return ResponseEntity.ok(chattingRoomResponseDtoList);
+    }
+
 
     @Operation(
         summary = "채팅방 생성",

@@ -5,6 +5,7 @@ import com.virtukch.nest.chatting_room.dto.ChattingRoomResponseDto;
 import com.virtukch.nest.chatting_room.model.ChattingRoom;
 import com.virtukch.nest.chatting_room.repository.ChattingRoomRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,15 @@ public class ChattingRoomService {
             throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
         }
         chattingRoomRepository.deleteById(id);
+    }
+
+    @Transactional
+    public List<ChattingRoomResponseDto> findChattingRoomByChattingRoomIdList(
+        List<Long> chattingRoomIdList) {
+        return chattingRoomRepository.findAllById(chattingRoomIdList)
+            .stream()
+            .map(this::toDto)
+            .toList();
     }
 
     private ChattingRoomResponseDto toDto(ChattingRoom room) {
