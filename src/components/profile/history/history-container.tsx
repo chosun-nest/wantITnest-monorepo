@@ -44,7 +44,7 @@ export default function HistoryContainer({
         <h2 className="text-sm text-gray-500 font-light">
           {startDate} ~ {endDate}
         </h2>
-        {isOwner && (
+        {isOwner ? (
           <button
             onClick={toggleImportant}
             className="transition-transform duration-200 hover:scale-110"
@@ -56,6 +56,14 @@ export default function HistoryContainer({
               <FaRegStar className="text-gray-400" />
             )}
           </button>
+        ) : (
+          <>
+            {important ? (
+              <FaStar className="text-yellow-400" />
+            ) : (
+              <FaRegStar className="text-gray-400" />
+            )}
+          </>
         )}
       </div>
 
