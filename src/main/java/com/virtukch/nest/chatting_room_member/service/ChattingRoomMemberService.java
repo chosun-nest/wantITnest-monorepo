@@ -30,6 +30,10 @@ public class ChattingRoomMemberService {
             chattingRoomMemberRequestDto.getMemberId());
     }
 
+    public List<Long> findMemberIdListByChattingRoomId(Long chattingRoomId) {
+        return chattingRoomMemberRepository.findMemberIdListByChattingRoomId(chattingRoomId);
+    }
+
     @Transactional
     public List<Long> findChattingRoomIdListByMemberId(Long memberId) {
         return chattingRoomMemberRepository.findChattingRoomIdListByMemberId(memberId);
