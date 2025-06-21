@@ -65,13 +65,6 @@ export default function HomeProject() {
           {/* 제목 */}
           <h2 className="text-lg font-semibold mb-1">{project.title}</h2>
 
-          {/* 본문 요약 */}
-          <p className="text-sm text-gray-700 mb-2">
-            {project.content.length > 100
-              ? `${project.content.slice(0, 100)}...`
-              : project.content}
-          </p>
-
           {/* 태그 */}
           <div className="flex flex-wrap gap-2 mb-2">
             {project.tags.map((tag) => (
