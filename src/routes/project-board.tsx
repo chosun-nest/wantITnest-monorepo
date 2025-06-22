@@ -60,7 +60,7 @@ export default function ProjectBoard() {
       setProjects(filtered);
       setTotalCount(filtered.length);
     } catch (error) {
-      console.error("📛 프로젝트 목록 불러오기 실패:", error);
+      console.error("프로젝트 목록 불러오기 실패:", error);
     } finally {
       setLoading(false);
     }

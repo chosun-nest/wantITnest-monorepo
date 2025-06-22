@@ -107,8 +107,9 @@ export default function ProjectWrite() {
         await updateProject(projectToEdit.projectId, {
           projectTitle: title,
           projectDescription: content || "",
+          isRecruiting: true,
           tags: selectedTags,
-          partCounts, // ✅ 스웨거 명세에 맞춰 수정
+          partCounts,
         });
         setModalContent({
           title: "수정 완료",
@@ -123,11 +124,12 @@ export default function ProjectWrite() {
         await createProjectPost({
           projectTitle: title,
           projectDescription: content || "",
+          isRecruiting: true,
           tags: selectedTags,
-          recruiting: true,
           partCounts,
           creatorPart: "BACKEND",
           creatorRole: "LEADER",
+          membersToRemove: [],
         });
         setModalContent({
           title: "게시 완료",

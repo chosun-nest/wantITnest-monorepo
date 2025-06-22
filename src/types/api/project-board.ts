@@ -71,13 +71,14 @@ export interface ProjectDetail {
 export interface CreateProjectPayload {
   projectTitle: string;
   projectDescription?: string;
+  isRecruiting: boolean;
   tags?: string[];
   partCounts: {
     [key: string]: number; // 예: FRONTEND: 2, BACKEND: 1
   };
   creatorPart: string;     // 예: "FRONTEND"
   creatorRole: string;     // 예: "LEADER"
-  recruiting: boolean;
+  membersToRemove: number[];
 }
 
 export interface CreateProjectPostResponse {
@@ -92,6 +93,7 @@ export interface CreateProjectPostResponse {
 export interface UpdateProjectPayload {
   projectTitle: string;
   projectDescription: string;
+  isRecruiting: boolean;
   tags: string[];
   partCounts?: {
     [key: string]: number;
