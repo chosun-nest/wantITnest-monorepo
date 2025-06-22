@@ -41,7 +41,7 @@ export default function Ai() {
   // 입력란 자동 스크롤
   useEffect(() => {
     if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      chatEndRef.current.scrollIntoView({ behavior: "auto" });
     }
   }, [messages, loading, isOpen]);
 
@@ -220,7 +220,7 @@ export default function Ai() {
 
       {/* AI 도우미 버튼 */}
       <button
-        onClick={() => { setIsOpen(true); setFooterStep("main"); setShowTooltip(false); }}
+        onClick={() => {  setIsOpen(prev => !prev); setFooterStep("main"); setShowTooltip(false); }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="fixed bottom-6 right-6 w-[50px] h-[50px] bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition duration-300 z-50"
@@ -241,11 +241,7 @@ export default function Ai() {
             <h2 className="text-base font-semibold text-gray-800 dark:text-white">
               AI 도우미 위닛(WitN)
             </h2>
-            <button
-              onClick={closeAndReset}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-300"
-              aria-label="닫기"
-            >✖️</button>
+            
           </div>
           {/* 채팅 히스토리 */}
           <div className="overflow-y-auto flex-grow pr-1 space-y-2 custom-scroll transition-all duration-300 ease-in-out">
