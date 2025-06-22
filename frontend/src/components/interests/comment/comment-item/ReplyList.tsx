@@ -1,4 +1,4 @@
-//
+// 대댓글 목록
 
 import CommentItem from "../CommentItem";
 import type { CommentWithReplies, BoardType } from "../../../../types/api/comments";

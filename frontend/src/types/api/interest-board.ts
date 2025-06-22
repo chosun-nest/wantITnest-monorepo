@@ -28,6 +28,7 @@ export interface PostDetail {   // 응답
   author: {         // 작성자 정보
     id: number;
     name: string;
+    profileImageUrl?: string;   // 작성자 프로필 이미지
   };
   viewCount: number;    // 조회수
   likeCount: number;    // 좋아요수

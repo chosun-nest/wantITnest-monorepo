@@ -1,48 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import {
-  getApplicationsByProjectId,
+  getApplicantsByProjectId,
   updateApplicationStatus,
 } from "../../api/project/ProjectAPI";
 import { useParams } from "react-router-dom";
-import type { Applicant } from "../../types/api/project-board";
+import type { ProjectApplyResponse } from "../../types/api/project-board";
 
 interface Props {
   onClose: () => void;
   onAccept: (user: {
     id: number;
     name: string;
-    role: "Frontend" | "Backend" | "PM";
+    role: "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
     followers: number;
   }) => void;
 }
 
-// 지원서 상태 타입 정의
-type Status = "pending" | "accepted" | "rejected";
+type Status = "WAITING" | "ACCEPTED" | "REJECTED";
 
-// API 응답에 상태 필드를 추가해서 로컬 상태로 관리
-interface ApplicationWithStatus extends Applicant {
+interface ApplicationWithStatus extends ProjectApplyResponse {
+  memberName: string;
   status: Status;
+  message2: string;
 }
 
 export default function ApplicationModal({ onClose, onAccept }: Props) {
-  const { id } = useParams(); // 1. 프로젝트 ID 추출
+  const { id } = useParams();
   const [applications, setApplications] = useState<ApplicationWithStatus[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. 지원자 목록 API 호출
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         if (!id) return;
-        const raw = await getApplicationsByProjectId(Number(id));
-        const withStatus: ApplicationWithStatus[] = raw.map((app) => ({
+        const raw = await getApplicantsByProjectId(Number(id));
+        const enriched: ApplicationWithStatus[] = raw.map((app) => ({
           ...app,
-          status: "pending",
+          status: app.status,
+          message2: "", // 추후 메시지 필드 확장 고려
         }));
-        setApplications(withStatus);
+        setApplications(enriched);
       } catch (err) {
         console.error("지원자 목록 불러오기 실패", err);
+        alert("지원자 목록을 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
       }
@@ -51,17 +52,20 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
     fetchApplications();
   }, [id]);
 
-  // 3. 수락 버튼 클릭 시 (API 호출 + 상태 변경 + 참여자 반영)
   const handleAccept = async (app: ApplicationWithStatus) => {
     try {
-      await updateApplicationStatus(app.id, "accepted");
+      await updateApplicationStatus(app.applicationId, "accepted");
       setApplications((prev) =>
-        prev.map((a) => (a.id === app.id ? { ...a, status: "accepted" } : a))
+        prev.map((a) =>
+          a.applicationId === app.applicationId
+            ? { ...a, status: "ACCEPTED" }
+            : a
+        )
       );
       onAccept({
-        id: app.id,
-        name: app.name,
-        role: app.role as "Frontend" | "Backend" | "PM",
+        id: app.memberId,
+        name: app.memberName,
+        role: app.part,
         followers: 0,
       });
     } catch (err) {
@@ -70,12 +74,15 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
     }
   };
 
-  // 4. 거절 버튼 클릭 시 (API 호출 + 상태 변경)
-  const handleReject = async (applicantId: number) => {
+  const handleReject = async (applicationId: number) => {
     try {
-      await updateApplicationStatus(applicantId, "rejected");
+      await updateApplicationStatus(applicationId, "rejected");
       setApplications((prev) =>
-        prev.map((app) => (app.id === applicantId ? { ...app, status: "rejected" } : app))
+        prev.map((app) =>
+          app.applicationId === applicationId
+            ? { ...app, status: "REJECTED" }
+            : app
+        )
       );
     } catch (err) {
       console.error("거절 처리 실패", err);
@@ -83,10 +90,13 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
     }
   };
 
-  // 5. 로딩 중 UI
   if (loading) return <div className="p-4">지원자 목록 불러오는 중...</div>;
 
-  // 6. 실제 지원자 목록 렌더링
+  // ✅ 거절되지 않은 지원자만 필터링
+  const visibleApplicants = applications.filter(
+    (app) => app.status !== "REJECTED"
+  );
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40"
@@ -104,24 +114,26 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {applications.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center">지원자가 없습니다.</p>
+          {visibleApplicants.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center">
+              지원자가 없습니다.
+            </p>
           ) : (
-            applications.map((app) => (
+            visibleApplicants.map((app) => (
               <div
-                key={app.id}
+                key={app.applicationId}
                 className="border rounded-md p-3 bg-gray-50 shadow-sm"
               >
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-medium text-blue-600">
-                    #{app.role}
+                    #{app.part}
                   </span>
-                  <span className="text-sm">👤 {app.name}</span>
+                  <span className="text-sm">👤 {app.memberName}</span>
                 </div>
                 <p className="text-sm text-gray-700 whitespace-pre-line mb-2">
-                  {app.message}
+                  {app.message2 || "(메시지 없음)"}
                 </p>
-                {app.status === "pending" ? (
+                {app.status === "WAITING" ? (
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => handleAccept(app)}
@@ -130,7 +142,7 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
                       수락
                     </button>
                     <button
-                      onClick={() => handleReject(app.id)}
+                      onClick={() => handleReject(app.applicationId)}
                       className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                     >
                       거절
@@ -139,12 +151,12 @@ export default function ApplicationModal({ onClose, onAccept }: Props) {
                 ) : (
                   <p
                     className={`text-sm font-semibold mt-2 text-right ${
-                      app.status === "accepted"
+                      app.status === "ACCEPTED"
                         ? "text-green-600"
                         : "text-red-500"
                     }`}
                   >
-                    {app.status === "accepted" ? "✅ 수락됨" : "❌ 거절됨"}
+                    ✅ 수락됨
                   </p>
                 )}
               </div>

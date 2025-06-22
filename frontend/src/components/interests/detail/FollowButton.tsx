@@ -39,13 +39,14 @@ export default function FollowButton({ memberId }: FollowButtonProps) {
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`px-4 py-1.5 border rounded-md text-sm font-bold transition ${
-        isFollowing
-          ? "bg-white text-[#1E3A8A] border-[#1E3A8A] hover:bg-[#f4f6fa]"
-          : "bg-[#1E3A8A] text-white border-transparent hover:bg-[#5f7fce]"
-      } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={`min-w-[100px] px-4 py-1.5 border rounded-md text-sm font-bold transition 
+        ${
+          isFollowing
+            ? "bg-white text-[#1E3A8A] border-[#1E3A8A] hover:bg-[#f4f6fa]"
+            : "bg-[#1E3A8A] text-white border-transparent hover:bg-[#5f7fce]"
+        } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
     >
-      {loading ? "처리 중..." : isFollowing ? "팔로잉" : "팔로우"}
+      {loading ? "처리 중..." : isFollowing ? "Unfollow" : "Follow"}
     </button>
   );
 }

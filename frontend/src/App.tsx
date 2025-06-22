@@ -40,7 +40,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <Home /> },
       { path: "project/:id", element: <ProjectDetail /> },
-      { path: "project-apply", element: <ProjectApply /> },
+      // ❌ 잘못된 중복 라우트 제거됨: project-apply
       { path: "notice-board/", element: <NoticeBoard /> },
       { path: "interests-board/", element: <InterestsBorad /> },
       { path: "interests-detail/:id", element: <InterestsDetail /> },
@@ -58,25 +58,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: "profile/",
-        element: <ProtectedRoute><Layout /></ProtectedRoute>,   // 라우트 명확히 분리
+        element: <ProtectedRoute><Layout /></ProtectedRoute>,
         children: [
-          {
-            path: "", // /profile
-            element: <Profile />, // 내 프로필
-          },
-          {
-            path: ":id", // /profile/123
-            element: <OtherProfile />, // 타인 프로필
-          },
+          { path: "", element: <Profile /> },
+          { path: ":id", element: <OtherProfile /> },
         ],
       },
-
+      { path: "profile-edit/", element: <ProfileEdit /> },
       {
-        path: "profile-edit/",
-        element: <ProfileEdit />,
-      },
-      {
-        path: "project-apply/:id",
+        path: "project-apply/:id", // ✅ 올바른 라우트 유지됨
         element: (
           <ProtectedRoute>
             <ProjectApply />
@@ -144,7 +134,6 @@ function App() {
   const [showBackdrop, setShowBackdrop] = useState(false);
   const dispatch = useDispatch();
 
-  // ✅ accessToken 복구: localStorage → Redux store
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
@@ -152,12 +141,11 @@ function App() {
     }
   }, [dispatch]);
 
-  // ✅ 유저 정보 로드
   useEffect(() => {
     const initUser = async () => {
       try {
         const user = await getMemberProfile();
-        console.log("🔥 getMemberProfile 응답:", user); // ✅ 여기
+        console.log("🔥 getMemberProfile 응답:", user);
 
         dispatch(
           setUser({

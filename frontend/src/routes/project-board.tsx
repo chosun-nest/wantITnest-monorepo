@@ -45,6 +45,7 @@ export default function ProjectBoard() {
           ...baseParams,
           keyword: searchKeyword,
           searchType: "ALL",
+          tags: selectedTags,
         });
       } else {
         data = await getProjects(baseParams);

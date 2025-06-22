@@ -27,7 +27,6 @@ export default function ChatRoom({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isMobile,
   chatRoom,
-  onBack,
 }: ChatRoomProps) {
   const [currentUser, setCurrentUser] = useState<SimpleMemberProfile | null>(
     null
@@ -167,42 +166,23 @@ export default function ChatRoom({
     );
 
   return (
-    <div className="flex flex-col w-[66%] max-w-[800px] min-w-[400px] h-screen mx-auto bg-white border rounded-xl shadow-md overflow-hidden">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-100">
-        <button
-          onClick={onBack}
-          className="text-xl font-bold text-gray-500 hover:text-black"
-        >
-          ←
-        </button>
-        <div className="flex flex-col items-center text-center flex-1">
-          <span className="font-semibold text-sm">{chatRoom.roomName}</span>
-          <span
-            className={`text-xs ${
-              isConnected ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {isConnected ? "연결됨" : "끊김"}
-          </span>
+    <>
+      {" "}
+      <div className=" overflow-auto ">
+        {/* 메시지 영역 */}
+        <div className="flex-1 px-4 py-3 bg-white overflow-y-auto">
+          {messages.map((msg) => (
+            <ChatBubble
+              key={msg.id}
+              message={msg}
+              isMe={msg.userName === String(currentUser.memberName)}
+            />
+          ))}
+          <div ref={messagesEndRef} />
         </div>
-        <div className="w-6" />
-      </div>
-
-      {/* 메시지 영역 */}
-      <div className="flex-1 px-4 py-3 bg-white overflow-y-auto">
-        {messages.map((msg) => (
-          <ChatBubble
-            key={msg.id}
-            message={msg}
-            isMe={msg.userName === String(currentUser.memberName)}
-          />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
+      </div>{" "}
       {/* 입력창 */}
-      <div className="flex items-center gap-2 px-4 py-3 border-t bg-gray-50">
+      <div className="flex w-[100%] items-center gap-2 ">
         <input
           value={inputMessage}
           onChange={handleInputChange}
@@ -213,11 +193,11 @@ export default function ChatRoom({
         <button
           onClick={handleSend}
           disabled={!inputMessage.trim()}
-          className="px-4 py-2 text-sm font-semibold text-white bg-blue-500 rounded-lg disabled:opacity-50"
+          className="px-4 py-2 text-sm font-semibold text-white bg-[#002f6c] rounded-lg disabled:opacity-50"
         >
           전송
         </button>
       </div>
-    </div>
+    </>
   );
 }
