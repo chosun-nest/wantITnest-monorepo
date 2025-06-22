@@ -237,7 +237,6 @@ public class ProjectService {
                             .projectId(projectId)
                             .part(part)
                             .role(ProjectMember.Role.MEMBER)
-                            .isApproved(false)
                             .build());
                 }
             } else if (toAdd < 0) {
@@ -470,8 +469,7 @@ public class ProjectService {
                 ProjectMember.ProjectMemberBuilder builder = ProjectMember.builder()
                         .projectId(projectId)
                         .part(part)
-                        .role(ProjectMember.Role.MEMBER)
-                        .isApproved(false);
+                        .role(ProjectMember.Role.MEMBER);
 
                 if (!assignedCreator && part == creatorPart) {
                     builder.memberId(creatorId);
