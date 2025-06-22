@@ -60,14 +60,17 @@ public class SecurityConfig {
                     "/api/v1/tags/**",
                     "/api/v1/posts/search",
                     "/api/v1/notices/**",
-                    "/api/v1/projects"
+                    "/api/v1/projects",
+                    "/api/v1/projects/search"
                 ).permitAll()
 
                 // GET 메서드만 허용하는 경로
                 .requestMatchers(HttpMethod.GET,
                         "/api/v1/posts",
                         "/api/v2/posts",
-                        "/uploaded-images/**"
+                        "/uploaded-images/**",
+                        "/api/v1/projects",
+                        "/api/v2/projects"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
