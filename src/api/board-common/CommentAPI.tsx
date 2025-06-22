@@ -11,7 +11,7 @@ import {
 } from "../../types/api/comments";
 import { getAccessToken } from "../../utils/auth";
 
-// ✅ 공통 인증 헤더
+// 공통 인증 헤더
 const authHeader = () => ({
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,
@@ -107,23 +107,3 @@ export const updateComment = async (
   );
   return res.data;
 };
-
-// 댓글 수정 (PATCH) -> skipAuth : false 적용 전 코드 형태
-// export const updateComment = async (
-//   boardType: BoardType,
-//   postId: number,
-//   commentId: number,
-//   payload: CommentPayload   // await updateComment("PROJECT", 42, 123, { content: "댓글 수정 내용입니다." });
-// ): Promise<CommentResponse> => {
-//   const token = getAccessToken();
-//   const res = await API.patch<CommentResponse>(
-//     `/api/v1/${boardType}/${postId}/comments/${commentId}`,
-//     payload,
-//     {
-//       headers: {
-//         Authorization: `Bearer ${token}`,    // 일일히 Authorization에 토큰 붙였어야 했어야 했음.
-//       },
-//     }
-//   );
-//   return res.data;
-// };

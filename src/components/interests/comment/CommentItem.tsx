@@ -18,6 +18,8 @@ import { showModal } from "../../../store/slices/modalSlice";
 import CommentForm from "./CommentForm";
 import ReplyInput from "./comment-item/ReplyInput";
 import ReplyList from "./comment-item/ReplyList";
+
+import CommentAuthorInfo from "./comment-item/CommentAuthorInfo"
 import CommentActionMenu from "./comment-item/CommentActionMenu";
 import ReactionButtons from "./comment-item/ReactionButtons";
 import { ArrowElbowDownRight } from "phosphor-react";
@@ -132,32 +134,26 @@ export default function CommentItem({
 
   return (
     <div className={`w-full ${ isReply ? "pl-6 bg-gray-50 border-l-2 border-blue-200" : "" }`}>
-      <div className="flex gap-3 py-3">
-        <img
-          src="/default-profile.png"
-          alt="profile"
-          className="object-cover w-10 h-10 rounded-full"
-        />
-        <div className="flex-1">
-          {isReply && (
-            <div className="flex items-center gap-1 mb-2 text-sm text-[#1E3A8A]">
-              <ArrowElbowDownRight size={18} className="text-[#1E3A8A]" />
-              <span className="text-xs font-semibold tracking-tight">답글</span>
-            </div>
-          )}
-
-          {/* 작성자 + 시간 + 메뉴 */}
-          <div className="flex items-center text-sm text-gray-500">
-            <span className="font-semibold text-black">{comment.author.name}</span>
-            <span className="mx-1">·</span>
-            <span>{comment.createdAt.slice(0, 16).replace("T", " ")}</span>
-
-            <CommentActionMenu
-              authorId={comment.author.id}
-              onEdit={() => setIsEditing(true)}
-              onDelete={handleDelete}
-            />
+      <div className="flex items-start gap-2 py-2">
+        {isReply && (
+          <div className="flex flex-col items-center pt-1 text-[#1E3A8A] min-w-[32px]">
+            <ArrowElbowDownRight size={18} />
+            <span className="text-[10px] font-semibold">답글</span>
           </div>
+        )}
+
+        <CommentAuthorInfo
+          authorId={comment.author.id}
+          authorName={comment.author.name}
+          authorImageUrl={comment.author.memberImageUrl}    // 백엔드 memberImageUrl 추가 되었는지 GET JSON 확인하기
+          createdAt={comment.createdAt}
+        />
+
+        <CommentActionMenu
+          authorId={comment.author.id}
+          onEdit={() => setIsEditing(true)}
+          onDelete={handleDelete}
+        />
 
           {/* 댓글 내용 */}
           <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">
@@ -247,6 +243,5 @@ export default function CommentItem({
           </AnimatePresence>
         </div>
       </div>
-    </div>
   );
 }

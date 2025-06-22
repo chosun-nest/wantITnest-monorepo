@@ -17,6 +17,7 @@ import Modal from "../components/common/modal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import PostDetailHeader from "../components/interests/detail/PostDetailHeader";
 import PostDetailInfo from "../components/interests/detail/PostDetailInfo";
+import { navigateToProfile } from "../utils/navigateToProfile";
 import FollowButton from "../components/interests/detail/FollowButton";
 import PostDetailContent from "../components/interests/detail/PostDetailContent";
 import PostDetailTags from "../components/interests/detail/PostDetailTags";
@@ -166,13 +167,13 @@ export default function InterestsDetail() {
             isAuthor={isAuthor}
             viewCount={post.viewCount}
             createdAt={post.createdAt}
-            onAuthorClick={() => {
-              if (isAuthor) {
-                navigate("/profile");
-              } else if (post.author.id) {  // 중복 리랜더링 방지
-                navigate(`/profile/${post.author.id}`);
-              }
-            }}
+            onAuthorClick={() =>
+                navigateToProfile({
+                navigate,
+                currentUserId: currentUserId!,
+                targetUserId: post.author.id,
+              })
+            }
           />
           <div className="flex items-center gap-2">
             {!isAuthor && <FollowButton memberId={post.author.id} />}

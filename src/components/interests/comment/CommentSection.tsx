@@ -87,6 +87,10 @@ export default function CommentSection({ boardType, postId }: { boardType: Board
         isLoggedIn={isLoggedIn}
         placeholder="댓글을 입력하세요"
       />
+      
+      {/* 구분선 */}
+      <hr className="my-6 border-gray-200" />
+      
       {loading ? (
         <SkeletonComment />
       ) : (
