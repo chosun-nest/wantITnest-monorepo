@@ -20,18 +20,16 @@ router = APIRouter()
         500: {"model": ErrorResponse, "description": "서버 오류"}
     },
     summary="AI 챗봇과 대화",
-    description="OpenAI GPT 모델을 사용하여 AI와 대화합니다. 스트리밍과 비스트리밍 모드를 지원합니다."
-)
-async def chat(request: ChatRequest):
-    """
-    AI 챗봇과 대화하는 엔드포인트
+    description="""
+    OpenAI GPT 모델을 사용하여 AI와 대화합니다. 스트리밍과 비스트리밍 모드를 지원합니다.
     
     - **messages**: 대화 메시지 목록 (최소 1개 이상)
     - **stream**: 스트리밍 응답 여부 (기본값: true)
     - **temperature**: 응답 창의성 0.0~2.0 (기본값: 0.7)  
     - **max_tokens**: 최대 토큰 수 (선택사항)
     """
-    
+)
+async def chat(request: ChatRequest):    
     # 입력 검증
     if not request.messages:
         raise HTTPException(
