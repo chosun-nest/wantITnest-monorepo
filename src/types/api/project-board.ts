@@ -93,10 +93,9 @@ export interface UpdateProjectPayload {
   projectTitle: string;
   projectDescription: string;
   tags: string[];
-  parts?: {
-    part: string;
-    count: number;
-  }[] | null;
+  partCounts?: {
+    [key: string]: number;
+  }; 
   imageUrls?: string[] | null;
 }
 

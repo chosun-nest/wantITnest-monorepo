@@ -1,4 +1,4 @@
-// 프로젝트 모집 글쓰기 페이지
+// ✅ 프로젝트 모집 글쓰기 페이지 (수정 통합 리팩토링)
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -12,11 +12,13 @@ import MarkdownEditor from "../components/board/write/MarkdownEditor";
 import SubmitButtons from "../components/board/write/SubmitButtons";
 import Modal from "../components/common/modal";
 import { ModalContent } from "../types/modal";
-import { updatePost } from "../api/interests/InterestsAPI";
-import { createProjectPost } from "../api/project/ProjectAPI";
-import type { PostDetail } from "../types/api/interest-board";
+import {
+  createProjectPost,
+  updateProject,
+} from "../api/project/ProjectAPI";
 import RecruitRoleList from "../components/project/RecruitRoleList";
 import { getMemberProfile } from "../api/profile/ProfileAPI";
+import type { ProjectDetail } from "../types/api/project-board";
 
 interface RecruitCardData {
   id: number;
@@ -29,30 +31,17 @@ export default function ProjectWrite() {
   const location = useLocation();
   const reduxAuthorName = useSelector(selectCurrentUserName);
 
-  const [finalAuthorName, setFinalAuthorName] = useState("모집중");
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const user = await getMemberProfile();
-        if (user.memberName) setFinalAuthorName(user.memberName);
-      } catch {
-        setFinalAuthorName("모집중");
-      }
-    };
-    fetchUser();
-  }, []);
-
   const navbarRef = useRef<HTMLDivElement>(null);
-  const postToEdit = location.state?.post as PostDetail | undefined;
-  const isEditMode = !!postToEdit;
+  const projectToEdit = location.state?.project as ProjectDetail | undefined;
+  const isEditMode = !!projectToEdit;
 
+  const [finalAuthorName, setFinalAuthorName] = useState("모집중");
   const [navHeight, setNavHeight] = useState(0);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<string | undefined>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [showFilterModal, setShowFilterModal] = useState(false);
   const [recruitCards, setRecruitCards] = useState<RecruitCardData[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState<ModalContent>({
     title: "",
@@ -73,16 +62,26 @@ export default function ProjectWrite() {
   }, []);
 
   useEffect(() => {
-    if (!isEditMode) setContent(defaultContent);
+    const fetchUser = async () => {
+      try {
+        const user = await getMemberProfile();
+        if (user.memberName) setFinalAuthorName(user.memberName);
+      } catch {
+        setFinalAuthorName("모집중");
+      }
+    };
+    fetchUser();
   }, []);
 
   useEffect(() => {
-    if (isEditMode && postToEdit) {
-      setTitle(postToEdit.title);
-      setContent(postToEdit.content);
-      setSelectedTags(postToEdit.tags);
+    if (!isEditMode) {
+      setContent(defaultContent);
+    } else if (projectToEdit) {
+      setTitle(projectToEdit.projectTitle);
+      setContent(projectToEdit.projectDescription);
+      setSelectedTags(projectToEdit.tags);
     }
-  }, [isEditMode]);
+  }, [isEditMode, projectToEdit]);
 
   const handleSubmit = async () => {
     if (!title || !content) {
@@ -96,7 +95,6 @@ export default function ProjectWrite() {
     }
 
     const validRoles = ["BACKEND", "FRONTEND", "PM", "DESIGN", "AI", "ETC"];
-
     const partCounts: { [key: string]: number } = recruitCards.reduce((acc, card) => {
       if (validRoles.includes(card.role)) {
         acc[card.role] = (acc[card.role] || 0) + 1;
@@ -105,11 +103,12 @@ export default function ProjectWrite() {
     }, {} as Record<string, number>);
 
     try {
-      if (isEditMode && postToEdit) {
-        await updatePost(postToEdit.postId, {
-          title,
-          content,
+      if (isEditMode && projectToEdit) {
+        await updateProject(projectToEdit.projectId, {
+          projectTitle: title,
+          projectDescription: content || "",
           tags: selectedTags,
+          partCounts, // ✅ 스웨거 명세에 맞춰 수정
         });
         setModalContent({
           title: "수정 완료",
@@ -117,7 +116,7 @@ export default function ProjectWrite() {
           type: "info",
           onClose: () => {
             setShowModal(false);
-            navigate(`/interests-detail/${postToEdit.postId}`);
+            navigate(`/project/${projectToEdit.projectId}`);
           },
         });
       } else {

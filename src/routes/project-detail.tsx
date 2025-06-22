@@ -65,7 +65,26 @@ export default function ProjectDetail() {
     initialize();
   }, [id, accessToken]);
 
-  const handleEdit = () => navigate(`/project/${id}/edit`);
+  const handleEdit = () => {
+    if (!project) return;
+
+    // partCounts 변환 로직 추가
+    const partCounts: Record<string, number> = {};
+    project.projectMembers.forEach((member) => {
+      if (member.part) {
+        partCounts[member.part] = (partCounts[member.part] || 0) + 1;
+      }
+    });
+
+    navigate("/project-write", {
+      state: {
+        project: {
+          ...project,
+          partCounts,
+        },
+      },
+    });
+  };
 
   const handleDelete = async () => {
     try {
@@ -137,7 +156,7 @@ export default function ProjectDetail() {
             author={{
               id: project.author.id,
               name: project.author.name,
-              profileImageUrl: "", // 기본 이미지
+              profileImageUrl: "",
             }}
             isAuthor={isAuthor}
             createdAt={project.createdAt}
@@ -146,9 +165,7 @@ export default function ProjectDetail() {
           />
 
           <div className="flex items-center gap-2">
-            {!isAuthor && (
-              <FollowButton memberId={project.author.id} />
-            )}
+            {!isAuthor && <FollowButton memberId={project.author.id} />}
             <PostDetailHeader
               isAuthor={isAuthor}
               onEdit={handleEdit}
@@ -185,7 +202,7 @@ export default function ProjectDetail() {
       <div className="w-full lg:w-[280px] shrink-0">
         <ParticipantCardBox
           project={project}
-          participants={[]} // 나중에 실제 참여자 연결
+          participants={[]}
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={() => {}}
           currentUserId={currentUserId!}
