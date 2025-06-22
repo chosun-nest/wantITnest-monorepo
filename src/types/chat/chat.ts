@@ -10,7 +10,7 @@ export interface SimpleMemberProfile {
 
 export interface ChatRoomProfile {
   roomType: unknown;
-  roomId: string;
+  roomId: number;
   roomName: string;
   roomImageUrl?: string;
   lastActivity: string;
