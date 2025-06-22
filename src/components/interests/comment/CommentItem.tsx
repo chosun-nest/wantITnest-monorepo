@@ -133,8 +133,9 @@ export default function CommentItem({
   };
 
   return (
-    <div className={`w-full ${ isReply ? "pl-6 bg-gray-50 border-l-2 border-blue-200" : "" }`}>
-      <div className="flex items-start gap-2 py-2">
+  <div className={`w-full ${isReply ? "pl-6 bg-gray-50 border-l-2 border-blue-200" : ""}`}>
+    <div className="py-2">
+      <div className="flex items-start gap-2">
         {isReply && (
           <div className="flex flex-col items-center pt-1 text-[#1E3A8A] min-w-[32px]">
             <ArrowElbowDownRight size={18} />
@@ -142,20 +143,24 @@ export default function CommentItem({
           </div>
         )}
 
-        <CommentAuthorInfo
-          authorId={comment.author.id}
-          authorName={comment.author.name}
-          authorImageUrl={comment.author.memberImageUrl}    // 백엔드 memberImageUrl 추가 되었는지 GET JSON 확인하기
-          createdAt={comment.createdAt}
-        />
+        {/* 댓글 전체 콘텐츠 래퍼 (세로 정렬) */}
+        <div className="flex flex-col flex-1">
+          {/* 작성자 정보 + 메뉴 (한 줄) */}
+          <div className="flex items-center justify-between">
+            <CommentAuthorInfo
+              authorId={comment.author.id}
+              authorName={comment.author.name}
+              authorImageUrl={comment.author.memberImageUrl}
+              createdAt={comment.createdAt}
+            />
+            <CommentActionMenu
+              authorId={comment.author.id}
+              onEdit={() => setIsEditing(true)}
+              onDelete={handleDelete}
+            />
+          </div>
 
-        <CommentActionMenu
-          authorId={comment.author.id}
-          onEdit={() => setIsEditing(true)}
-          onDelete={handleDelete}
-        />
-
-          {/* 댓글 내용 */}
+          {/* 댓글 본문 */}
           <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">
             {isEditing ? (
               <div className="space-y-1">
@@ -164,7 +169,6 @@ export default function CommentItem({
                     @{extractMentionAndContent(comment.content).mention}
                   </div>
                 )}
-
                 <CommentForm
                   initialValue={extractMentionAndContent(comment.content).content}
                   onSubmit={(updatedContent) => {
@@ -243,5 +247,7 @@ export default function CommentItem({
           </AnimatePresence>
         </div>
       </div>
+    </div>
+  </div>
   );
 }
