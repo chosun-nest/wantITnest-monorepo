@@ -306,11 +306,11 @@ public class ProjectService {
 
         switch (searchType) {
             case "TITLE" -> projectPage = projectRepository
-                    .findByProjectTitleContainingIgnoreCase(keyword, pageable);
+                    .findByProjectTitle(keyword, pageable);
             case "CONTENT" -> projectPage = projectRepository
-                    .findByProjectDescriptionContainingIgnoreCase(keyword, pageable);
+                    .findByProjectDescriptionContaining(keyword, pageable);
             default -> projectPage = projectRepository
-                    .findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContainingIgnoreCase(keyword, keyword, pageable);
+                    .findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContaining(keyword, keyword, pageable);
         }
         return buildProjectListResponse(projectPage);
     }
@@ -335,11 +335,11 @@ public class ProjectService {
         Page<Project> projectPage;
         switch (searchType.toUpperCase()) {
             case "TITLE" -> projectPage = projectRepository
-                    .findByProjectIdInAndProjectTitleContainingIgnoreCase(projectIds, keyword, pageable);
+                    .findByProjectIdAndTitle(projectIds, keyword, pageable);
             case "CONTENT" -> projectPage = projectRepository
-                    .findByProjectIdInAndProjectDescriptionContaining(projectIds, keyword, pageable);
+                    .findByProjectIdAndDescription(projectIds, keyword, pageable);
             default -> projectPage = projectRepository
-                    .findByProjectIdInAndProjectTitleContainingIgnoreCaseOrProjectIdInAndProjectDescriptionContainingIgnoreCase(projectIds, keyword, projectIds, keyword, pageable);
+                    .findByProjectIdAndTitleOrDescription(projectIds, keyword, projectIds, keyword, pageable);
         }
 
         return buildProjectListResponse(projectPage);
