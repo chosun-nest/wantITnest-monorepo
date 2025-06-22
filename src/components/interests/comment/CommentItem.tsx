@@ -5,8 +5,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-//import { useDispatch, useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import {
   deleteComment,
   updateComment,
@@ -14,14 +15,15 @@ import {
   reactToComment,
 } from "../../../api/board-common/CommentAPI";
 import { showModal } from "../../../store/slices/modalSlice";
-//import { selectCurrentUserId } from "../../../store/slices/userSlice";
+import { selectCurrentUserId } from "../../../store/slices/userSlice";
+
 import CommentForm from "./CommentForm";
 import ReplyInput from "./comment-item/ReplyInput";
 import ReplyList from "./comment-item/ReplyList";
-
-import CommentAuthorInfo from "./comment-item/CommentAuthorInfo"
 import CommentActionMenu from "./comment-item/CommentActionMenu";
 import ReactionButtons from "./comment-item/ReactionButtons";
+
+import { navigateToProfile } from "../../../utils/navigateToProfile";
 import { ArrowElbowDownRight } from "phosphor-react";
 import type { CommentWithReplies, BoardType } from "../../../types/api/comments";
 
@@ -39,25 +41,23 @@ export default function CommentItem({
   onRefresh,
 }: CommentItemProps) {
   const dispatch = useDispatch();
-  //const currentUserId = useSelector(selectCurrentUserId);
-  //const isReply = comment.parentId && comment.parentId > 0;
+  const navigate = useNavigate();
+  const currentUserId = useSelector(selectCurrentUserId);
+
   const isReply = !!comment.parentId;
 
   const [isEditing, setIsEditing] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
+
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const isMenuOpen = openMenuId === comment.commentId;
 
   const handleDelete = async () => {
     try {
       await deleteComment(boardType, postId, comment.commentId);
       onRefresh();
     } catch {
-      dispatch(
-        showModal({
-          title: "삭제 실패",
-          message: "댓글 삭제 중 오류 발생",
-          type: "error",
-        })
-      );
+      dispatch(showModal({ title: "삭제 실패", message: "댓글 삭제 중 오류 발생", type: "error" }));
     }
   };
 
@@ -67,13 +67,7 @@ export default function CommentItem({
       setIsEditing(false);
       onRefresh();
     } catch {
-      dispatch(
-        showModal({
-          title: "수정 실패",
-          message: "댓글 수정 중 오류 발생",
-          type: "error",
-        })
-      );
+      dispatch(showModal({ title: "수정 실패", message: "댓글 수정 중 오류 발생", type: "error" }));
     }
   };
 
@@ -81,87 +75,107 @@ export default function CommentItem({
     const cleanContent = content.replace(/^@\S+\s/, "");
     const replyContent = `@${comment.author.name} ${cleanContent}`;
     try {
-      await createReplyComment(boardType, postId, comment.commentId, {
-        content: replyContent,
-      });
+      await createReplyComment(boardType, postId, comment.commentId, { content: replyContent });
       setIsReplying(false);
       onRefresh();
     } catch {
-      dispatch(
-        showModal({
-          title: "답글 실패",
-          message: "답글 작성 중 오류 발생",
-          type: "error",
-        })
-      );
+      dispatch(showModal({ title: "답글 실패", message: "답글 작성 중 오류 발생", type: "error" }));
     }
   };
 
   const handleReaction = async (type: "LIKE" | "DISLIKE") => {
     try {
-      await reactToComment(boardType, postId, comment.commentId, {
-        reactionType: type,
-      });
+      await reactToComment(boardType, postId, comment.commentId, { reactionType: type });
       onRefresh();
     } catch {
-      dispatch(
-        showModal({
-          title: "반응 실패",
-          message: "좋아요/싫어요 중 오류 발생",
-          type: "error",
-        })
-      );
+      dispatch(showModal({ title: "반응 실패", message: "좋아요/싫어요 중 오류 발생", type: "error" }));
     }
+  };
+
+  const extractMentionAndContent = (content: string) => {
+    const match = content.match(/^@(\S+)\s(.*)/);
+    if (!match) return { mention: null, content };
+    return { mention: match[1], content: match[2] };
   };
 
   const formatContent = (content: string) => {
     const { mention, content: body } = extractMentionAndContent(content);
     return (
       <>
-        {mention && (
-          <span className="font-semibold text-[#1E3A8A]">@{mention}</span>
-        )}{" "}
-        {body}
+        {mention && <span className="font-semibold text-[#1E3A8A]">@{mention}</span>} {body}
       </>
     );
   };
 
-  const extractMentionAndContent = (content: string) => {   // 멘션 고정용 : 멘션 & 본문 분리 유틸 함수
-    const match = content.match(/^@(\S+)\s(.*)/);
-    if (!match) return { mention: null, content };
-    return { mention: match[1], content: match[2] };
-  };
-
   return (
-  <div className={`w-full ${isReply ? "pl-6 bg-gray-50 border-l-2 border-blue-200" : ""}`}>
-    <div className="py-2">
-      <div className="flex items-start gap-2">
-        {isReply && (
-          <div className="flex flex-col items-center pt-1 text-[#1E3A8A] min-w-[32px]">
-            <ArrowElbowDownRight size={18} />
-            <span className="text-[10px] font-semibold">답글</span>
+<div className={`w-full ${isReply ? "bg-gray-50 border-l-2 border-blue-200" : ""}`}>
+  <div className="py-2">
+    <div className="flex items-start gap-2">
+      
+      {/* ↳ 답글 아이콘 (대댓글일 때만 왼쪽에 표시) */}
+      {isReply && (
+        <div className="flex flex-col items-center min-w-[40px] pt-1 pl-1 text-[#1E3A8A]">
+          <div className="flex items-center gap-1 text-xs font-semibold">
+            <ArrowElbowDownRight size={14} />
+            <span>답글</span>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* 댓글 전체 콘텐츠 래퍼 (세로 정렬) */}
+      {/* 프로필 + 내용 전체 */}
+      <div className="flex items-start flex-1 gap-3">
+        {/* 프로필 이미지 */}
+        <img
+          src={comment.author.memberImageUrl || "/assets/images/user.png"}
+          alt="작성자"
+          className="object-cover w-10 h-10 rounded-full cursor-pointer"
+          onClick={() =>
+            navigateToProfile({
+              navigate,
+              currentUserId: currentUserId!,
+              targetUserId: comment.author.id,
+            })
+          }
+        />
+
+        {/* 내용 본문 */}
         <div className="flex flex-col flex-1">
-          {/* 작성자 정보 + 메뉴 (한 줄) */}
-          <div className="flex items-center justify-between">
-            <CommentAuthorInfo
-              authorId={comment.author.id}
-              authorName={comment.author.name}
-              authorImageUrl={comment.author.memberImageUrl}
-              createdAt={comment.createdAt}
-            />
+          {/* 작성자 + 시간 + 메뉴 */}
+          <div className="flex items-start justify-between">
+            <div
+              className="cursor-pointer"
+              onClick={() =>
+                navigateToProfile({
+                  navigate,
+                  currentUserId: currentUserId!,
+                  targetUserId: comment.author.id,
+                })
+              }
+            >
+              <div className="text-sm font-semibold">{comment.author.name}</div>
+              <div className="text-xs text-gray-500">
+                {comment.createdAt.slice(0, 16).replace("T", " ")}
+              </div>
+            </div>
+
             <CommentActionMenu
               authorId={comment.author.id}
-              onEdit={() => setIsEditing(true)}
-              onDelete={handleDelete}
+              onEdit={() => {
+                setIsEditing(true);
+                setOpenMenuId(null); // 메뉴 닫기
+              }}
+              onDelete={async () => {
+                await handleDelete();
+                setOpenMenuId(null);
+              }}
+              isOpen={isMenuOpen}
+              onOpen={() => setOpenMenuId(comment.commentId)}
+              onClose={() => setOpenMenuId(null)}
             />
           </div>
 
-          {/* 댓글 본문 */}
-          <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">
+          {/* 댓글 내용 */}
+          <div className="mt-1 text-sm text-gray-800 whitespace-pre-wrap">
             {isEditing ? (
               <div className="space-y-1">
                 {comment.content.startsWith("@") && (
@@ -173,9 +187,7 @@ export default function CommentItem({
                   initialValue={extractMentionAndContent(comment.content).content}
                   onSubmit={(updatedContent) => {
                     const mention = extractMentionAndContent(comment.content).mention;
-                    const newContent = mention
-                      ? `@${mention} ${updatedContent}`
-                      : updatedContent;
+                    const newContent = mention ? `@${mention} ${updatedContent}` : updatedContent;
                     handleUpdate(newContent);
                   }}
                   onCancel={() => setIsEditing(false)}
@@ -249,5 +261,7 @@ export default function CommentItem({
       </div>
     </div>
   </div>
+</div>
+
   );
 }

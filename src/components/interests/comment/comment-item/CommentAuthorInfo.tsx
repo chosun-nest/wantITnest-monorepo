@@ -36,21 +36,17 @@ export default function CommentAuthorInfo({
   };
 
   return (
-    <div
-      className="flex items-center gap-2 p-1 -ml-1 transition rounded-md cursor-pointer hover:bg-gray-100"
-      onClick={handleClick}
-    >
+    <div className="flex items-center gap-3 cursor-pointer" onClick={handleClick}>
       <img
         src={authorImageUrl || "/default-profile.png"}
         alt="작성자"
         className="object-cover w-10 h-10 rounded-full"
       />
-      <div className="flex flex-col text-sm">
-        <span className="font-semibold text-black">{authorName}</span>
-        <span className="text-xs text-gray-500">
-          {createdAt.slice(0, 16).replace("T", " ")}
-        </span>
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold text-gray-900">{authorName}</span>
+        <span className="text-xs text-gray-500">{createdAt.slice(0, 16).replace("T", " ")}</span>
       </div>
     </div>
   );
+
 }
