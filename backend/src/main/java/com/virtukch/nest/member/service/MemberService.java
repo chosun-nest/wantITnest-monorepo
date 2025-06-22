@@ -55,6 +55,8 @@ public class MemberService {
         List<MemberTechStackResponseDto> memberTechStackResponseDtoList = memberTechStackService.findByMemberId(
             memberId);
 
+        String memberImageUrlHotFix = member.getMemberImageUrl() == null ? "/uploaded-images/default/default.png" : member.getMemberImageUrl();
+
         return MemberResponseDto.builder()
             .memberId(member.getMemberId())
             .memberEmail(member.getMemberEmail())
@@ -66,7 +68,7 @@ public class MemberService {
             .memberSnsUrl4(member.getMemberSnsUrl4())
             .memberIsStudent(member.getMemberIsStudent())
             .memberIntroduce(member.getMemberIntroduce())
-            .memberImageUrl(member.getMemberImageUrl())
+            .memberImageUrl(memberImageUrlHotFix)
             .memberPasswordLength(member.getMemberPasswordLength())
 //            .memberInterestResponseDtoList(memberInterestResponseDtoList)
             .memberDepartmentResponseDtoList(memberDepartmentResponseDtoList)
