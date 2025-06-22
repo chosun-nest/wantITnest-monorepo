@@ -20,24 +20,40 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByTagIds(@Param("tagIds") List<Long> tagIds, Pageable pageable);
 
     // 제목 검색
-    Page<Project> findByProjectTitleContainingIgnoreCase(String keyword, Pageable pageable);
+    @Query("SELECT p FROM Project p WHERE p.projectTitle LIKE CONCAT('%', :keyword, '%')")
+    Page<Project> findByProjectTitle(@Param("keyword") String keyword, Pageable pageable);
 
     // 글 검색
     @Query("SELECT p FROM Project p WHERE p.projectDescription LIKE CONCAT('%', :keyword, '%')")
-    Page<Project> findByProjectDescriptionContainingIgnoreCase(@Param("description")String keyword, Pageable pageable);
+    Page<Project> findByProjectDescriptionContaining(@Param("keyword")String keyword, Pageable pageable);
 
 
-    Page<Project> findByProjectIdInAndProjectTitleContainingIgnoreCase(Collection<Long> ids, String title, Pageable pageable);
+    @Query("SELECT p FROM Project p WHERE p.projectId IN :ids AND p.projectTitle LIKE CONCAT('%', :title, '%')")
+    Page<Project> findByProjectIdAndTitle(@Param("ids") Collection<Long> ids, @Param("title") String title, Pageable pageable);
 
-    Page<Project> findByProjectIdInAndProjectDescriptionContaining(Collection<Long> ids, String description, Pageable pageable);
+    @Query("SELECT p FROM Project p WHERE p.projectId IN :ids AND p.projectDescription LIKE CONCAT('%', :description, '%')")
+    Page<Project> findByProjectIdAndDescription(@Param("ids") Collection<Long> ids, @Param("description") String description, Pageable pageable);
 
-    Page<Project> findByProjectIdInAndProjectTitleContainingIgnoreCaseOrProjectIdInAndProjectDescriptionContainingIgnoreCase(Collection<Long> ids, String title, Collection<Long> ids1, String description, Pageable pageable);
+    @Query("""
+SELECT p FROM Project p
+WHERE 
+    (p.projectId IN :titleIds AND p.projectTitle LIKE CONCAT('%', :title, '%'))
+    OR
+    (p.projectId IN :descriptionIds AND p.projectDescription LIKE CONCAT('%', :description, '%'))
+""")
+    Page<Project> findByProjectIdAndTitleOrDescription(
+        @Param("titleIds") Collection<Long> titleIds,
+        @Param("title") String title,
+        @Param("descriptionIds") Collection<Long> descriptionIds,
+        @Param("description") String description,
+        Pageable pageable
+    );
 
     // 디폴트 검색
     @Query("SELECT p FROM Project p WHERE " +
-            "UPPER(p.projectTitle) LIKE UPPER(CONCAT('%', :title, '%')) OR " +
+            "p.projectTitle LIKE CONCAT('%', :title, '%') OR " +
             "p.projectDescription LIKE CONCAT('%', :description, '%')")
-    Page<Project> findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContainingIgnoreCase(@Param("title")String title, @Param("description")String description, Pageable pageable);
+    Page<Project> findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContaining(@Param("title")String title, @Param("description")String description, Pageable pageable);
 
     @Query("SELECT p.memberId FROM Project p WHERE p.projectId = :projectId")
     Optional<Long> findWriterIdByProjectId(@Param("projectId") Long projectId);
