@@ -12,9 +12,10 @@ import {
   Applicant,
 } from "../../types/api/project-board";
 
-//
-// ✅ 프로젝트 관련 API
-//
+// =============================================
+// ✅ 공통 인증: 프로젝트 게시판은 일부 비공개, 일부 공개
+// 검색용 API는 공개 접근 허용됨 (skipAuth 사용)
+// =============================================
 
 // 📘 프로젝트 게시글 생성 (POST)
 export const createProjectPost = async (
@@ -24,16 +25,19 @@ export const createProjectPost = async (
   return response.data;
 };
 
-// 📘 프로젝트 목록 조회 (GET) - 태그, 키워드, 모집상태, 페이징, 정렬 포함
+// 📘 프로젝트 목록 조회 (GET)
 export const getProjects = async (params: {
   "pageable.page": number;
   "pageable.size": number;
   "pageable.sort": string;
-  tags?: string[];             // 🔍 태그 필터링 (다중 허용)
-  keyword?: string;            // 🔍 제목/내용 검색
-  isRecruiting?: boolean;      // ✅ 모집중 필터
+  tags?: string[];
+  keyword?: string;
+  isRecruiting?: boolean;
 }): Promise<ProjectListResponse> => {
-  const response = await API.get("/api/v1/projects", { params });
+  const response = await API.get("/api/v1/projects", {
+    params,
+    headers: { skipAuth: true },
+  });
   return response.data;
 };
 
@@ -61,10 +65,6 @@ export const deleteProject = async (
   return response.data;
 };
 
-//
-// ✅ 지원서 관련 API
-//
-
 // 📬 프로젝트 지원서 제출 (POST)
 export const applyToProject = async (
   payload: ApplyProjectPayload
@@ -86,4 +86,31 @@ export const updateApplicationStatus = async (
   status: "accepted" | "rejected"
 ): Promise<void> => {
   await API.patch(`/api/v1/applications/${applicationId}/status`, { status });
+};
+
+// 🔍 프로젝트 검색 (GET /projects/search) - 인증 없이 접근 가능
+export const searchProjects = async (params: {
+  keyword: string;
+  searchType?: "ALL" | "TITLE" | "CONTENT";
+  tags?: string[];
+  "pageable.page": number;
+  "pageable.size": number;
+  "pageable.sort": string;
+}): Promise<ProjectListResponse> => {
+  const queryParams = new URLSearchParams();
+
+  queryParams.append("keyword", params.keyword);
+  if (params.searchType) queryParams.append("searchType", params.searchType);
+  queryParams.append("pageable.page", String(params["pageable.page"]));
+  queryParams.append("pageable.size", String(params["pageable.size"]));
+  queryParams.append("pageable.sort", params["pageable.sort"]);
+  if (params.tags && params.tags.length > 0) {
+    params.tags.forEach((tag) => queryParams.append("tags", tag));
+  }
+
+  const response = await API.get(`/api/v1/projects/search?${queryParams.toString()}`, {
+    headers: { skipAuth: true },
+  });
+
+  return response.data;
 };
