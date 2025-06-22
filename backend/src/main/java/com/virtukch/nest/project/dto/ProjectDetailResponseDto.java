@@ -29,6 +29,9 @@ public class ProjectDetailResponseDto {
     private String createdAt;
     private String updatedAt;
 
+    private Integer currentNumberOfMembers;
+    private Integer maximumNumberOfMembers;
+
     private List<ProjectMemberSimpleDto> projectMembers;
     private Boolean isRecruiting;
 

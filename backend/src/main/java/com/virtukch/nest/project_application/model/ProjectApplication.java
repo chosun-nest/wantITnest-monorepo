@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -30,7 +31,7 @@ public class ProjectApplication {
 
     public enum ApplicationStatus {
         WAITING,
-        APPROVED,
+        ACCEPTED,
         REJECTED
     }
 }
