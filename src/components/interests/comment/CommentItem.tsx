@@ -175,7 +175,7 @@ export default function CommentItem({
           </div>
 
           {/* 댓글 내용 */}
-          <div className="mt-1 text-sm text-gray-800 whitespace-pre-wrap">
+          <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">
             {isEditing ? (
               <div className="space-y-1">
                 {comment.content.startsWith("@") && (
