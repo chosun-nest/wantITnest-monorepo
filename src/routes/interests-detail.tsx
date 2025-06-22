@@ -206,10 +206,12 @@ export default function InterestsDetail() {
         <hr className="my-6 border-gray-200" />
 
         {/* 댓글 섹션 */}
-        <CommentSection
-          boardType="INTEREST"
-          postId={post.postId}
-        />
+        <div className="mt-8 p-6 bg-[#f9fafb] border border-gray-200 shadow-sm">
+          <CommentSection
+            boardType="INTEREST"
+            postId={post.postId}
+          />
+        </div>
       </div>
 
       {/* 삭제 확인 모달 */}
