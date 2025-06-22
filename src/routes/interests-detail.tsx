@@ -137,7 +137,7 @@ export default function InterestsDetail() {
         로그인 후 게시글을 확인할 수 있습니다.
         <button
           onClick={() => navigate("/login")}
-          className="px-4 py-2 mt-4 text-white bg-blue-500 rounded"
+          className="px-4 py-2 mt-4 text-white bg-[1e3a8a] rounded"
         >
           로그인하러 가기
         </button>
