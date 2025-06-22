@@ -11,6 +11,18 @@ RUN npm ci
 # 소스 코드 복사
 COPY . .
 
+# 빌드 시 환경변수 받기
+ARG VITE_API_BASE_URL
+ARG VITE_API_CHAT_URL
+
+# ENV로 설정하여 npm run build에서 사용 가능하도록
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_API_CHAT_URL=$VITE_API_CHAT_URL
+
+# 환경변수 확인 (디버깅용)
+RUN echo "Building with VITE_API_BASE_URL: $VITE_API_BASE_URL"
+RUN echo "Building with VITE_API_CHAT_URL: $VITE_API_CHAT_URL"
+
 # 프로덕션 빌드
 RUN npm run build
 

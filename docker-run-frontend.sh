@@ -31,6 +31,19 @@ check_env_files() {
     echo -e "${GREEN}✅ 환경변수 파일 확인 완료${NC}"
 }
 
+# 환경변수 로드
+load_env_vars() {
+    echo -e "${BLUE}🔧 환경변수를 로드합니다...${NC}"
+    export $(cat .env.frontend | grep -v ^# | grep -v ^$ | xargs)
+    echo -e "${YELLOW}   VITE_API_BASE_URL: $VITE_API_BASE_URL${NC}"
+    echo -e "${YELLOW}   VITE_API_CHAT_URL: $VITE_API_CHAT_URL${NC}"
+    
+    # docker-compose 설정 확인 (디버깅용)
+    echo -e "${BLUE}🔍 Docker Compose 설정을 확인합니다...${NC}"
+    echo -e "${YELLOW}   build args에서 VITE_API_BASE_URL 치환 결과:${NC}"
+    docker-compose -f $COMPOSE_FILE config | grep -A 5 "VITE_API_BASE_URL" || echo "   설정을 찾을 수 없습니다."
+}
+
 # Docker 설치 확인
 check_docker() {
     if ! command -v docker &> /dev/null; then
@@ -50,6 +63,7 @@ start_services() {
     
     check_env_files
     check_docker
+    load_env_vars
     
     # 이전 컨테이너 정리
     echo -e "${BLUE}🧹 이전 컨테이너를 정리합니다...${NC}"
@@ -152,6 +166,10 @@ show_logs() {
 restart_services() {
     local service_name=$1
     local build_flag=$2
+    
+    # 항상 환경변수 로드 (모든 재시작 시)
+    check_env_files
+    load_env_vars
     
     if [ -z "$service_name" ]; then
         # 모든 서비스 재시작
