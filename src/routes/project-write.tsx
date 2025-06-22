@@ -19,10 +19,9 @@ import RecruitRoleList from "../components/project/RecruitRoleList";
 import { getMemberProfile } from "../api/profile/ProfileAPI";
 import type { ProjectDetail } from "../types/api/project-board";
 
-// ✅ 기존 구조에 맞춰 string 타입 유지
 interface RecruitCardData {
   id: number;
-  role: string; // ← string 그대로 유지
+  role: string;
   authorName: string;
 }
 
@@ -100,7 +99,7 @@ export default function ProjectWrite() {
       return acc;
     }, {} as Record<string, number>);
 
-    const totalMembers = recruitCards.length;
+    const totalMembers = Object.values(partCounts).reduce((sum, count) => sum + count, 0);
 
     try {
       if (isEditMode && projectToEdit) {
@@ -127,7 +126,7 @@ export default function ProjectWrite() {
           isRecruiting: true,
           tags: selectedTags,
           partCounts,
-          creatorPart: "BACKEND",
+          creatorPart: recruitCards[0]?.role || "BACKEND",
           creatorRole: "LEADER",
           maximumNumberOfMembers: totalMembers,
         });
@@ -204,7 +203,6 @@ export default function ProjectWrite() {
             />
           </div>
 
-          {/* 오른쪽 모집 카드 */}
           <div className="w-full md:w-[300px]">
             <RecruitRoleList
               onChange={setRecruitCards}

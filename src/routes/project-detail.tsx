@@ -34,13 +34,15 @@ export default function ProjectDetail() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
+    if (accessToken === undefined) return;
+
     const initialize = async () => {
       if (!accessToken) {
         setAuthError(true);
         setLoading(false);
         return;
       }
-
+      
       try {
         const user = await getMemberProfile();
         dispatch(setUser({

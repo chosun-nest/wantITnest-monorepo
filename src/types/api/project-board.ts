@@ -1,9 +1,4 @@
-// ✅ types/project-board.ts
-
-// ==================================
-// 📘 GET /api/projects - 전체 목록 조회
-// ==================================
-
+// ✅ 프로젝트 요약 정보
 export interface ProjectSummary {
   projectId: number;
   projectTitle: string;
@@ -32,18 +27,15 @@ export interface PageInfo {
 }
 
 export interface ProjectListResponse {
-  projects: ProjectSummary[]; // ✅ Swagger 응답 필드 명세 반영
+  projects: ProjectSummary[];
   totalCount: number;
   pageInfo: PageInfo;
 }
 
-// ==================================
-// 🔍 GET /api/projects/{projectId} - 상세 조회
-// ==================================
-
+// ✅ 프로젝트 상세 조회
 export interface ProjectMember {
-  part: "FRONTEND" | "BACKEND" | "PM";
-  role: "MEMBER" | "LEADER";
+  part: "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
+  role: "LEADER" | "MEMBER";
   memberId: number | null;
   memberName: string | null;
 }
@@ -66,20 +58,18 @@ export interface ProjectDetail {
   maximumNumberOfMembers: number;
 }
 
-// ==================================
-// 🟢 POST /api/v1/projects/new - 프로젝트 생성
-// ==================================
-
+// ✅ 프로젝트 생성 요청/응답
 export interface CreateProjectPayload {
   projectTitle: string;
   projectDescription?: string;
   isRecruiting: boolean;
   tags?: string[];
   partCounts: {
-    [key: string]: number; // 예: FRONTEND: 2, BACKEND: 1
+    [key: string]: number;
   };
-  creatorPart: string;     // 예: "FRONTEND"
-  creatorRole: string;     // 예: "LEADER"
+  creatorPart: string;
+  creatorRole: string;
+  maximumNumberOfMembers: number;
 }
 
 export interface CreateProjectPostResponse {
@@ -87,10 +77,7 @@ export interface CreateProjectPostResponse {
   message: string;
 }
 
-// ==================================
-// 📝 PATCH /api/v1/projects/{projectId} - 프로젝트 수정
-// ==================================
-
+// ✅ 프로젝트 수정
 export interface UpdateProjectPayload {
   projectTitle: string;
   projectDescription: string;
@@ -98,48 +85,39 @@ export interface UpdateProjectPayload {
   tags: string[];
   partCounts?: {
     [key: string]: number;
-  }; 
-}
-
-// ==================================
-// 📝 PATCH /api/v2/projects/{projectId} - 프로젝트 수정
-// ==================================
-
-export interface UpdateProjectPayload {
-  projectTitle: string;
-  projectDescription: string;
-  isRecruiting: boolean;
-  tags: string[];
-  partCounts?: {
-    [key: string]: number;
-  }; 
+  };
   imageUrls?: string[] | null;
 }
 
-// ==================================
-// ❌ DELETE /api/projects/{projectId} - 삭제 응답
-// ==================================
-
+// ✅ 프로젝트 삭제
 export interface DeleteProjectResponse {
   projectId: number;
   message: string;
 }
 
-// ==================================
-// 📬 지원서 제출 및 지원자 조회
-// ==================================
-
-export interface ApplyProjectPayload {
+// ✅ 지원서 제출 (POST /apply)
+export interface ProjectApplyRequest {
   projectId: number;
-  field: string;
+  part: "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
   message: string;
 }
 
+export interface ProjectApplyResponse {
+  applicationId: number;
+  memberId: number;
+  memberName: string;
+  part: "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
+  status: "WAITING" | "ACCEPTED" | "REJECTED";
+  appliedAt: string;
+}
+
+// ✅ 지원자 목록 조회 (GET /applications)
 export interface Applicant {
-  id: number;
-  name: string;
-  major: string;
+  applicationId: number;
+  memberId: number;
+  memberName: string;
+  part: "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
+  status: "WAITING" | "ACCEPTED" | "REJECTED";
+  appliedAt: string;
   message: string;
-  role: string;
-  status: "accepted" | "rejected" | "pending";
 }

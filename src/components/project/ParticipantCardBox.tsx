@@ -1,15 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import type { ProjectDetail, ProjectMember } from "../../types/api/project-board";
 
+// ✅ ApplicationModal에서 전달하는 형태에 맞춰 타입 수정
+interface CustomApplicant {
+  id: number;
+  name: string;
+  role: "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
+  followers: number;
+}
+
 interface Props {
   project: ProjectDetail;
-  participants: ProjectMember[]; // 현재는 project.projectMembers랑 동일
+  participants: ProjectMember[];
   onOpenModal: () => void;
-  onAccept: (user: ProjectMember) => void;
+  onAccept: (user: CustomApplicant) => void;
   currentUserId: number;
 }
 
-const ROLES = ["FRONTEND", "BACKEND", "DESIGN", "AI", "PM"];
+const ROLES: CustomApplicant["role"][] = ["FRONTEND", "BACKEND", "DESIGN", "AI", "PM"];
 
 export default function ParticipantCardBox({
   project,
@@ -21,10 +29,12 @@ export default function ParticipantCardBox({
   const navigate = useNavigate();
 
   const isAuthor = project.author?.id === currentUserId;
-  const isClosed = project.isRecruiting === false;
+
+  // ✅ 모집 마감 여부: 현재 참여자가 정원을 넘었는지
+  const isClosed = participants.length >= project.maximumNumberOfMembers;
 
   const handleApply = () => {
-    navigate("/project-apply", { state: { project } });
+    navigate(`/project-apply/${project.projectId}`);
   };
 
   const getMemberByRole = (role: string) =>
@@ -37,12 +47,7 @@ export default function ParticipantCardBox({
         {isAuthor ? (
           <button
             onClick={onOpenModal}
-            disabled={isClosed}
-            className={`px-3 py-1.5 text-sm rounded ${
-              isClosed
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
+            className="px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
           >
             지원서 확인
           </button>
@@ -56,7 +61,7 @@ export default function ParticipantCardBox({
                 : "bg-blue-600 text-white hover:bg-blue-700"
             }`}
           >
-            지원하기
+            {isClosed ? "모집 완료" : "지원하기"}
           </button>
         )}
       </div>
@@ -90,9 +95,8 @@ export default function ParticipantCardBox({
         })}
       </div>
 
-      {/* ✅ 전체 참여 인원 표시 */}
       <div className="text-sm text-gray-600 text-right mt-3">
-        참여 {project.currentNumberOfMembers} / {project.maximumNumberOfMembers}
+        참여 {participants.length} / {project.maximumNumberOfMembers}
       </div>
     </div>
   );
