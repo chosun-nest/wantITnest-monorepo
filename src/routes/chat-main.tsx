@@ -59,7 +59,7 @@ export default function ChatMain() {
         const mappedRooms: ChatRoomProfile[] = myRooms.map((room: any) => ({
           roomId: room.chattingRoomId,
           roomName: room.chattingRoomName,
-          roomImageUrl: "/dm-chat.png",
+          roomImageUrl: "/assets/images/user.png",
           roomType: "dm",
           lastActivity: room.lastChattedAt || room.createdAt,
         }));
