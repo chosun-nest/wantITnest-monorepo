@@ -6,8 +6,7 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
-import com.virtukch.nest.project.exception.NoProjectAuthorityException;
-import com.virtukch.nest.project.exception.ProjectNotFoundException;
+import com.virtukch.nest.project.exception.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project_member.model.ProjectMember;
@@ -49,8 +48,7 @@ public class ProjectService {
         String projectTitle = requestDto.getProjectTitle();
         log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
-        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
-        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription(), maxMember));
+        Project project = projectRepository.save(Project.createProject(memberId, projectTitle, requestDto.getProjectDescription()));
 
         saveProjectTags(project, requestDto.getTags());
 
@@ -69,8 +67,7 @@ public class ProjectService {
     public ProjectResponseDto createProject(Long memberId, ProjectWithImagesRequestDto requestDto) {
         String title = requestDto.getProjectTitle();
         log.info("[모집글 생성 시작] title={}, memberId={}", title, memberId);
-        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
-        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription(), maxMember));
+        Project project = projectRepository.save(Project.createProject(memberId, title, requestDto.getProjectDescription()));
 
         saveProjectTags(project, requestDto.getTags());
 
@@ -84,7 +81,7 @@ public class ProjectService {
         List<String> imageUrls;
         if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()){
             imageUrls = imageService.uploadImages(requestDto.getImages(), prefix, project.getProjectId());
-            project.updateProject(project.getProjectTitle(), project.getProjectDescription(), project.getMaxMember(), project.isRecruiting(), imageUrls);
+            project.updateProject(project.getProjectTitle(), project.getProjectDescription(), project.getIsRecruiting(), imageUrls);
          }
 
         log.info("[모집글 생성 완료] projectId={}", project.getProjectId());
@@ -101,6 +98,9 @@ public class ProjectService {
 
         List<ProjectMember> projectMembers = projectMemberRepository.findByProjectId(projectId);
 
+        int currentNumberOfMembers = (int) projectMembers.stream().filter(pm -> pm.getMemberId() != null).count();
+        int maximumNumberOfMembers = projectMembers.size();
+
         Map<Long, String> memberIdToName = projectMembers.stream()
                 .map(ProjectMember::getMemberId)
                 .filter(Objects::nonNull)
@@ -111,9 +111,18 @@ public class ProjectService {
                                 .map(Member::getMemberName)
                                 .orElse("탈퇴한 사용자")
                 ));
-        Boolean isRecruiting = project.isRecruiting();
+        Boolean isRecruiting = project.getIsRecruiting();
 
-        return ProjectDtoConverter.toDetailResponseDto(project, creator, tagNames, projectMembers, memberIdToName, isRecruiting);
+        return ProjectDtoConverter.toDetailResponseDto(
+            project,
+            creator,
+            tagNames,
+            projectMembers,
+            memberIdToName,
+            isRecruiting,
+            currentNumberOfMembers,
+            maximumNumberOfMembers
+        );
     }
 
     // 게시글 목록 조회
@@ -136,15 +145,32 @@ public class ProjectService {
     @Transactional
     public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectRequestDto requestDto) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
-        int maxMember = requestDto.getPartCounts().values().stream().mapToInt(Integer::intValue).sum();
+
         project.updateProject(requestDto.getProjectTitle(),
                 requestDto.getProjectDescription(),
-                maxMember,
-                requestDto.isRecruiting());
+                requestDto.getIsRecruiting());
+
+        // Remove members if specified in requestDto before updating part counts
+        if (requestDto.getMembersToRemove() != null && !requestDto.getMembersToRemove().isEmpty()) {
+            removeProjectMembers(projectId, requestDto.getMembersToRemove());
+        }
+
+        // Update creator's part if creatorPart is present
+        if (requestDto.getCreatorPart() != null) {
+            ProjectMember.Part newPart = requestDto.getCreatorPart();
+            ProjectMember creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+                .orElseThrow(CanNotRemoveCreatorException::new);
+            creator.setPart(newPart);
+            projectMemberRepository.save(creator);
+        }
 
         projectTagRepository.deleteAllByProjectId(projectId);
 
         saveProjectTags(project, requestDto.getTags());
+
+        if (requestDto.getPartCounts() != null && !requestDto.getPartCounts().isEmpty()) {
+            updatePartCounts(projectId, requestDto.getPartCounts());
+        }
 
         return ProjectDtoConverter.toUpdateResponseDto(project);
     }
@@ -155,12 +181,87 @@ public class ProjectService {
 
         List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, projectId, project.getImageUrlList());
         project.updateProject(project.getProjectTitle(), project.getProjectDescription(),
-                project.getMaxMember(), project.isRecruiting(), imageUrls);
+                project.getIsRecruiting(), imageUrls);
+
+        // Remove members if specified in requestDto before updating part counts
+        if (requestDto.getMembersToRemove() != null && !requestDto.getMembersToRemove().isEmpty()) {
+            removeProjectMembers(projectId, requestDto.getMembersToRemove());
+        }
+
+        // Update creator's part if creatorPart is present
+        if (requestDto.getCreatorPart() != null) {
+            ProjectMember.Part newPart = requestDto.getCreatorPart();
+            ProjectMember creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+                .orElseThrow(CanNotRemoveCreatorException::new);
+            creator.setPart(newPart);
+            projectMemberRepository.save(creator);
+        }
 
         projectTagRepository.deleteAllByProjectId(project.getProjectId());
         saveProjectTags(project, requestDto.getTags());
 
+        if (requestDto.getPartCounts() != null && !requestDto.getPartCounts().isEmpty()) {
+            updatePartCounts(projectId, requestDto.getPartCounts());
+        }
+
         return ProjectDtoConverter.toUpdateResponseDto(project);
+    }
+
+    @Transactional
+    public void updatePartCounts(Long projectId, Map<ProjectMember.Part, Integer> partCounts) {
+        for (Map.Entry<ProjectMember.Part, Integer> entry : partCounts.entrySet()) {
+            ProjectMember.Part part = entry.getKey();
+            int targetCount = entry.getValue();
+
+            List<ProjectMember> members = projectMemberRepository.findByProjectIdAndPart(projectId, part);
+            // Separate filled and vacant slots
+            List<ProjectMember> filled = members.stream()
+                    .filter(pm -> pm.getMemberId() != null)
+                    .toList();
+            List<ProjectMember> vacant = members.stream()
+                    .filter(pm -> pm.getMemberId() == null)
+                    .toList();
+            int filledCount = filled.size();
+            int vacantCount = vacant.size();
+            int totalCount = filledCount + vacantCount;
+
+            if (targetCount < filledCount) {
+                throw new ProjectMemberRemoveException(part, filledCount, targetCount);
+            }
+
+            int toAdd = targetCount - totalCount;
+            if (toAdd > 0) {
+                // Add new vacant slots
+                for (int i = 0; i < toAdd; i++) {
+                    projectMemberRepository.save(ProjectMember.builder()
+                            .projectId(projectId)
+                            .part(part)
+                            .role(ProjectMember.Role.MEMBER)
+                            .isApproved(false)
+                            .build());
+                }
+            } else if (toAdd < 0) {
+                // Remove up to -toAdd vacant (memberId == null) slots only
+                int toRemove = -toAdd;
+                // Only remove vacant slots, never filled
+                if (toRemove > 0 && vacantCount > 0) {
+                    List<ProjectMember> toDelete = vacant.stream().limit(toRemove).toList();
+                    projectMemberRepository.deleteAll(toDelete);
+                }
+                // If not enough vacant slots, do not remove filled slots
+            }
+            // If toAdd == 0, nothing to do
+        }
+    }
+
+    @Transactional
+    public void removeProjectMembers(Long projectId, List<Long> memberIds) {
+        for (Long memberId : memberIds) {
+            ProjectMember member = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+                    .orElseThrow(() -> new ProjectMemberNotFoundException(projectId, memberId));
+            member.removeMember();
+            projectMemberRepository.save(member);
+        }
     }
 
     @Transactional
@@ -177,15 +278,6 @@ public class ProjectService {
     public com.virtukch.nest.project.model.Project findByIdOrThrow(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
-
-//    @Transactional(readOnly = true)
-//    public com.virtukch.nest.project.model.Project findOwnedProjectOrThrow(Long projectId, Long memberId) {
-//        com.virtukch.nest.project.model.Project project = findByIdOrThrow(projectId);
-//        if(!Objects.equals(project.getProjectLeader(), memberId)) {
-//            throw new NoProjectAuthorityException(projectId, memberId);
-//        }
-//        return project;
-//    }
 
     @Transactional
     public Project validateProjectOwnershipAndGet(Long projectId, Long memberId) {
@@ -339,9 +431,14 @@ public class ProjectService {
             imageUrl = imageUrlList.get(0);
         }
 
-        Boolean isRecruiting = project.isRecruiting();
+        Boolean isRecruiting = project.getIsRecruiting();
 
-        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting);
+        // Calculate current and maximum number of members
+        List<ProjectMember> members = projectMemberRepository.findByProjectId(project.getProjectId());
+        int currentNumberOfMembers = (int) members.stream().filter(pm -> pm.getMemberId() != null).count();
+        int maximumNumberOfMembers = members.size();
+
+        return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting, currentNumberOfMembers, maximumNumberOfMembers);
     }
 
     private Map<Long, Long> fetchCommentCountMap(List<Project> projects) {

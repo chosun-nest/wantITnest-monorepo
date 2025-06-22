@@ -47,4 +47,9 @@ public class ProjectMember {
         }
         return false;
     }
+
+    public void removeMember() {
+        this.memberId = null;
+        this.isApproved = false;
+    }
 }

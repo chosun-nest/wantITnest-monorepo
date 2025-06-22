@@ -31,4 +31,22 @@ public class ProjectExceptionHandler {
     public ResponseEntity<String> handleCannotDeleteProject(CannotDeleteProjectException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    // 프로젝트 멤버 삭제 불가 - 400 BAD_REQUEST
+    @ExceptionHandler(ProjectMemberRemoveException.class)
+    public ResponseEntity<String> handleProjectMemberRemove(ProjectMemberRemoveException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // 프로젝트 멤버에서 작성자 삭제 불가 - 400 BAD_REQUEST
+    @ExceptionHandler(CanNotRemoveCreatorException.class)
+    public ResponseEntity<String> handleCanNotRemoveCreator(CanNotRemoveCreatorException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // 프로젝트 참여 멤버가 아님 - 400 BAD_REQUEST
+    @ExceptionHandler(ProjectMemberNotFoundException.class)
+    public ResponseEntity<String> handleProjectMemberNotFound(ProjectMemberNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }

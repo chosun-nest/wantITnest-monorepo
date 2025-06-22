@@ -1,19 +1,11 @@
 package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
-import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.post.exception.InvalidPostTitleException;
-import com.virtukch.nest.post.model.Post;
-import com.virtukch.nest.project.dto.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.exception.InvalidProjectTitleException;
-import com.virtukch.nest.project_member.model.ProjectMember;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,13 +29,9 @@ public class Project extends BaseTimeEntity {
     private String projectDescription;
 
 
-    //최대 모집 인원
-    @Column(nullable = false)
-    private int maxMember;
-
     //모집 마감 여부 (2025.05.02 UPDATE)
     @Column(nullable = false)
-    private boolean isRecruiting = true;
+    private Boolean isRecruiting = true;
 
     //조회수
     @Column(nullable = false)
@@ -56,8 +44,7 @@ public class Project extends BaseTimeEntity {
 
     public static Project createProject(Long memberId,
                                         String projectTitle,
-                                        String projectDescription,
-                                        int maxMember) {
+                                        String projectDescription) {
         if(projectTitle == null || projectTitle.isBlank()) {
             throw new InvalidProjectTitleException();
         }
@@ -66,7 +53,6 @@ public class Project extends BaseTimeEntity {
         project.memberId = memberId;
         project.projectTitle = projectTitle;
         project.projectDescription = projectDescription;
-        project.maxMember = maxMember;
 
         return project;
     }
@@ -80,18 +66,13 @@ public class Project extends BaseTimeEntity {
     //프로젝트 업데이트 메서드
     public void updateProject(String projectTitle,
                               String projectDescription,
-                              int maxMember,
-                              boolean isRecruiting) {
+                              Boolean isRecruiting) {
         if(projectTitle != null && !projectTitle.isBlank()) {
             this.projectTitle = projectTitle;
         } else throw new InvalidProjectTitleException();
 
         if(projectDescription != null && !projectDescription.isBlank()) {
             this.projectDescription = projectDescription;
-        }
-
-        if (maxMember > 0) {
-            this.maxMember = maxMember;
         }
 
         if(isRecruiting) {
@@ -103,10 +84,9 @@ public class Project extends BaseTimeEntity {
 
     public void updateProject(String projectTitle,
                               String projectDescription,
-                              int maxMember,
-                              boolean isRecruiting,
+                              Boolean isRecruiting,
                               List<String> imageUrls) {
-        updateProject(projectTitle, projectDescription, maxMember, isRecruiting);
+        updateProject(projectTitle, projectDescription,  isRecruiting);
         if(imageUrls != null) {
             this.imageUrls = imageUrls.isEmpty() ? null : String.join("||", imageUrls);
         }
