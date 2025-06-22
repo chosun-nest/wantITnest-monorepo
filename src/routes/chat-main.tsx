@@ -25,6 +25,8 @@ export default function ChatMain() {
   const currentUserId = useSelector(selectCurrentUserId);
   const { navbarHeight } = useNavbarHeight();
   const [mode, setMode] = useState<ChatMode>("following");
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedUser, setSelectedUser] = useState<SimpleMemberProfile | null>(
     null
   );
@@ -168,26 +170,35 @@ export default function ChatMain() {
 
   return (
     <S.Container navbarHeight={navbarHeight + 20}>
-      {mode === "following" && (
-        <FollowingList
-          isMobile
-          onSelectUser={handleSelectUser}
-          users={followings}
-        />
-      )}
+      <h2 className="mb-2 pl-4 font-bold text-xl h-[10%] w-[66%] max-w-[800px] min-w-[400px] border border-[#002f6c] overflow-auto shadow-sm rounded-xl mx-auto flex items-center">
+        {mode === "following" && "내 팔로잉 목록"}
+        {mode === "room" && "채팅방 목록"}
+        {mode === "chat" && selectedRoom && `${selectedRoom.roomName}의 채팅방`}
+      </h2>
 
-      {mode === "room" && (
-        <ChatList
-          isMobile
-          chatRooms={chatRooms}
-          onSelectUser={handleSelectRoom}
-        />
-      )}
+      <div className="flex flex-col h-[100%] w-[66%] max-w-[800px] min-w-[400px] bg-white p-5 border border-[#002f6c] overflow-auto shadow-sm rounded-xl ">
+        {mode === "following" && (
+          <>
+            <FollowingList
+              isMobile
+              onSelectUser={handleSelectUser}
+              users={followings}
+            />
+          </>
+        )}
 
-      {mode === "chat" && selectedRoom && (
-        <ChatRoom isMobile chatRoom={selectedRoom} onBack={handleBack} />
-      )}
+        {mode === "room" && (
+          <ChatList
+            isMobile
+            chatRooms={chatRooms}
+            onSelectUser={handleSelectRoom}
+          />
+        )}
 
+        {mode === "chat" && selectedRoom && (
+          <ChatRoom isMobile chatRoom={selectedRoom} onBack={handleBack} />
+        )}
+      </div>
       <ChatUnderbar onChangeMode={setMode} />
     </S.Container>
   );
