@@ -27,9 +27,6 @@ public class ProjectMember {
     @Enumerated(EnumType.STRING)
     private Part part; // 백엔드, 프론트엔드 등
 
-
-    private boolean isApproved;
-
     public enum Role {
         LEADER, MEMBER
     }
@@ -50,6 +47,5 @@ public class ProjectMember {
 
     public void removeMember() {
         this.memberId = null;
-        this.isApproved = false;
     }
 }
