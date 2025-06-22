@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useNavbarHeight } from "../context/NavbarHeightContext";
 import ChatRoom from "../components/chat/chat-room";
@@ -11,13 +12,13 @@ import {
   ChatRoomProfile,
 } from "../types/chat/chat";
 import { checkMyFollowings } from "../api/following/follow";
-import io from "socket.io-client";
-import { createRoom, enterRoom } from "../api/following/chat";
+import { checkMyChatRooms, createRoom, enterRoom } from "../api/following/chat";
 import { useSelector } from "react-redux";
 import { selectCurrentUserId } from "../store/slices/userSlice";
+import { getMemberProfile } from "../api/profile/ProfileAPI";
+import io from "socket.io-client";
 
-const WS_SERVER_URL =
-  import.meta.env.VITE_API_CHAT_URL || "http://localhost:4000";
+const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL;
 const socket = io(WS_SERVER_URL, { transports: ["websocket"] });
 
 export default function ChatMain() {
@@ -31,7 +32,9 @@ export default function ChatMain() {
     null
   );
   const [followings, setFollowings] = useState<SimpleMemberProfile[]>([]);
+  const [chatRooms, setChatRooms] = useState<ChatRoomProfile[]>([]);
 
+  // 🔹 팔로잉 목록
   useEffect(() => {
     checkMyFollowings().then((data) => {
       const mapped: SimpleMemberProfile[] = data.users.map((user) => ({
@@ -45,25 +48,82 @@ export default function ChatMain() {
     });
   }, []);
 
+  // 🔹 나의 채팅방 목록 + 실시간 반영
+  useEffect(() => {
+    const loadMyRooms = async () => {
+      try {
+        const myRooms = await checkMyChatRooms();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mappedRooms: ChatRoomProfile[] = myRooms.map((room: any) => ({
+          roomId: room.chattingRoomId,
+          roomName: room.chattingRoomName,
+          roomImageUrl: "/dm-chat.png",
+          roomType: "dm",
+          lastActivity: room.lastChattedAt || room.createdAt,
+        }));
+        setChatRooms(mappedRooms);
+      } catch (err) {
+        console.error("내 채팅방 목록 불러오기 실패:", err);
+      }
+    };
+
+    if (socket && currentUserId) {
+      socket.emit("getChatRooms", currentUserId);
+
+      socket.on("chatRoomsList", (rooms: any[]) => {
+        const mapped = rooms.map((room: any) => ({
+          roomId: room.chattingRoomId,
+          roomName: room.chattingRoomName,
+          roomImageUrl: "/dm-chat.png",
+          roomType: "dm",
+          lastActivity: room.lastChattedAt || room.createdAt,
+        }));
+        setChatRooms(mapped);
+      });
+
+      socket.on("newMessage", (data: any) => {
+        setChatRooms((prev) =>
+          prev
+            .map((room) =>
+              room.roomId === data.roomId
+                ? { ...room, lastActivity: data.timestamp }
+                : room
+            )
+            .sort(
+              (a, b) =>
+                new Date(b.lastActivity).getTime() -
+                new Date(a.lastActivity).getTime()
+            )
+        );
+      });
+    }
+
+    loadMyRooms();
+
+    return () => {
+      socket.off("chatRoomsList");
+      socket.off("newMessage");
+    };
+  }, [socket, currentUserId]);
+
+  // 🔹 상대 선택 시 채팅방 생성
   const handleSelectUser = async (user: SimpleMemberProfile) => {
     try {
+      const myName = await getMemberProfile().then((p) => p.memberName);
+      const sortedNames = [user.memberName, myName].sort();
+      const roomName = `${sortedNames[0]}-${sortedNames[1]}`;
+
       setSelectedUser(user);
       setSelectedRoom(null);
 
-      // 1. 채팅방 생성 (상대방의 memberId로)
-      const roomData = await createRoom(user.memberName);
-
-      // 2. 방 정보 가져오기
+      const roomData = await createRoom(roomName);
       const roomId = roomData.chattingRoomId;
-      const roomName = roomData.chattingRoomName;
 
-      // 3. 입장 처리
       await enterRoom({ roomId, memberId: user.memberId });
       if (currentUserId) {
         await enterRoom({ roomId, memberId: currentUserId });
       }
 
-      // 4. 모드 전환 + ChatRoom 진입
       setSelectedRoom({
         roomId,
         roomName,
@@ -71,10 +131,26 @@ export default function ChatMain() {
         roomType: "dm",
         lastActivity: new Date().toISOString(),
       });
+
       setMode("chat");
-    } catch (err) {
-      console.error("채팅방 생성 또는 입장 실패:", err);
-      alert("채팅방 생성 실패");
+    } catch (err: any) {
+      if (err.response?.status === 500) {
+        // 이미 방이 있는 경우
+        console.warn("이미 존재하는 채팅방입니다. 기존 방 진입 처리.");
+
+        const myName = await getMemberProfile().then((p) => p.memberName);
+        const sortedNames = [user.memberName, myName].sort();
+        const roomName = `${sortedNames[0]}-${sortedNames[1]}`;
+
+        const existingRoom = chatRooms.find((r) => r.roomName === roomName);
+        if (existingRoom) {
+          setSelectedRoom(existingRoom);
+          setMode("chat");
+        }
+      } else {
+        console.error("채팅방 생성 실패:", err);
+        alert("채팅방 생성 실패");
+      }
     }
   };
 
@@ -103,23 +179,8 @@ export default function ChatMain() {
       {mode === "room" && (
         <ChatList
           isMobile
-          socket={socket}
-          currentUserId={String(selectedUser?.memberId ?? "")}
+          chatRooms={chatRooms}
           onSelectUser={handleSelectRoom}
-        />
-      )}
-
-      {mode === "chat" && selectedUser && (
-        <ChatRoom
-          isMobile
-          onBack={handleBack}
-          chatRoom={{
-            roomId: `dm-${selectedUser.memberId}`, // 서버에서 고유한 roomId 포맷 지정해야 일치
-            roomName: selectedUser.memberName,
-            roomImageUrl: selectedUser.memberImageUrl,
-            roomType: "dm",
-            lastActivity: new Date().toISOString(),
-          }}
         />
       )}
 

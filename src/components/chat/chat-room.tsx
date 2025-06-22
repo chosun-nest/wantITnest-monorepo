@@ -11,7 +11,7 @@ interface ChatMessage {
   userName: string;
   userImage?: string;
   timestamp: string;
-  roomId: string;
+  roomId: number;
   read?: boolean;
 }
 
@@ -24,6 +24,7 @@ interface ChatRoomProps {
 const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL;
 
 export default function ChatRoom({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isMobile,
   chatRoom,
   onBack,
@@ -38,6 +39,7 @@ export default function ChatRoom({
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -93,7 +95,7 @@ export default function ChatRoom({
         setMessages((prev) => [...prev, messageData]);
       }
     });
-
+    /*
     socket.on("userJoined", ({ message, timestamp }) => {
       const systemMessage: ChatMessage = {
         id: `system_${Date.now()}`,
@@ -117,7 +119,7 @@ export default function ChatRoom({
       };
       setMessages((prev) => [...prev, systemMessage]);
     });
-
+*/
     socket.on("error", ({ message }) => {
       console.error("채팅 오류:", message);
       alert(`채팅 오류: ${message}`);
@@ -193,7 +195,7 @@ export default function ChatRoom({
           <ChatBubble
             key={msg.id}
             message={msg}
-            isMe={msg.user === String(currentUser.memberId)}
+            isMe={msg.userName === String(currentUser.memberName)}
           />
         ))}
         <div ref={messagesEndRef} />
