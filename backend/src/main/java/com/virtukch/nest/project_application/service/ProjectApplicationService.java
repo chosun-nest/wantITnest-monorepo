@@ -116,7 +116,6 @@ public class ProjectApplicationService extends BaseTimeEntity {
         if (!vacantList.isEmpty()) {
             ProjectMember vacant = vacantList.get(0);
             vacant.setMemberId(application.getMemberId());
-            vacant.setApproved(true);
             projectMemberRepository.save(vacant);
         } else {
             // 파트별 모집 인원 초과 방지
@@ -130,7 +129,6 @@ public class ProjectApplicationService extends BaseTimeEntity {
                     .memberId(application.getMemberId())
                     .role(ProjectMember.Role.MEMBER)
                     .part(application.getPart())
-                    .isApproved(true)
                     .build());
         }
 
