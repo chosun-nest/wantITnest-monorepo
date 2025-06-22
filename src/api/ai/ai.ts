@@ -6,7 +6,7 @@
  */
 
 export async function fetchChatBotAnswer(question: string): Promise<string> {
-  const res = await fetch("http://wantitnest/api/chatbot", {
+  const res = await fetch("http://wantitnest/api/ai/chatbot", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question }),
