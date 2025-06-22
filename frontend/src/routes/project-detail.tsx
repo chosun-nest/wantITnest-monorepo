@@ -6,18 +6,22 @@ import { setUser, selectCurrentUserId } from "../store/slices/userSlice";
 import { getMemberProfile } from "../api/profile/ProfileAPI";
 import { getProjectById, deleteProject } from "../api/project/ProjectAPI";
 
-import CommentSection from "../components/project/commentsection";
-import ParticipantCardBox from "../components/project/ParticipantCardBox";
+import CommentSection from "../components/project/comment/CommentSection";
 import ApplicationModal from "../components/project/ApplicationModal";
 import ConfirmModal from "../components/common/ConfirmModal";
-import useResponsive from "../hooks/responsive";
+import ParticipantCardBox from "../components/project/ParticipantCardBox";
+
+import PostDetailInfo from "../components/project/detail/PostDetailInfo";
+import PostDetailHeader from "../components/project/detail/PostDetailHeader";
+import PostDetailTags from "../components/project/detail/PostDetailTags";
+import FollowButton from "../components/project/detail/FollowButton";
+
 import type { ProjectDetail } from "../types/api/project-board";
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isMobile = useResponsive();
 
   const accessToken = useSelector(selectAccessToken);
   const currentUserId = useSelector(selectCurrentUserId);
@@ -28,7 +32,6 @@ export default function ProjectDetail() {
   const [notFound, setNotFound] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const initialize = async () => {
@@ -62,7 +65,26 @@ export default function ProjectDetail() {
     initialize();
   }, [id, accessToken]);
 
-  const handleEdit = () => navigate(`/project/${id}/edit`);
+  const handleEdit = () => {
+    if (!project) return;
+
+    // partCounts 변환 로직 추가
+    const partCounts: Record<string, number> = {};
+    project.projectMembers.forEach((member) => {
+      if (member.part) {
+        partCounts[member.part] = (partCounts[member.part] || 0) + 1;
+      }
+    });
+
+    navigate("/project-write", {
+      state: {
+        project: {
+          ...project,
+          partCounts,
+        },
+      },
+    });
+  };
 
   const handleDelete = async () => {
     try {
@@ -112,93 +134,82 @@ export default function ProjectDetail() {
 
   const isAuthor = project.author.id === currentUserId;
 
+  const handleAuthorClick = () => {
+    if (isAuthor) {
+      navigate("/profile");
+    } else {
+      navigate(`/profile/${project.author.id}`);
+    }
+  };
+
   return (
-    <div className={`max-w-6xl mx-auto px-4 pt-36 pb-10 flex ${isMobile ? "flex-col gap-4" : "flex-row gap-8"}`}>
-      {/* 왼쪽: 본문 영역 */}
+    <div className="max-w-6xl mx-auto px-4 pt-36 pb-10 flex flex-col lg:flex-row gap-8">
+      {/* 왼쪽 본문 영역 */}
       <div className="flex-1">
-        <h1 className={`font-bold text-blue-900 mb-2 ${isMobile ? "text-lg" : "text-xl md:text-2xl"}`}>
+        <h1 className="text-2xl font-bold text-[#00256c] mb-4 break-words">
           {project.projectTitle}
         </h1>
 
-        {/* 작성자 정보 */}
-        <div className={`flex ${isMobile ? "flex-col gap-1" : "justify-between items-center mt-1"}`}>
+        {/* 작성자 정보 + 버튼 */}
+        <div className="flex items-start justify-between mb-6">
+          <PostDetailInfo
+            author={{
+              id: project.author.id,
+              name: project.author.name,
+              profileImageUrl: "",
+            }}
+            isAuthor={isAuthor}
+            createdAt={project.createdAt}
+            viewCount={project.viewCount}
+            onAuthorClick={handleAuthorClick}
+          />
+
           <div className="flex items-center gap-2">
-            <img src="/assets/images/manager-bird.png" alt="프로필" className="w-8 h-8 rounded-full" />
-            <span className="font-semibold text-[16px] text-gray-900">{project.author.name}</span>
+            {!isAuthor && <FollowButton memberId={project.author.id} />}
+            <PostDetailHeader
+              isAuthor={isAuthor}
+              onEdit={handleEdit}
+              onDelete={() => setShowDeleteConfirm(true)}
+            />
           </div>
-          <button className="px-3 py-1 text-sm border rounded hover:bg-gray-100 w-fit">
-            + 팔로우
-          </button>
         </div>
 
-        <div className="mt-2 text-[15px] text-gray-600 flex gap-2 flex-wrap">
-          <span>생성일: {project.createdAt}</span>
-          <span>수정일: {project.updatedAt}</span>
-        </div>
+        <hr className="my-6 border-gray-200" />
 
-        {/* 수정 / 삭제 */}
-        {isAuthor && (
-          <div className="flex gap-2 mt-4">
-            <button
-              onClick={handleEdit}
-              className="px-3 py-1 text-sm text-white bg-yellow-400 rounded hover:bg-yellow-500"
-            >
-              ✏️ 수정
-            </button>
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
-            >
-              🗑 삭제
-            </button>
-          </div>
-        )}
-
-        <hr className="my-4 border-gray-300" />
-
-        {/* 설명, 태그 */}
+        {/* 내용 */}
         <div className="mb-6 leading-relaxed text-gray-700 whitespace-pre-line">
           {project.projectDescription}
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-6">
-          {project.tags.map((tag) => (
-            <span key={tag} className="px-2 py-1 text-xs text-gray-800 bg-gray-100 rounded">
-              {tag}
-            </span>
-          ))}
-        </div>
+        {/* 태그 */}
+        <PostDetailTags tags={project.tags} />
 
-        {/* 아래 항목은 타입에 없으므로 주석 처리하거나 추후 확장 */}
-        {/* 
-        <div className="mb-6 text-sm text-gray-500">
-          모집 상태: <strong>{project.status}</strong> / 참여 인원: {project.currentMember} / {project.maxMember}
-        </div>
-        */}
-
+        {/* 댓글 */}
         <div className="px-5 py-4 mb-6 border rounded bg-gray-50">
           <CommentSection boardType="PROJECT" postId={project.projectId} />
         </div>
 
-        <div className="mt-4">
-          <button onClick={() => navigate(-1)} className="px-4 py-2 text-sm text-white rounded bg-slate-800">
-            ← 뒤로 가기
-          </button>
-        </div>
+        {/* 뒤로가기 */}
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 text-sm text-white rounded bg-slate-800"
+        >
+          ← 뒤로 가기
+        </button>
       </div>
 
-      {/* 오른쪽: 참여자 카드 or 지원 버튼 */}
-      <div className={`w-full ${isMobile ? "mt-6" : "lg:w-[280px] shrink-0"}`}>
+      {/* 오른쪽 참여자 카드 */}
+      <div className="w-full lg:w-[280px] shrink-0">
         <ParticipantCardBox
           project={project}
-          participants={[]} // 서버 연동 시 대체 예정
+          participants={[]}
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={() => {}}
           currentUserId={currentUserId!}
         />
       </div>
 
-      {/* 모달들 */}
+      {/* 지원자 모달 */}
       {isModalOpen && (
         <ApplicationModal
           onClose={() => setIsModalOpen(false)}
@@ -206,6 +217,7 @@ export default function ProjectDetail() {
         />
       )}
 
+      {/* 삭제 확인 모달 */}
       {showDeleteConfirm && (
         <ConfirmModal
           title="프로젝트 삭제"

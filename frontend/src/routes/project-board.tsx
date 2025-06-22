@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectAccessToken } from "../store/slices/authSlice";
-import { getProjects } from "../api/project/ProjectAPI";
+import { getProjects, searchProjects } from "../api/project/ProjectAPI";
 import type { ProjectSummary } from "../types/api/project-board";
 import BoardWriteButton from "../components/board/write/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
 import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 
-const ITEMS_PER_PAGE = 7;
+const ITEMS_PER_PAGE = 8;
 
 type FilterType = "ALL" | "RECRUITING" | "COMPLETED";
 
@@ -32,19 +32,33 @@ export default function ProjectBoard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const params: any = {
+      const baseParams = {
         "pageable.page": currentPage - 1,
         "pageable.size": ITEMS_PER_PAGE,
         "pageable.sort": "createdAt,desc",
+        tags: selectedTags,
       };
-      if (searchKeyword.trim()) params.keyword = searchKeyword;
-      if (selectedTags.length > 0) params.tags = selectedTags;
-      if (filterType === "RECRUITING") params.recruiting = true;
-      if (filterType === "COMPLETED") params.recruiting = false;
 
-      const data = await getProjects(params);
-      setProjects(data.projects);
-      setTotalCount(data.totalCount);
+      let data;
+      if (searchKeyword.trim() !== "") {
+        data = await searchProjects({
+          ...baseParams,
+          keyword: searchKeyword,
+          searchType: "ALL",
+        });
+      } else {
+        data = await getProjects(baseParams);
+      }
+
+      let filtered = data.projects;
+      if (filterType === "RECRUITING") {
+        filtered = filtered.filter((p) => p.isRecruiting);
+      } else if (filterType === "COMPLETED") {
+        filtered = filtered.filter((p) => !p.isRecruiting);
+      }
+
+      setProjects(filtered);
+      setTotalCount(filtered.length);
     } catch (error) {
       console.error("프로젝트 목록 불러오기 실패:", error);
     } finally {
@@ -75,31 +89,15 @@ export default function ProjectBoard() {
     setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
 
-  if (loading) {
-    return <div className="p-10 text-center">⏳ 로딩 중입니다...</div>;
-  }
-
-  if (authError) {
-    return (
-      <div className="p-10 font-semibold text-center text-red-500">
-        🔒 로그인 후 프로젝트 목록을 볼 수 있습니다.
-      </div>
-    );
-  }
-
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
     <div className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}>
-      {/* ✅ 게시판 제목 + 필터 버튼들 */}
+      {/* ✅ 필터 버튼 */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-300 pb-2 mb-4">
         <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">프로젝트 모집 게시판</h1>
         <div className="flex gap-2">
-          {([
-            { label: "전체", type: "ALL" },
-            { label: "모집중", type: "RECRUITING" },
-            { label: "모집완료", type: "COMPLETED" },
-          ] as const).map(({ label, type }) => (
+          {(["ALL", "RECRUITING", "COMPLETED"] as FilterType[]).map((type) => (
             <button
               key={type}
               onClick={() => {
@@ -112,13 +110,17 @@ export default function ProjectBoard() {
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              {label}
+              {type === "ALL"
+                ? "전체"
+                : type === "RECRUITING"
+                ? "모집중"
+                : "모집완료"}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ✅ 총 게시물 수 + 검색창 + 태그 버튼 */}
+      {/* ✅ 검색창 & 태그 선택 버튼 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <p className="text-sm text-gray-600">
           총 <strong>{totalCount}</strong>개의 게시물이 있습니다.
@@ -143,12 +145,11 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* ✅ 선택된 태그 필터 버튼 UI */}
+      {/* ✅ 선택된 태그들 */}
       {selectedTags.length > 0 && (
         <BoardTagFilterButton
           selectedTags={selectedTags}
           onRemoveTag={removeSelectedTag}
-          onOpenFilter={() => setShowFilterModal(true)}
         />
       )}
 
@@ -165,15 +166,19 @@ export default function ProjectBoard() {
       )}
 
       {/* ✅ 게시글 목록 */}
-      <div className="space-y-4">
-        {projects.map((project) => (
-          <div
-            key={project.projectId}
-            onClick={() => handleRowClick(project)}
-            className="p-4 border rounded-lg cursor-pointer hover:shadow"
-          >
-            <div className="flex items-center justify-start gap-2 mb-2">
-              {project.isRecruiting !== undefined && (
+      {projects.length === 0 ? (
+        <div className="py-10 text-center text-gray-500">
+          표시할 게시글이 없습니다.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {projects.map((project) => (
+            <div
+              key={project.projectId}
+              onClick={() => handleRowClick(project)}
+              className="p-4 border rounded-lg cursor-pointer hover:shadow"
+            >
+              <div className="flex items-center justify-start gap-2 mb-2">
                 <span
                   className={`px-2 py-1 text-sm font-semibold border rounded-full ${
                     project.isRecruiting
@@ -183,34 +188,38 @@ export default function ProjectBoard() {
                 >
                   {project.isRecruiting ? "모집중" : "모집완료"}
                 </span>
-              )}
-              <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
-                {project.projectTitle}
-              </h2>
-            </div>
-
-            <p className="mb-2 text-sm text-gray-700">
-              {project.previewContent.length > 100
-                ? `${project.previewContent.slice(0, 100)}...`
-                : project.previewContent}
-            </p>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-1 text-xs text-gray-600 bg-gray-100 border border-gray-300 rounded"
-                >
-                  {tag}
+                <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
+                  {project.projectTitle}
+                </h2>
+              </div>
+              <p className="mb-2 text-sm text-gray-700">
+                {project.previewContent.length > 100
+                  ? `${project.previewContent.slice(0, 100)}...`
+                  : project.previewContent}
+              </p>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 text-xs text-gray-600 bg-gray-100 border border-gray-300 rounded"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>
+                  {project.author.name} · {project.createdAt}
                 </span>
-              ))}
+                <span>
+                  조회수 {project.viewCount} · 댓글수 {project.commentCount}
+                </span>
+                
+              </div>
             </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>{project.author.name} · {project.createdAt}</span>
-              <span>조회수 {project.viewCount}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* ✅ 페이지네이션 */}
       <div className="flex justify-center mt-6 space-x-2">

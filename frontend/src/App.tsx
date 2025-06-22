@@ -15,7 +15,6 @@ import { setAccessToken } from "./store/slices/authSlice"; // âœ… accessToken ë³
 
 import ProjectBoard from "./routes/project-board"; //yu-gyeom
 import ProjectDetail from "./routes/project-detail"; //yu-gyeom
-import ProjectEdit from "./routes/project-edit"; // yu-gyeom
 import ProjectApply from "./routes/project-apply"; // yu-gyeom
 import NoticeBoard from "./routes/NoticeBoard"; //hye-rin
 import InterestsBorad from "./routes/interests-borad"; //yeong-eun
@@ -41,14 +40,6 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <Home /> },
       { path: "project/:id", element: <ProjectDetail /> },
-      {
-        path: "project/:id/edit",
-        element: (
-          <ProtectedRoute>
-            <ProjectEdit />
-          </ProtectedRoute>
-        ),
-      },
       { path: "project-apply", element: <ProjectApply /> },
       { path: "notice-board/", element: <NoticeBoard /> },
       { path: "interests-board/", element: <InterestsBorad /> },

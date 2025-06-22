@@ -5,13 +5,14 @@ interface RoleToggleBadgeProps {
   setRole: (newRole: string) => void;
 }
 
-const roles = ["PM", "frontend", "backend", "AI", "design", "etc"];
+// ✅ 이미 대문자로 정의된 역할 목록
+const roles = ["PM", "FRONTEND", "BACKEND", "AI", "DESIGN", "ETC"];
 
 export default function RoleToggleBadge({ role, setRole }: RoleToggleBadgeProps) {
   const [open, setOpen] = useState(false);
 
   const handleSelect = (selected: string) => {
-    setRole(selected);
+    setRole(selected); // 변환 필요 없음
     setOpen(false);
   };
 

@@ -8,7 +8,7 @@ interface RecruitRoleCardProps {
 }
 
 export default function RecruitRoleCard({
-  defaultRole = "frontend",
+  defaultRole = "FRONTEND",
   authorName,
   onRoleChange,
 }: RecruitRoleCardProps) {
@@ -16,6 +16,7 @@ export default function RecruitRoleCard({
 
   return (
     <div className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm">
+      {/* 역할 뱃지 */}
       <RoleToggleBadge
         role={role}
         setRole={(newRole) => {
@@ -23,10 +24,8 @@ export default function RecruitRoleCard({
           onRoleChange?.(newRole);
         }}
       />
-
-      <div className="flex items-center justify-end">
-        <span className="font-medium">{authorName}</span>
-      </div>
+      {/* 작성자 이름 */}
+      <span className="font-medium">{authorName}</span>
     </div>
   );
 }

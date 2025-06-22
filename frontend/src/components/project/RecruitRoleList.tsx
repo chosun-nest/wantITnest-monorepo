@@ -61,7 +61,6 @@ export default function RecruitRoleList({
             key={card.id}
             defaultRole={card.role}
             authorName={card.authorName}
-            profileImageUrl="/assets/default-profile.png"
             onRoleChange={(role) => handleChangeRole(card.id, role)}
           />
         ))}
