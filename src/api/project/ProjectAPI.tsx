@@ -77,6 +77,7 @@ export const getProjectById = async (
   projectId: number
 ): Promise<ProjectDetail> => {
   const response = await API.get(`/api/v1/projects/${projectId}`);
+  console.log("🛠️ getProjectById 응답:", response.data); // ✅ 이 줄 추가
   return response.data;
 };
 

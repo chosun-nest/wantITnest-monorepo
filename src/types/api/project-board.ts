@@ -62,10 +62,12 @@ export interface ProjectDetail {
   updatedAt: string;
   projectMembers: ProjectMember[];
   isRecruiting: boolean;
+  currentNumberOfMembers: number;
+  maximumNumberOfMembers: number;
 }
 
 // ==================================
-// 🟢 POST /api/projects/new - 프로젝트 생성
+// 🟢 POST /api/v1/projects/new - 프로젝트 생성
 // ==================================
 
 export interface CreateProjectPayload {
@@ -78,7 +80,6 @@ export interface CreateProjectPayload {
   };
   creatorPart: string;     // 예: "FRONTEND"
   creatorRole: string;     // 예: "LEADER"
-  membersToRemove: number[];
 }
 
 export interface CreateProjectPostResponse {
@@ -87,7 +88,21 @@ export interface CreateProjectPostResponse {
 }
 
 // ==================================
-// 📝 PATCH /api/projects/{projectId} - 프로젝트 수정
+// 📝 PATCH /api/v1/projects/{projectId} - 프로젝트 수정
+// ==================================
+
+export interface UpdateProjectPayload {
+  projectTitle: string;
+  projectDescription: string;
+  isRecruiting: boolean;
+  tags: string[];
+  partCounts?: {
+    [key: string]: number;
+  }; 
+}
+
+// ==================================
+// 📝 PATCH /api/v2/projects/{projectId} - 프로젝트 수정
 // ==================================
 
 export interface UpdateProjectPayload {

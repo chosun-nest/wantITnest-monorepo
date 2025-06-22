@@ -68,7 +68,6 @@ export default function ProjectDetail() {
   const handleEdit = () => {
     if (!project) return;
 
-    // partCounts 변환 로직 추가
     const partCounts: Record<string, number> = {};
     project.projectMembers.forEach((member) => {
       if (member.part) {
@@ -202,7 +201,7 @@ export default function ProjectDetail() {
       <div className="w-full lg:w-[280px] shrink-0">
         <ParticipantCardBox
           project={project}
-          participants={[]}
+          participants={project.projectMembers} // ✅ 정확하게 연결됨
           onOpenModal={() => setIsModalOpen(true)}
           onAccept={() => {}}
           currentUserId={currentUserId!}
