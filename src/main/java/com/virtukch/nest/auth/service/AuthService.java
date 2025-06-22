@@ -116,7 +116,7 @@ public class AuthService {
             .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
 
         String token = jwtTokenProvider.createToken(member.getMemberId());
-        String resetLink = "http://119.219.30.209:6020/reset-password?token=" + token;
+        String resetLink = "http://121.178.113.153:6020/reset-password?token=" + token;
         String subject = "[NEST] 비밀번호 재설정 안내";
         String body = String.format(
             "안녕하세요.%n%n 비밀번호를 재설정하기 위해 아래 링크를 클릭해주세요:%n%n%s%n%n본 이메일은 10분간 유효합니다.", resetLink);
