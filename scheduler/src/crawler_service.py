@@ -83,7 +83,7 @@ class NoticeService:
             # 연도 필터링
             filtered_notices = [
                 notice for notice in notices 
-                if notice["date"].startswith(CRAWL_CONFIG["year_filter"])
+                if notice["date"].startswith(str(CRAWL_CONFIG["year_filter"]))
             ]
             
             logger.info(f"[{category}] 수집된 공지사항: {len(filtered_notices)}개")
