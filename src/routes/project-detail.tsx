@@ -6,7 +6,7 @@ import { setUser, selectCurrentUserId } from "../store/slices/userSlice";
 import { getMemberProfile } from "../api/profile/ProfileAPI";
 import { getProjectById, deleteProject } from "../api/project/ProjectAPI";
 
-import CommentSection from "../components/project/commentsection";
+import CommentSection from "../components/project/comment/CommentSection";
 import ApplicationModal from "../components/project/ApplicationModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import ParticipantCardBox from "../components/project/ParticipantCardBox";

@@ -211,7 +211,10 @@ export default function ProjectBoard() {
                 <span>
                   {project.author.name} · {project.createdAt}
                 </span>
-                <span>조회수 {project.viewCount}</span>
+                <span>
+                  조회수 {project.viewCount} · 댓글수 {project.commentCount}
+                </span>
+                
               </div>
             </div>
           ))}
