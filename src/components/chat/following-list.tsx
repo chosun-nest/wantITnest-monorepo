@@ -11,8 +11,7 @@ export default function FollowingList({
   onSelectUser,
 }: FollowingListProps) {
   return (
-    <div className="p-5 w-[66%] max-w-[800px] min-w-[400px] border border-[#002f6c] rounded-lg shadow-sm">
-      <h2 className="font-bold text-xl">내 팔로잉 목록</h2>
+    <div className="flex flex-col h-full">
       <ul className="mt-4">
         {users.map((following) => (
           <li

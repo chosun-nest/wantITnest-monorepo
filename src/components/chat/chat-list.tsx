@@ -48,7 +48,7 @@ export default function ChatList({ onSelectUser, chatRooms }: ChatListProps) {
 
   if (!chatRooms || chatRooms.length === 0) {
     return (
-      <div className="w-[66%] max-w-[800px] min-w-[400px] p-5 border border-[#002f6c] rounded-lg shadow-sm">
+      <div className="">
         <div className="text-center py-8 text-gray-500">
           <div className="text-4xl mb-2">💬</div>
           <p>참여 중인 채팅방이 없습니다.</p>
@@ -59,9 +59,8 @@ export default function ChatList({ onSelectUser, chatRooms }: ChatListProps) {
   }
 
   return (
-    <div className="w-[66%] max-w-[800px] min-w-[400px] p-5 border border-[#002f6c] rounded-lg shadow-sm">
+    <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-xl">채팅방 목록</h2>
         <span className="text-sm text-gray-500">
           {chatRooms.length}개의 채팅방
         </span>
@@ -96,21 +95,12 @@ export default function ChatList({ onSelectUser, chatRooms }: ChatListProps) {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-gray-900 truncate flex items-center">
                   {room.roomName}
-                  {room.roomId === 1 && (
-                    <span className="ml-2 px-2 py-1 bg-orange-200 text-orange-800 text-xs rounded-full">
-                      LIVE
-                    </span>
-                  )}
                 </h3>
                 <span className="text-xs text-gray-500 ml-2">
                   {formatLastActivity(room.lastActivity)}
                 </span>
               </div>
               <div className="flex items-center justify-between mt-1">
-                <p className="text-sm text-gray-600 truncate">
-                  {/* ChatRoomProfile에는 메시지 정보가 없으므로 생략 */}
-                  최근 메시지 없음
-                </p>
                 <div className="flex items-center text-xs text-gray-400 ml-2">
                   <span className="mr-1">👥</span>
                   <span>2</span> {/* memberCount도 없으므로 고정 */}
