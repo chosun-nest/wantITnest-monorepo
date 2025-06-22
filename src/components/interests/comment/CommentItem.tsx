@@ -134,7 +134,7 @@ export default function CommentItem({
     <div className={`w-full ${ isReply ? "pl-6 bg-gray-50 border-l-2 border-blue-200" : "" }`}>
       <div className="flex gap-3 py-3">
         <img
-          src="/default-profile.png"
+          src="/assets/images/user.png"
           alt="profile"
           className="object-cover w-10 h-10 rounded-full"
         />
