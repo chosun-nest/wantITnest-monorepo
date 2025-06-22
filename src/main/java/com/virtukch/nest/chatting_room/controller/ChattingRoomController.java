@@ -5,6 +5,8 @@ import com.virtukch.nest.chatting_room.dto.ChattingRoomRequestDto;
 import com.virtukch.nest.chatting_room.dto.ChattingRoomResponseDto;
 import com.virtukch.nest.chatting_room.service.ChattingRoomService;
 import com.virtukch.nest.chatting_room_member.service.ChattingRoomMemberService;
+import com.virtukch.nest.member.dto.MemberResponseDto;
+import com.virtukch.nest.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,6 +33,7 @@ public class ChattingRoomController {
 
     private final ChattingRoomService chattingRoomService;
     private final ChattingRoomMemberService chattingRoomMemberService;
+    private final MemberService memberService;
 
     @Operation(
         summary = "내 채팅방 목록 조회",
@@ -123,5 +126,35 @@ public class ChattingRoomController {
         @Parameter(name = "chattingRoomId", description = "삭제할 채팅방 ID") @PathVariable("chattingRoomId") Long chattingRoomId) {
         chattingRoomService.deleteChattingRoomById(chattingRoomId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+        summary = "채팅방 멤버 조회",
+        description = "특정 채팅방 ID를 기준으로 해당 채팅방에 속한 멤버들의 정보를 조회합니다.",
+        security = @SecurityRequirement(name = "bearerAuth"),
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "채팅방 멤버 조회 성공",
+                content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MemberResponseDto.class)
+                )
+            )
+        }
+    )
+    @GetMapping("/{chattingRoomId}")
+    public ResponseEntity<List<MemberResponseDto>> findMemberListByChattingRoomId(
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @PathVariable Long chattingRoomId) {
+        // 1. 채팅 룸 아이디를 받아서 -> 멤버 아이디 리스트를 받아 옴
+        List<Long> memberIdList = chattingRoomMemberService.findMemberIdListByChattingRoomId(
+            chattingRoomId);
+
+        // 2. 멤버 아이디 리스트를 받아다가 -> 멤버 ResponseDtoList 를 반환함
+        List<MemberResponseDto> memberResponseDtoList = memberService.findAllByMemberIdList(
+            memberIdList);
+
+        return ResponseEntity.ok(memberResponseDtoList);
     }
 }
