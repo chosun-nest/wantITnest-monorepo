@@ -129,9 +129,7 @@ export const deleteFavoriteTag = async (tagName: string): Promise<void> => {
   );
 };
 
-
 // 다른 사용자 프로필 조회
-
 // 특정 회원 프로필 조회 - 로그인 필요(GET)
 export const getMemberProfileById = async (memberId: number): Promise<MemberProfile> => {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;

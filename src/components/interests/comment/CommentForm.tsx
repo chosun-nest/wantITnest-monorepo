@@ -1,5 +1,5 @@
 // 4. 댓글 입력/수정/답글 작성 폼
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 
 interface CommentFormProps {
   onSubmit: (content: string) => void;
@@ -29,13 +29,6 @@ export default function CommentForm({
     setContent("");
   };
 
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.style.height = "auto"; // reset height
-      ref.current.style.height = `${ref.current.scrollHeight}px`; // set new height
-    }
-  }, [content]);
-
   if (!isLoggedIn) {
     return (
       <div className="p-3 text-sm text-gray-500 bg-gray-100 border rounded">
@@ -48,8 +41,8 @@ export default function CommentForm({
     <div className="space-y-2">
       <textarea
         ref={ref}
-        className="w-full p-2 text-sm border rounded resize-none focus:outline-none focus:ring focus:border-[#1E3A8A] transition-all duration-150"
-        rows={1}
+        className="w-full p-2 text-sm border rounded resize-none overflow-y-auto h-24
+                  focus:outline-none focus:ring focus:border-[#1E3A8A] transition-all duration-150"
         placeholder={placeholder}
         value={content}
         onChange={(e) => setContent(e.target.value)}

@@ -16,7 +16,7 @@ import {
 } from "../../types/api/interest-board";
 import { getAccessToken } from "../../utils/auth";
 
-// ✅ 공통 인증 헤더
+// 공통 인증 헤더
 const authHeader = () => ({
   headers: {
     Authorization: `Bearer ${getAccessToken()}`,

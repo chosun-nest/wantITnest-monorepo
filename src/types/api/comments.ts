@@ -9,6 +9,7 @@ export interface Comment {    // 댓글 항목 타입
   author: {
     id: number;
     name: string;
+    memberImageUrl?: string;  // 작성자 프로필 이미지 // 백엔드 추가 api 되었는지 확인
   };
   authorName: string;   // 작성자 이름
   createdAt: string;    // 작성일자
