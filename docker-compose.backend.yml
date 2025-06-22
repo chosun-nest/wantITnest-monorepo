@@ -65,7 +65,6 @@ services:
       - NODE_ENV=production
 
 volumes:
-  # 업로드된 이미지 볼륨 (Frontend와 공유)
   uploaded-images:
     driver: local
 

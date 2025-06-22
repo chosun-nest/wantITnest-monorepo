@@ -6,6 +6,8 @@
 # 1. BACKEND (Spring Boot/Gradle) - backend/ 디렉토리
 # ==========================================================================================
 
+backend/uploaded-images/*
+
 # Gradle
 backend/.gradle/
 backend/build/
