@@ -11,8 +11,6 @@ import TagFilterModal from "../components/board/tag/TagFilterModal";
 
 const ITEMS_PER_PAGE = 8;
 
-// ... 생략된 import들은 그대로 유지
-
 type FilterType = "ALL" | "RECRUITING" | "COMPLETED";
 
 export default function ProjectBoard() {
@@ -32,42 +30,41 @@ export default function ProjectBoard() {
   const [filterType, setFilterType] = useState<FilterType>("ALL");
 
   const fetchData = async () => {
-  setLoading(true);
-  try {
-    const params: any = {
-      "pageable.page": currentPage - 1,
-      "pageable.size": ITEMS_PER_PAGE,
-      "pageable.sort": "createdAt,desc",
-    };
-    if (selectedTags.length > 0) params.tags = selectedTags;
+    setLoading(true);
+    try {
+      const baseParams = {
+        "pageable.page": currentPage - 1,
+        "pageable.size": ITEMS_PER_PAGE,
+        "pageable.sort": "createdAt,desc",
+        tags: selectedTags,
+      };
 
-    let data;
-    if (searchKeyword.trim() !== "") {
-      data = await searchProjects({
-        ...params,
-        keyword: searchKeyword,
-        searchType: "ALL",
-      });
-    } else {
-      data = await getProjects(params);
+      let data;
+      if (searchKeyword.trim() !== "") {
+        data = await searchProjects({
+          ...baseParams,
+          keyword: searchKeyword,
+          searchType: "ALL",
+        });
+      } else {
+        data = await getProjects(baseParams);
+      }
+
+      let filtered = data.projects;
+      if (filterType === "RECRUITING") {
+        filtered = filtered.filter((p) => p.isRecruiting);
+      } else if (filterType === "COMPLETED") {
+        filtered = filtered.filter((p) => !p.isRecruiting);
+      }
+
+      setProjects(filtered);
+      setTotalCount(filtered.length);
+    } catch (error) {
+      console.error("📛 프로젝트 목록 불러오기 실패:", error);
+    } finally {
+      setLoading(false);
     }
-
-    // 클라이언트 측 필터링
-    let filtered = data.projects;
-    if (filterType === "RECRUITING") {
-      filtered = filtered.filter((p) => p.isRecruiting);
-    } else if (filterType === "COMPLETED") {
-      filtered = filtered.filter((p) => !p.isRecruiting);
-    }
-
-    setProjects(filtered);
-    setTotalCount(filtered.length);
-  } catch (error) {
-    console.error("프로젝트 목록 불러오기 실패:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -123,7 +120,7 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* ✅ 검색창 & 태그 */}
+      {/* ✅ 검색창 & 태그 선택 버튼 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <p className="text-sm text-gray-600">
           총 <strong>{totalCount}</strong>개의 게시물이 있습니다.
@@ -148,15 +145,15 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* ✅ 선택된 태그 */}
+      {/* ✅ 선택된 태그들 */}
       {selectedTags.length > 0 && (
         <BoardTagFilterButton
           selectedTags={selectedTags}
           onRemoveTag={removeSelectedTag}
-          onOpenFilter={() => setShowFilterModal(true)}
         />
       )}
 
+      {/* ✅ 태그 모달 */}
       {showFilterModal && (
         <TagFilterModal
           onClose={() => setShowFilterModal(false)}
@@ -168,7 +165,7 @@ export default function ProjectBoard() {
         />
       )}
 
-      {/* ✅ 게시글이 없을 때 처리 */}
+      {/* ✅ 게시글 목록 */}
       {projects.length === 0 ? (
         <div className="py-10 text-center text-gray-500">
           표시할 게시글이 없습니다.
