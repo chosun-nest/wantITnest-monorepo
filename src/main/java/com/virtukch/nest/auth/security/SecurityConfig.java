@@ -61,6 +61,7 @@ public class SecurityConfig {
                     "/api/v1/posts/search",
                     "/api/v1/notices/**",
                     "/api/v1/projects",
+                    "/api/v1/projects/search",
                     "/error"
                 ).permitAll()
 
@@ -68,7 +69,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,
                         "/api/v1/posts",
                         "/api/v2/posts",
-                        "/uploaded-images/**"
+                        "/uploaded-images/**",
+                        "/api/v1/projects",
+                        "/api/v2/projects"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
