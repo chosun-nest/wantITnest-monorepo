@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -93,10 +94,14 @@ export default function ProjectBoard() {
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
-    <div className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}>
+    <div
+      className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}
+    >
       {/* ✅ 필터 버튼 */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-300 pb-2 mb-4">
-        <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">프로젝트 모집 게시판</h1>
+        <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">
+          프로젝트 모집 게시판
+        </h1>
         <div className="flex gap-2">
           {(["ALL", "RECRUITING", "COMPLETED"] as FilterType[]).map((type) => (
             <button
@@ -114,8 +119,8 @@ export default function ProjectBoard() {
               {type === "ALL"
                 ? "전체"
                 : type === "RECRUITING"
-                ? "모집중"
-                : "모집완료"}
+                  ? "모집중"
+                  : "모집완료"}
             </button>
           ))}
         </div>
@@ -189,7 +194,9 @@ export default function ProjectBoard() {
                 >
                   {project.isRecruiting ? "모집중" : "모집완료"}
                 </span>
-                <h2 className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}>
+                <h2
+                  className={`font-semibold ${isMobile ? "text-base" : "text-lg"}`}
+                >
                   {project.projectTitle}
                 </h2>
               </div>
@@ -199,7 +206,7 @@ export default function ProjectBoard() {
                   : project.previewContent}
               </p>
               <div className="flex flex-wrap gap-2 mb-2">
-                {project.tags.map((tag) => (
+                {[...new Set(project.tags)].map((tag) => (
                   <span
                     key={tag}
                     className="px-2 py-1 text-xs text-gray-600 bg-gray-100 border border-gray-300 rounded"
@@ -215,7 +222,6 @@ export default function ProjectBoard() {
                 <span>
                   조회수 {project.viewCount} · 댓글수 {project.commentCount}
                 </span>
-                
               </div>
             </div>
           ))}
@@ -229,7 +235,9 @@ export default function ProjectBoard() {
             key={i + 1}
             onClick={() => handlePageClick(i + 1)}
             className={`px-3 py-1 rounded border ${
-              currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-white text-gray-700"
+              currentPage === i + 1
+                ? "bg-blue-500 text-white"
+                : "bg-white text-gray-700"
             }`}
           >
             {i + 1}
