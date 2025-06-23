@@ -102,6 +102,8 @@ export default function ProjectBoard() {
         <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">
           프로젝트 모집 게시판
         </h1>
+      <div className="flex flex-col pb-2 mb-4 border-b border-gray-300 md:flex-row md:items-center md:justify-between">
+        <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">프로젝트 모집 게시판</h1>
         <div className="flex gap-2">
           {(["ALL", "RECRUITING", "COMPLETED"] as FilterType[]).map((type) => (
             <button
