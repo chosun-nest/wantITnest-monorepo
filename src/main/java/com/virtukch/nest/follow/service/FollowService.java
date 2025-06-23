@@ -122,10 +122,10 @@ public class FollowService {
             throw new MemberNotFoundException("회원을 찾을 수 없습니다. ID: " + memberId);
         }
         
-        // 2. 팔로워 관계 목록 조회 (나를 팔로우하는 사용자들)
+        // 2. 팔로워 관계 목록 조회 (회원 A를 팔로우하는 사용자들)
         List<Follow> followerList = followRepository.findByFollowingIdOrderByCreatedAtDesc(memberId);
         
-        // 3. 나를 팔로우하는 사용자들의 ID 목록 추출
+        // 3. 회원 A를 팔로우하는 사용자들의 ID 목록 추출
         List<Long> followerIds = followerList.stream()
                 .map(Follow::getFollowerId)
                 .toList();
@@ -135,7 +135,7 @@ public class FollowService {
                 List.of() : 
                 memberRepository.findAllById(followerIds).stream()
                         .map(member -> {
-                            // 해당 회원이 나를 팔로우한 시작 시간 찾기
+                            // 해당 팔로워가 회원 A를 팔로우한 시작 시간 찾기
                             LocalDateTime followedAt = followerList.stream()
                                     .filter(follow -> follow.getFollowerId().equals(member.getMemberId()))
                                     .findFirst()

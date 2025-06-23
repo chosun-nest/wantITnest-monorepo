@@ -188,4 +188,34 @@ public class FollowController {
         
         return ResponseEntity.ok(response);
     }
+    
+    @Operation(
+        summary = "특정 사용자를 팔로우하는 사용자 목록 조회 (팔로워 목록)",
+        description = """
+                특정 사용자를 팔로우하고 있는 사용자 목록 조회 사용자들의 목록을 조회합니다.
+                
+                ✅ 응답 정보:
+                - 특정 사용자를 팔로우하는 사용자들의 기본 정보
+                - 팔로우 시작 날짜
+                - 총 팔로워 수
+                
+                ✅ 요청 방법:
+                - HTTP Method: `GET`
+                - 요청 URL: `/api/v1/follow/{memberId}/followers`
+                - 헤더: `Authorization: Bearer {access_token}`
+                """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "팔로워 목록 조회 성공",
+            content = @Content(schema = @Schema(implementation = FollowListResponseDto.class)))
+    })
+    @GetMapping("{memberId}/followers")
+    public ResponseEntity<FollowListResponseDto> getFollowersListByMemberId(
+            @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long memberId) {
+        
+        FollowListResponseDto response = followService.getFollowersList(memberId);
+        
+        return ResponseEntity.ok(response);
+    }
 }
