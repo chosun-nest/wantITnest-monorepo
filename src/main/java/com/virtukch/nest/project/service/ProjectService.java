@@ -304,13 +304,17 @@ public class ProjectService {
     public ProjectListResponseDto searchProjects(String keyword, String searchType, Pageable pageable) {
         Page<Project> projectPage;
 
-        switch (searchType) {
-            case "TITLE" -> projectPage = projectRepository
-                    .findByProjectTitle(keyword, pageable);
-            case "CONTENT" -> projectPage = projectRepository
-                    .findByProjectDescriptionContaining(keyword, pageable);
-            default -> projectPage = projectRepository
-                    .findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContaining(keyword, keyword, pageable);
+        switch (searchType.toUpperCase()) {
+            case "TITLE" -> projectPage = projectRepository.searchByProjectTitle(keyword, pageable);
+            case "CONTENT" -> projectPage = projectRepository.searchByProjectDescriptionContaining(keyword, pageable);
+            default -> {
+                // ID 검색은 전처리 필요
+                List<Long> titleIds = projectRepository.findIdsByProjectTitle(keyword); // 가정된 메서드
+                List<Long> descriptionIds = projectRepository.findIdsByProjectDescription(keyword); // 가정된 메서드
+
+                projectPage = projectRepository.searchByProjectTitleOrProjectDescriptionInIds(
+                        titleIds, keyword, descriptionIds, keyword, pageable);
+            }
         }
         return buildProjectListResponse(projectPage);
     }
@@ -335,11 +339,11 @@ public class ProjectService {
         Page<Project> projectPage;
         switch (searchType.toUpperCase()) {
             case "TITLE" -> projectPage = projectRepository
-                    .findByProjectIdAndTitle(projectIds, keyword, pageable);
+                    .searchByProjectIdAndTitle(projectIds, keyword, pageable);
             case "CONTENT" -> projectPage = projectRepository
-                    .findByProjectIdAndDescription(projectIds, keyword, pageable);
+                    .searchByProjectIdAndDescription(projectIds, keyword, pageable);
             default -> projectPage = projectRepository
-                    .findByProjectIdAndTitleOrDescription(projectIds, keyword, projectIds, keyword, pageable);
+                    .searchByProjectIdAndTitleOrDescription(projectIds, keyword, projectIds, keyword, pageable);
         }
 
         return buildProjectListResponse(projectPage);

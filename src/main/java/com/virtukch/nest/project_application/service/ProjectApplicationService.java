@@ -157,7 +157,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
             throw new ApplicationNotFoundException();
         }
 
-        Long writerId = projectRepository.findWriterIdByProjectId(projectId)
+        Long writerId = projectRepository.searchWriterIdByProjectId(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         if (!writerId.equals(requesterId)) {
