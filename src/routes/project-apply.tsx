@@ -10,11 +10,20 @@ export default function ProjectApply() {
   const isMobile = useResponsive();
 
   const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [selectedPart, setSelectedPart] = useState<PartType | null>(null);
   const [message, setMessage] = useState("");
-  const [selectedField, setSelectedField] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fieldOptions = ["프론트엔드", "백엔드", "디자이너", "AI / 데이터 분석"];
+  type PartType = "FRONTEND" | "BACKEND" | "PM" | "DESIGN" | "AI" | "ETC";
+
+  const partOptions: { label: string; value: PartType }[] = [
+    { label: "프론트엔드", value: "FRONTEND" },
+    { label: "백엔드", value: "BACKEND" },
+    { label: "PM", value: "PM" },
+    { label: "디자인", value: "DESIGN" },
+    { label: "AI", value: "AI" },
+    { label: "기타", value: "ETC" },
+  ];
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -32,25 +41,28 @@ export default function ProjectApply() {
   }, [id, navigate]);
 
   const handleSubmit = async () => {
-    if (!message.trim()) {
-      alert("지원 동기를 작성해주세요!");
+    if (!selectedPart) {
+      alert("희망 분야를 선택해주세요!");
       return;
     }
-    if (!selectedField) {
-      alert("희망 분야를 선택해주세요!");
+    if (!message.trim()) {
+      alert("지원 동기를 작성해주세요!");
       return;
     }
 
     try {
       setIsSubmitting(true);
-      await applyToProject({
-        projectId: Number(id),
-        field: selectedField,
-        message,
-      });
 
-      alert(`'${selectedField}' 분야로 지원이 완료되었습니다!`);
-      navigate(-1);
+      const payload = {
+        projectId: Number(id),
+        part: selectedPart,
+        message,
+      };
+
+      await applyToProject(Number(id), payload);
+
+      alert(`'${selectedPart}' 분야로 지원이 완료되었습니다!`);
+      navigate(`/project/${id}`);
     } catch (error) {
       console.error("지원서 제출 실패:", error);
       alert("지원서 제출 중 오류가 발생했습니다.");
@@ -66,40 +78,31 @@ export default function ProjectApply() {
   return (
     <div className="max-w-4xl mx-auto px-4 pt-36 pb-20">
       <div className="bg-gray-50 shadow-md rounded-lg p-10">
-        <h2
-          className={`text-2xl font-extrabold text-center mb-6 text-blue-900 ${
-            isMobile ? "text-xl" : "text-2xl"
-          }`}
-        >
-          {project.projectTitle}에 지원 동기 작성
+        <h2 className={`text-2xl font-extrabold text-center mb-6 text-blue-900 ${isMobile ? "text-xl" : "text-2xl"}`}>
+          {project.projectTitle}에 지원하기
         </h2>
 
-        <h3 className="text-base font-semibold mb-2">
-          ✅ 희망하는 분야를 선택해 주세요
-        </h3>
+        <h3 className="text-base font-semibold mb-2">✅ 희망하는 분야를 선택해 주세요</h3>
         <div className="flex flex-wrap gap-2 mb-6">
-          {fieldOptions.map((field) => (
+          {partOptions.map(({ label, value }) => (
             <button
-              key={field}
-              onClick={() => setSelectedField(field)}
-              className={`px-3 py-1 rounded-full border text-sm transition-all duration-150
-                ${
-                  selectedField === field
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                }`}
+              key={value}
+              onClick={() => setSelectedPart(value)}
+              className={`px-3 py-1 rounded-full border text-sm transition-all duration-150 ${
+                selectedPart === value
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
             >
-              #{field}
+              #{label}
             </button>
           ))}
         </div>
 
-        <h3 className="text-base font-semibold mb-2">
-          ✏️ 지원 동기를 작성해 주세요
-        </h3>
+        <h3 className="text-base font-semibold mb-2">✏️ 지원 동기를 작성해 주세요</h3>
         <textarea
-          className="w-full h-56 p-4 border rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="본인이 왜 이 프로젝트에 지원하는지 간단히 소개해주세요. 지금까지의 경험, 열정, 관심 분야 등을 자유롭게 작성해도 좋아요!"
+          className="w-full h-48 p-4 border rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="왜 이 프로젝트에 관심이 있는지, 어떤 기여를 하고 싶은지 자유롭게 작성해 주세요."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           maxLength={400}
@@ -108,9 +111,7 @@ export default function ProjectApply() {
           {message.length} / 400
         </div>
 
-        <div
-          className={`flex ${isMobile ? "flex-col gap-2" : "justify-between"} mt-6`}
-        >
+        <div className={`flex ${isMobile ? "flex-col gap-2" : "justify-between"} mt-6`}>
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-slate-800 text-white text-sm rounded hover:bg-slate-700"

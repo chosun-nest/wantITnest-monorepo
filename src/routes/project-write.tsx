@@ -1,4 +1,3 @@
-// ✅ 프로젝트 모집 글쓰기 페이지 (수정 통합 리팩토링)
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -94,13 +93,13 @@ export default function ProjectWrite() {
       return;
     }
 
-    const validRoles = ["BACKEND", "FRONTEND", "PM", "DESIGN", "AI", "ETC"];
-    const partCounts: { [key: string]: number } = recruitCards.reduce((acc, card) => {
-      if (validRoles.includes(card.role)) {
-        acc[card.role] = (acc[card.role] || 0) + 1;
-      }
+    const partCounts: Record<string, number> = recruitCards.reduce((acc, card) => {
+      const role = card.role;
+      acc[role] = (acc[role] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
+
+    const totalMembers = Object.values(partCounts).reduce((sum, count) => sum + count, 0);
 
     try {
       if (isEditMode && projectToEdit) {
@@ -127,9 +126,9 @@ export default function ProjectWrite() {
           isRecruiting: true,
           tags: selectedTags,
           partCounts,
-          creatorPart: "BACKEND",
+          creatorPart: recruitCards[0]?.role || "BACKEND",
           creatorRole: "LEADER",
-          membersToRemove: [],
+          maximumNumberOfMembers: totalMembers,
         });
         setModalContent({
           title: "게시 완료",
@@ -160,7 +159,6 @@ export default function ProjectWrite() {
       <div className="max-w-6xl mx-auto px-4 mt-[40px]" style={{ paddingTop: navHeight }}>
         <BoardTypeSelector boardType="projects" />
         <div className="flex flex-col md:flex-row gap-8">
-          {/* 왼쪽 입력 영역 */}
           <div className="flex-1">
             <div className="p-3 mb-4 text-sm border-l-4 border-blue-600 rounded bg-blue-50">
               <strong>프로젝트 모집 예시를 참고해 작성해주세요.</strong><br />
@@ -205,7 +203,6 @@ export default function ProjectWrite() {
             />
           </div>
 
-          {/* 오른쪽 모집 카드 */}
           <div className="w-full md:w-[300px]">
             <RecruitRoleList
               onChange={setRecruitCards}

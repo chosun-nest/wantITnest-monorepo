@@ -41,7 +41,7 @@ export default function ChatBubble({ message, isMe }: ChatBubbleProps) {
           className={`
             px-4 py-2 text-sm rounded-2xl shadow-sm 
             whitespace-pre-wrap break-words inline-block
-            ${isMe ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}
+            ${isMe ? "bg-[#002f6c] text-white" : "bg-gray-200 text-gray-800"}
           `}
         >
           {message.text}

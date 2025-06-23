@@ -3,7 +3,7 @@ import RecruitRoleCard from "./RecruitRoleCard";
 
 interface RecruitCardData {
   id: number;
-  role: string;
+  role: string; // 대문자 문자열: "FRONTEND", "BACKEND", ...
   authorName: string;
 }
 
@@ -18,17 +18,17 @@ export default function RecruitRoleList({
 }: RecruitRoleListProps) {
   const [cards, setCards] = useState<RecruitCardData[]>([]);
 
-  // ✅ 디폴트 카드 1개 (작성자)
+  // ✅ 초기 작성자 카드 1개 생성
   useEffect(() => {
     const defaultCard: RecruitCardData = {
       id: 1,
-      role: "frontend",
+      role: "FRONTEND", // ✅ 대문자로 고정
       authorName,
     };
     setCards([defaultCard]);
   }, [authorName]);
 
-  // ✅ 카드 배열 변경 시 상위로 전달
+  // ✅ 카드 배열 변경 시 상위 컴포넌트에 전달
   useEffect(() => {
     onChange(cards);
   }, [cards, onChange]);
@@ -37,8 +37,8 @@ export default function RecruitRoleList({
     const newId = cards.length > 0 ? cards[cards.length - 1].id + 1 : 1;
     const newCard: RecruitCardData = {
       id: newId,
-      role: "frontend",
-      authorName: "모집중", // ✅ 추가 카드는 '모집중'으로 고정
+      role: "FRONTEND", // ✅ 기본값도 대문자로
+      authorName: "모집중", // 추가 카드는 '모집중'으로 고정
     };
     setCards((prev) => [...prev, newCard]);
   };
@@ -46,7 +46,9 @@ export default function RecruitRoleList({
   const handleChangeRole = (id: number, newRole: string) => {
     setCards((prev) =>
       prev.map((card) =>
-        card.id === id ? { ...card, role: newRole } : card
+        card.id === id
+          ? { ...card, role: newRole.toUpperCase() } // ✅ 혹시 lowercase로 들어와도 대문자로 변환
+          : card
       )
     );
   };

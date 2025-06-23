@@ -1,5 +1,4 @@
 import { API } from "..";
-
 import {
   CreateProjectPayload,
   CreateProjectPostResponse,
@@ -7,8 +6,8 @@ import {
   ProjectDetail,
   UpdateProjectPayload,
   DeleteProjectResponse,
-  ApplyProjectPayload,
-  Applicant,
+  ProjectApplyRequest,
+  ProjectApplyResponse,
 } from "../../types/api/project-board";
 
 // ✅ 프로젝트 게시글 생성
@@ -19,7 +18,7 @@ export const createProjectPost = async (
   return response.data;
 };
 
-// ✅ 프로젝트 목록 조회 (검색어 없이)
+// ✅ 프로젝트 목록 조회
 export const getProjects = async (params: {
   "pageable.page": number;
   "pageable.size": number;
@@ -27,12 +26,11 @@ export const getProjects = async (params: {
   tags?: string[];
 }): Promise<ProjectListResponse> => {
   const queryParams = new URLSearchParams();
-
   queryParams.append("pageable.page", String(params["pageable.page"]));
   queryParams.append("pageable.size", String(params["pageable.size"]));
   queryParams.append("pageable.sort", params["pageable.sort"]);
 
-  if (params.tags && params.tags.length > 0) {
+  if (params.tags?.length) {
     params.tags.forEach((tag) => queryParams.append("tags", tag));
   }
 
@@ -43,7 +41,7 @@ export const getProjects = async (params: {
   return response.data;
 };
 
-// ✅ 프로젝트 검색 (/search)
+// ✅ 프로젝트 검색
 export const searchProjects = async (params: {
   keyword: string;
   searchType?: "ALL" | "TITLE" | "CONTENT";
@@ -53,15 +51,13 @@ export const searchProjects = async (params: {
   "pageable.sort": string;
 }): Promise<ProjectListResponse> => {
   const queryParams = new URLSearchParams();
-
   queryParams.append("keyword", params.keyword);
   if (params.searchType) queryParams.append("searchType", params.searchType);
-
   queryParams.append("pageable.page", String(params["pageable.page"]));
   queryParams.append("pageable.size", String(params["pageable.size"]));
   queryParams.append("pageable.sort", params["pageable.sort"]);
 
-  if (params.tags && params.tags.length > 0) {
+  if (params.tags?.length) {
     params.tags.forEach((tag) => queryParams.append("tags", tag));
   }
 
@@ -96,22 +92,24 @@ export const deleteProject = async (
   return response.data;
 };
 
-// ✅ 프로젝트 지원서 제출
+// ✅ 프로젝트 모집글에 지원
 export const applyToProject = async (
-  payload: ApplyProjectPayload
-): Promise<void> => {
-  await API.post("/api/v1/applications", payload);
+  projectId: number,
+  payload: ProjectApplyRequest
+): Promise<ProjectApplyResponse> => {
+  const response = await API.post(`/api/v1/projects/${projectId}/apply`, payload);
+  return response.data;
 };
 
-// ✅ 지원자 목록 조회
-export const getApplicationsByProjectId = async (
+// ✅ [이름 변경] 지원자 목록 조회 (Swagger 구조에 맞춤)
+export const getApplicantsByProjectId = async (
   projectId: number
-): Promise<Applicant[]> => {
+): Promise<ProjectApplyResponse[]> => {
   const response = await API.get(`/api/v1/projects/${projectId}/applications`);
   return response.data;
 };
 
-// ✅ 지원서 상태 변경
+// ✅ 지원서 상태 변경 (수락 / 거절)
 export const updateApplicationStatus = async (
   applicationId: number,
   status: "accepted" | "rejected"
