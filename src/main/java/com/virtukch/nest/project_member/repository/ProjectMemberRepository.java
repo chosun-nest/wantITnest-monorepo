@@ -18,4 +18,5 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     Optional<ProjectMember> findByProjectIdAndMemberId(Long projectId, Long memberId);
     long countByProjectIdAndPartAndMemberIdIsNotNull(Long projectId, ProjectMember.Part part);
     long countByProjectIdAndPart(Long projectId, ProjectMember.Part part);
+    List<ProjectMember> findByProjectIdAndMemberIdIsNotNull(Long projectId);
 }

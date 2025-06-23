@@ -25,6 +25,7 @@ public class ProjectApplication {
     private ProjectMember.Part part;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private ApplicationStatus status;
 
     private LocalDateTime appliedAt;
@@ -32,6 +33,11 @@ public class ProjectApplication {
     public enum ApplicationStatus {
         WAITING,
         ACCEPTED,
-        REJECTED
+        REJECTED,
+        CANCELLED
+    }
+
+    public void updateStatus(ApplicationStatus newStatus) {
+        this.status = newStatus;
     }
 }
