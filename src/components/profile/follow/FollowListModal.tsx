@@ -4,6 +4,7 @@ import { checkOthersFollowers, checkOthersFollowings } from "../../../api/follow
 import type { FollowUser } from "../../../types/follow/follow";
 import FollowUserItem from "./FollowUserItem";
 import Modal from "../../common/modal";
+import SkeletonFollowUserItem from "./SkeletonFollowUserItem";
 
 interface FollowListModalProps {
   type: "follower" | "following";
@@ -45,29 +46,40 @@ export default function FollowListModal({
   }, [type, memberId]);
 
   return (
-    <Modal
-      title={title}
-      message="팔로우 정보를 확인하세요." // 예시 메시지
-      onClose={onClose}
-      type="info"
-    >
+    <Modal 
+      title={title} 
+      onClose={onClose} 
+      type="info" 
+      message="아래 목록에서 사용자를 확인하고 프로필을 방문하거나 팔로우 상태를 변경할 수 있습니다.">
       {loading ? (
-        <div className="p-4 text-center text-gray-500">불러오는 중...</div>
+        <ul className="max-h-[400px] overflow-y-auto divide-y">
+          {[...Array(5)].map((_, i) => (
+            <li key={i}>
+              <SkeletonFollowUserItem />
+            </li>
+          ))}
+        </ul>
       ) : users.length === 0 ? (
         <div className="p-4 text-center text-gray-500">표시할 사용자가 없습니다.</div>
       ) : (
         <ul className="max-h-[400px] overflow-y-auto divide-y">
-          {users.map((user) => (
-            <li key={user.memberId}>
-              <FollowUserItem
-                user={user}
-                onFollowChange={() => {
-                  if (type === "follower") onRefreshFollowerCount?.();
-                  if (type === "following") onRefreshFollowingCount?.();
-                }}
-              />
-            </li>
-          ))}
+          {loading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <li key={i}>
+                  <SkeletonFollowUserItem />
+                </li>
+              ))
+            : users.map((user) => (
+                <li key={user.memberId}>
+                  <FollowUserItem
+                    user={user}
+                    onFollowChange={() => {
+                      if (type === "follower") onRefreshFollowerCount?.();
+                      if (type === "following") onRefreshFollowingCount?.();
+                    }}
+                  />
+                </li>
+              ))}
         </ul>
       )}
     </Modal>
