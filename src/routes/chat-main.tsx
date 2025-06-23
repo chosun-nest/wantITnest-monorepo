@@ -15,7 +15,10 @@ import { checkMyFollowings } from "../api/following/follow";
 import { checkMyChatRooms, createRoom, enterRoom } from "../api/following/chat";
 import { useSelector } from "react-redux";
 import { selectCurrentUserId } from "../store/slices/userSlice";
-import { getMemberProfile } from "../api/profile/ProfileAPI";
+import {
+  getMemberProfile,
+  getMemberProfileById,
+} from "../api/profile/ProfileAPI";
 import io from "socket.io-client";
 
 const WS_SERVER_URL = import.meta.env.VITE_API_CHAT_URL;
@@ -38,16 +41,29 @@ export default function ChatMain() {
 
   // 🔹 팔로잉 목록
   useEffect(() => {
-    checkMyFollowings().then((data) => {
-      const mapped: SimpleMemberProfile[] = data.users.map((user) => ({
-        memberId: user.memberId,
-        memberName: user.memberName,
-        memberImageUrl: user.memberImageUrl,
-        memberIntroduce: user.memberIntroduce,
-        memberIsStudent: user.memberIsStudent,
-      }));
-      setFollowings(mapped);
-    });
+    const loadFollowings = async () => {
+      try {
+        const data = await checkMyFollowings();
+
+        const users = data.users as SimpleMemberProfile[];
+
+        const updatedUsers = await Promise.all(
+          users.map(async (user) => {
+            const profile = await getMemberProfileById(user.memberId);
+            return {
+              ...user,
+              memberImageUrl: profile.memberImageUrl,
+            };
+          })
+        );
+
+        setFollowings(updatedUsers);
+      } catch (err) {
+        console.error("팔로잉 목록 불러오기 실패:", err);
+      }
+    };
+
+    loadFollowings();
   }, []);
 
   // 🔹 나의 채팅방 목록 + 실시간 반영
