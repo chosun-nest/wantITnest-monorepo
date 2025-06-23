@@ -72,16 +72,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
     }
 
     @Transactional
-    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId, Long requesterId) {
-
-        // 존재 확인
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        // 작성자 확인
-        if (!project.getMemberId().equals(requesterId)) {
-            throw new NotProjectOwnerException();
-        }
+    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId) {
 
         List<ProjectApplication> applications = projectApplicationRepository.findByProjectId(projectId);
 
