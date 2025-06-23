@@ -101,13 +101,13 @@ export const deleteProject = async (
 };
 
 // ✅ 프로젝트 모집글에 지원
-export const applyToProject = async (
-  projectId: number,
-  payload: ProjectApplyRequest
-): Promise<ProjectApplyResponse> => {
+export const applyToProject = async (payload: ProjectApplyRequest) => {
   const response = await API.post(
-    `/api/v1/projects/${projectId}/apply`,
-    payload
+    `/api/v1/projects/${payload.projectId}/apply`,
+    { part: payload.part },
+    {
+      headers: { skipAuth: false },
+    }
   );
   return response.data;
 };
@@ -116,14 +116,20 @@ export const applyToProject = async (
 export const getApplicantsByProjectId = async (
   projectId: number
 ): Promise<ProjectApplyResponse[]> => {
-  const response = await API.get(`/api/v1/projects/${projectId}/applications`);
+  const response = await API.get(`/api/v1/projects/${projectId}/applications`, {
+    headers: { skipAuth: false },
+  });
   return response.data;
 };
 
 // ✅ 지원서 상태 변경 (수락 / 거절)
 export const updateApplicationStatus = async (
+  projectId: number,
   applicationId: number,
-  status: "accepted" | "rejected"
+  status: "accept" | "reject"
 ): Promise<void> => {
-  await API.patch(`/api/v1/applications/${applicationId}/status`, { status });
+  await API.post(
+    `/api/v1/projects/${projectId}/applications/${applicationId}/${status}`,
+    { headers: { skipAuth: false } }
+  );
 };
