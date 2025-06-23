@@ -1,6 +1,5 @@
 package com.virtukch.nest.project.dto;
 
-import com.virtukch.nest.post.dto.AuthorDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +15,7 @@ public class ProjectSummaryDto {
     private String previewContent;
     private Integer currentNumberOfMembers;
     private Integer maximumNumberOfMembers;
-    private AuthorDto author;
+    private ProjectAuthorDto author;
     private List<String> tags;
     private Integer viewCount;
     private String createdAt;

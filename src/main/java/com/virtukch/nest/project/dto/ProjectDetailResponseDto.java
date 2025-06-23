@@ -1,6 +1,5 @@
 package com.virtukch.nest.project.dto;
 
-import com.virtukch.nest.post.dto.AuthorDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
