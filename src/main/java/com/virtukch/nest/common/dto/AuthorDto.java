@@ -1,6 +1,5 @@
 package com.virtukch.nest.common.dto;
 
-import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
