@@ -34,7 +34,7 @@ public class ProjectApplication {
         WAITING,
         ACCEPTED,
         REJECTED,
-        CANCELLED
+        CANCELED
     }
 
     public void updateStatus(ApplicationStatus newStatus) {

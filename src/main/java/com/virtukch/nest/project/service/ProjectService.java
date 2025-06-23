@@ -270,7 +270,7 @@ public class ProjectService {
                     memberId,
                     ProjectApplication.ApplicationStatus.ACCEPTED
             ).ifPresent(application -> {
-                application.updateStatus(ProjectApplication.ApplicationStatus.CANCELLED);
+                application.updateStatus(ProjectApplication.ApplicationStatus.CANCELED);
                 projectApplicationRepository.save(application);
             });
         }
