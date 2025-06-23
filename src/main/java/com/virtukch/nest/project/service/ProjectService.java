@@ -132,7 +132,7 @@ public class ProjectService {
     // 게시글 목록 조회
     @Transactional(readOnly = true)
     public ProjectListResponseDto getProjectList(Pageable pageable) {
-        Page<com.virtukch.nest.project.model.Project> projectPage = projectRepository.findAll(pageable);
+        Page<Project> projectPage = projectRepository.findAll(pageable);
         return buildProjectListResponse(projectPage);
     }
 
@@ -392,8 +392,8 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    private ProjectListResponseDto buildProjectListResponse(Page<com.virtukch.nest.project.model.Project> projectPage) {
-        List<com.virtukch.nest.project.model.Project> projects = projectPage.getContent();
+    private ProjectListResponseDto buildProjectListResponse(Page<Project> projectPage) {
+        List<Project> projects = projectPage.getContent();
 
         Map<Long, String> memberNameMap = fetchMemberNameMap(projects);
         Map<Long, List<Long>> projectTagMap = fetchPostTagMap(projects);
