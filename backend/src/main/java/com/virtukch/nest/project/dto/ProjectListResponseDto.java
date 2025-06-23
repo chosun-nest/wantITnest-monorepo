@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.dto;
 
+import com.virtukch.nest.common.dto.PageInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,5 +13,5 @@ import java.util.List;
 public class ProjectListResponseDto {
     private List<ProjectSummaryDto> projects;
     private int totalCount;
-    private ProjectPageInfoDto pageInfo; // 페이지 정보
+    private PageInfoDto pageInfo; // 페이지 정보
 }

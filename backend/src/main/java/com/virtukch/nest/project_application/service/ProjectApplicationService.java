@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -47,8 +48,11 @@ public class ProjectApplicationService extends BaseTimeEntity {
         projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        // 중복 지원 방지
-        if (projectApplicationRepository.existsByProjectIdAndMemberIdAndStatusNot(projectId, memberId, ProjectApplication.ApplicationStatus.REJECTED)) {
+        // 중복 지원 방지 (REJECTED 또는 CANCELLED 제외)
+        if (projectApplicationRepository.existsByProjectIdAndMemberIdAndStatusNotIn(
+                projectId,
+                memberId,
+                List.of(ProjectApplication.ApplicationStatus.REJECTED, ProjectApplication.ApplicationStatus.CANCELED))) {
             throw new DuplicateApplicationException();
         }
 
@@ -68,16 +72,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
     }
 
     @Transactional
-    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId, Long requesterId) {
-
-        // 존재 확인
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        // 작성자 확인
-        if (!project.getMemberId().equals(requesterId)) {
-            throw new NotProjectOwnerException();
-        }
+    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId) {
 
         List<ProjectApplication> applications = projectApplicationRepository.findByProjectId(projectId);
 
@@ -130,6 +125,18 @@ public class ProjectApplicationService extends BaseTimeEntity {
                     .role(ProjectMember.Role.MEMBER)
                     .part(application.getPart())
                     .build());
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        int registeredCount = projectMemberRepository
+                .findByProjectIdAndMemberIdIsNotNull(projectId)
+                .size();
+
+        if (registeredCount >= maxMember) {
+            project.setIsRecruiting(false);
+            projectRepository.save(project);
         }
 
         Member member = memberRepository.findById(application.getMemberId()).orElse(null);

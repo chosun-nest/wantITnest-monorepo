@@ -9,6 +9,9 @@ import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
+
+import com.virtukch.nest.project_application.model.ProjectApplication;
+import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
 import com.virtukch.nest.project_tag.model.ProjectTag;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectApplicationRepository projectApplicationRepository;
     private final MemberRepository memberRepository;
     private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
     private final ProjectTagRepository projectTagRepository;
@@ -128,7 +132,7 @@ public class ProjectService {
     // 게시글 목록 조회
     @Transactional(readOnly = true)
     public ProjectListResponseDto getProjectList(Pageable pageable) {
-        Page<com.virtukch.nest.project.model.Project> projectPage = projectRepository.findAll(pageable);
+        Page<Project> projectPage = projectRepository.findAll(pageable);
         return buildProjectListResponse(projectPage);
     }
 
@@ -260,6 +264,15 @@ public class ProjectService {
                     .orElseThrow(() -> new ProjectMemberNotFoundException(projectId, memberId));
             member.removeMember();
             projectMemberRepository.save(member);
+            // Update application status to CANCELLED if exists
+            projectApplicationRepository.findByProjectIdAndMemberIdAndStatus(
+                    projectId,
+                    memberId,
+                    ProjectApplication.ApplicationStatus.ACCEPTED
+            ).ifPresent(application -> {
+                application.updateStatus(ProjectApplication.ApplicationStatus.CANCELED);
+                projectApplicationRepository.save(application);
+            });
         }
     }
 
@@ -379,8 +392,8 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    private ProjectListResponseDto buildProjectListResponse(Page<com.virtukch.nest.project.model.Project> projectPage) {
-        List<com.virtukch.nest.project.model.Project> projects = projectPage.getContent();
+    private ProjectListResponseDto buildProjectListResponse(Page<Project> projectPage) {
+        List<Project> projects = projectPage.getContent();
 
         Map<Long, String> memberNameMap = fetchMemberNameMap(projects);
         Map<Long, List<Long>> projectTagMap = fetchPostTagMap(projects);

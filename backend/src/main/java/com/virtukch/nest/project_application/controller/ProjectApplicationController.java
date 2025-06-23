@@ -51,8 +51,7 @@ public class ProjectApplicationController {
     @GetMapping("/{projectId}/applications")
     public ResponseEntity<List<ProjectApplicationResponseDto>> getProjectApplications(@AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long projectId) {
-        Long requestId = user.getMember().getMemberId();
-        List<ProjectApplicationResponseDto> applications = projectApplicationService.getApplicationsByProject(projectId, requestId);
+        List<ProjectApplicationResponseDto> applications = projectApplicationService.getApplicationsByProject(projectId);
         return ResponseEntity.ok(applications);
     }
 
