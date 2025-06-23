@@ -1,11 +1,12 @@
 package com.virtukch.nest.comment.dto.converter;
 
+import com.virtukch.nest.common.dto.AuthorDto;
 import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
 import com.virtukch.nest.comment.dto.CommentListResponseDto;
 import com.virtukch.nest.comment.dto.CommentResponseDto;
 import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.common.dto.PageInfoDto;
-import com.virtukch.nest.post.dto.AuthorDto;
+import com.virtukch.nest.member.model.Member;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -14,15 +15,11 @@ import java.util.List;
 
 public class CommentDtoConverter {
 
-    public static CommentResponseDto toResponseDto(Comment comment, String memberName) {
+    public static CommentResponseDto toResponseDto(Comment comment, Member member) {
         return CommentResponseDto.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.getCommentContent())
-                .author(AuthorDto.builder()
-                        .id(comment.getMemberId())
-                        .name(memberName)
-                        .build()
-                )
+                .author(AuthorDto.create(member))
                 .createdAt(timeFormat(comment.getCreatedAt()))
                 .updatedAt(timeFormat(comment.getUpdatedAt()))
                 .parentId(comment.getParentId())

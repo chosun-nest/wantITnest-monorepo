@@ -1,7 +1,6 @@
 package com.virtukch.nest.project.dto.converter;
 
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.post.dto.AuthorDto;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project_member.model.ProjectMember;
@@ -39,9 +38,10 @@ public class ProjectDtoConverter {
                 .projectTitle(project.getProjectTitle())
                 .previewContent(generatePreview(project.getProjectDescription()))
                 .tags(tagNames)
-                .author(AuthorDto.builder()
+                .author(ProjectAuthorDto.builder()
                         .id(project.getMemberId())
-                        .name(memberName).build()
+                        .name(memberName)
+                        .build()
                 )
                 .viewCount(project.getViewCount())
                 .createdAt(timeFormat(project.getCreatedAt()))

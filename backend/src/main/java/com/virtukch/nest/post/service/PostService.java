@@ -1,5 +1,6 @@
 package com.virtukch.nest.post.service;
 
+import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.common.service.ImageService;
 import com.virtukch.nest.member.exception.MemberNotFoundException;
@@ -382,13 +383,13 @@ public class PostService {
     private PostListResponseDto buildPostListResponse(Page<Post> postPage) {
         List<Post> posts = postPage.getContent();
 
-        Map<Long, String> memberNameMap = fetchMemberNameMap(posts);  // memberId -> memberName
+        Map<Long, Member> memberMap = fetchMemberMap(posts);  // memberId -> memberName
         Map<Long, List<Long>> postTagMap = fetchPostTagMap(posts);  // postId -> List<TagId>
         Map<Long, String> tagNameMap = fetchTagNameMap(postTagMap);  // tagId → tagName
         Map<Long, Long> commentCountMap = fetchCommentCountMap(posts);  // postId -> commentCount
 
         List<PostSummaryDto> summaries = posts.stream()
-                .map(post -> buildPostSummaryDto(post, memberNameMap, postTagMap, tagNameMap, commentCountMap))
+                .map(post -> buildPostSummaryDto(post, memberMap, postTagMap, tagNameMap, commentCountMap))
                 .toList();
 
         return PostDtoConverter.toListResponseDto(summaries, postPage);
@@ -399,7 +400,7 @@ public class PostService {
      * 게시글 정보와 작성자 이름, 태그 이름 목록, 댓글 개수를 포함한 DTO를 생성합니다.
      *
      * @param post 게시글 엔티티
-     * @param memberNameMap 회원 ID와 이름을 매핑한 맵
+     * @param memberMap 회원 ID와 회원을 매핑한 맵
      * @param postTagMap 게시글 ID와 태그 ID 목록을 매핑한 맵
      * @param tagNameMap 태그 ID와 이름을 매핑한 맵
      * @param commentCountMap 게시글 ID와 댓글 개수를 매핑한 맵
@@ -407,12 +408,12 @@ public class PostService {
      */
     private PostSummaryDto buildPostSummaryDto(
             Post post,
-            Map<Long, String> memberNameMap,
+            Map<Long, Member> memberMap,
             Map<Long, List<Long>> postTagMap,
             Map<Long, String> tagNameMap,
             Map<Long, Long> commentCountMap
     ){
-        String memberName = memberNameMap.get(post.getMemberId());
+        Member member = memberMap.get(post.getMemberId());
         List<String> tagNames = postTagMap.getOrDefault(post.getId(), Collections.emptyList()).stream()
                 .map(tagNameMap::get)
                 .filter(Objects::nonNull)
@@ -425,7 +426,7 @@ public class PostService {
             imageUrl = imageUrlList.get(0);
         }
 
-        return PostDtoConverter.toSummaryDto(post, memberName, tagNames, commentCount, imageUrl);
+        return PostDtoConverter.toSummaryDto(post, member, tagNames, commentCount, imageUrl);
     }
 
     /**
@@ -434,13 +435,13 @@ public class PostService {
      * @param posts 게시글 목록
      * @return 회원 ID를 키로, 회원 이름을 값으로 하는 맵
      */
-    private Map<Long, String> fetchMemberNameMap(List<Post> posts) {
+    private Map<Long, Member> fetchMemberMap(List<Post> posts) {
         List<Long> memberIds = posts.stream()
                                 .map(Post::getMemberId)
                                 .distinct()
                                 .toList();
         return memberRepository.findAllById(memberIds).stream()
-            .collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
+                .collect(Collectors.toMap(Member::getMemberId, member -> member));
     }
 
     /**

@@ -86,8 +86,8 @@ public class CommentService {
 
     private CommentResponseDto saveAndConvert(Comment comment, Long memberId) {
         Comment savedComment = commentRepository.save(comment);
-        String memberName = findMemberOrThrow(memberId).getMemberName();
-        return CommentDtoConverter.toResponseDto(savedComment, memberName);
+        Member member = findMemberOrThrow(memberId);
+        return CommentDtoConverter.toResponseDto(savedComment, member);
     }
 
     /**
@@ -120,16 +120,16 @@ public class CommentService {
         List<Comment> allReplies = findAllRepliesRecursively(boardType, postId, rootComments);
         allComments.addAll(allReplies);
 
-        // 3. 멤버 이름 매핑
-        Map<Long, String> memberNameMap = memberRepository.findAllById(
+        // 3. 멤버 정보 매핑
+        Map<Long, Member> memberMap = memberRepository.findAllById(
                 allComments.stream().map(Comment::getMemberId).distinct().toList()
-        ).stream().collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
+        ).stream().collect(Collectors.toMap(Member::getMemberId, member -> member));
 
         // 4. DTO 변환
         Map<Long, CommentResponseDto> responseMap = new LinkedHashMap<>();
         for (Comment comment : allComments) {
-            String authorName = memberNameMap.get(comment.getMemberId());
-            CommentResponseDto dto = CommentDtoConverter.toResponseDto(comment, authorName);
+            Member author = memberMap.get(comment.getMemberId());
+            CommentResponseDto dto = CommentDtoConverter.toResponseDto(comment, author);
             responseMap.put(comment.getCommentId(), dto);
         }
 
@@ -298,7 +298,7 @@ public class CommentService {
         Member member = findMemberOrThrow(memberId);
 
         comment.update(requestDto.getContent());
-        return CommentDtoConverter.toResponseDto(comment, member.getMemberName());
+        return CommentDtoConverter.toResponseDto(comment, member);
     }
 
     /**
