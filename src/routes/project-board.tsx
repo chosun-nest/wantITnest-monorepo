@@ -62,7 +62,7 @@ export default function ProjectBoard() {
       setProjects(filtered);
       setTotalCount(filtered.length);
     } catch (error) {
-      console.error("프로젝트 목록 불러오기 실패:", error);
+      console.error("제목 목록 불러오기 실패:", error);
     } finally {
       setLoading(false);
     }
@@ -97,13 +97,11 @@ export default function ProjectBoard() {
     <div
       className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}
     >
-      {/* ✅ 필터 버튼 */}
-      <div className="flex flex-col pb-2 mb-4 border-b border-gray-300 md:flex-row md:items-center md:justify-between">
+      {/* 필터 버튼 */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-2 mb-4 border-b border-gray-300">
         <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">
           프로젝트 모집 게시판
         </h1>
-      <div className="flex flex-col pb-2 mb-4 border-b border-gray-300 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">프로젝트 모집 게시판</h1>
         <div className="flex gap-2">
           {(["ALL", "RECRUITING", "COMPLETED"] as FilterType[]).map((type) => (
             <button
@@ -128,7 +126,7 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* ✅ 검색창 & 태그 선택 버튼 */}
+      {/* 검색창 & 태그 선택 버튼 */}
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-gray-600">
           총 <strong>{totalCount}</strong>개의 게시물이 있습니다.
@@ -153,7 +151,7 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* ✅ 선택된 태그들 */}
+      {/* 선택된 태그 */}
       {selectedTags.length > 0 && (
         <BoardTagFilterButton
           selectedTags={selectedTags}
@@ -161,7 +159,7 @@ export default function ProjectBoard() {
         />
       )}
 
-      {/* ✅ 태그 모달 */}
+      {/* 태그 모달 */}
       {showFilterModal && (
         <TagFilterModal
           onClose={() => setShowFilterModal(false)}
@@ -173,7 +171,7 @@ export default function ProjectBoard() {
         />
       )}
 
-      {/* ✅ 게시글 목록 */}
+      {/* 게시글 목록 */}
       {projects.length === 0 ? (
         <div className="py-10 text-center text-gray-500">
           표시할 게시글이 없습니다.
@@ -230,7 +228,7 @@ export default function ProjectBoard() {
         </div>
       )}
 
-      {/* ✅ 페이지네이션 */}
+      {/* 페이지네이션 */}
       <div className="flex justify-center mt-6 space-x-2">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
