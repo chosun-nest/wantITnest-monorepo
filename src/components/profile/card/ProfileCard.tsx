@@ -1,12 +1,15 @@
 // 프로필 카드 컴포넌트
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GithubLogo, LinkedinLogo, InstagramLogo } from "phosphor-react"; // npm install phosphor-react
 import { ModalContent } from "../../../types/modal";
-import { ProfileCardProps } from "../../../types/profile";
+import { ProfileCardProps } from "../../../types/profile";  // 프로필 관련 api용 ts
+//import { MemberProfile } from "../../../types/api/profile"; // 프로필 컴포넌트 관련 ts
 import Modal from "../../common/modal";
 import techColorMap from "../../../utils/tech-corlor-map";
 import ProfileActionButton from "./FollowOrEditButton";
+import FollowListModal from "../follow/FollowListModal";    //팔로워/팔로잉 수 하위
+import { checkOthersFollowers, checkOthersFollowings } from "../../../api/following/follow";
 
 export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps) {
   const navigate = useNavigate();
@@ -16,14 +19,21 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
     type: "info",
   });
   const [showModal, setShowModal] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [modalType, setModalType] = useState<"follower" | "following" | null>(null);
 
-  if (!profile) {
-    return (
-      <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">
-        <p className="text-sm text-gray-500">⚠️ 프로필 정보를 불러올 수 없습니다.</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const [followers, followings] = await Promise.all([
+        checkOthersFollowers(String(profile.memberId)),
+        checkOthersFollowings(String(profile.memberId)),
+      ]);
+      setFollowerCount(followers.totalCount);
+      setFollowingCount(followings.totalCount);
+    };
+    fetchCounts();
+  }, [profile.memberId]);
 
   const handleMissingLink = () => {
     setModalContent({
@@ -34,7 +44,15 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
     setShowModal(true);
   };
 
+  if (!profile) {
     return (
+      <div className="w-80 h-[450px] p-4 border rounded-xl shadow-md bg-white flex items-center justify-center">
+        <p className="text-sm text-gray-500">⚠️ 프로필 정보를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
+  
+  return (
     <>
       <div className="p-4 bg-white border shadow-md w-80 rounded-xl">
         {/* 프로필 이미지 */}
@@ -79,11 +97,37 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
 
         {/* 한 줄 소개 */}
         <p className="mt-2 text-sm text-left">{profile.introduce}</p>
+        
+        {/* 팔로우 수 표시 */}
+        <div className="flex gap-6 mt-3 text-sm font-medium text-gray-700">
+          <button onClick={() => setModalType("follower")}>
+            팔로워 <span className="ml-1 text-blue-800">{followerCount}</span>
+          </button>
+          <button onClick={() => setModalType("following")}>
+            팔로잉 <span className="ml-1 text-blue-800">{followingCount}</span>
+          </button>
+        </div>
 
+        {/* 팔로워 리스트 모달 */}
+        {modalType && (
+          <FollowListModal
+            type={modalType as "follower" | "following"}
+            memberId={profile.memberId}
+            memberName={profile.name}
+            onClose={() => setModalType(null)}
+            onRefreshFollowerCount={() => {
+              checkOthersFollowers(String(profile.memberId)).then(res => setFollowerCount(res.totalCount));
+            }}
+            onRefreshFollowingCount={() => {
+              checkOthersFollowings(String(profile.memberId)).then(res => setFollowingCount(res.totalCount));
+            }}
+          />
+        )}
+        
         {/* 기술 스택 */}
         <div className="flex flex-wrap gap-2 mt-5">
           {profile.techStacks?.map((stack: string, i: number) => {
-            const colorClass = techColorMap[stack] || "bg-blue-200 text-white";
+            const colorClass = techColorMap[stack] || "bg-gray-300 text-gray-800";
             return (
               <span
                 key={i}
