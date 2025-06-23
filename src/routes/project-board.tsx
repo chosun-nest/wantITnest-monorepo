@@ -98,7 +98,7 @@ export default function ProjectBoard() {
       className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}
     >
       {/* ✅ 필터 버튼 */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-300 pb-2 mb-4">
+      <div className="flex flex-col pb-2 mb-4 border-b border-gray-300 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">
           프로젝트 모집 게시판
         </h1>
@@ -127,11 +127,11 @@ export default function ProjectBoard() {
       </div>
 
       {/* ✅ 검색창 & 태그 선택 버튼 */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-gray-600">
           총 <strong>{totalCount}</strong>개의 게시물이 있습니다.
         </p>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex w-full gap-2 sm:w-auto">
           <input
             type="text"
             placeholder="제목 또는 내용 검색"
@@ -144,7 +144,7 @@ export default function ProjectBoard() {
           />
           <button
             onClick={() => setShowFilterModal(true)}
-            className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 border rounded"
+            className="px-3 py-2 text-sm text-gray-700 bg-gray-100 border rounded hover:bg-gray-200"
           >
             🔍 태그 선택
           </button>
