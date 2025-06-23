@@ -11,8 +11,9 @@ import java.util.Optional;
 public interface ProjectApplicationRepository extends JpaRepository<ProjectApplication, Long> {
     List<ProjectApplication> findByProjectId(Long projectId);
     List<ProjectApplication> findByMemberId(Long memberId);
-    Optional<ProjectApplication> findByProjectIdAndMemberIdAndPart(Long projectId, Long memberId, ProjectMember.Part part);
+    Optional<ProjectApplication> findByProjectIdAndMemberIdAndStatus(Long projectId, Long memberId, ProjectApplication.ApplicationStatus status);
+    //Optional<ProjectApplication> findByProjectIdAndMemberId(Long projectId, Long memberId);
     long countByProjectIdAndStatus(Long projectId, ProjectApplication.ApplicationStatus status);
 
-    boolean existsByProjectIdAndMemberIdAndStatusNot(Long projectId, Long memberId, ProjectApplication.ApplicationStatus status);
+    boolean existsByProjectIdAndMemberIdAndStatusNotIn(Long projectId, Long memberId, Collection<ProjectApplication.ApplicationStatus> statuses);
 }

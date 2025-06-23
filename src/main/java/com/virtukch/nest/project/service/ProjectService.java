@@ -9,6 +9,9 @@ import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
+
+import com.virtukch.nest.project_application.model.ProjectApplication;
+import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import com.virtukch.nest.project_member.model.ProjectMember;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
 import com.virtukch.nest.project_tag.model.ProjectTag;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectApplicationRepository projectApplicationRepository;
     private final MemberRepository memberRepository;
     private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
     private final ProjectTagRepository projectTagRepository;
@@ -260,6 +264,15 @@ public class ProjectService {
                     .orElseThrow(() -> new ProjectMemberNotFoundException(projectId, memberId));
             member.removeMember();
             projectMemberRepository.save(member);
+            // Update application status to CANCELLED if exists
+            projectApplicationRepository.findByProjectIdAndMemberIdAndStatus(
+                    projectId,
+                    memberId,
+                    ProjectApplication.ApplicationStatus.ACCEPTED
+            ).ifPresent(application -> {
+                application.updateStatus(ProjectApplication.ApplicationStatus.CANCELLED);
+                projectApplicationRepository.save(application);
+            });
         }
     }
 
