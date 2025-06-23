@@ -9,10 +9,9 @@ services:
       - "6030:6030"
     env_file:
       - ./.env.backend
+    user: "1000:1000"
     volumes:
-      # 업로드된 이미지 볼륨
       - ./backend/uploaded-images:/app/uploaded-images
-      # 로그 파일 저장
       - ./backend/logs:/app/logs
     networks:
       - backend-network
