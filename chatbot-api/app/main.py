@@ -1,4 +1,8 @@
+# app/main.py
+# FastAPI 실행 진입점 (uvicorn 실행, 미들웨어, 라우터 등록)
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.routers import chat
 
 # FastAPI 앱 생성
@@ -8,6 +12,14 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # 챗봇 라우터 등록 (Nginx에서 /api/chat으로 라우팅)
@@ -27,11 +39,12 @@ async def root():
         "health": "/health"
     }
 
+# 개발/테스트용 직접 실행 지원
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         app, 
         host="0.0.0.0", 
         port=8001,  # 스케줄러가 8000번 포트 사용 중이므로 8001번 포트 사용
-        reload=True  # 개발용 - 운영시 제거
+        reload=True  # # 개발시만 True - 운영시 제거
     )
