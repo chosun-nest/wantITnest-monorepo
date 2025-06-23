@@ -185,7 +185,7 @@ public class ProjectController {
             @RequestParam String keyword,
             @RequestParam(required = false, defaultValue = "ALL") String searchType,
             @RequestParam(required = false) List<String> tags,
-            @PageableDefault(size = 10, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         ProjectListResponseDto responseDto;
         if(tags == null || tags.isEmpty()) {
