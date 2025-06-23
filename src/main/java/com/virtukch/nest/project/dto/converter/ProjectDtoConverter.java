@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.dto.converter;
 
+import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.model.Project;
@@ -89,7 +90,7 @@ public class ProjectDtoConverter {
         return ProjectListResponseDto.builder()
                 .projects(summaries)
                 .totalCount((int) page.getTotalElements())
-                .pageInfo(toPageInfoDto(page))
+                .pageInfo(PageInfoDto.create(page))
                 .build();
     }
 
