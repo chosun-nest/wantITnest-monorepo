@@ -8,6 +8,7 @@ import type { ProjectSummary } from "../types/api/project-board";
 import BoardWriteButton from "../components/board/write/BoardWriteButton";
 import useResponsive from "../hooks/responsive";
 import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
+import SelectedTagList from "../components/board/tag/SelectedTagList";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
 
 const ITEMS_PER_PAGE = 8;
@@ -97,7 +98,7 @@ export default function ProjectBoard() {
       className={`mx-auto p-4 pt-24 ${isMobile ? "max-w-full" : "max-w-4xl"}`}
     >
       {/* 필터 버튼 */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between pb-2 mb-4 border-b border-gray-300">
+      <div className="flex flex-col pb-2 mb-4 border-b border-gray-300 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-[#00256c] mb-2 md:mb-0">
           프로젝트 모집 게시판
         </h1>
@@ -152,7 +153,7 @@ export default function ProjectBoard() {
 
       {/* 선택된 태그 */}
       {selectedTags.length > 0 && (
-        <BoardTagFilterButton
+        <SelectedTagList
           selectedTags={selectedTags}
           onRemoveTag={removeSelectedTag}
         />
