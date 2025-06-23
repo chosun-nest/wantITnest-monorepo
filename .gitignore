@@ -8,6 +8,10 @@
 
 backend/uploaded-images/*
 
+# default 파일 또는 폴더는 git에 포함
+!backend/uploaded-images/default
+!backend/uploaded-images/default/**
+
 # Gradle
 backend/.gradle/
 backend/build/
