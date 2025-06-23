@@ -14,6 +14,15 @@ public class AuthorDto {
     private String memberImageUrl;
 
     public static AuthorDto create(Member member) {
+        // Member가 null인 경우 탈퇴한 사용자로 처리
+        if (member == null) {
+            return AuthorDto.builder()
+                    .id(null)
+                    .name("탈퇴한 사용자")
+                    .memberImageUrl(null)
+                    .build();
+        }
+
         return AuthorDto.builder()
                 .id(member.getMemberId())
                 .name(member.getMemberName())

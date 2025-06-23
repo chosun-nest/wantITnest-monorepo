@@ -20,28 +20,36 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByTagIds(@Param("tagIds") List<Long> tagIds, Pageable pageable);
 
     // 제목 검색
-    @Query("SELECT p FROM Project p WHERE p.projectTitle LIKE CONCAT('%', :keyword, '%')")
-    Page<Project> findByProjectTitle(@Param("keyword") String keyword, Pageable pageable);
+    @Query("SELECT p FROM Project p WHERE UPPER(p.projectTitle) LIKE UPPER(CONCAT('%', :keyword, '%'))")
+    Page<Project> searchByProjectTitle(@Param("keyword") String keyword, Pageable pageable);
 
     // 글 검색
     @Query("SELECT p FROM Project p WHERE p.projectDescription LIKE CONCAT('%', :keyword, '%')")
-    Page<Project> findByProjectDescriptionContaining(@Param("keyword")String keyword, Pageable pageable);
+    Page<Project> searchByProjectDescriptionContaining(@Param("keyword")String keyword, Pageable pageable);
+
+    // 프로젝트 제목으로 projectId 조회
+    @Query("SELECT p.projectId FROM Project p WHERE UPPER(p.projectTitle) LIKE UPPER(CONCAT('%', :keyword, '%'))")
+    List<Long> findIdsByProjectTitle(@Param("keyword") String keyword);
+
+    // 프로젝트 설명으로 projectId 조회
+    @Query("SELECT p.projectId FROM Project p WHERE p.projectDescription LIKE CONCAT('%', :keyword, '%')")
+    List<Long> findIdsByProjectDescription(@Param("keyword") String keyword);
 
 
-    @Query("SELECT p FROM Project p WHERE p.projectId IN :ids AND p.projectTitle LIKE CONCAT('%', :title, '%')")
-    Page<Project> findByProjectIdAndTitle(@Param("ids") Collection<Long> ids, @Param("title") String title, Pageable pageable);
+    @Query("SELECT p FROM Project p WHERE p.projectId IN :ids AND UPPER(p.projectTitle) LIKE UPPER(CONCAT('%', :title, '%'))")
+    Page<Project> searchByProjectIdAndTitle(@Param("ids") Collection<Long> ids, @Param("title") String title, Pageable pageable);
 
     @Query("SELECT p FROM Project p WHERE p.projectId IN :ids AND p.projectDescription LIKE CONCAT('%', :description, '%')")
-    Page<Project> findByProjectIdAndDescription(@Param("ids") Collection<Long> ids, @Param("description") String description, Pageable pageable);
+    Page<Project> searchByProjectIdAndDescription(@Param("ids") Collection<Long> ids, @Param("description") String description, Pageable pageable);
 
     @Query("""
 SELECT p FROM Project p
 WHERE 
-    (p.projectId IN :titleIds AND p.projectTitle LIKE CONCAT('%', :title, '%'))
+    (p.projectId IN :titleIds AND UPPER(p.projectTitle) LIKE UPPER(CONCAT('%', :title, '%')))
     OR
     (p.projectId IN :descriptionIds AND p.projectDescription LIKE CONCAT('%', :description, '%'))
 """)
-    Page<Project> findByProjectIdAndTitleOrDescription(
+    Page<Project> searchByProjectIdAndTitleOrDescription(
         @Param("titleIds") Collection<Long> titleIds,
         @Param("title") String title,
         @Param("descriptionIds") Collection<Long> descriptionIds,
@@ -51,10 +59,16 @@ WHERE
 
     // 디폴트 검색
     @Query("SELECT p FROM Project p WHERE " +
-            "p.projectTitle LIKE CONCAT('%', :title, '%') OR " +
-            "p.projectDescription LIKE CONCAT('%', :description, '%')")
-    Page<Project> findByProjectTitleContainingIgnoreCaseOrProjectDescriptionContaining(@Param("title")String title, @Param("description")String description, Pageable pageable);
+            "(p.projectId IN :titleIds AND UPPER(p.projectTitle) LIKE UPPER(CONCAT('%', :title, '%'))) OR " +
+            "(p.projectId IN :descriptionIds AND p.projectDescription LIKE CONCAT('%', :description, '%'))")
+    Page<Project> searchByProjectTitleOrProjectDescriptionInIds(
+            @Param("titleIds") Collection<Long> titleIds,
+            @Param("title") String title,
+            @Param("descriptionIds") Collection<Long> descriptionIds,
+            @Param("description") String description,
+            Pageable pageable
+    );
 
     @Query("SELECT p.memberId FROM Project p WHERE p.projectId = :projectId")
-    Optional<Long> findWriterIdByProjectId(@Param("projectId") Long projectId);
+    Optional<Long> searchWriterIdByProjectId(@Param("projectId") Long projectId);
 }
