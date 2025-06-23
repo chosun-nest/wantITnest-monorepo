@@ -52,7 +52,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
         if (projectApplicationRepository.existsByProjectIdAndMemberIdAndStatusNotIn(
                 projectId,
                 memberId,
-                List.of(ProjectApplication.ApplicationStatus.REJECTED, ProjectApplication.ApplicationStatus.CANCELLED))) {
+                List.of(ProjectApplication.ApplicationStatus.REJECTED, ProjectApplication.ApplicationStatus.CANCELED))) {
             throw new DuplicateApplicationException();
         }
 
