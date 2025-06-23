@@ -170,13 +170,13 @@ export default function ChatMain() {
 
   return (
     <S.Container navbarHeight={navbarHeight + 20}>
-      <h2 className="mb-2 pl-4 font-bold text-xl h-[10%] w-[66%] max-w-[800px] min-w-[400px] border border-[#002f6c] overflow-auto shadow-sm rounded-xl mx-auto flex items-center">
+      <h2 className="mb-2 pl-4 font-bold text-xl h-[10%] w-[85%] max-w-[800px] min-w-[350px] border border-[#002f6c] shadow-sm rounded-xl mx-auto flex items-center">
         {mode === "following" && "내 팔로잉 목록"}
         {mode === "room" && "채팅방 목록"}
         {mode === "chat" && selectedRoom && `${selectedRoom.roomName}의 채팅방`}
       </h2>
 
-      <div className="flex flex-col h-[100%] w-[66%] max-w-[800px] min-w-[400px] bg-white p-5 border border-[#002f6c] overflow-auto shadow-sm rounded-xl ">
+      <div className="flex flex-col flex-1 min-h-0 h-[100%] w-[85%] max-w-[800px] min-w-[350px] bg-white p-5 border border-[#002f6c] overflow-auto shadow-sm rounded-xl ">
         {mode === "following" && (
           <>
             <FollowingList
