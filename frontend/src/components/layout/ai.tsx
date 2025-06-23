@@ -36,6 +36,7 @@ export default function Ai() {
   const [loading, setLoading] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
   const [color] = useState("#ffffff");
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // 입력란 자동 스크롤
