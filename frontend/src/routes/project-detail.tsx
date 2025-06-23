@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { selectAccessToken } from "../store/slices/authSlice";
 import { setUser, selectCurrentUserId } from "../store/slices/userSlice";
 import { getMemberProfile } from "../api/profile/ProfileAPI";
-import { getProjectById, deleteProject } from "../api/project/ProjectAPI";
+import {
+  getProjectById,
+  deleteProject,
+  getApplicantsByProjectId,
+} from "../api/project/ProjectAPI";
 
 import CommentSection from "../components/project/comment/CommentSection";
 import ApplicationModal from "../components/project/ApplicationModal";
@@ -33,6 +38,9 @@ export default function ProjectDetail() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const [myApplicationStatus, setMyApplicationStatus] = useState<
+    "WAITING" | "ACCEPTED" | "REJECTED" | "CANCELED" | null
+  >(null);
   useEffect(() => {
     if (accessToken === undefined) return;
 
@@ -42,17 +50,32 @@ export default function ProjectDetail() {
         setLoading(false);
         return;
       }
-      
+
       try {
         const user = await getMemberProfile();
-        dispatch(setUser({
-          memberId: user.memberId,
-          memberName: user.memberName,
-          memberRole: user.memberRole,
-        }));
+        dispatch(
+          setUser({
+            memberId: user.memberId,
+            memberName: user.memberName,
+            memberRole: user.memberRole,
+          })
+        );
 
         const data = await getProjectById(Number(id));
         setProject(data);
+
+        if (user?.memberId && data?.projectId) {
+          try {
+            const applicants = await getApplicantsByProjectId(data.projectId);
+            const found = applicants.find((a) => a.memberId === user.memberId);
+            if (found) {
+              setMyApplicationStatus(found.status);
+              console.log("지원자 상태:", found.status);
+            }
+          } catch (err) {
+            console.error("지원자 상태 조회 실패:", err);
+          }
+        }
       } catch (err: any) {
         if (err.response?.status === 404) {
           setNotFound(true);
@@ -203,10 +226,10 @@ export default function ProjectDetail() {
       <div className="w-full lg:w-[280px] shrink-0">
         <ParticipantCardBox
           project={project}
-          participants={project.projectMembers} // ✅ 정확하게 연결됨
+          participants={project.projectMembers}
           onOpenModal={() => setIsModalOpen(true)}
-          onAccept={() => {}}
           currentUserId={currentUserId!}
+          myApplicationStatus={myApplicationStatus}
         />
       </div>
 

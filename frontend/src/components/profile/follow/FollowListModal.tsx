@@ -1,10 +1,11 @@
-// 팔로워/팔로잉/서로 팔로우
+// 2단계 팔로워/팔로잉 확인 
+
 import { useEffect, useState } from "react";
-import { checkOthersFollowers, checkOthersFollowings } from "../../../api/following/follow";
+import { checkOthersFollowers, checkOthersFollowings, checkMyFollowers, checkMyFollowings, } from "../../../api/following/follow";
 import type { FollowUser } from "../../../types/follow/follow";
 import FollowUserItem from "./FollowUserItem";
-import Modal from "../../common/modal";
 import SkeletonFollowUserItem from "./SkeletonFollowUserItem";
+import { X } from "phosphor-react";
 
 interface FollowListModalProps {
   type: "follower" | "following";
@@ -13,19 +14,22 @@ interface FollowListModalProps {
   onClose: () => void;
   onRefreshFollowerCount?: () => void;
   onRefreshFollowingCount?: () => void;
+  isMyself?: boolean;
 }
 
 export default function FollowListModal({
   type,
   memberId,
+  memberName,
   onClose,
   onRefreshFollowerCount,
   onRefreshFollowingCount,
+  isMyself,
 }: FollowListModalProps) {
   const [users, setUsers] = useState<FollowUser[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const title = type === "follower" ? "팔로워 목록" : "팔로잉 목록";
+  const title = type === "follower" ? "팔로워" : "팔로잉";
 
   useEffect(() => {
     const fetchList = async () => {
@@ -33,8 +37,12 @@ export default function FollowListModal({
       try {
         const data =
           type === "follower"
-            ? await checkOthersFollowers(String(memberId))
-            : await checkOthersFollowings(String(memberId));
+            ? isMyself
+              ? await checkMyFollowers()
+              : await checkOthersFollowers(String(memberId))
+            : isMyself
+              ? await checkMyFollowings()
+              : await checkOthersFollowings(String(memberId));
         setUsers(data.users);
       } catch (e) {
         console.error("팔로우 목록 조회 실패", e);
@@ -46,42 +54,36 @@ export default function FollowListModal({
   }, [type, memberId]);
 
   return (
-    <Modal 
-      title={title} 
-      onClose={onClose} 
-      type="info" 
-      message="아래 목록에서 사용자를 확인하고 프로필을 방문하거나 팔로우 상태를 변경할 수 있습니다.">
-      {loading ? (
-        <ul className="max-h-[400px] overflow-y-auto divide-y">
-          {[...Array(5)].map((_, i) => (
-            <li key={i}>
-              <SkeletonFollowUserItem />
-            </li>
-          ))}
-        </ul>
-      ) : users.length === 0 ? (
-        <div className="p-4 text-center text-gray-500">표시할 사용자가 없습니다.</div>
-      ) : (
-        <ul className="max-h-[400px] overflow-y-auto divide-y">
-          {loading
-            ? Array.from({ length: 5 }).map((_, i) => (
-                <li key={i}>
-                  <SkeletonFollowUserItem />
-                </li>
-              ))
-            : users.map((user) => (
-                <li key={user.memberId}>
-                  <FollowUserItem
-                    user={user}
-                    onFollowChange={() => {
-                      if (type === "follower") onRefreshFollowerCount?.();
-                      if (type === "following") onRefreshFollowingCount?.();
-                    }}
-                  />
-                </li>
-              ))}
-        </ul>
-      )}
-    </Modal>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="relative w-full max-w-md max-h-[80vh] bg-white rounded-xl shadow-lg overflow-hidden">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold">{memberName}님의 {title}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* 내용 */}
+        <div className="overflow-y-auto max-h-[60vh]">
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => <SkeletonFollowUserItem key={i} />)
+          ) : users.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">아직 {title}가 없습니다.</div>
+          ) : (
+            users.map((user) => (
+              <FollowUserItem
+                key={user.memberId}
+                user={user}
+                onFollowChange={() => {
+                  if (type === "follower") onRefreshFollowerCount?.();
+                  if (type === "following") onRefreshFollowingCount?.();
+                }}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

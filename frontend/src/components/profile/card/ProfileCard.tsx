@@ -9,7 +9,13 @@ import Modal from "../../common/modal";
 import techColorMap from "../../../utils/tech-corlor-map";
 import ProfileActionButton from "./FollowOrEditButton";
 import FollowListModal from "../follow/FollowListModal";    //팔로워/팔로잉 수 하위
-import { checkOthersFollowers, checkOthersFollowings } from "../../../api/following/follow";
+import {
+  checkMyFollowers,
+  checkMyFollowings,
+  checkOthersFollowers,
+  checkOthersFollowings,
+} from "../../../api/following/follow";
+import FollowStats from "../follow/FollowStats";
 
 export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps) {
   const navigate = useNavigate();
@@ -22,6 +28,25 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [modalType, setModalType] = useState<"follower" | "following" | null>(null);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const [followers, followings] = isOwnProfile
+        ? await Promise.all([
+            checkMyFollowers(),
+            checkMyFollowings(),
+          ])
+        : await Promise.all([
+            checkOthersFollowers(String(profile.memberId)),
+            checkOthersFollowings(String(profile.memberId)),
+          ]);
+
+      setFollowerCount(followers.totalCount);
+      setFollowingCount(followings.totalCount);
+    };
+
+    fetchCounts();
+  }, [profile.memberId, isOwnProfile]);
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -99,14 +124,23 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
         <p className="mt-2 text-sm text-left">{profile.introduce}</p>
         
         {/* 팔로우 수 표시 */}
-        <div className="flex gap-6 mt-3 text-sm font-medium text-gray-700">
-          <button onClick={() => setModalType("follower")}>
-            팔로워 <span className="ml-1 text-blue-800">{followerCount}</span>
-          </button>
-          <button onClick={() => setModalType("following")}>
-            팔로잉 <span className="ml-1 text-blue-800">{followingCount}</span>
-          </button>
-        </div>
+        <FollowStats
+          memberId={profile.memberId}
+          memberName={profile.name}
+          followerCount={followerCount}
+          followingCount={followingCount}
+          isMyself={isOwnProfile}
+          onRefreshFollowerCount={() =>
+            checkOthersFollowers(String(profile.memberId)).then((res) =>
+              setFollowerCount(res.totalCount)
+            )
+          }
+          onRefreshFollowingCount={() =>
+            checkOthersFollowings(String(profile.memberId)).then((res) =>
+              setFollowingCount(res.totalCount)
+            )
+          }
+        />
 
         {/* 팔로워 리스트 모달 */}
         {modalType && (
@@ -114,6 +148,7 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
             type={modalType as "follower" | "following"}
             memberId={profile.memberId}
             memberName={profile.name}
+            isMyself={isOwnProfile}
             onClose={() => setModalType(null)}
             onRefreshFollowerCount={() => {
               checkOthersFollowers(String(profile.memberId)).then(res => setFollowerCount(res.totalCount));
