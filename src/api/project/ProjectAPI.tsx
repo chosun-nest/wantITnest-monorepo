@@ -18,25 +18,30 @@ export const createProjectPost = async (
   return response.data;
 };
 
-// ✅ 프로젝트 목록 조회
+// ✅ 프로젝트 목록 조회 (쿼리 파라미터: page, size, sort, tags)
 export const getProjects = async (params: {
-  "pageable.page": number;
-  "pageable.size": number;
-  "pageable.sort": string;
+  page: number;
+  size: number;
+  sort: string;
   tags?: string[];
 }): Promise<ProjectListResponse> => {
   const queryParams = new URLSearchParams();
-  queryParams.append("pageable.page", String(params["pageable.page"]));
-  queryParams.append("pageable.size", String(params["pageable.size"]));
-  queryParams.append("pageable.sort", params["pageable.sort"]);
 
+  if (params.page !== undefined)
+    queryParams.append("page", String(params.page));
+  if (params.size !== undefined)
+    queryParams.append("size", String(params.size));
+  if (params.sort) queryParams.append("sort", params.sort);
   if (params.tags?.length) {
     params.tags.forEach((tag) => queryParams.append("tags", tag));
   }
 
-  const response = await API.get(`/api/v1/projects?${queryParams.toString()}`, {
-    headers: { skipAuth: true },
-  });
+  const response = await API.get<ProjectListResponse>(
+    `/api/v1/projects?${queryParams.toString()}`,
+    {
+      headers: { skipAuth: true },
+    }
+  );
 
   return response.data;
 };
@@ -46,24 +51,27 @@ export const searchProjects = async (params: {
   keyword: string;
   searchType?: "ALL" | "TITLE" | "CONTENT";
   tags?: string[];
-  "pageable.page": number;
-  "pageable.size": number;
-  "pageable.sort": string;
+  page: number;
+  size: number;
+  sort: string;
 }): Promise<ProjectListResponse> => {
   const queryParams = new URLSearchParams();
   queryParams.append("keyword", params.keyword);
   if (params.searchType) queryParams.append("searchType", params.searchType);
-  queryParams.append("pageable.page", String(params["pageable.page"]));
-  queryParams.append("pageable.size", String(params["pageable.size"]));
-  queryParams.append("pageable.sort", params["pageable.sort"]);
+  queryParams.append("page", String(params.page));
+  queryParams.append("size", String(params.size));
+  queryParams.append("sort", params.sort);
 
   if (params.tags?.length) {
     params.tags.forEach((tag) => queryParams.append("tags", tag));
   }
 
-  const response = await API.get(`/api/v1/projects/search?${queryParams.toString()}`, {
-    headers: { skipAuth: true },
-  });
+  const response = await API.get<ProjectListResponse>(
+    `/api/v1/projects/search?${queryParams.toString()}`,
+    {
+      headers: { skipAuth: true },
+    }
+  );
 
   return response.data;
 };
@@ -97,7 +105,10 @@ export const applyToProject = async (
   projectId: number,
   payload: ProjectApplyRequest
 ): Promise<ProjectApplyResponse> => {
-  const response = await API.post(`/api/v1/projects/${projectId}/apply`, payload);
+  const response = await API.post(
+    `/api/v1/projects/${projectId}/apply`,
+    payload
+  );
   return response.data;
 };
 

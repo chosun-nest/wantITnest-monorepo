@@ -34,9 +34,9 @@ export default function ProjectBoard() {
     setLoading(true);
     try {
       const baseParams = {
-        "pageable.page": currentPage - 1,
-        "pageable.size": ITEMS_PER_PAGE,
-        "pageable.sort": "createdAt,desc",
+        page: currentPage - 1,
+        size: ITEMS_PER_PAGE,
+        sort: "createdAt,desc",
         tags: selectedTags,
       };
 
@@ -46,7 +46,6 @@ export default function ProjectBoard() {
           ...baseParams,
           keyword: searchKeyword,
           searchType: "ALL",
-          tags: selectedTags,
         });
       } else {
         data = await getProjects(baseParams);
@@ -60,9 +59,9 @@ export default function ProjectBoard() {
       }
 
       setProjects(filtered);
-      setTotalCount(filtered.length);
+      setTotalCount(data.totalCount);
     } catch (error) {
-      console.error("제목 목록 불러오기 실패:", error);
+      console.error("프로젝트 목록 불러오기 실패:", error);
     } finally {
       setLoading(false);
     }
