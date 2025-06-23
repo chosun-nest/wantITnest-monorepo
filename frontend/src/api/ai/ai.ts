@@ -10,7 +10,6 @@ export async function fetchChatBotAnswer(question: string): Promise<string> {
       stream: false,
     }),
   });
-
   if (!res.ok) return "오류가 발생했습니다.";
   
   const data = await res.json();
