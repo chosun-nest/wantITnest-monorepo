@@ -99,7 +99,7 @@ export default function ProfileCard({ profile, isOwnProfile }: ProfileCardProps)
         <p className="mt-2 text-sm text-left">{profile.introduce}</p>
         
         {/* 팔로우 수 표시 */}
-        <div className="flex gap-6 text-sm font-medium text-gray-700">
+        <div className="flex gap-6 mt-3 text-sm font-medium text-gray-700">
           <button onClick={() => setModalType("follower")}>
             팔로워 <span className="ml-1 text-blue-800">{followerCount}</span>
           </button>
