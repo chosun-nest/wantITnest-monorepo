@@ -304,18 +304,27 @@ public class ProjectService {
     public ProjectListResponseDto searchProjects(String keyword, String searchType, Pageable pageable) {
         Page<Project> projectPage;
 
+        if (keyword == null || keyword.trim().isEmpty()) {
+            projectPage = projectRepository.findAll(pageable);
+            return buildProjectListResponse(projectPage);
+        }
+
         switch (searchType.toUpperCase()) {
             case "TITLE" -> projectPage = projectRepository.searchByProjectTitle(keyword, pageable);
             case "CONTENT" -> projectPage = projectRepository.searchByProjectDescriptionContaining(keyword, pageable);
             default -> {
-                // ID 검색은 전처리 필요
-                List<Long> titleIds = projectRepository.findIdsByProjectTitle(keyword); // 가정된 메서드
-                List<Long> descriptionIds = projectRepository.findIdsByProjectDescription(keyword); // 가정된 메서드
+                List<Long> titleIds = projectRepository.findIdsByProjectTitle(keyword);
+                List<Long> descriptionIds = projectRepository.findIdsByProjectDescription(keyword);
+
+                if (titleIds.isEmpty() && descriptionIds.isEmpty()) {
+                    return buildProjectListResponse(Page.empty(pageable));
+                }
 
                 projectPage = projectRepository.searchByProjectTitleOrProjectDescriptionInIds(
                         titleIds, keyword, descriptionIds, keyword, pageable);
             }
         }
+
         return buildProjectListResponse(projectPage);
     }
 
