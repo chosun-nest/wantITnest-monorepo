@@ -1,6 +1,7 @@
 package com.virtukch.nest.post.dto.converter;
 
 import com.virtukch.nest.common.dto.PageInfoDto;
+import com.virtukch.nest.common.dto.AuthorDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.model.Post;
@@ -31,16 +32,13 @@ public class PostDtoConverter {
                 .build();
     }
 
-    public static PostSummaryDto toSummaryDto(Post post, String memberName, List<String> tagNames, Long commentCount, String imageUrl) {
+    public static PostSummaryDto toSummaryDto(Post post, Member member, List<String> tagNames, Long commentCount, String imageUrl) {
         return PostSummaryDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .previewContent(generatePreview(post.getContent()))
                 .tags(tagNames)
-                .author(AuthorDto.builder()
-                        .id(post.getMemberId())
-                        .name(memberName).build()
-                )
+                .author(AuthorDto.create(member))
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .dislikeCount(post.getDislikeCount())
@@ -56,10 +54,7 @@ public class PostDtoConverter {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tags(tagNames)
-                .author(AuthorDto.builder()
-                        .id(member.getMemberId())
-                        .name(member.getMemberName())
-                        .build())
+                .author(AuthorDto.create(member))
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .dislikeCount(post.getDislikeCount())
