@@ -414,6 +414,13 @@ public class PostService {
             Map<Long, Long> commentCountMap
     ){
         Member member = memberMap.get(post.getMemberId());
+        
+        // Member가 null인 경우 탈퇴한 사용자로 판단하고 로깅
+        if (member == null) {
+            log.warn("[탈퇴 사용자 감지] PostId [{}]의 MemberId [{}]에 해당하는 회원이 탈퇴했습니다. '탈퇴한 사용자'로 표시됩니다.", 
+                    post.getId(), post.getMemberId());
+        }
+        
         List<String> tagNames = postTagMap.getOrDefault(post.getId(), Collections.emptyList()).stream()
                 .map(tagNameMap::get)
                 .filter(Objects::nonNull)
