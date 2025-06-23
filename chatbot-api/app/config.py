@@ -1,3 +1,6 @@
+# app/config.py
+# 환경변수, OpenAI, 기타 설정 관리
+
 import os
 from typing import Optional
 from dotenv import load_dotenv
@@ -9,9 +12,9 @@ class Settings:
     
     # OpenAI 설정
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
-    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o")
     OPENAI_TEMPERATURE: float = float(os.getenv("OPENAI_TEMPERATURE", "0.7"))
-    OPENAI_MAX_TOKENS: Optional[int] = None if not os.getenv("OPENAI_MAX_TOKENS") else int(os.getenv("OPENAI_MAX_TOKENS"))
+    OPENAI_MAX_TOKENS: Optional[int] = None if not os.getenv("OPENAI_MAX_TOKENS") else int(os.getenv("OPENAI_MAX_TOKENS", 256))
     
     # 채팅 설정
     MAX_MESSAGES_HISTORY: int = int(os.getenv("CHATBOT_MAX_MESSAGES_HISTORY", "8"))
