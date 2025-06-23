@@ -31,6 +31,12 @@ backend/*.zip
 backend/*.tar.gz
 backend/*.rar
 
+# Logs
+backend/logs
+backend/*.log
+backend/logs/*
+backend/logs/**
+
 # IDE - Backend
 backend/.idea/
 backend/*.iws
