@@ -9,6 +9,11 @@ capstone-design-aws/
 └── .env.template   # 기존 통합 템플릿 (참고용)
 ```
 
+## 개발환경 - node.js 설치
+`https://nodejs.org/ko` 페이지에서 Install 클릭
+![alt text]({6B88F406-D843-4DE6-9F2A-7DDCE1310CFF}.png)
+개인 컴퓨터 요구사항에 맞춰 설정정
+
 ## 🚀 설정 방법
 
 ### 1. 환경변수 파일 생성
