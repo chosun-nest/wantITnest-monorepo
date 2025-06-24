@@ -26,7 +26,7 @@ interface RecruitCardData {
 export default function ProjectWrite() {
   const navigate = useNavigate();
   const location = useLocation();
-  const reduxAuthorName = useSelector(selectCurrentUserName);
+  
   //const reduxAuthorName = useSelector(selectCurrentUserName);
 
   const navbarRef = useRef<HTMLDivElement>(null);
@@ -166,13 +166,6 @@ export default function ProjectWrite() {
               boardType="projects"
             />
             <MarkdownEditor content={content} setContent={setContent} />
-            <BoardTagFilterButton
-              selectedTags={selectedTags}
-              onRemoveTag={(tag) =>
-                setSelectedTags((prev) => prev.filter((t) => t !== tag))
-              }
-              onOpenFilter={() => setShowFilterModal(true)}
-            />
 
             {/* 태그 리스트 표시 */}
             <SelectedTagList
