@@ -23,14 +23,6 @@ export default function FollowUserItem({ user, onFollowChange }: FollowUserItemP
   const handleFollowToggle = async () => {
     if (loading) return;
     setLoading(true);
-    // try {
-    //   if (isFollowing) {
-    //     await unfollow();
-    //   } else {
-    //     await follow();
-    //   }
-    // } catch (err) {
-    //   console.error("팔로우 상태 변경 실패", err);
     try {
       if (isFollowing) {
         await unfollow();
@@ -58,7 +50,7 @@ export default function FollowUserItem({ user, onFollowChange }: FollowUserItemP
         />
         <div>
           <p className="font-semibold">{user.memberName}</p>
-          <p className="text-xs text-gray-500">{user.memberIntroduce}</p>
+          
         </div>
       </div>
 

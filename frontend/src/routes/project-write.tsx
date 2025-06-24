@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectCurrentUserName } from "../store/slices/userSlice";
+//import { useSelector } from "react-redux";
+//import { selectCurrentUserName } from "../store/slices/userSlice";
 import Navbar from "../components/layout/navbar";
 import BoardTypeSelector from "../components/board/write/BoardTypeSelector";
 import TagFilterModal from "../components/board/tag/TagFilterModal";
-import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
+import SelectedTagList from "../components/board/tag/SelectedTagList";
+//import BoardTagFilterButton from "../components/board/tag/BoardTagFilterButton";
 import TitleInput from "../components/board/write/TitleInput";
 import MarkdownEditor from "../components/board/write/MarkdownEditor";
 import SubmitButtons from "../components/board/write/SubmitButtons";
@@ -25,7 +26,9 @@ interface RecruitCardData {
 export default function ProjectWrite() {
   const navigate = useNavigate();
   const location = useLocation();
-  const reduxAuthorName = useSelector(selectCurrentUserName);
+  
+  //const reduxAuthorName = useSelector(selectCurrentUserName);
+
   const navbarRef = useRef<HTMLDivElement>(null);
 
   const projectToEdit = location.state?.project as ProjectDetail | undefined;
@@ -150,7 +153,7 @@ export default function ProjectWrite() {
         style={{ paddingTop: navHeight }}
       >
         <BoardTypeSelector boardType="projects" />
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex-1">
             <div className="p-3 mb-4 text-sm border-l-4 border-blue-600 rounded bg-blue-50">
               <strong>프로젝트 모집 예시를 참고해 작성해주세요.</strong>
@@ -163,13 +166,23 @@ export default function ProjectWrite() {
               boardType="projects"
             />
             <MarkdownEditor content={content} setContent={setContent} />
-            <BoardTagFilterButton
+
+            {/* 태그 리스트 표시 */}
+            <SelectedTagList
               selectedTags={selectedTags}
-              onRemoveTag={(tag) =>
-                setSelectedTags((prev) => prev.filter((t) => t !== tag))
-              }
-              onOpenFilter={() => setShowFilterModal(true)}
+              onRemoveTag={(tag) => setSelectedTags((prev) => prev.filter((t) => t !== tag))}
             />
+
+            {/* 태그 필터 모달 열기 버튼 */}
+            <div className="mt-2">
+              <button
+                onClick={() => setShowFilterModal(true)}
+                className="px-3 py-2 text-sm text-gray-700 bg-gray-100 border rounded hover:bg-gray-200"
+              >
+                🔍 태그 선택
+              </button>
+            </div>
+
             {showFilterModal && (
               <TagFilterModal
                 onClose={() => setShowFilterModal(false)}
