@@ -1,20 +1,15 @@
 package com.virtukch.nest.auth.service;
 
-import com.virtukch.nest.auth.dto.LoginRequestDto;
-import com.virtukch.nest.auth.dto.LoginResponseDto;
-import com.virtukch.nest.auth.dto.SignupRequestDto;
-import com.virtukch.nest.auth.dto.SignupResponseDto;
+import com.virtukch.nest.auth.dto.*;
 import com.virtukch.nest.auth.exception.EmailAlreadyExistException;
 import com.virtukch.nest.auth.exception.InvalidTokenException;
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.common.dto.CommonResponseDto;
-import com.virtukch.nest.auth.dto.PasswordResetRequestDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.member_department.service.MemberDepartmentService;
-import com.virtukch.nest.member_interest.service.MemberInterestService;
 import com.virtukch.nest.member_tech_stack.service.MemberTechStackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +30,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final MemberDepartmentService memberDepartmentService;
     private final MemberTechStackService memberTechStackService;
-    private final MemberInterestService memberInterestService;
     private final EmailService emailService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         // 이메일 중복 확인
@@ -150,5 +145,15 @@ public class AuthService {
         return CommonResponseDto.builder()
             .message("비밀번호가 성공적으로 변경되었습니다.")
             .build();
+    }
+
+    public void logout(String token) {
+        tokenBlacklistService.blacklistToken(token);
+        log.info("사용자 로그아웃 완료");
+    }
+
+    public void logoutAll(Long memberId) {
+        tokenBlacklistService.blacklistAllUserTokens(memberId);
+        log.info("사용자 ID {}의 모든 토큰 무효화 완료", memberId);
     }
 }
