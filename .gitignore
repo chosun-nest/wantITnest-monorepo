@@ -386,6 +386,8 @@ logs/
 *.db
 *.sqlite
 *.sqlite3
+mysqldata
+redisdata
 
 # Configuration files with sensitive data
 config.local.*
