@@ -1,23 +1,22 @@
 package com.virtukch.nest.auth.controller;
 
-import com.virtukch.nest.auth.dto.LoginRequestDto;
-import com.virtukch.nest.auth.dto.LoginResponseDto;
-import com.virtukch.nest.auth.dto.PasswordResetRequestDto;
-import com.virtukch.nest.auth.dto.SendPasswordResetLinkRequestDto;
-import com.virtukch.nest.auth.dto.SignupRequestDto;
-import com.virtukch.nest.auth.dto.SignupResponseDto;
+import com.virtukch.nest.auth.dto.*;
+import com.virtukch.nest.auth.exception.InvalidTokenException;
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.auth.security.JwtAuthenticationHelper;
 import com.virtukch.nest.auth.service.AuthService;
 import com.virtukch.nest.common.dto.CommonResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -41,13 +40,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginRequestDto));
     }
 
-    @Operation(summary = "로그아웃", description = "현재 토큰을 무효화합니다.")
+    @Operation(summary = "로그아웃", description = "Access Token과 Refresh Token을 모두 무효화합니다.")
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponseDto> logout(
-            @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<CommonResponseDto> logout(@RequestBody LogoutRequestDto request) {
 
-        String token = authorizationHeader.replace("Bearer ", "");
-        authService.logout(token);
+        authService.logout(request.getAccessToken(), request.getRefreshToken());
 
         return ResponseEntity.ok(
                 CommonResponseDto.builder()
@@ -56,25 +53,12 @@ public class AuthController {
         );
     }
 
-    @Operation(summary = "모든 기기에서 로그아웃", description = "해당 사용자의 모든 토큰을 무효화합니다.")
-    @PostMapping("/logout-all")
-    public ResponseEntity<CommonResponseDto> logoutAll(
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        authService.logoutAll(userDetails.getMember().getMemberId());
-
-        return ResponseEntity.ok(
-                CommonResponseDto.builder()
-                        .message("모든 기기에서 로그아웃되었습니다.")
-                        .build()
-        );
-    }
-
     @Operation(summary = "토큰 재발급", description = "Refresh Token 을 제공하면 Access Token 과 Refresh Token 을 return 합니다.")
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDto> refresh(
         @RequestHeader("Authorization") @Parameter(description = "Bearer {refresh_token}") String refreshToken) {
-        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+        String token = refreshToken.replace("Bearer ", "");
+        return ResponseEntity.ok(authService.refreshToken(token));
     }
 
     @Operation(
@@ -88,8 +72,10 @@ public class AuthController {
     )
     @GetMapping("/me")
     public ResponseEntity<Long> getMemberIdFromJWT(
-        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        return ResponseEntity.ok(customUserDetails.getMember().getMemberId());
+            @RequestHeader("Authorization") String accessToken) {
+        String token = accessToken.replace("Bearer ", "");
+        Long memberId = authService.getMemberIdFromToken(token);
+        return ResponseEntity.ok(memberId);
     }
 
     // 로그인하지 않은 회원에게 이메일을 입력 받아 비밀번호 재설정 링크를 보내는 메서드

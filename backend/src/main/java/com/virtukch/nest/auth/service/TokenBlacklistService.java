@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -37,6 +36,10 @@ public class TokenBlacklistService {
                         Duration.ofMillis(ttl)
                 );
                 log.info("토큰 블랙리스트 추가: {}", token.substring(0, 20) + "...");
+
+                // 사용자 ID별 Access Token 목록에도 추가
+                Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
+                redisTemplate.opsForSet().add("user_access_tokens:" + memberId, token);
             }
         } catch (Exception e) {
             log.error("토큰 블랙리스트 추가 실패", e);
@@ -46,24 +49,5 @@ public class TokenBlacklistService {
     // 토큰이 블랙리스트에 있는지 확인
     public boolean isTokenBlacklisted(String token) {
         return redisTemplate.hasKey("blacklist:" + token);
-    }
-
-    // 특정 사용자의 모든 토큰 무효화 (강제 로그아웃)
-    public void blacklistAllUserTokens(Long memberId) {
-        // 패턴으로 해당 사용자의 모든 토큰 찾기
-        Set<String> keys = redisTemplate.keys("blacklist:*");
-        for (String key : keys) {
-            String token = key.replace("blacklist:", "");
-            try {
-                Long tokenMemberId = jwtTokenProvider.getMemberIdFromToken(token);
-                if (tokenMemberId.equals(memberId)) {
-                    // 이미 블랙리스트에 있으면 패스
-                    continue;
-                }
-            } catch (Exception e) {
-                // 토큰 파싱 실패 시 해당 키 삭제
-                redisTemplate.delete(key);
-            }
-        }
     }
 }

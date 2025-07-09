@@ -1,14 +1,14 @@
 package com.virtukch.nest.auth.security;
 
-import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.member.repository.MemberRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.virtukch.nest.member.repository.MemberRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j  // ✅ 로깅 추가
 @Service

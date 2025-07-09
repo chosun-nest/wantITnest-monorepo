@@ -31,6 +31,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenBlacklistService tokenBlacklistService;
+    private final JwtAuthenticationHelper jwtAuthenticationHelper;
 
     // ✅ 1. Swagger 관련 요청을 따로 처리
     @Bean
@@ -78,7 +79,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService, tokenBlacklistService),
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService, jwtAuthenticationHelper),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -88,7 +89,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("*"); // 모든 Origin 허용 (필요에 따라 도메인 제한 가능)
+        configuration.addAllowedOrigin("https://wantitnest.co.kr"); // 프론트엔드 도메인만 허용
         configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
         configuration.addAllowedHeader("*"); // 모든 요청 헤더 허용
         configuration.setAllowCredentials(true); // 인증 정보 포함 여부 (JWT 사용 시 true)

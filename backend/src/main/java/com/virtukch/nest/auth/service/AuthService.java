@@ -4,6 +4,7 @@ import com.virtukch.nest.auth.dto.*;
 import com.virtukch.nest.auth.exception.EmailAlreadyExistException;
 import com.virtukch.nest.auth.exception.InvalidTokenException;
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.auth.security.JwtAuthenticationHelper;
 import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.common.dto.CommonResponseDto;
 import com.virtukch.nest.member.model.Member;
@@ -32,6 +33,7 @@ public class AuthService {
     private final MemberTechStackService memberTechStackService;
     private final EmailService emailService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final JwtAuthenticationHelper jwtAuthenticationHelper;
 
     public SignupResponseDto signup(SignupRequestDto signupRequestDto) {
         // 이메일 중복 확인
@@ -95,15 +97,19 @@ public class AuthService {
     }
 
     public LoginResponseDto refreshToken(String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            log.error("Token refresh failed: Invalid refresh token");
-            throw new InvalidTokenException("Invalid refresh token");
-        }
-
+        // 1. JWT 검증 + 블랙리스트 체크
+        validateToken(refreshToken);
         Long memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken);
-        String newAccessToken = jwtTokenProvider.createToken(memberId);
 
-        return new LoginResponseDto(newAccessToken, refreshToken);
+        // 2. ✅ 기존 refresh token 블랙리스트 추가 (토큰 무효화)
+        tokenBlacklistService.blacklistToken(refreshToken);
+
+        // 3. ✅ 새로운 토큰들 생성
+        String newAccessToken = jwtTokenProvider.createToken(memberId);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
+
+        log.info("토큰 재발급 완료: memberId {}", memberId);
+        return new LoginResponseDto(newAccessToken, newRefreshToken);
     }
 
     public CommonResponseDto sendPasswordResetLink(String email) {
@@ -128,10 +134,7 @@ public class AuthService {
         String token = passwordResetRequestDto.getToken();
         String newPassword = passwordResetRequestDto.getNewPassword();
 
-        if (!jwtTokenProvider.validateToken(token)) {
-            log.warn("[비밀번호 재설정] 유효하지 않은 토큰 요청");
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
-        }
+        validateToken(token);
 
         Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
         Member member = memberRepository.findById(memberId)
@@ -147,13 +150,36 @@ public class AuthService {
             .build();
     }
 
-    public void logout(String token) {
-        tokenBlacklistService.blacklistToken(token);
-        log.info("사용자 로그아웃 완료");
+    public void logout(String accessToken, String refreshToken) {
+        try {
+            // 1. ✅ Access Token 블랙리스트 추가
+            tokenBlacklistService.blacklistToken(accessToken);
+            log.info("Access Token 블랙리스트 추가 완료");
+
+            // 2. ✅ Refresh Token도 블랙리스트 추가
+            tokenBlacklistService.blacklistToken(refreshToken);
+            log.info("Refresh Token 블랙리스트 추가 완료");
+
+        } catch (Exception e) {
+            log.error("로그아웃 처리 중 오류 발생", e);
+            // 일부 실패해도 계속 진행 (부분 성공도 의미있음)
+        }
+
+        log.info("완전한 로그아웃 처리 완료");
     }
 
-    public void logoutAll(Long memberId) {
-        tokenBlacklistService.blacklistAllUserTokens(memberId);
-        log.info("사용자 ID {}의 모든 토큰 무효화 완료", memberId);
+    public Long getMemberIdFromToken(String token) {
+        TokenValidationResult result = jwtAuthenticationHelper.validateToken(token);
+        if (!result.isValid()) {
+            throw new InvalidTokenException(result.getErrorType().getDefaultMessage());
+        }
+        return result.getMemberId();
+    }
+
+    private void validateToken(String token) {
+        TokenValidationResult result = jwtAuthenticationHelper.validateToken(token);
+        if (!result.isValid()) {
+            throw new InvalidTokenException(result.getErrorType().getDefaultMessage());
+        }
     }
 }
