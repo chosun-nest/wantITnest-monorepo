@@ -1,6 +1,6 @@
 package com.virtukch.nest.auth.security;
 
-import com.virtukch.nest.auth.service.TokenBlacklistService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -29,9 +29,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final TokenBlacklistService tokenBlacklistService;
     private final JwtAuthenticationHelper jwtAuthenticationHelper;
+    private final ObjectMapper objectMapper;
 
     // ✅ 1. Swagger 관련 요청을 따로 처리
     @Bean
@@ -56,7 +55,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/api/v1/auth/**",
+                    "/api/v1/auth/login",
+                    "/api/v1/auth/signup",
+                    "/api/v1/auth/refresh",
+                    "/api/v1/auth/send-password-reset-link",
+                    "/api/v1/auth/reset-password",
+                    "/api/v1/auth/verify-email",
+
                     "/api/v1/tech-stacks",
                     "/api/v1/interests",
                     "/api/v1/departments",
@@ -79,8 +84,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService, jwtAuthenticationHelper),
-                UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtAuthenticationFilter(customUserDetailsService, jwtAuthenticationHelper),
+                UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtExceptionFilter(objectMapper), JwtAuthenticationFilter.class);
 
         return http.build();
     }

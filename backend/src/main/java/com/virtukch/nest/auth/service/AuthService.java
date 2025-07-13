@@ -99,12 +99,19 @@ public class AuthService {
     public LoginResponseDto refreshToken(String refreshToken) {
         // 1. JWT 검증 + 블랙리스트 체크
         validateToken(refreshToken);
+        
+        // 2. 토큰 타입 검증 (refresh token인지 확인)
+        String tokenType = jwtTokenProvider.getTokenType(refreshToken);
+        if (!"refresh".equals(tokenType)) {
+            throw new InvalidTokenException("Refresh token이 아닙니다.");
+        }
+        
         Long memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken);
 
-        // 2. ✅ 기존 refresh token 블랙리스트 추가 (토큰 무효화)
+        // 3. ✅ 기존 refresh token 블랙리스트 추가 (토큰 무효화)
         tokenBlacklistService.blacklistToken(refreshToken);
 
-        // 3. ✅ 새로운 토큰들 생성
+        // 4. ✅ 새로운 토큰들 생성
         String newAccessToken = jwtTokenProvider.createToken(memberId);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
@@ -162,7 +169,6 @@ public class AuthService {
 
         } catch (Exception e) {
             log.error("로그아웃 처리 중 오류 발생", e);
-            // 일부 실패해도 계속 진행 (부분 성공도 의미있음)
         }
 
         log.info("완전한 로그아웃 처리 완료");

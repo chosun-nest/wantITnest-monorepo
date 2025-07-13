@@ -1,6 +1,5 @@
 package com.virtukch.nest.auth.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.virtukch.nest.auth.dto.TokenValidationResult;
 import com.virtukch.nest.auth.exception.InvalidTokenException;
 import jakarta.servlet.FilterChain;
@@ -15,13 +14,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j  // ✅ 로깅 추가
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService; // ✅ 사용자 정보 로드
     private final JwtAuthenticationHelper jwtAuthenticationHelper;
 
@@ -44,10 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
+        // 비회원일 경우 인증하지 않고 넘어감
         if (token != null) {
             TokenValidationResult result = jwtAuthenticationHelper.validateToken(token);
             if (result.isValid()) {
-                // Optional에 값이 존재할 경우에만 authenticate 메서드를 실행
                 authenticate(result.getMemberId());
             } else {
                 // 검증 실패시 예외 발생
