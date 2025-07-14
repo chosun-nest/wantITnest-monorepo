@@ -58,9 +58,8 @@ public class SecurityConfig {
                     "/api/v1/auth/login",
                     "/api/v1/auth/signup",
                     "/api/v1/auth/refresh",
-                    "/api/v1/auth/send-password-reset-link",
-                    "/api/v1/auth/reset-password",
-                    "/api/v1/auth/verify-email",
+                    "/api/v1/auth/password-reset-link-request",
+                    "/api/v1/auth/password-reset",
 
                     "/api/v1/tech-stacks",
                     "/api/v1/interests",

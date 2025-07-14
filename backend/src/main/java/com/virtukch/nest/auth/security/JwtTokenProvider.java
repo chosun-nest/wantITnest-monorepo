@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ public class JwtTokenProvider {
     @Value("${jwt.access-token-expiration}")
     private long accessTokenValidity;
 
-    @Getter
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenValidity;
 
@@ -33,37 +31,38 @@ public class JwtTokenProvider {
     }
 
     // 액세스 토큰 생성 (memberId 기반)
-    public String createToken(Long memberId) {
+    public String createAccessToken(Long memberId) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(memberId));
         claims.put("type", "access");
         Date now = new Date();
         Date validity = new Date(now.getTime() + accessTokenValidity);
 
-        return Jwts.builder()
-            .setClaims(claims)
-            .setIssuedAt(now)
-            .setExpiration(validity)
-            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-            .compact();
+        return buildToken(claims, now, validity);
     }
 
     // 리프레시 토큰 생성 (memberId 기반)
     public String createRefreshToken(Long memberId) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(memberId));
+        Claims claims = Jwts.claims();
+        claims.setSubject(String.valueOf(memberId));
         claims.put("type", "refresh");
-        
-        return Jwts.builder()
-            .setClaims(claims)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
-            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-            .compact();
+        claims.setIssuer("wantitnest-auth");
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + refreshTokenValidity);
+
+        return buildToken(claims, now, validity);
     }
 
-    //TODO : 비밀번호 재설정 토큰 추가
-    // 토큰 기한 5분 정도로 짧게 설정 필요
     public String createPasswordResetToken(Long memberId) {
-        return null;
+        Claims claims = Jwts.claims();
+        claims.setSubject(String.valueOf(memberId));
+        claims.put("type", "password_reset");
+        claims.setIssuer("wantitnest-auth");
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + 600000);  // 10분
+
+        return buildToken(claims, now, validity);
     }
 
     // 토큰에서 memberId 추출
@@ -83,5 +82,14 @@ public class JwtTokenProvider {
     // 토큰 타입 확인
     public String getTokenType(String token) {
         return (String) getClaims(token).get("type");
+    }
+
+    private String buildToken(Claims claims, Date now, Date validity) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 }

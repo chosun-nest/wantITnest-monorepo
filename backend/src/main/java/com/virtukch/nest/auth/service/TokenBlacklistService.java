@@ -1,5 +1,6 @@
 package com.virtukch.nest.auth.service;
 
+import com.virtukch.nest.auth.exception.InvalidTokenException;
 import com.virtukch.nest.auth.security.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +30,13 @@ public class TokenBlacklistService {
             long ttl = expiration.getTime() - System.currentTimeMillis();
 
             if (ttl > 0) {
-                // Redis에 토큰 저장 (TTL 설정으로 자동 삭제)
+                // 블랙리스트 처리 : Redis에 토큰 저장 (TTL 설정으로 자동 삭제)
                 redisTemplate.opsForValue().set(
                         "blacklist:" + token,
                         "BLACKLISTED",
                         Duration.ofMillis(ttl)
                 );
                 log.info("토큰 블랙리스트 추가: {}", token.substring(0, 20) + "...");
-
-                // 사용자 ID별 Access Token 목록에도 추가
-                Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
-                redisTemplate.opsForSet().add("user_access_tokens:" + memberId, token);
             }
         } catch (Exception e) {
             log.error("토큰 블랙리스트 추가 실패", e);

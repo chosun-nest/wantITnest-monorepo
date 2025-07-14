@@ -7,6 +7,7 @@ import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.auth.security.JwtAuthenticationHelper;
 import com.virtukch.nest.auth.security.JwtTokenProvider;
 import com.virtukch.nest.common.dto.CommonResponseDto;
+import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.model.Role;
 import com.virtukch.nest.member.repository.MemberRepository;
@@ -55,7 +56,7 @@ public class AuthService {
         memberRepository.save(member);
 
         // 2. JWT 토큰 생성
-        String accessToken = jwtTokenProvider.createToken(member.getMemberId());
+        String accessToken = jwtTokenProvider.createAccessToken(member.getMemberId());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getMemberId());
 
         // 3. Token 에서 memberId 추출
@@ -90,7 +91,7 @@ public class AuthService {
         Long memberId = userDetails.getMember().getMemberId();
 
         // ✅ JWT 토큰 생성
-        String accessToken = jwtTokenProvider.createToken(memberId);
+        String accessToken = jwtTokenProvider.createAccessToken(memberId);
         String refreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
         return new LoginResponseDto(accessToken, refreshToken);
@@ -112,7 +113,7 @@ public class AuthService {
         tokenBlacklistService.blacklistToken(refreshToken);
 
         // 4. ✅ 새로운 토큰들 생성
-        String newAccessToken = jwtTokenProvider.createToken(memberId);
+        String newAccessToken = jwtTokenProvider.createAccessToken(memberId);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
         log.info("토큰 재발급 완료: memberId {}", memberId);
@@ -123,7 +124,7 @@ public class AuthService {
         Member member = memberRepository.findByMemberEmail(email)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
 
-        String token = jwtTokenProvider.createToken(member.getMemberId());
+        String token = jwtTokenProvider.createPasswordResetToken(member.getMemberId());
         String resetLink = "http://wantitnest.co.kr/reset-password?token=" + token;
         String subject = "[NEST] 비밀번호 재설정 안내";
         String body = String.format(
@@ -143,9 +144,17 @@ public class AuthService {
 
         validateToken(token);
 
+        // 2. 토큰 타입 검증 (refresh token인지 확인)
+        String tokenType = jwtTokenProvider.getTokenType(token);
+        if (!"password_reset".equals(tokenType)) {
+            throw new InvalidTokenException("password_reset token이 아닙니다.");
+        }
+
+        tokenBlacklistService.blacklistToken(token);
+
         Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+            .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
 
         member.updatePassword(passwordEncoder.encode(newPassword));
         member.updatePasswordLength(newPassword.length());
