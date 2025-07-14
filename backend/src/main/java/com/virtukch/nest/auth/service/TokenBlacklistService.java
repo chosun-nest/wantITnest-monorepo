@@ -1,6 +1,5 @@
 package com.virtukch.nest.auth.service;
 
-import com.virtukch.nest.auth.exception.InvalidTokenException;
 import com.virtukch.nest.auth.security.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
