@@ -42,6 +42,7 @@ jwt:
   secret: ${JWT_SECRET:VUkwMS0xMjM0LTU2NzgtOWFiYy1kZWZnaGk=}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+  password-reset-token-expiration: ${JWT_PASSWORD_RESET_EXPIRATION:600000}
 
 springdoc:
   api-docs:

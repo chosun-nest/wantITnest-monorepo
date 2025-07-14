@@ -25,6 +25,9 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenValidity;
 
+    @Value("${jwt.password-reset-token-expiration}")
+    private long passwordResetTokenValidity;
+
     // 서명 키 생성
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -60,7 +63,7 @@ public class JwtTokenProvider {
         claims.setIssuer("wantitnest-auth");
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + 600000);  // 10분
+        Date validity = new Date(now.getTime() + passwordResetTokenValidity);  // 10분
 
         return buildToken(claims, now, validity);
     }
