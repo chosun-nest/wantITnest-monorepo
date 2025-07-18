@@ -181,7 +181,7 @@ public class PostService {
         Post post = validatePostOwnershipAndGet(postId, memberId);
 
         List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, postId, post.getImageUrlList());
-        post.updatePost(post.getTitle(), post.getContent(), imageUrls);
+        post.updatePost(requestDto.getTitle(), requestDto.getContent(), imageUrls);
 
         // 관련된 postTag 전부 삭제
         postTagRepository.deleteAllByPostId(post.getId());
@@ -260,10 +260,12 @@ public class PostService {
                 ? List.of("UNCATEGORIZED")
                 : tagNames;
 
-        tags.stream()
+        List<PostTag> postTags = tags.stream()
                 .map(tagService::findByNameOrThrow)
                 .map(tag -> new PostTag(post.getId(), tag.getId()))
-                .forEachOrdered(postTagRepository::save);
+                .toList();
+
+        postTagRepository.saveAll(postTags);
     }
     
     /**
