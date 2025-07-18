@@ -65,11 +65,7 @@ public class AuthService {
         // 4. memberDepartment 데이터 삽입 (다대다 테이블 고려)
         memberDepartmentService.create(memberId, signupRequestDto.getDepartmentIdList());
 
-        // memberInterest 데이터는 받지 읺기로 함.
-//        // 5. memberInterest 데이터 삽입 (다대다 테이블 고려)
-//        memberInterestService.create(memberId, signupRequestDto.getInterestIdList());
-
-        // 6. memberTechStack 데이터 삽입 (다대다 테이블 고려)
+        // 5. memberTechStack 데이터 삽입 (다대다 테이블 고려)
         memberTechStackService.create(memberId, signupRequestDto.getTechStackIdList());
 
         return SignupResponseDto.builder()
