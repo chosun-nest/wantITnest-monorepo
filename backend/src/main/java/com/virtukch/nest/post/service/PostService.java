@@ -1,8 +1,8 @@
 package com.virtukch.nest.post.service;
 
-import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.common.service.ImageService;
+import com.virtukch.nest.common.service.ViewCountService;
 import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
@@ -44,6 +44,7 @@ public class PostService {
     private final TagService tagService;
     private final CommentRepository commentRepository;
     private final ImageService imageService;
+    private final ViewCountService viewCountService;
 
     private final String prefix = "interest";
 
@@ -102,9 +103,11 @@ public class PostService {
      * @throws PostNotFoundException 게시글이 존재하지 않을 경우
      */
     @Transactional
-    public PostDetailResponseDto getPostDetail(Long postId) {
+    public PostDetailResponseDto getPostDetail(Long postId, Long memberId) {
         Post post = findByIdOrThrow(postId);
-        post.increaseViewCount(); // 조회수 증가
+        if (viewCountService.checkAndSetView(prefix, postId, memberId)) {
+            post.increaseViewCount();
+        }
 
         Member member = findMemberOrThrow(post);
         List<String> tagNames = extractTagNames(postId);
@@ -181,7 +184,7 @@ public class PostService {
         Post post = validatePostOwnershipAndGet(postId, memberId);
 
         List<String> imageUrls = imageService.replaceImages(requestDto.getImages(), prefix, postId, post.getImageUrlList());
-        post.updatePost(post.getTitle(), post.getContent(), imageUrls);
+        post.updatePost(requestDto.getTitle(), requestDto.getContent(), imageUrls);
 
         // 관련된 postTag 전부 삭제
         postTagRepository.deleteAllByPostId(post.getId());
@@ -260,10 +263,12 @@ public class PostService {
                 ? List.of("UNCATEGORIZED")
                 : tagNames;
 
-        tags.stream()
+        List<PostTag> postTags = tags.stream()
                 .map(tagService::findByNameOrThrow)
                 .map(tag -> new PostTag(post.getId(), tag.getId()))
-                .forEachOrdered(postTagRepository::save);
+                .toList();
+
+        postTagRepository.saveAll(postTags);
     }
     
     /**

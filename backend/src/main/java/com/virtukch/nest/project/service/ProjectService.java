@@ -2,6 +2,7 @@ package com.virtukch.nest.project.service;
 
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.common.service.ImageService;
+import com.virtukch.nest.common.service.ViewCountService;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.project.dto.*;
@@ -45,6 +46,8 @@ public class ProjectService {
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final ImageService imageService;
+    private final ViewCountService viewCountService;
+
     private final String prefix = "project";
 
     @Transactional
@@ -93,9 +96,11 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectDetailResponseDto getProjectDetail(Long projectId) {
+    public ProjectDetailResponseDto getProjectDetail(Long projectId, Long memberId) {
         Project project = findByIdOrThrow(projectId);
-        project.incrementViewCount();
+        if (viewCountService.checkAndSetView(prefix, projectId, memberId)) {
+            project.increaseViewCount();
+        }
 
         Member creator = findMemberOrThrow(project);
         List<String> tagNames = extractTagNames(projectId);

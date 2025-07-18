@@ -61,8 +61,9 @@ public class PostController {
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailResponseDto> getPostDetail(@PathVariable Long postId) {
-        PostDetailResponseDto responseDto = postService.getPostDetail(postId);
+    public ResponseEntity<PostDetailResponseDto> getPostDetail(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails user) {
+        Long memberId = user.getMember().getMemberId();
+        PostDetailResponseDto responseDto = postService.getPostDetail(postId, memberId);
         return ResponseEntity.ok(responseDto);
     }
 

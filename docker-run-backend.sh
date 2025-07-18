@@ -38,6 +38,11 @@ check_env_files() {
         echo -e "${YELLOW}   (ChatBot 기능이 작동하지 않을 수 있습니다.)${NC}"
     fi
     
+    # DB 비밀번호 확인
+    if [ -z "MYSQL_PASSWORD" ] || [ "MYSQL_PASSWORD" = "your_secure_db_password_here" ]; then
+        echo -e "${YELLOW}⚠️ DB_PASSWORD가 설정되지 않았거나 기본값입니다.${NC}"
+        echo -e "${YELLOW}   .env.backend 파일에서 보안이 강화된 데이터베이스 비밀번호를 설정해주세요.${NC}"
+    fi
     echo -e "${GREEN}✅ 환경변수 파일 확인 완료${NC}"
 }
 

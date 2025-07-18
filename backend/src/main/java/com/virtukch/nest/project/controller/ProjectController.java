@@ -55,7 +55,6 @@ public class ProjectController {
                 .body(responseDto);
     }
 
-    // 전체 프로젝트 조회
     @Operation(
         summary = "프로젝트 모집글 상세 조회",
         description = """
@@ -66,8 +65,10 @@ public class ProjectController {
             """
     )
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(@PathVariable Long projectId) {
-        ProjectDetailResponseDto responseDto = projectService.getProjectDetail(projectId);
+    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(
+            @PathVariable Long projectId, @AuthenticationPrincipal CustomUserDetails user) {
+        Long memberId = user.getMember().getMemberId();
+        ProjectDetailResponseDto responseDto = projectService.getProjectDetail(projectId, memberId);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -103,8 +104,6 @@ public class ProjectController {
         return ResponseEntity.ok(responseDto);
     }
 
-
-    //프로젝트 업데이트
     @Operation(
             summary = "프로젝트 모집글 수정",
             description = """
