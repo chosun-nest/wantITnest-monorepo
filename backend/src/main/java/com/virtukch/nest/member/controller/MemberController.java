@@ -116,7 +116,7 @@ public class MemberController {
 
                 ✅ 이후 이미지 사용하는 법:
                 - 위에서 받은 `imageUrl`을 그대로 브라우저에서 요청하면 이미지에 접근할 수 있습니다.
-                - 예: `http://119.219.30.209:6030/uploaded-images/member_1/f66f14c3-13eb-4298-a294-308cb1faee45.jpeg`
+                - 예: `http://123.456.78.90:6030/uploaded-images/member_1/f66f14c3-13eb-4298-a294-308cb1faee45.jpeg`
 
                 ⚠️ 이미지 업로드 시 기존 이미지가 자동으로 삭제되며, 새 이미지로 교체됩니다.
             """

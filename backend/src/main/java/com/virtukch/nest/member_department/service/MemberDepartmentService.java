@@ -30,8 +30,7 @@ public class MemberDepartmentService {
 
     // 2. findByMemberId
     public List<MemberDepartmentResponseDto> findByMemberId(Long memberId) {
-        List<MemberDepartment> memberDepartmentList = memberDepartmentRepository.findByMemberId(
-            memberId);
+        List<MemberDepartment> memberDepartmentList = memberDepartmentRepository.findByMemberId(memberId);
 
         return memberDepartmentList.stream()
             .map(memberDepartment -> MemberDepartmentResponseDto.builder()
