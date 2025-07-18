@@ -15,18 +15,16 @@ services:
       - ./backend/logs:/app/logs
     networks:
       - backend-network
-    depends_on:
-      - chatbot-api
     extra_hosts:
       - "host.docker.internal:host-gateway" # 호스트 연결 설정
     restart: unless-stopped
 
   # FastAPI 챗봇 API 서버
-  chatbot-api:
+  ai-api:
     build:
-      context: ./chatbot-api
+      context: ./ai-api
       dockerfile: Dockerfile
-    container_name: chatbot-api
+    container_name: ai-api
     ports:
       - "8001:8001"
     env_file:
@@ -45,11 +43,11 @@ services:
       start_period: 30s
 
   # Node.js 실시간 채팅 서버
-  node-chat-backend:
+  chat-websocket:
     build:
-      context: ./node-backend
+      context: ./chat-websocket
       dockerfile: Dockerfile
-    container_name: node-chat-backend
+    container_name: chat-websocket
     ports:
       - "4000:4000"
     env_file:

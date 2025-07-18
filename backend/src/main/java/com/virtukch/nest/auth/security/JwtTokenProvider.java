@@ -67,7 +67,7 @@ public class JwtTokenProvider {
     }
 
     // Claims 정보 가져오기
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(getSigningKey())
             .build()

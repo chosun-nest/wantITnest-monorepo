@@ -1,5 +1,6 @@
 package com.virtukch.nest.auth.security;
 
+import com.virtukch.nest.auth.service.TokenBlacklistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // ✅ 1. Swagger 관련 요청을 따로 처리
     @Bean
@@ -76,7 +78,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService, tokenBlacklistService),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

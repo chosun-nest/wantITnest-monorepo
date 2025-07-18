@@ -1,6 +1,7 @@
 package com.virtukch.nest.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.virtukch.nest.auth.service.TokenBlacklistService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -25,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService; // ✅ 사용자 정보 로드
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -46,8 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = extractToken(request);
 
-            if (isValid(token)) {
+            if (isValid(token) && !tokenBlacklistService.isTokenBlacklisted(token)) {
                 authenticate(token);
+            } else if (tokenBlacklistService.isTokenBlacklisted(token)) {
+                log.warn("블랙리스트된 토큰 사용 시도");
+                handleUnauthorized(response, "로그아웃된 토큰입니다.");
+                return;
             }
 
         } catch (ExpiredJwtException e) {

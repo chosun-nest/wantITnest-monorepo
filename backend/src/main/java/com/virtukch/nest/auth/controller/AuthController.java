@@ -41,6 +41,35 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginRequestDto));
     }
 
+    @Operation(summary = "로그아웃", description = "현재 토큰을 무효화합니다.")
+    @PostMapping("/logout")
+    public ResponseEntity<CommonResponseDto> logout(
+            @RequestHeader("Authorization") String authorizationHeader) {
+
+        String token = authorizationHeader.replace("Bearer ", "");
+        authService.logout(token);
+
+        return ResponseEntity.ok(
+                CommonResponseDto.builder()
+                        .message("로그아웃되었습니다.")
+                        .build()
+        );
+    }
+
+    @Operation(summary = "모든 기기에서 로그아웃", description = "해당 사용자의 모든 토큰을 무효화합니다.")
+    @PostMapping("/logout-all")
+    public ResponseEntity<CommonResponseDto> logoutAll(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        authService.logoutAll(userDetails.getMember().getMemberId());
+
+        return ResponseEntity.ok(
+                CommonResponseDto.builder()
+                        .message("모든 기기에서 로그아웃되었습니다.")
+                        .build()
+        );
+    }
+
     @Operation(summary = "토큰 재발급", description = "Refresh Token 을 제공하면 Access Token 과 Refresh Token 을 return 합니다.")
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDto> refresh(
