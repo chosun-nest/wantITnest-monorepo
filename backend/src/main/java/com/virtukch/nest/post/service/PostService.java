@@ -1,8 +1,8 @@
 package com.virtukch.nest.post.service;
 
-import com.virtukch.nest.comment.model.Comment;
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.common.service.ImageService;
+import com.virtukch.nest.common.service.ViewCountService;
 import com.virtukch.nest.member.exception.MemberNotFoundException;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
@@ -44,6 +44,7 @@ public class PostService {
     private final TagService tagService;
     private final CommentRepository commentRepository;
     private final ImageService imageService;
+    private final ViewCountService viewCountService;
 
     private final String prefix = "interest";
 
@@ -102,9 +103,11 @@ public class PostService {
      * @throws PostNotFoundException 게시글이 존재하지 않을 경우
      */
     @Transactional
-    public PostDetailResponseDto getPostDetail(Long postId) {
+    public PostDetailResponseDto getPostDetail(Long postId, Long memberId) {
         Post post = findByIdOrThrow(postId);
-        post.increaseViewCount(); // 조회수 증가
+        if (viewCountService.checkAndSetView("post", postId, memberId)) {
+            post.increaseViewCount(); // 조회수 증가
+        }
 
         Member member = findMemberOrThrow(post);
         List<String> tagNames = extractTagNames(postId);
