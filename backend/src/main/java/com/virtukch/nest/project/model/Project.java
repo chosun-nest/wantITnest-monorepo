@@ -61,7 +61,9 @@ public class Project extends BaseTimeEntity {
 
 
     //조회수 증가 메서드
-    public void incrementViewCount(){ this.viewCount++; }
+    public void increaseViewCount(){
+        this.viewCount++;
+    }
 
 
 

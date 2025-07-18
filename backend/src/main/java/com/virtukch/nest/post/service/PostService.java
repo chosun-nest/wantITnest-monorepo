@@ -105,8 +105,8 @@ public class PostService {
     @Transactional
     public PostDetailResponseDto getPostDetail(Long postId, Long memberId) {
         Post post = findByIdOrThrow(postId);
-        if (viewCountService.checkAndSetView("post", postId, memberId)) {
-            post.increaseViewCount(); // 조회수 증가
+        if (viewCountService.checkAndSetView(prefix, postId, memberId)) {
+            post.increaseViewCount();
         }
 
         Member member = findMemberOrThrow(post);
