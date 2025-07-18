@@ -2,7 +2,7 @@
 
 # ===========================================
 # wantITnest - Backend 서비스 배포 스크립트
-# Spring Boot + Chatbot API + Node.js Chat
+# Spring Boot + AI API + Node.js Chat
 # ===========================================
 
 set -e  # 에러 발생 시 스크립트 종료
@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 프로젝트 설정
-PROJECT_NAME="want-it-nest-backend"
+PROJECT_NAME="wantitnest-backend"
 COMPOSE_FILE="docker-compose.backend.yml"
 
 # 환경변수 파일 검증
@@ -39,7 +39,7 @@ check_env_files() {
     fi
     
     # DB 비밀번호 확인
-    if [ -z "$DB_PASSWORD" ] || [ "$DB_PASSWORD" = "your_secure_db_password_here" ]; then
+    if [ -z "MYSQL_PASSWORD" ] || [ "MYSQL_PASSWORD" = "your_secure_db_password_here" ]; then
         echo -e "${YELLOW}⚠️ DB_PASSWORD가 설정되지 않았거나 기본값입니다.${NC}"
         echo -e "${YELLOW}   .env.backend 파일에서 보안이 강화된 데이터베이스 비밀번호를 설정해주세요.${NC}"
     fi
@@ -75,8 +75,8 @@ start_services() {
     echo -e "${BLUE}🗂️ 필요한 디렉토리를 생성합니다...${NC}"
     mkdir -p backend/uploaded-images
     mkdir -p backend/logs
-    mkdir -p chatbot-api/logs
-    mkdir -p node-backend/logs
+    mkdir -p ai-api/logs
+    mkdir -p chat-websocket/logs
     
     # 이미지 빌드 및 서비스 시작
     echo -e "${BLUE}🔨 Docker 이미지를 빌드하고 서비스를 시작합니다...${NC}"
@@ -84,10 +84,6 @@ start_services() {
     
     echo ""
     echo -e "${GREEN}✅ Backend 서비스가 시작되었습니다!${NC}"
-    echo -e "${BLUE}🔍 서비스 확인:${NC}"
-    echo -e "   - ${YELLOW}Spring Boot API${NC}: http://localhost:6030"
-    echo -e "   - ${YELLOW}챗봇 API${NC}: http://localhost:8001"
-    echo -e "   - ${YELLOW}실시간 채팅${NC}: http://localhost:4000"
     echo ""
 }
 
@@ -118,8 +114,8 @@ show_logs() {
         echo ""
         
         echo -e "${YELLOW}=== Chatbot API 파일 로그 (최근 20줄) ===${NC}"
-        if [ -f "chatbot-api/logs/app.log" ]; then
-            tail -20 chatbot-api/logs/app.log 2>/dev/null || echo "로그 파일을 찾을 수 없습니다."
+        if [ -f "ai-api/logs/app.log" ]; then
+            tail -20 ai-api/logs/app.log 2>/dev/null || echo "로그 파일을 찾을 수 없습니다."
         else
             echo "로그 파일이 아직 생성되지 않았습니다."
         fi
@@ -135,6 +131,7 @@ show_logs() {
         # 특정 서비스의 파일 로그 확인
         case $service_name in
             "spring-backend")
+
                 if [ -f "backend/logs/application.log" ]; then
                     echo -e "${YELLOW}=== Spring Boot 파일 로그 (최근 50줄) ===${NC}"
                     tail -50 backend/logs/application.log
@@ -143,25 +140,29 @@ show_logs() {
                 echo -e "${YELLOW}=== Spring Boot 컨테이너 로그 ===${NC}"
                 docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE logs -f $service_name
                 ;;
-            "chatbot-api")
-                if [ -f "chatbot-api/logs/app.log" ]; then
+            "ai-api")
+                if [ -f "ai-api/logs/app.log" ]; then
                     echo -e "${YELLOW}=== Chatbot API 파일 로그 (최근 50줄) ===${NC}"
-                    tail -50 chatbot-api/logs/app.log
+                    tail -50 ai-api/logs/app.log
                     echo ""
                 fi
                 echo -e "${YELLOW}=== Chatbot API 컨테이너 로그 ===${NC}"
                 docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE logs -f $service_name
                 ;;
-            "node-chat-backend")
+            "chat-websocket")
                 echo -e "${YELLOW}=== Node.js 실시간 채팅 로그 ===${NC}"
+                docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE logs -f $service_name
+                ;;
+            "mysql-container")
+                echo -e "${YELLOW}=== MySQL 컨테이너 로그 ===${NC}"
                 docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE logs -f $service_name
                 ;;
             *)
                 echo -e "${RED}❌ 알 수 없는 서비스명: $service_name${NC}"
                 echo -e "${BLUE}Backend에서 사용 가능한 서비스:${NC}"
                 echo -e "   - spring-backend (Spring Boot API)"
-                echo -e "   - chatbot-api (챗봇 API)"  
-                echo -e "   - node-chat-backend (실시간 채팅)"
+                echo -e "   - ai-api (AI API)"  
+                echo -e "   - chat-websocket (실시간 채팅)"
                 exit 1
                 ;;
         esac
@@ -187,7 +188,7 @@ restart_services() {
     else
         # 특정 서비스 재시작
         case $service_name in
-            "spring-backend"|"chatbot-api"|"node-chat-backend")
+            "spring-backend"|"ai-api"|"chat-websocket")
                 if [ "$build_flag" = "--build" ]; then
                     echo -e "${BLUE}🔄 $service_name 서비스를 다시 빌드하고 재시작합니다...${NC}"
                     docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE stop $service_name
@@ -244,15 +245,15 @@ show_usage() {
     echo ""
     echo -e "${GREEN}📌 Backend 서비스명 목록:${NC}"
     echo -e "   - ${BLUE}spring-backend${NC}     (Spring Boot API - 6030 포트)"
-    echo -e "   - ${BLUE}chatbot-api${NC}        (챗봇 API - 8001 포트)"
-    echo -e "   - ${BLUE}node-chat-backend${NC}  (실시간 채팅 - 4000 포트)"
+    echo -e "   - ${BLUE}ai-api${NC}        (챗봇 API - 8001 포트)"
+    echo -e "   - ${BLUE}chat-websocket${NC}  (실시간 채팅 - 4000 포트)"
     echo ""
     echo -e "${GREEN}📌 사용 예시:${NC}"
     echo -e "   ${YELLOW}./docker-run-backend.sh logs spring-backend${NC}    # Spring Boot 로그 확인"
-    echo -e "   ${YELLOW}./docker-run-backend.sh restart chatbot-api --build${NC}  # 챗봇 API 재빌드 후 재시작"
+    echo -e "   ${YELLOW}./docker-run-backend.sh restart ai-api --build${NC}  # 챗봇 API 재빌드 후 재시작"
     echo ""
     echo -e "${GREEN}📚 유용한 정보:${NC}"
-    echo -e "   - 파일 로그 위치: backend/logs/, chatbot-api/logs/"
+    echo -e "   - 파일 로그 위치: backend/logs/, ai-api/logs/"
     echo -e "   - 환경설정: .env.backend"
     echo -e "   - Docker Compose: docker-compose.backend.yml"
     echo ""
