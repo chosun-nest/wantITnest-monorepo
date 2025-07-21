@@ -10,22 +10,20 @@ import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.exception.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
-
-import com.virtukch.nest.project_application.model.ProjectApplication;
+import com.virtukch.nest.project_application.model.ApplicationStatus;
 import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
 import com.virtukch.nest.project_tag.model.ProjectTag;
 import com.virtukch.nest.project_tag.repository.ProjectTagRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import com.virtukch.nest.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,13 +103,13 @@ public class ProjectService {
         Member creator = findMemberOrThrow(project);
         List<String> tagNames = extractTagNames(projectId);
 
-        List<ProjectMember> projectMembers = projectMemberRepository.findByProjectId(projectId);
+        List<ProjectParticipant> projectMembers = projectMemberRepository.findByProjectId(projectId);
 
-        int currentNumberOfMembers = (int) projectMembers.stream().filter(pm -> pm.getMemberId() != null).count();
+        int currentNumberOfMembers = (int) projectMembers.stream().filter(pm -> pm.getParticipantId() != null).count();
         int maximumNumberOfMembers = projectMembers.size();
 
         Map<Long, String> memberIdToName = projectMembers.stream()
-                .map(ProjectMember::getMemberId)
+                .map(ProjectParticipant::getParticipantId)
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toMap(
@@ -166,8 +164,8 @@ public class ProjectService {
 
         // Update creator's part if creatorPart is present
         if (requestDto.getCreatorPart() != null) {
-            ProjectMember.Part newPart = requestDto.getCreatorPart();
-            ProjectMember creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+            ProjectParticipant.Part newPart = requestDto.getCreatorPart();
+            ProjectParticipant creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
                 .orElseThrow(CanNotRemoveCreatorException::new);
             creator.setPart(newPart);
             projectMemberRepository.save(creator);
@@ -199,8 +197,8 @@ public class ProjectService {
 
         // Update creator's part if creatorPart is present
         if (requestDto.getCreatorPart() != null) {
-            ProjectMember.Part newPart = requestDto.getCreatorPart();
-            ProjectMember creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+            ProjectParticipant.Part newPart = requestDto.getCreatorPart();
+            ProjectParticipant creator = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
                 .orElseThrow(CanNotRemoveCreatorException::new);
             creator.setPart(newPart);
             projectMemberRepository.save(creator);
@@ -217,18 +215,18 @@ public class ProjectService {
     }
 
     @Transactional
-    public void updatePartCounts(Long projectId, Map<ProjectMember.Part, Integer> partCounts) {
-        for (Map.Entry<ProjectMember.Part, Integer> entry : partCounts.entrySet()) {
-            ProjectMember.Part part = entry.getKey();
+    public void updatePartCounts(Long projectId, Map<ProjectParticipant.Part, Integer> partCounts) {
+        for (Map.Entry<ProjectParticipant.Part, Integer> entry : partCounts.entrySet()) {
+            ProjectParticipant.Part part = entry.getKey();
             int targetCount = entry.getValue();
 
-            List<ProjectMember> members = projectMemberRepository.findByProjectIdAndPart(projectId, part);
+            List<ProjectParticipant> members = projectMemberRepository.findByProjectIdAndPart(projectId, part);
             // Separate filled and vacant slots
-            List<ProjectMember> filled = members.stream()
-                    .filter(pm -> pm.getMemberId() != null)
+            List<ProjectParticipant> filled = members.stream()
+                    .filter(pm -> pm.getParticipantId() != null)
                     .toList();
-            List<ProjectMember> vacant = members.stream()
-                    .filter(pm -> pm.getMemberId() == null)
+            List<ProjectParticipant> vacant = members.stream()
+                    .filter(pm -> pm.getParticipantId() == null)
                     .toList();
             int filledCount = filled.size();
             int vacantCount = vacant.size();
@@ -242,10 +240,10 @@ public class ProjectService {
             if (toAdd > 0) {
                 // Add new vacant slots
                 for (int i = 0; i < toAdd; i++) {
-                    projectMemberRepository.save(ProjectMember.builder()
+                    projectMemberRepository.save(ProjectParticipant.builder()
                             .projectId(projectId)
                             .part(part)
-                            .role(ProjectMember.Role.MEMBER)
+                            .role(ProjectParticipant.Role.MEMBER)
                             .build());
                 }
             } else if (toAdd < 0) {
@@ -253,7 +251,7 @@ public class ProjectService {
                 int toRemove = -toAdd;
                 // Only remove vacant slots, never filled
                 if (toRemove > 0 && vacantCount > 0) {
-                    List<ProjectMember> toDelete = vacant.stream().limit(toRemove).toList();
+                    List<ProjectParticipant> toDelete = vacant.stream().limit(toRemove).toList();
                     projectMemberRepository.deleteAll(toDelete);
                 }
                 // If not enough vacant slots, do not remove filled slots
@@ -265,7 +263,7 @@ public class ProjectService {
     @Transactional
     public void removeProjectMembers(Long projectId, List<Long> memberIds) {
         for (Long memberId : memberIds) {
-            ProjectMember member = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
+            ProjectParticipant member = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId)
                     .orElseThrow(() -> new ProjectMemberNotFoundException(projectId, memberId));
             member.removeMember();
             projectMemberRepository.save(member);
@@ -273,9 +271,9 @@ public class ProjectService {
             projectApplicationRepository.findByProjectIdAndMemberIdAndStatus(
                     projectId,
                     memberId,
-                    ProjectApplication.ApplicationStatus.ACCEPTED
+                    ApplicationStatus.ACCEPTED
             ).ifPresent(application -> {
-                application.updateStatus(ProjectApplication.ApplicationStatus.CANCELED);
+                application.updateStatus(ApplicationStatus.CANCELED);
                 projectApplicationRepository.save(application);
             });
         }
@@ -464,8 +462,8 @@ public class ProjectService {
         Boolean isRecruiting = project.getIsRecruiting();
 
         // Calculate current and maximum number of members
-        List<ProjectMember> members = projectMemberRepository.findByProjectId(project.getProjectId());
-        int currentNumberOfMembers = (int) members.stream().filter(pm -> pm.getMemberId() != null).count();
+        List<ProjectParticipant> members = projectMemberRepository.findByProjectId(project.getProjectId());
+        int currentNumberOfMembers = (int) members.stream().filter(pm -> pm.getParticipantId() != null).count();
         int maximumNumberOfMembers = members.size();
 
         return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting, currentNumberOfMembers, maximumNumberOfMembers);
@@ -487,20 +485,20 @@ public class ProjectService {
 
     // 프로젝트 멤버 생성
     public void createProjectMembers(Long projectId, Long creatorId,
-                                     Map<ProjectMember.Part, Integer> partCounts,
-                                     ProjectMember.Part creatorPart,
-                                     ProjectMember.Role creatorRole) {
-        List<ProjectMember> slots = new ArrayList<>();
+                                     Map<ProjectParticipant.Part, Integer> partCounts,
+                                     ProjectParticipant.Part creatorPart,
+                                     ProjectParticipant.Role creatorRole) {
+        List<ProjectParticipant> slots = new ArrayList<>();
         boolean assignedCreator = false;
 
-        for (Map.Entry<ProjectMember.Part, Integer> entry : partCounts.entrySet()) {
-            ProjectMember.Part part = entry.getKey();
+        for (Map.Entry<ProjectParticipant.Part, Integer> entry : partCounts.entrySet()) {
+            ProjectParticipant.Part part = entry.getKey();
             int count = entry.getValue();
             for (int i = 0; i < count; i++) {
-                ProjectMember.ProjectMemberBuilder builder = ProjectMember.builder()
+                ProjectParticipant.ProjectMemberBuilder builder = ProjectParticipant.builder()
                         .projectId(projectId)
                         .part(part)
-                        .role(ProjectMember.Role.MEMBER);
+                        .role(ProjectParticipant.Role.MEMBER);
 
                 if (!assignedCreator && part == creatorPart) {
                     builder.memberId(creatorId);

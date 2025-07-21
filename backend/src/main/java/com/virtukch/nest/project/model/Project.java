@@ -7,13 +7,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 public class Project extends BaseTimeEntity {
 
@@ -26,27 +26,43 @@ public class Project extends BaseTimeEntity {
     //프로젝트 제목
     private String projectTitle;
 
-    //프로젝트 내용 -> 프로젝트 설명
+    //프로젝트 설명
     @Lob
     private String projectDescription;
 
-
     //모집 마감 여부 (2025.05.02 UPDATE)
+    @Setter
     @Column(nullable = false)
     private Boolean isRecruiting = true;
+
+    @Column(nullable = false)
+    private ProjectStatus status;
 
     //조회수
     @Column(nullable = false)
     private Integer viewCount = 0;
+    
+    // 총 모집 인원 : 추가된 역할을 기준으로 자동 계산됨
+    private Integer total_member_needed;
+    
+    // 현재까지 모집된 인원
+    private Integer current_members;
+
+    // 프로젝트 모집 마감 기한
+    private LocalDateTime recruitment_end_date;
+    
+    // 프로젝트 시작 일자
+    private LocalDateTime project_start_date;
+    
+    // 프로젝트 종료 일자
+    private LocalDateTime project_end_date;
 
     // image url
     @Column(columnDefinition = "TEXT")
     private String imageUrls;
 
 
-    public static Project createProject(Long memberId,
-                                        String projectTitle,
-                                        String projectDescription) {
+    public static Project createProject(Long memberId, String projectTitle, String projectDescription) {
         if(projectTitle == null || projectTitle.isBlank()) {
             throw new InvalidProjectTitleException();
         }
@@ -64,7 +80,6 @@ public class Project extends BaseTimeEntity {
     public void increaseViewCount(){
         this.viewCount++;
     }
-
 
 
     //프로젝트 업데이트 메서드

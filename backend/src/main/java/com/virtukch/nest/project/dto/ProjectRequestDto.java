@@ -1,6 +1,7 @@
 package com.virtukch.nest.project.dto;
 
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_member.model.Position;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
@@ -14,8 +15,8 @@ public class ProjectRequestDto {
     private String projectDescription;
     private Boolean isRecruiting;
     private List<String> tags;
-    private Map<ProjectMember.Part, Integer> partCounts;
-    private ProjectMember.Part creatorPart; // 작성자가 들어갈 파트
-    private ProjectMember.Role creatorRole = ProjectMember.Role.LEADER; // 기본값 LEADER
+    private Map<ProjectParticipant.Part, Integer> partCounts;
+    private ProjectParticipant.Part creatorPart; // 작성자가 들어갈 파트
+    private Position createrPostion = Position.LEADER; // 기본값 LEADER
     private List<Long> membersToRemove;
 }

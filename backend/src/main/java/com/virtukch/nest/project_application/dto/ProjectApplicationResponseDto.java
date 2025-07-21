@@ -1,7 +1,7 @@
 package com.virtukch.nest.project_application.dto;
 
-import com.virtukch.nest.project_application.model.ProjectApplication;
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_application.model.ApplicationStatus;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ public class ProjectApplicationResponseDto {
     private Long applicationId;
     private Long memberId;
     private String memberName;
-    private ProjectMember.Part part;
-    private ProjectApplication.ApplicationStatus status;
+    private ProjectParticipant.Part part;
+    private ApplicationStatus status;
     private LocalDateTime appliedAt;
 }

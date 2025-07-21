@@ -1,7 +1,7 @@
 package com.virtukch.nest.project_member.controller;
 
 
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,7 +29,7 @@ public class ProjectMemberController {
     )
     @GetMapping
     public ResponseEntity<List<String>> getPartEnums() {
-        List<String> parts = Arrays.stream(ProjectMember.Part.values())
+        List<String> parts = Arrays.stream(ProjectParticipant.Part.values())
                 .map(Enum::name)
                 .toList();
         return ResponseEntity.ok(parts);

@@ -6,12 +6,13 @@ import com.virtukch.nest.project_application.dto.ProjectApplicationRequestDto;
 import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
 import com.virtukch.nest.project_application.exception.*;
+import com.virtukch.nest.project_application.model.ApplicationStatus;
 import com.virtukch.nest.project_application.model.ProjectApplication;
 import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.project.repository.ProjectRepository;
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
 import com.virtukch.nest.project_application.exception.AlreadyProcessedApplicationException;
 import com.virtukch.nest.project.model.Project;
@@ -22,8 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
         if (projectApplicationRepository.existsByProjectIdAndMemberIdAndStatusNotIn(
                 projectId,
                 memberId,
-                List.of(ProjectApplication.ApplicationStatus.REJECTED, ProjectApplication.ApplicationStatus.CANCELED))) {
+                List.of(ApplicationStatus.REJECTED, ApplicationStatus.CANCELED))) {
             throw new DuplicateApplicationException();
         }
 
@@ -60,7 +59,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
                 .projectId(projectId)
                 .memberId(memberId)
                 .part(requestDto.getPart())
-                .status(ProjectApplication.ApplicationStatus.WAITING)
+                .status(ApplicationStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build();
 
@@ -87,13 +86,13 @@ public class ProjectApplicationService extends BaseTimeEntity {
         ProjectApplication application = projectApplicationRepository.findById(applicationId)
                 .orElseThrow(ApplicationNotFoundException::new);
         validateOwnership(projectId, requesterId, application);
-        if (application.getStatus() != ProjectApplication.ApplicationStatus.WAITING) {
+        if (application.getStatus() != ApplicationStatus.PENDING) {
             throw new AlreadyProcessedApplicationException();
         }
 
         // 현재 ACCEPTED 상태의 인원 수 조회
         long acceptedCount = projectApplicationRepository.countByProjectIdAndStatus(
-                projectId, ProjectApplication.ApplicationStatus.ACCEPTED);
+                projectId, ApplicationStatus.ACCEPTED);
 
         // 프로젝트 최대 인원 수를 동적으로 계산
         int maxMember = projectMemberRepository.findByProjectId(projectId).size();
@@ -102,15 +101,15 @@ public class ProjectApplicationService extends BaseTimeEntity {
             throw new ProjectFullException("프로젝트 모집 인원을 초과하여 승인할 수 없습니다.");
         }
 
-        application.setStatus(ProjectApplication.ApplicationStatus.ACCEPTED);
+        application.setStatus(ApplicationStatus.ACCEPTED);
         projectApplicationRepository.save(application);
 
-        List<ProjectMember> vacantList = projectMemberRepository
+        List<ProjectParticipant> vacantList = projectMemberRepository
                 .findByProjectIdAndPartAndMemberIdIsNull(projectId, application.getPart());
 
         if (!vacantList.isEmpty()) {
-            ProjectMember vacant = vacantList.get(0);
-            vacant.setMemberId(application.getMemberId());
+            ProjectParticipant vacant = vacantList.get(0);
+            vacant.setParticipantId(application.getMemberId());
             projectMemberRepository.save(vacant);
         } else {
             // 파트별 모집 인원 초과 방지
@@ -119,10 +118,10 @@ public class ProjectApplicationService extends BaseTimeEntity {
             if (approvedCount >= maxCount) {
                 throw new ProjectFullException(application.getPart() + " 파트의 모집 인원을 초과할 수 없습니다.");
             }
-            projectMemberRepository.save(ProjectMember.builder()
+            projectMemberRepository.save(ProjectParticipant.builder()
                     .projectId(projectId)
                     .memberId(application.getMemberId())
-                    .role(ProjectMember.Role.MEMBER)
+                    .role(ProjectParticipant.Role.MEMBER)
                     .part(application.getPart())
                     .build());
         }
@@ -148,11 +147,11 @@ public class ProjectApplicationService extends BaseTimeEntity {
         ProjectApplication application = projectApplicationRepository.findById(applicationId)
                 .orElseThrow(ApplicationNotFoundException::new);
         validateOwnership(projectId, requesterId, application);
-        if (application.getStatus() != ProjectApplication.ApplicationStatus.WAITING) {
+        if (application.getStatus() != ApplicationStatus.PENDING) {
             throw new AlreadyProcessedApplicationException();
         }
 
-        application.setStatus(ProjectApplication.ApplicationStatus.REJECTED);
+        application.setStatus(ApplicationStatus.REJECTED);
         projectApplicationRepository.save(application);
 
         Member member = memberRepository.findById(application.getMemberId()).orElse(null);

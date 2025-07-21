@@ -4,7 +4,7 @@ import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.model.Project;
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -54,14 +54,14 @@ public class ProjectDtoConverter {
                 .build();
     }
 
-    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member leader, List<String> tagNames, List<ProjectMember> projectMemberList, Map<Long, String> memberIdToName, Boolean isRecruiting, int currentNumberOfMembers, int maximumNumberOfMembers) {
+    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member leader, List<String> tagNames, List<ProjectParticipant> projectMemberList, Map<Long, String> memberIdToName, Boolean isRecruiting, int currentNumberOfMembers, int maximumNumberOfMembers) {
         List<ProjectMemberSimpleDto> memberDtos = projectMemberList.stream().map(pm -> {
             ProjectMemberSimpleDto dto = new ProjectMemberSimpleDto();
             dto.setPart(pm.getPart());
-            dto.setRole(pm.getRole());
-            if (pm.getMemberId() != null) {
-                dto.setMemberId(pm.getMemberId());
-                dto.setMemberName(memberIdToName.getOrDefault(pm.getMemberId(), "알 수 없음"));
+            dto.setRole(pm.getPosition());
+            if (pm.getParticipantId() != null) {
+                dto.setMemberId(pm.getParticipantId());
+                dto.setMemberName(memberIdToName.getOrDefault(pm.getParticipantId(), "알 수 없음"));
             }
             return dto;
         }).toList();

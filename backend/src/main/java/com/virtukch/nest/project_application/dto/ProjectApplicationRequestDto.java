@@ -1,12 +1,12 @@
 package com.virtukch.nest.project_application.dto;
 
 
-import com.virtukch.nest.project_member.model.ProjectMember;
+import com.virtukch.nest.project_member.model.ProjectParticipant;
 import lombok.Getter;
 
 
 @Getter
 public class ProjectApplicationRequestDto {
     private Long projectId;
-    private ProjectMember.Part part;
+    private ProjectParticipant.Part part;
 }
