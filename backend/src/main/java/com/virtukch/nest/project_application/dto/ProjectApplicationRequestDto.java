@@ -1,7 +1,7 @@
 package com.virtukch.nest.project_application.dto;
 
 
-import com.virtukch.nest.project_member.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectParticipant;
 import lombok.Getter;
 
 

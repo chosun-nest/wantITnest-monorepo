@@ -7,15 +7,18 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.project.dto.*;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
+import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
+import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
 import com.virtukch.nest.project.exception.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.repository.ProjectRepository;
-import com.virtukch.nest.project_application.model.ApplicationStatus;
+import com.virtukch.nest.project.model.ApplicationStatus;
 import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
-import com.virtukch.nest.project_member.model.ProjectParticipant;
-import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
-import com.virtukch.nest.project_tag.model.ProjectTag;
-import com.virtukch.nest.project_tag.repository.ProjectTagRepository;
+import com.virtukch.nest.project.model.ProjectParticipant;
+import com.virtukch.nest.project_participant.repository.ProjectParticipantRepository;
+import com.virtukch.nest.project.model.ProjectTag;
+import com.virtukch.nest.project.repository.ProjectTagRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
 import com.virtukch.nest.tag.service.TagService;
@@ -38,7 +41,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectApplicationRepository projectApplicationRepository;
     private final MemberRepository memberRepository;
-    private final ProjectMemberRepository projectMemberRepository; // ✅ 추가
+    private final ProjectParticipantRepository projectMemberRepository; // ✅ 추가
     private final ProjectTagRepository projectTagRepository;
     private final TagService tagService;
     private final CommentRepository commentRepository;
@@ -49,7 +52,7 @@ public class ProjectService {
     private final String prefix = "project";
 
     @Transactional
-    public ProjectResponseDto createProject(Long memberId, ProjectRequestDto requestDto) {
+    public ProjectResponseDto createProject(Long memberId, ProjectCreateRequestDto requestDto) {
         String projectTitle = requestDto.getProjectTitle();
         log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
@@ -105,11 +108,11 @@ public class ProjectService {
 
         List<ProjectParticipant> projectMembers = projectMemberRepository.findByProjectId(projectId);
 
-        int currentNumberOfMembers = (int) projectMembers.stream().filter(pm -> pm.getParticipantId() != null).count();
+        int currentNumberOfMembers = (int) projectMembers.stream().filter(pm -> pm.getMemberId() != null).count();
         int maximumNumberOfMembers = projectMembers.size();
 
         Map<Long, String> memberIdToName = projectMembers.stream()
-                .map(ProjectParticipant::getParticipantId)
+                .map(ProjectParticipant::getMemberId)
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toMap(
@@ -150,7 +153,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectRequestDto requestDto) {
+    public ProjectResponseDto updateProject(Long projectId, Long memberId, ProjectCreateRequestDto requestDto) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
 
         project.updateProject(requestDto.getProjectTitle(),
@@ -223,10 +226,10 @@ public class ProjectService {
             List<ProjectParticipant> members = projectMemberRepository.findByProjectIdAndPart(projectId, part);
             // Separate filled and vacant slots
             List<ProjectParticipant> filled = members.stream()
-                    .filter(pm -> pm.getParticipantId() != null)
+                    .filter(pm -> pm.getMemberId() != null)
                     .toList();
             List<ProjectParticipant> vacant = members.stream()
-                    .filter(pm -> pm.getParticipantId() == null)
+                    .filter(pm -> pm.getMemberId() == null)
                     .toList();
             int filledCount = filled.size();
             int vacantCount = vacant.size();
@@ -463,7 +466,7 @@ public class ProjectService {
 
         // Calculate current and maximum number of members
         List<ProjectParticipant> members = projectMemberRepository.findByProjectId(project.getProjectId());
-        int currentNumberOfMembers = (int) members.stream().filter(pm -> pm.getParticipantId() != null).count();
+        int currentNumberOfMembers = (int) members.stream().filter(pm -> pm.getMemberId() != null).count();
         int maximumNumberOfMembers = members.size();
 
         return ProjectDtoConverter.toSummaryDto(project, memberName, tagNames, commentCount, imageUrl, isRecruiting, currentNumberOfMembers, maximumNumberOfMembers);

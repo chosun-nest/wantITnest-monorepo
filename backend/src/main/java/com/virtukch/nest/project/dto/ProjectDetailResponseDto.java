@@ -1,5 +1,8 @@
 package com.virtukch.nest.project.dto;
 
+import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.project.dto.response.RoleDetailDto;
+import com.virtukch.nest.project.model.ProjectStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,24 +17,34 @@ import java.util.List;
 public class ProjectDetailResponseDto {
 
     private Long projectId;
-
     private String projectTitle;
-
     private String projectDescription;
 
-    private List<String> tags;
+    private ProjectStatus status;
+    private Boolean isRecruiting;
 
-    private ProjectAuthorDto author;
+    private Integer totalMemberNeeded;      // 프로젝트 필요 인원 수
+    private Integer currentMembers;         // 현재 지원자 수
 
-    private Integer viewCount;
+    private String recruitmentStartDate;    // 모집 시작 시간
+    private String recruitmentEndDate;      // 모집 마감 시간
+    private String projectStartDate;        // 프로젝트 시작 시간
+    private String projectEndDate;          // 프로젝트 종료 시간
 
-    private String createdAt;
+    private String createdAt;           // 글 작성 시각
     private String updatedAt;
 
-    private Integer currentNumberOfMembers;
-    private Integer maximumNumberOfMembers;
+    private Long commentCount;
+
+    private AuthorDto author;
+
+    private List<String> tags;
+    private List<String> imageUrls;
+    private List<RoleDetailDto>  roles;
+
+    private Integer viewCount;
+    private String imageUrl;
 
     private List<ProjectMemberSimpleDto> projectMembers;
-    private Boolean isRecruiting;
 
 }

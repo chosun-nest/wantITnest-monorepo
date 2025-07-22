@@ -1,4 +1,4 @@
-package com.virtukch.nest.project_member.model;
+package com.virtukch.nest.project.model;
 
 public enum Position {
     LEADER,

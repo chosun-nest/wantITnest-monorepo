@@ -1,7 +1,7 @@
-package com.virtukch.nest.project_member.controller;
+package com.virtukch.nest.project_participant.controller;
 
 
-import com.virtukch.nest.project_member.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectParticipant;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/projects/members")
 @RequiredArgsConstructor
-public class ProjectMemberController {
+public class ProjectParticipantController {
     @Operation(
         summary = "프로젝트 역할 목록 조회",
         description = """

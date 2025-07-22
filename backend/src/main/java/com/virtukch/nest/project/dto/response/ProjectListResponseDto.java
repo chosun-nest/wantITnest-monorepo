@@ -1,4 +1,4 @@
-package com.virtukch.nest.project.dto;
+package com.virtukch.nest.project.dto.response;
 
 import com.virtukch.nest.common.dto.PageInfoDto;
 import lombok.AllArgsConstructor;

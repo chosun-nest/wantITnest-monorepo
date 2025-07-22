@@ -1,7 +1,7 @@
 package com.virtukch.nest.project_application.dto.converter;
 
 import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
-import com.virtukch.nest.project_application.model.ProjectApplication;
+import com.virtukch.nest.project.model.ProjectApplication;
 
 public class ProjectApplicationDtoConverter {
     public static ProjectApplicationResponseDto toResponseDto(ProjectApplication application, String memberName) {

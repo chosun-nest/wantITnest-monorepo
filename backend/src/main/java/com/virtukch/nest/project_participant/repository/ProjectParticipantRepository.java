@@ -1,6 +1,6 @@
-package com.virtukch.nest.project_member.repository;
+package com.virtukch.nest.project_participant.repository;
 
-import com.virtukch.nest.project_member.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProjectMemberRepository extends JpaRepository<ProjectParticipant, Long> {
+public interface ProjectParticipantRepository extends JpaRepository<ProjectParticipant, Long> {
 
     List<ProjectParticipant> findByProjectId(Long projectId);
     List<ProjectParticipant> findByProjectIdAndPartAndMemberIdIsNull(Long projectId, ProjectParticipant.Part part);

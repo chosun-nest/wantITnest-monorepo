@@ -1,6 +1,6 @@
 package com.virtukch.nest.project.exception;
 
-import com.virtukch.nest.project_member.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectParticipant;
 
 public class ProjectMemberRemoveException extends  RuntimeException{
     public ProjectMemberRemoveException(ProjectParticipant.Part part, int filledCount, int targetCount) {

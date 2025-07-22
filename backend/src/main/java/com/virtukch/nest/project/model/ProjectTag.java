@@ -1,4 +1,4 @@
-package com.virtukch.nest.project_tag.model;
+package com.virtukch.nest.project.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

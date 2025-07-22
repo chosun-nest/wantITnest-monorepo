@@ -1,7 +1,7 @@
 package com.virtukch.nest.project_application.repository;
 
-import com.virtukch.nest.project_application.model.ApplicationStatus;
-import com.virtukch.nest.project_application.model.ProjectApplication;
+import com.virtukch.nest.project.model.ApplicationStatus;
+import com.virtukch.nest.project.model.ProjectApplication;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

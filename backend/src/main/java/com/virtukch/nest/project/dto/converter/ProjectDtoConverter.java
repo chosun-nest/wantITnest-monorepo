@@ -3,8 +3,10 @@ package com.virtukch.nest.project.dto.converter;
 import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.dto.*;
+import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
 import com.virtukch.nest.project.model.Project;
-import com.virtukch.nest.project_member.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectParticipant;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -59,9 +61,9 @@ public class ProjectDtoConverter {
             ProjectMemberSimpleDto dto = new ProjectMemberSimpleDto();
             dto.setPart(pm.getPart());
             dto.setRole(pm.getPosition());
-            if (pm.getParticipantId() != null) {
-                dto.setMemberId(pm.getParticipantId());
-                dto.setMemberName(memberIdToName.getOrDefault(pm.getParticipantId(), "알 수 없음"));
+            if (pm.getMemberId() != null) {
+                dto.setMemberId(pm.getMemberId());
+                dto.setMemberName(memberIdToName.getOrDefault(pm.getMemberId(), "알 수 없음"));
             }
             return dto;
         }).toList();

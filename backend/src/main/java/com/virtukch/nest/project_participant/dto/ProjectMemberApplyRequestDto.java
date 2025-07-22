@@ -1,6 +1,6 @@
-package com.virtukch.nest.project_member.dto;
+package com.virtukch.nest.project_participant.dto;
 
-import com.virtukch.nest.project_member.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectParticipant;
 
 public class ProjectMemberApplyRequestDto {
     private Long projectId;

@@ -1,10 +1,14 @@
 package com.virtukch.nest.project.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.project.dto.*;
+import com.virtukch.nest.project.dto.ProjectDetailResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
+import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
+import com.virtukch.nest.project.dto.ProjectResponseDto;
 import com.virtukch.nest.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +17,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.net.URI;
 import java.util.List;
@@ -46,7 +49,7 @@ public class ProjectController {
     @PostMapping("/new")
     public ResponseEntity<ProjectResponseDto> createProject(
             @AuthenticationPrincipal CustomUserDetails user,
-            @RequestBody ProjectRequestDto requestDTO) {
+            @RequestBody ProjectCreateRequestDto requestDTO) {
         Long memberId = user.getMember().getMemberId();
         log.info("[모집글 작성 요청] memberId={}", memberId);
         ProjectResponseDto responseDto = projectService.createProject(memberId, requestDTO);
@@ -123,7 +126,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDto> updateProject(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long projectId,
-            @Valid @RequestBody ProjectRequestDto requestDto) {
+            @Valid @RequestBody ProjectCreateRequestDto requestDto) {
 
         Long memberId = user.getMember().getMemberId();
         log.info("[모집글 수정 요청] projectId={}, memberId={}", projectId, memberId);

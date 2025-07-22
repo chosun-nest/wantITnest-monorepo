@@ -6,14 +6,14 @@ import com.virtukch.nest.project_application.dto.ProjectApplicationRequestDto;
 import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
 import com.virtukch.nest.project_application.exception.*;
-import com.virtukch.nest.project_application.model.ApplicationStatus;
-import com.virtukch.nest.project_application.model.ProjectApplication;
+import com.virtukch.nest.project.model.ApplicationStatus;
+import com.virtukch.nest.project.model.ProjectApplication;
 import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
 import com.virtukch.nest.project.repository.ProjectRepository;
-import com.virtukch.nest.project_member.model.ProjectParticipant;
-import com.virtukch.nest.project_member.repository.ProjectMemberRepository;
+import com.virtukch.nest.project.model.ProjectParticipant;
+import com.virtukch.nest.project_participant.repository.ProjectParticipantRepository;
 import com.virtukch.nest.project_application.exception.AlreadyProcessedApplicationException;
 import com.virtukch.nest.project.model.Project;
 import jakarta.transaction.Transactional;
@@ -32,7 +32,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
     private final ProjectApplicationRepository projectApplicationRepository;
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
-    private final ProjectMemberRepository projectMemberRepository;
+    private final ProjectParticipantRepository projectMemberRepository;
 
     @Transactional
     public ProjectApplicationResponseDto applyToProject(Long projectId, Long memberId, ProjectApplicationRequestDto requestDto) {

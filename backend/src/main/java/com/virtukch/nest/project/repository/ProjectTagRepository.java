@@ -1,6 +1,6 @@
-package com.virtukch.nest.project_tag.repository;
+package com.virtukch.nest.project.repository;
 
-import com.virtukch.nest.project_tag.model.ProjectTag;
+import com.virtukch.nest.project.model.ProjectTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.virtukch.nest.project_member.dto;
+package com.virtukch.nest.project_participant.dto;
 
 import lombok.Getter;
 import lombok.Setter;

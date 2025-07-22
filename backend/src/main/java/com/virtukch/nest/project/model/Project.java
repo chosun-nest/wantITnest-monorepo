@@ -5,9 +5,9 @@ import com.virtukch.nest.project.exception.InvalidProjectTitleException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +21,15 @@ public class Project extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectId; //프로젝트 아이디
 
+    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProjectRole> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProjectApplication> applications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProjectParticipant> participants = new ArrayList<>();
+
     private Long memberId;
 
     //프로젝트 제목
@@ -30,8 +39,6 @@ public class Project extends BaseTimeEntity {
     @Lob
     private String projectDescription;
 
-    //모집 마감 여부 (2025.05.02 UPDATE)
-    @Setter
     @Column(nullable = false)
     private Boolean isRecruiting = true;
 
@@ -43,19 +50,19 @@ public class Project extends BaseTimeEntity {
     private Integer viewCount = 0;
     
     // 총 모집 인원 : 추가된 역할을 기준으로 자동 계산됨
-    private Integer total_member_needed;
+    private Integer totalMemberNeeded;
     
     // 현재까지 모집된 인원
-    private Integer current_members;
+    private Integer currentMembers;
 
     // 프로젝트 모집 마감 기한
-    private LocalDateTime recruitment_end_date;
+    private LocalDateTime recruitmentEndDate;
     
     // 프로젝트 시작 일자
-    private LocalDateTime project_start_date;
+    private LocalDateTime projectStartDate;
     
     // 프로젝트 종료 일자
-    private LocalDateTime project_end_date;
+    private LocalDateTime projectEndDate;
 
     // image url
     @Column(columnDefinition = "TEXT")
@@ -94,11 +101,7 @@ public class Project extends BaseTimeEntity {
             this.projectDescription = projectDescription;
         }
 
-        if(isRecruiting) {
-            this.isRecruiting = true;
-        } else {
-            this.isRecruiting = false;
-        }
+        this.isRecruiting = isRecruiting;
     }
 
     public void updateProject(String projectTitle,

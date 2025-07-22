@@ -1,4 +1,4 @@
-package com.virtukch.nest.project_application.model;
+package com.virtukch.nest.project.model;
 
 public enum ApplicationStatus {
     PENDING,
