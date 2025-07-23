@@ -1,7 +1,7 @@
 package com.virtukch.nest.project.model;
 
-import com.virtukch.nest.project.dto.request.RoleCreateRequestDto;
 import com.virtukch.nest.project.dto.request.RoleTechStackRequestDto;
+import com.virtukch.nest.project.model.enums.Proficiency;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.virtukch.nest.project_application.dto;
 
-import com.virtukch.nest.project.model.ApplicationStatus;
+import com.virtukch.nest.project.model.enums.ApplicationStatus;
 import com.virtukch.nest.project.model.ProjectParticipant;
 import lombok.*;
 

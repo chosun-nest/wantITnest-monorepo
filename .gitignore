@@ -426,5 +426,7 @@ docs/_build/
 test-results/
 coverage-reports/
 
+CLAUDE.md
+
 # README files (프로젝트마다 다를 수 있으므로)
-# README.md  # 주석 처리 - 필요시 활성화
+# README.md  # 주석 처리 - 필요시 활성화 

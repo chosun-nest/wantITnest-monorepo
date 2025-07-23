@@ -1,6 +1,6 @@
 package com.virtukch.nest.project.dto;
 
-import com.virtukch.nest.project.model.Position;
+import com.virtukch.nest.project.model.enums.Position;
 import com.virtukch.nest.project.model.ProjectParticipant;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

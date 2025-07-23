@@ -1,5 +1,6 @@
 package com.virtukch.nest.post.service;
 
+import com.virtukch.nest.comment.model.BoardType;
 import com.virtukch.nest.comment.repository.CommentRepository;
 import com.virtukch.nest.common.service.ImageService;
 import com.virtukch.nest.common.service.ViewCountService;
@@ -494,12 +495,12 @@ public class PostService {
      */
     private Map<Long, Long> fetchCommentCountMap(List<Post> posts) {
         List<Long> postIds = posts.stream().map(Post::getId).toList();
-        
+
         if (postIds.isEmpty()) {
             return Collections.emptyMap();
         }
-        
-        return commentRepository.countByPostIdIn(postIds).stream()
+
+        return commentRepository.countByPostIdIn(BoardType.INTEREST, postIds).stream()
                 .collect(Collectors.toMap(
                         result -> (Long) result[0],  // postId
                         result -> (Long) result[1]   // count

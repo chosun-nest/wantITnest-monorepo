@@ -2,7 +2,7 @@ package com.virtukch.nest.project.dto;
 
 import com.virtukch.nest.common.dto.AuthorDto;
 import com.virtukch.nest.project.dto.response.RoleDetailDto;
-import com.virtukch.nest.project.model.ProjectStatus;
+import com.virtukch.nest.project.model.enums.ProjectStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,16 +35,14 @@ public class ProjectDetailResponseDto {
     private String updatedAt;
 
     private Long commentCount;
+    private Integer viewCount;
 
     private AuthorDto author;
 
     private List<String> tags;
     private List<String> imageUrls;
-    private List<RoleDetailDto>  roles;
 
-    private Integer viewCount;
-    private String imageUrl;
-
-    private List<ProjectMemberSimpleDto> projectMembers;
+    private List<RoleDetailDto> roles;
+    private List<ParticipantDto> participants;
 
 }

@@ -1,8 +1,11 @@
 package com.virtukch.nest.project.dto.request;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
 public class ProjectUpdateRequestDto {
     String projectTitle;
     String projectDescription;
@@ -13,5 +16,5 @@ public class ProjectUpdateRequestDto {
 
     Boolean isRecruiting;
 
-    List<String> tags;
+    List<String> tagNames;
 }

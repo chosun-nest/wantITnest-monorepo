@@ -1,7 +1,7 @@
 package com.virtukch.nest.project.dto.response;
 
 import com.virtukch.nest.common.dto.AuthorDto;
-import com.virtukch.nest.project.model.ProjectStatus;
+import com.virtukch.nest.project.model.enums.ProjectStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

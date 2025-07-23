@@ -1,5 +1,7 @@
 package com.virtukch.nest.project.model;
 
+import com.virtukch.nest.project.model.enums.ParticipantStatus;
+import com.virtukch.nest.project.model.enums.Position;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

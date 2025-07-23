@@ -1,9 +1,12 @@
 package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
+import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
+import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.exception.InvalidProjectTitleException;
 import com.virtukch.nest.project.exception.InvalidTotalMemberCountException;
+import com.virtukch.nest.project.model.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,8 +40,10 @@ public class Project extends BaseTimeEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectTag> tags = new ArrayList<>();
 
-    @Column(nullable = false)
-    private Long memberId;
+    //글 작성자
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     //프로젝트 제목
     @Column(nullable = false)
@@ -81,9 +86,8 @@ public class Project extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String imageUrls;
 
-
     //======팩토리 메서드======
-    public static Project createProject(Long memberId, ProjectCreateRequestDto requestDto) {
+    public static Project createProject(Member member, ProjectCreateRequestDto requestDto) {
         if(requestDto.getProjectTitle() == null || requestDto.getProjectTitle().isBlank()) {
             throw new InvalidProjectTitleException();
         }
@@ -93,7 +97,7 @@ public class Project extends BaseTimeEntity {
 
         Project project = new Project();
 
-        project.memberId = memberId;
+        project.member = member;
         project.projectTitle = requestDto.getProjectTitle();
         project.projectDescription = requestDto.getProjectDescription();
         project.status = ProjectStatus.RECRUITING;
@@ -129,26 +133,42 @@ public class Project extends BaseTimeEntity {
 
 
     //프로젝트 업데이트 메서드
-    public void updateProject(String projectTitle, String projectDescription, Boolean isRecruiting) {
-        if(projectTitle != null && !projectTitle.isBlank()) {
-            this.projectTitle = projectTitle;
-        } else throw new InvalidProjectTitleException();
-
-        if(projectDescription != null && !projectDescription.isBlank()) {
-            this.projectDescription = projectDescription;
+    public void updateProject(ProjectUpdateRequestDto requestDto, List<ProjectTag> projectTags) {
+        if(requestDto.getProjectTitle() != null && !requestDto.getProjectTitle().isBlank()) {
+            projectTitle = requestDto.getProjectTitle();
+        } else if (requestDto.getProjectTitle() != null && requestDto.getProjectTitle().isBlank()) {
+            throw new InvalidProjectTitleException();
         }
 
-        this.isRecruiting = isRecruiting;
+        if(requestDto.getProjectDescription() != null) {
+            projectDescription = requestDto.getProjectDescription();
+        }
+
+        if(requestDto.getRecruitmentEndDate() != null) {
+            recruitmentEndDate = requestDto.getRecruitmentEndDate();
+        }
+
+        if(requestDto.getProjectStartDate() != null) {
+            projectStartDate = requestDto.getProjectStartDate();
+        }
+
+        if(requestDto.getProjectEndDate() != null) {
+            projectEndDate = requestDto.getProjectEndDate();
+        }
+
+        if(requestDto.getIsRecruiting() != null) {
+            isRecruiting = requestDto.getIsRecruiting();
+        }
+
+        if(projectTags != null) {
+            tags =  projectTags;
+        }
     }
 
     public void updateProject(String projectTitle,
                               String projectDescription,
                               Boolean isRecruiting,
                               List<String> imageUrls) {
-        updateProject(projectTitle, projectDescription,  isRecruiting);
-        if(imageUrls != null) {
-            this.imageUrls = imageUrls.isEmpty() ? null : String.join("||", imageUrls);
-        }
     }
 
     public List<String> getImageUrlList() {

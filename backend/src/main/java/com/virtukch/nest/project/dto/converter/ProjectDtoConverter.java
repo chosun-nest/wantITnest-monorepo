@@ -2,35 +2,20 @@ package com.virtukch.nest.project.dto.converter;
 
 import com.virtukch.nest.common.dto.AuthorDto;
 import com.virtukch.nest.common.dto.PageInfoDto;
-import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.project.dto.ProjectDetailResponseDto;
-import com.virtukch.nest.project.dto.ProjectMemberSimpleDto;
-import com.virtukch.nest.project.dto.ProjectPageInfoDto;
-import com.virtukch.nest.project.dto.ProjectResponseDto;
-import com.virtukch.nest.project.dto.response.ProjectCreateResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
 import com.virtukch.nest.project.model.Project;
-import com.virtukch.nest.project.model.ProjectParticipant;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 public class ProjectDtoConverter {
 
-    public static ProjectCreateResponseDto toCreateResponseDto(Project project) {
-        return ProjectCreateResponseDto.builder()
-                .projectId(project.getProjectId())
-                .projectTitle(project.getProjectTitle())
-                .status(project.getStatus())
-                .currentMembers(project.getCurrentMembers())
-                .totalMemberNeeded(project.getTotalMemberNeeded())
-                .recruitmentEndDate(timeFormat(project.getRecruitmentEndDate()))
-                .message("프로젝트가 성공적으로 생성되었습니다.")
-                .build();
+    public static ProjectResponseDto toCreateResponseDto(Project project) {
+        return buildResponse(project, "프로젝트가 성공적으로 생성되었습니다.");
     }
 
     public static ProjectResponseDto toUpdateResponseDto(Project project) {
@@ -44,64 +29,16 @@ public class ProjectDtoConverter {
     private static ProjectResponseDto buildResponse(Project project, String message) {
         return ProjectResponseDto.builder()
                 .projectId(project.getProjectId())
+                .projectTitle(project.getProjectTitle())
+                .status(project.getStatus())
+                .currentMembers(project.getCurrentMembers())
+                .totalMemberNeeded(project.getTotalMemberNeeded())
+                .recruitmentEndDate(timeFormat(project.getRecruitmentEndDate()))
                 .message(message)
                 .build();
     }
 
-    public static ProjectSummaryDto toSummaryDto(Project project, String memberName, List<String> tagNames, Long commentCount, String imageUrl, Boolean isRecruiting, int currentNumberOfMembers, int maximumNumberOfMembers) {
-        return ProjectSummaryDto.builder()
-                .projectId(project.getProjectId())
-                .projectTitle(project.getProjectTitle())
-                .previewContent(generatePreview(project.getProjectDescription()))
-                .tags(tagNames)
-                .author(AuthorDto.builder()
-                        .id(project.getMemberId())
-                        .name(memberName)
-                        .build()
-                )
-                .viewCount(project.getViewCount())
-                .createdAt(timeFormat(project.getCreatedAt()))
-                .commentCount(commentCount)
-                .imageUrl(imageUrl)
-                .isRecruiting(isRecruiting)
-                .currentNumberOfMembers(currentNumberOfMembers)
-                .maximumNumberOfMembers(maximumNumberOfMembers)
-                .build();
-    }
-
-    public static ProjectDetailResponseDto toDetailResponseDto(Project project, Member leader, List<String> tagNames, List<ProjectParticipant> projectMemberList, Map<Long, String> memberIdToName, Boolean isRecruiting, int currentNumberOfMembers, int maximumNumberOfMembers) {
-        List<ProjectMemberSimpleDto> memberDtos = projectMemberList.stream().map(pm -> {
-            ProjectMemberSimpleDto dto = new ProjectMemberSimpleDto();
-            dto.setPart(pm.getPart());
-            dto.setRole(pm.getPosition());
-            if (pm.getMemberId() != null) {
-                dto.setMemberId(pm.getMemberId());
-                dto.setMemberName(memberIdToName.getOrDefault(pm.getMemberId(), "알 수 없음"));
-            }
-            return dto;
-        }).toList();
-
-        return ProjectDetailResponseDto.builder()
-                .projectId(project.getProjectId())
-                .projectTitle(project.getProjectTitle())
-                .projectDescription(project.getProjectDescription())
-                .tags(tagNames)
-                .viewCount(project.getViewCount())
-                .createdAt(timeFormat(project.getCreatedAt()))
-                .updatedAt(timeFormat(project.getUpdatedAt()))
-                .author(ProjectAuthorDto.builder()
-                        .id(leader.getMemberId())
-                        .name(leader.getMemberName())
-                        .build())
-                .projectMembers(memberDtos)
-                .isRecruiting(isRecruiting)
-                .currentNumberOfMembers(currentNumberOfMembers)
-                .maximumNumberOfMembers(maximumNumberOfMembers)
-                .build();
-    }
-
-
-    public static ProjectListResponseDto toProjectListResponseDto(Page<Project> page) {
+    public static ProjectListResponseDto toProjectListResponseDto(List<ProjectSummaryDto> summaries, Page<Project> page) {
         return ProjectListResponseDto.builder()
                 .projects(summaries)
                 .totalCount((int) page.getTotalElements())
@@ -109,16 +46,21 @@ public class ProjectDtoConverter {
                 .build();
     }
 
-    public static ProjectPageInfoDto toPageInfoDto(Page<?> page) {
-        return ProjectPageInfoDto.builder()
-                .pageNumber(page.getNumber())
-                .pageSize(page.getSize())
-                .totalPages(page.getTotalPages())
-                .totalElements(page.getTotalElements())
-                .first(page.isFirst())
-                .last(page.isLast())
-                .hasNext(page.hasNext())
-                .hasPrevious(page.hasPrevious())
+    public static ProjectSummaryDto toSummaryDto(Project project, List<String> tagNames, Long commentCount) {
+        return ProjectSummaryDto.builder()
+                .projectId(project.getProjectId())
+                .projectTitle(project.getProjectTitle())
+                .previewContent(generatePreview(project.getProjectDescription()))
+                .status(project.getStatus())
+                .isRecruiting(project.getIsRecruiting())
+                .totalMemberNeeded(project.getTotalMemberNeeded())
+                .currentMembers(project.getCurrentMembers())
+                .recruitmentEndDate(timeFormat(project.getRecruitmentEndDate()))
+                .createdAt(timeFormat(project.getCreatedAt()))
+                .commentCount(commentCount)
+                .author(AuthorDto.create(project.getMember()))
+                .tags(tagNames)
+                .viewCount(project.getViewCount())
                 .build();
     }
 
@@ -128,6 +70,12 @@ public class ProjectDtoConverter {
 
     private static String generatePreview(String projectDescription) {
         if (projectDescription == null) return "";
-        return projectDescription.length() <= 100 ? projectDescription : projectDescription.substring(0, 100) + "...";
+        String plainText = projectDescription.replaceAll("\\*\\*", "")
+                .replaceAll("#+", "")
+                .replaceAll("```", "")
+                .replaceAll("`", "")
+                .replaceAll("> ", "")
+                .replaceAll("\\[(.*?)]\\((.*?)\\)", "$1");
+        return plainText.length() <= 100 ? plainText : plainText.substring(0, 100) + "...";
     }
 }

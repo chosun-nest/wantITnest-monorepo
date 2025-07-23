@@ -1,6 +1,6 @@
 package com.virtukch.nest.project.dto.request;
 
-import com.virtukch.nest.project.model.Proficiency;
+import com.virtukch.nest.project.model.enums.Proficiency;
 import lombok.Getter;
 
 @Getter

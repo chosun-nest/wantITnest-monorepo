@@ -6,7 +6,7 @@ import com.virtukch.nest.project_application.dto.ProjectApplicationRequestDto;
 import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
 import com.virtukch.nest.project_application.exception.*;
-import com.virtukch.nest.project.model.ApplicationStatus;
+import com.virtukch.nest.project.model.enums.ApplicationStatus;
 import com.virtukch.nest.project.model.ProjectApplication;
 import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import com.virtukch.nest.member.model.Member;

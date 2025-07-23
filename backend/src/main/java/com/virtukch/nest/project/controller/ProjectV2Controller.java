@@ -1,20 +1,10 @@
 package com.virtukch.nest.project.controller;
 
-import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.project.dto.ProjectResponseDto;
-import com.virtukch.nest.project.dto.ProjectWithImagesRequestDto;
 import com.virtukch.nest.project.service.ProjectService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 
 @Slf4j

@@ -1,4 +1,4 @@
-package com.virtukch.nest.project.model;
+package com.virtukch.nest.project.model.enums;
 
 public enum ProjectStatus {
     RECRUITING, // 모집 중

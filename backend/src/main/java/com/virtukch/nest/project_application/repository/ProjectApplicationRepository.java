@@ -1,6 +1,6 @@
 package com.virtukch.nest.project_application.repository;
 
-import com.virtukch.nest.project.model.ApplicationStatus;
+import com.virtukch.nest.project.model.enums.ApplicationStatus;
 import com.virtukch.nest.project.model.ProjectApplication;
 import org.springframework.data.jpa.repository.JpaRepository;
 

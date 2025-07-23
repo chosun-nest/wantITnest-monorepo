@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.model;
 
+import com.virtukch.nest.project.model.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.LastModifiedDate;

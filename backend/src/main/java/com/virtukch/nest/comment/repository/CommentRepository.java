@@ -38,12 +38,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             @Param("postId") Long postId,
             @Param("rootIds") List<Long> parentIds);
 
-    void deleteAllByPostId(Long postId);
+    void deleteAllByPostId(Long postId); //TODO boardType 추가 필요
 
     Optional<Comment> findById(Long commentId);
 
     boolean existsByParentId(Long parentId);
 
-    @Query("SELECT c.postId, COUNT(c) FROM Comment c WHERE c.postId IN :postIds GROUP BY c.postId")
-    List<Object[]> countByPostIdIn(@Param("postIds") List<Long> postIds);
+    @Query("""
+            SELECT c.postId, COUNT(c) FROM Comment c
+            WHERE c.postId IN :postIds AND c.boardType == :boardType
+            GROUP BY c.postId
+            """)
+    List<Object[]> countByPostIdIn(@Param("boardType") BoardType boardType, @Param("postIds") List<Long> postIds);
 }

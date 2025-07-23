@@ -1,6 +1,6 @@
 package com.virtukch.nest.project.dto.response;
 
-import com.virtukch.nest.project.model.Proficiency;
+import com.virtukch.nest.project.model.enums.Proficiency;
 
 public class RoleTechStackResponseDto {
     Long roleId;
