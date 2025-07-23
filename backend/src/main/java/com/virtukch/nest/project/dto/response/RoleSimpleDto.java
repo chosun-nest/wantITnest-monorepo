@@ -1,5 +1,10 @@
 package com.virtukch.nest.project.dto.response;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
 public class RoleSimpleDto {
     Long roleId;
     String roleName;

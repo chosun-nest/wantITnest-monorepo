@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,8 +21,10 @@ public class ProjectParticipant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long projectId;
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     // 사용자 아이디
     @Column(nullable = false)
@@ -42,10 +45,9 @@ public class ProjectParticipant {
     private LocalDateTime leftAt;
 
     //======팩토리 메서드======
-    public static ProjectParticipant createParticipant(Long projectId, Long memberId, Long roleId, Position position) {
+    public static ProjectParticipant createParticipant(Long memberId, Long roleId, Position position) {
         ProjectParticipant participant = new ProjectParticipant();
 
-        participant.projectId = projectId;
         participant.memberId = memberId;
         participant.roleId = roleId;
         participant.position = position;

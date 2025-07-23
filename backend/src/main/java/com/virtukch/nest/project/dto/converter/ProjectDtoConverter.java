@@ -1,8 +1,13 @@
 package com.virtukch.nest.project.dto.converter;
 
+import com.virtukch.nest.common.dto.AuthorDto;
 import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.project.dto.*;
+import com.virtukch.nest.project.dto.ProjectDetailResponseDto;
+import com.virtukch.nest.project.dto.ProjectMemberSimpleDto;
+import com.virtukch.nest.project.dto.ProjectPageInfoDto;
+import com.virtukch.nest.project.dto.ProjectResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectCreateResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
 import com.virtukch.nest.project.model.Project;
@@ -16,8 +21,16 @@ import java.util.Map;
 
 public class ProjectDtoConverter {
 
-    public static ProjectResponseDto toCreateResponseDto(Project project) {
-        return buildResponse(project, "게시글이 성공적으로 등록되었습니다.");
+    public static ProjectCreateResponseDto toCreateResponseDto(Project project) {
+        return ProjectCreateResponseDto.builder()
+                .projectId(project.getProjectId())
+                .projectTitle(project.getProjectTitle())
+                .status(project.getStatus())
+                .currentMembers(project.getCurrentMembers())
+                .totalMemberNeeded(project.getTotalMemberNeeded())
+                .recruitmentEndDate(timeFormat(project.getRecruitmentEndDate()))
+                .message("프로젝트가 성공적으로 생성되었습니다.")
+                .build();
     }
 
     public static ProjectResponseDto toUpdateResponseDto(Project project) {
@@ -41,7 +54,7 @@ public class ProjectDtoConverter {
                 .projectTitle(project.getProjectTitle())
                 .previewContent(generatePreview(project.getProjectDescription()))
                 .tags(tagNames)
-                .author(ProjectAuthorDto.builder()
+                .author(AuthorDto.builder()
                         .id(project.getMemberId())
                         .name(memberName)
                         .build()
@@ -88,7 +101,7 @@ public class ProjectDtoConverter {
     }
 
 
-    public static ProjectListResponseDto toProjectListResponseDto(List<ProjectSummaryDto> summaries, Page<?> page) {
+    public static ProjectListResponseDto toProjectListResponseDto(Page<Project> page) {
         return ProjectListResponseDto.builder()
                 .projects(summaries)
                 .totalCount((int) page.getTotalElements())

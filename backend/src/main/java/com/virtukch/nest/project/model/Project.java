@@ -1,8 +1,11 @@
 package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
+import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
 import com.virtukch.nest.project.exception.InvalidProjectTitleException;
+import com.virtukch.nest.project.exception.InvalidTotalMemberCountException;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,29 +17,35 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "project_id")
     private Long projectId; //프로젝트 아이디
 
-    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectRole> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectApplication> applications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectParticipant> participants = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProjectTag> tags = new ArrayList<>();
+
+    @Column(nullable = false)
     private Long memberId;
 
     //프로젝트 제목
+    @Column(nullable = false)
     private String projectTitle;
 
     //프로젝트 설명
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String projectDescription;
 
     @Column(nullable = false)
@@ -48,20 +57,24 @@ public class Project extends BaseTimeEntity {
     //조회수
     @Column(nullable = false)
     private Integer viewCount = 0;
-    
+
     // 총 모집 인원 : 추가된 역할을 기준으로 자동 계산됨
+    @Column(nullable = false)
     private Integer totalMemberNeeded;
     
     // 현재까지 모집된 인원
     private Integer currentMembers;
 
     // 프로젝트 모집 마감 기한
+    @Column(nullable = false)
     private LocalDateTime recruitmentEndDate;
     
     // 프로젝트 시작 일자
+    @Column(nullable = false)
     private LocalDateTime projectStartDate;
     
     // 프로젝트 종료 일자
+    @Column(nullable = false)
     private LocalDateTime projectEndDate;
 
     // image url
@@ -69,19 +82,45 @@ public class Project extends BaseTimeEntity {
     private String imageUrls;
 
 
-    public static Project createProject(Long memberId, String projectTitle, String projectDescription) {
-        if(projectTitle == null || projectTitle.isBlank()) {
+    //======팩토리 메서드======
+    public static Project createProject(Long memberId, ProjectCreateRequestDto requestDto) {
+        if(requestDto.getProjectTitle() == null || requestDto.getProjectTitle().isBlank()) {
             throw new InvalidProjectTitleException();
+        }
+        if(requestDto.getTotalMemberNeeded() == null || requestDto.getTotalMemberNeeded() == 0) {
+            throw new InvalidTotalMemberCountException(0);
         }
 
         Project project = new Project();
+
         project.memberId = memberId;
-        project.projectTitle = projectTitle;
-        project.projectDescription = projectDescription;
+        project.projectTitle = requestDto.getProjectTitle();
+        project.projectDescription = requestDto.getProjectDescription();
+        project.status = ProjectStatus.RECRUITING;
+        project.totalMemberNeeded = requestDto.getTotalMemberNeeded();
+        project.currentMembers = 1; // 글 작성자는 반드시 프로젝트에 참여하므로
+        project.recruitmentEndDate = requestDto.getRecruitmentEndDate();
+        project.projectStartDate = requestDto.getProjectStartDate();
+        project.projectEndDate = requestDto.getProjectEndDate();
 
         return project;
     }
 
+    // 편의 메서드
+    public void addRole(ProjectRole role) {
+        roles.add(role);
+        role.setProject(this);
+    }
+
+    public void addTag(ProjectTag tag) {
+        tags.add(tag);
+        tag.setProject(this);
+    }
+
+    public void addParticipant(ProjectParticipant participant) {
+        participants.add(participant);
+        participant.setProject(this);
+    }
 
     //조회수 증가 메서드
     public void increaseViewCount(){
@@ -90,9 +129,7 @@ public class Project extends BaseTimeEntity {
 
 
     //프로젝트 업데이트 메서드
-    public void updateProject(String projectTitle,
-                              String projectDescription,
-                              Boolean isRecruiting) {
+    public void updateProject(String projectTitle, String projectDescription, Boolean isRecruiting) {
         if(projectTitle != null && !projectTitle.isBlank()) {
             this.projectTitle = projectTitle;
         } else throw new InvalidProjectTitleException();

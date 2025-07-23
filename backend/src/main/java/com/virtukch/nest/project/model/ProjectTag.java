@@ -1,28 +1,32 @@
 package com.virtukch.nest.project.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.virtukch.nest.tag.model.Tag;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ProjectTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long projectId;
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 
-    private Long tagId;
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    private Tag tag;
 
-    @Builder
-    public ProjectTag(Long projectId, Long tagId) {
-        this.projectId = projectId;
-        this.tagId = tagId;
+    public static ProjectTag createProjectTag(Project project, Tag tag) {
+        ProjectTag projectTag = new ProjectTag();
+        projectTag.project = project;
+        projectTag.tag = tag;
+
+        return projectTag;
     }
 }
