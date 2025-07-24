@@ -94,4 +94,11 @@ public class ProjectController {
 
         return ResponseEntity.ok(responseDto);
     }
+
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<ProjectResponseDto> deleteProject(@AuthenticationPrincipal CustomUserDetails user,
+                                                            @PathVariable Long projectId) {  
+        Long memberId = user.getMember().getMemberId();
+        ProjectResponseDto responseDto = projectService.deleteProject(projectId, memberId);
+    }
 }

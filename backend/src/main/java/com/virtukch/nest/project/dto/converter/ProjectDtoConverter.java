@@ -23,7 +23,12 @@ public class ProjectDtoConverter {
     }
 
     public static ProjectResponseDto toDeleteResponseDto(Project project) {
-        return buildResponse(project, "게시글이 성공적으로 삭제되었습니다.");
+        return ProjectResponseDto.builder()
+                .projectId(project.getProjectId())
+                .projectTitle(project.getProjectTitle())
+                .status(project.getStatus())
+                .message("게시글이 성공적으로 삭제되었습니다.")
+                .build();
     }
 
     private static ProjectResponseDto buildResponse(Project project, String message) {

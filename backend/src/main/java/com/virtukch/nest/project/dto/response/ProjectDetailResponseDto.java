@@ -31,8 +31,8 @@ public class ProjectDetailResponseDto {
     private String projectStartDate;        // 프로젝트 시작 시간
     private String projectEndDate;          // 프로젝트 종료 시간
 
-    private String createdAt;           // 글 작성 시각
-    private String updatedAt;
+    private String createdAt;               // 프로젝트 생성 시각
+    private String updatedAt;               // 프로젝트 수정 시각
 
     private Long commentCount;
     private Integer viewCount;

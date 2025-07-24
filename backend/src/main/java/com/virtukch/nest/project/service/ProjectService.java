@@ -19,6 +19,8 @@ import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project.repository.ProjectTagRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
+import com.virtukch.nest.tag.service.TagService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final TagRepository tagRepository;
+    private final TagService tagService;
     private final CommentRepository commentRepository;
     private final MemberService memberService;
     private final ProjectTagRepository projectTagRepository;
@@ -94,11 +98,23 @@ public class ProjectService {
         List<Tag> tags = tagRepository.findByNameIn(requestDto.getTagNames());
         List<ProjectTag> projectTags = projectTagRepository.findByTagIn(tags);
 
+        if (projectTags.isEmpty()) {
+            Tag tag = tagService.findByNameOrThrow("UNCATEGORIZED");
+            projectTags.add(ProjectTag.createProjectTag(project, tag));
+        }
+
         project.updateProject(requestDto, projectTags);
 
         return ProjectDtoConverter.toUpdateResponseDto(project);
     }
 
+    @Transactional
+    public ProjectResponseDto deleteProject(Long projectId, Long memberId) {
+        Project project = validateProjectOwnershipAndGet(projectId, memberId);
+        
+        projectRepository.deleteProject(project);
+        return ProjectDtoConverter.toDeleteResponseDto(project);
+    }
 
 
     private ProjectListResponseDto buildListResponseDto(Page<Project> projectPage) {
@@ -125,7 +141,7 @@ public class ProjectService {
 
         return commentRepository.countByPostIdIn(BoardType.PROJECT, projectIds).stream()
                 .collect(Collectors.toMap(
-                        result -> (Long) result[0],  // postId
+                        result -> (Long) result[0],  // articleId
                         result -> (Long) result[1]   // count
                 ));
     }
