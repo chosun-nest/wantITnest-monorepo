@@ -17,8 +17,7 @@ public class RoleCapacityExceededException extends RuntimeException {
     ));
   }
 
-  public RoleCapacityExceededException(Long roleId, String roleName,
-                                       Integer requiredCount, Integer currentCount) {
+  public RoleCapacityExceededException(Long roleId, String roleName, Integer requiredCount, Integer currentCount) {
     this(roleId, roleName, requiredCount, currentCount, currentCount + 1);
   }
 }

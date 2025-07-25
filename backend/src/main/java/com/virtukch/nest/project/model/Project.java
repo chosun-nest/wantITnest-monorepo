@@ -8,9 +8,8 @@ import com.virtukch.nest.project.exception.InvalidProjectTitleException;
 import com.virtukch.nest.project.exception.InvalidTotalMemberCountException;
 import com.virtukch.nest.project.model.enums.ProjectStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,6 +19,8 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project extends BaseTimeEntity {
 
@@ -87,27 +88,26 @@ public class Project extends BaseTimeEntity {
     private String imageUrls;
 
     //======팩토리 메서드======
-    public static Project createProject(Member member, ProjectCreateRequestDto requestDto) {
-        if(requestDto.getProjectTitle() == null || requestDto.getProjectTitle().isBlank()) {
+    public static Project create(Member member, String title, String description, Integer totalMemberNeeded,
+                                 LocalDateTime recruitmentEndDate, LocalDateTime projectStartDate, LocalDateTime projectEndDate) {
+        if(title == null || title.isBlank()) {
             throw new InvalidProjectTitleException();
         }
-        if(requestDto.getTotalMemberNeeded() == null || requestDto.getTotalMemberNeeded() == 0) {
+        if(totalMemberNeeded == null || totalMemberNeeded == 0) {
             throw new InvalidTotalMemberCountException(0);
         }
 
-        Project project = new Project();
-
-        project.member = member;
-        project.projectTitle = requestDto.getProjectTitle();
-        project.projectDescription = requestDto.getProjectDescription();
-        project.status = ProjectStatus.RECRUITING;
-        project.totalMemberNeeded = requestDto.getTotalMemberNeeded();
-        project.currentMembers = 1; // 글 작성자는 반드시 프로젝트에 참여하므로
-        project.recruitmentEndDate = requestDto.getRecruitmentEndDate();
-        project.projectStartDate = requestDto.getProjectStartDate();
-        project.projectEndDate = requestDto.getProjectEndDate();
-
-        return project;
+        return Project.builder()
+                .member(member)
+                .projectTitle(title)
+                .projectDescription(description)
+                .status(ProjectStatus.RECRUITING)
+                .totalMemberNeeded(totalMemberNeeded)
+                .currentMembers(1) // 글 작성자는 반드시 프로젝트에 참여하므로
+                .recruitmentEndDate(recruitmentEndDate)
+                .projectStartDate(projectStartDate)
+                .projectEndDate(projectEndDate)
+                .build();
     }
 
     // 편의 메서드
@@ -140,35 +140,23 @@ public class Project extends BaseTimeEntity {
             throw new InvalidProjectTitleException();
         }
 
-        if(requestDto.getProjectDescription() != null) {
+        if(requestDto.getProjectDescription() != null)
             projectDescription = requestDto.getProjectDescription();
-        }
 
-        if(requestDto.getRecruitmentEndDate() != null) {
+        if(requestDto.getRecruitmentEndDate() != null)
             recruitmentEndDate = requestDto.getRecruitmentEndDate();
-        }
 
-        if(requestDto.getProjectStartDate() != null) {
+        if(requestDto.getProjectStartDate() != null)
             projectStartDate = requestDto.getProjectStartDate();
-        }
 
-        if(requestDto.getProjectEndDate() != null) {
+        if(requestDto.getProjectEndDate() != null)
             projectEndDate = requestDto.getProjectEndDate();
-        }
 
-        if(requestDto.getIsRecruiting() != null) {
+        if(requestDto.getIsRecruiting() != null)
             isRecruiting = requestDto.getIsRecruiting();
-        }
 
-        if(projectTags != null) {
+        if(projectTags != null)
             tags =  projectTags;
-        }
-    }
-
-    public void updateProject(String projectTitle,
-                              String projectDescription,
-                              Boolean isRecruiting,
-                              List<String> imageUrls) {
     }
 
     public List<String> getImageUrlList() {

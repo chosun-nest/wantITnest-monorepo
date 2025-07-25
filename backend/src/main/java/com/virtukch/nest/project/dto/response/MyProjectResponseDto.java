@@ -1,9 +1,14 @@
 package com.virtukch.nest.project.dto.response;
 
 import com.virtukch.nest.project.dto.ProjectDetailResponseDto;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@Getter
+@Builder
 public class MyProjectResponseDto {
     ProjectDetailResponseDto projectInfo;       // 기본 프로젝트 정보
     Integer totalApplicationCount;             // 전체 지원서 수

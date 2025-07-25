@@ -1,8 +1,6 @@
 package com.virtukch.nest.project_application.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.project_application.dto.ProjectApplicationRequestDto;
-import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project_application.service.ProjectApplicationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

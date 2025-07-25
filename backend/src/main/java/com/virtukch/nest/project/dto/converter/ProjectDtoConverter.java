@@ -2,14 +2,16 @@ package com.virtukch.nest.project.dto.converter;
 
 import com.virtukch.nest.common.dto.AuthorDto;
 import com.virtukch.nest.common.dto.PageInfoDto;
-import com.virtukch.nest.project.dto.response.ProjectResponseDto;
-import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
-import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
+import com.virtukch.nest.common.utils.DateUtils;
+import com.virtukch.nest.common.utils.StringUtils;
+import com.virtukch.nest.member.model.Member;
+import com.virtukch.nest.project.dto.common.RoleSimpleDto;
+import com.virtukch.nest.project.dto.response.*;
 import com.virtukch.nest.project.model.Project;
+import com.virtukch.nest.project.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectRole;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ProjectDtoConverter {
@@ -31,6 +33,38 @@ public class ProjectDtoConverter {
                 .build();
     }
 
+    public static ProjectDetailResponseDto toDetailResponseDto(Project project, List<String> tagNames) {
+        Member author = project.getMember();
+
+        List<ProjectRole> roles = project.getRoles();
+        List<ProjectParticipant> participants = project.getParticipants();
+
+        return ProjectDetailResponseDto.builder()
+                .projectId(project.getProjectId())
+                .projectTitle(project.getProjectTitle())
+                .projectDescription(project.getProjectDescription())
+                .status(project.getStatus())
+                .totalMemberNeeded(project.getTotalMemberNeeded())
+                .currentMembers(project.getCurrentMembers())
+                .recruitmentEndDate(DateUtils.formatDateTime(project.getRecruitmentEndDate()))
+                .projectStartDate(DateUtils.formatDateTime(project.getProjectStartDate()))
+                .projectEndDate(DateUtils.formatDateTime(project.getProjectEndDate()))
+                .createdAt(DateUtils.formatDateTime(project.getCreatedAt()))
+                .updatedAt(DateUtils.formatDateTime(project.getUpdatedAt()))
+                .viewCount(project.getViewCount())
+                .author(AuthorDto.builder()
+                        .id(author.getMemberId())
+                        .name(author.getMemberName())
+                        .memberImageUrl(author.getMemberImageUrl())
+                        .build())
+                .tags(tagNames)
+                .roles(roles.stream()
+                        .map(RoleDtoConverter::toSimpleDto)
+                        .toList())
+                .participants(null) // TODO
+                .build();
+    }
+
     private static ProjectResponseDto buildResponse(Project project, String message) {
         return ProjectResponseDto.builder()
                 .projectId(project.getProjectId())
@@ -38,7 +72,7 @@ public class ProjectDtoConverter {
                 .status(project.getStatus())
                 .currentMembers(project.getCurrentMembers())
                 .totalMemberNeeded(project.getTotalMemberNeeded())
-                .recruitmentEndDate(timeFormat(project.getRecruitmentEndDate()))
+                .recruitmentEndDate(DateUtils.formatDateTime(project.getRecruitmentEndDate()))
                 .message(message)
                 .build();
     }
@@ -55,32 +89,17 @@ public class ProjectDtoConverter {
         return ProjectSummaryDto.builder()
                 .projectId(project.getProjectId())
                 .projectTitle(project.getProjectTitle())
-                .previewContent(generatePreview(project.getProjectDescription()))
+                .previewContent(StringUtils.generateTextPreview(project.getProjectDescription(), 100))
                 .status(project.getStatus())
                 .isRecruiting(project.getIsRecruiting())
                 .totalMemberNeeded(project.getTotalMemberNeeded())
                 .currentMembers(project.getCurrentMembers())
-                .recruitmentEndDate(timeFormat(project.getRecruitmentEndDate()))
-                .createdAt(timeFormat(project.getCreatedAt()))
+                .recruitmentEndDate(DateUtils.formatDateTime(project.getRecruitmentEndDate()))
+                .createdAt(DateUtils.formatDateTime(project.getCreatedAt()))
                 .commentCount(commentCount)
                 .author(AuthorDto.create(project.getMember()))
                 .tags(tagNames)
                 .viewCount(project.getViewCount())
                 .build();
-    }
-
-    private static String timeFormat(LocalDateTime dateTime) {
-        return dateTime.format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
-    }
-
-    private static String generatePreview(String projectDescription) {
-        if (projectDescription == null) return "";
-        String plainText = projectDescription.replaceAll("\\*\\*", "")
-                .replaceAll("#+", "")
-                .replaceAll("```", "")
-                .replaceAll("`", "")
-                .replaceAll("> ", "")
-                .replaceAll("\\[(.*?)]\\((.*?)\\)", "$1");
-        return plainText.length() <= 100 ? plainText : plainText.substring(0, 100) + "...";
     }
 }

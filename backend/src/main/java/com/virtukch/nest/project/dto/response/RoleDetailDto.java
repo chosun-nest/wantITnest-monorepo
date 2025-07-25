@@ -1,7 +1,12 @@
 package com.virtukch.nest.project.dto.response;
 
+import lombok.Builder;
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
+@Builder
 public class RoleDetailDto {
     Long roleId;
     String roleName;
@@ -12,5 +17,5 @@ public class RoleDetailDto {
     Integer currentCount;
     Boolean isActive;
 
-    List<RoleTechStackResponseDto> techStacks;
+    List<RoleTechStackDto> techStacks;
 }

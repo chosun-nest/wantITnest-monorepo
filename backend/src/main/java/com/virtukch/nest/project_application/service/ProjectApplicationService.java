@@ -2,8 +2,6 @@ package com.virtukch.nest.project_application.service;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.project_application.exception.ProjectNotFoundException;
-import com.virtukch.nest.project_application.dto.ProjectApplicationRequestDto;
-import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
 import com.virtukch.nest.project_application.exception.*;
 import com.virtukch.nest.project.model.enums.ApplicationStatus;

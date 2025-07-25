@@ -8,19 +8,22 @@ import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
 import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.dto.request.RoleCreateRequestDto;
-import com.virtukch.nest.project.dto.response.ProjectResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
 import com.virtukch.nest.project.exception.ProjectNotFoundException;
-import com.virtukch.nest.project.model.*;
+import com.virtukch.nest.project.model.Project;
+import com.virtukch.nest.project.model.ProjectParticipant;
+import com.virtukch.nest.project.model.ProjectRole;
+import com.virtukch.nest.project.model.ProjectTag;
 import com.virtukch.nest.project.model.enums.Position;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project.repository.ProjectTagRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
 import com.virtukch.nest.tag.service.TagService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,7 +31,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,22 +57,36 @@ public class ProjectService {
 
         // projectId가 필요하므로 먼저 저장
         Member member = memberService.findOrThrow(memberId);
-        Project project = projectRepository.save(Project.createProject(member, requestDto));
+        Project project = projectRepository.save(Project.create(
+                member,
+                requestDto.getProjectTitle(),
+                requestDto.getProjectDescription(),
+                requestDto.getTotalMemberNeeded(),
+                requestDto.getRecruitmentEndDate(),
+                requestDto.getProjectStartDate(),
+                requestDto.getProjectEndDate())
+        );
 
-        List<RoleCreateRequestDto> roles = requestDto.getRoles();
-        roles.forEach(role -> {
-            ProjectRole projectRole = ProjectRole.createProjectRole(role);
+        List<RoleCreateRequestDto> roleCreateRequestDtos = requestDto.getRoles();
+        roleCreateRequestDtos.forEach(roleDto -> {
+            ProjectRole projectRole = ProjectRole.create(
+                    roleDto.getRoleName(),
+                    roleDto.getRoleDescription(),
+                    roleDto.getAdditionalRequirements(),
+                    roleDto.getRequiredCount());
             project.addRole(projectRole);
         });
 
         List<Tag> tags = tagRepository.findByNameIn(requestDto.getTags());
         tags.forEach(tag -> {
-            ProjectTag projectTag = ProjectTag.createProjectTag(project, tag);
+            ProjectTag projectTag = ProjectTag.create(project, tag);
             project.addTag(projectTag);
         });
         
         ProjectRole creatorRole = project.getRoles().get(requestDto.getCreatorRoleIndex());
-        ProjectParticipant participant = ProjectParticipant.createParticipant(memberId, creatorRole.getId(), Position.LEADER);
+        creatorRole.increaseCurrentCount();
+
+        ProjectParticipant participant = ProjectParticipant.create(memberId, creatorRole.getId(), Position.LEADER);
         project.addParticipant(participant); // 프로젝트 글 작성자가 LEADER
 
         return ProjectDtoConverter.toCreateResponseDto(project);
@@ -100,7 +116,7 @@ public class ProjectService {
 
         if (projectTags.isEmpty()) {
             Tag tag = tagService.findByNameOrThrow("UNCATEGORIZED");
-            projectTags.add(ProjectTag.createProjectTag(project, tag));
+            projectTags.add(ProjectTag.create(project, tag));
         }
 
         project.updateProject(requestDto, projectTags);
@@ -108,11 +124,19 @@ public class ProjectService {
         return ProjectDtoConverter.toUpdateResponseDto(project);
     }
 
+    @Transactional(readOnly = true)
+    public ProjectDetailResponseDto getProjectDetail(Long projectId) {
+        Project project = findByIdOrThrow(projectId);
+        List<String> tagNames = projectTagRepository.findTagNamesByProjectId(projectId);
+        return ProjectDtoConverter.toDetailResponseDto(project, tagNames);
+    }
+
+    // TODO: 요구사항 정리 필요 -> 지금은 연관관계 이런 거 다 무시하고 바로 삭제해버림
     @Transactional
     public ProjectResponseDto deleteProject(Long projectId, Long memberId) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
         
-        projectRepository.deleteProject(project);
+        projectRepository.delete(project);
         return ProjectDtoConverter.toDeleteResponseDto(project);
     }
 

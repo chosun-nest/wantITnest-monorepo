@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.model;
 
+import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.model.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,22 +12,27 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@EntityListeners(AuditingEntityListener.class)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class ProjectApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long applicationId;
 
-    @Column(nullable = false)
-    private Long projectId;
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 
-    @Column(nullable = false)
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(nullable = false)
-    private Long roleId;
+    @ManyToOne
+    @JoinColumn(name = "project_role_id")
+    private ProjectRole role;
 
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
@@ -67,7 +73,21 @@ public class ProjectApplication {
 
 
     // ======팩토리 메서드=======
-
+    public static ProjectApplication create(Project project, Member member, ProjectRole role,
+                                            String applicationMessage, LocalDate availableStartDate,
+                                            String availableTimeSlots, String timePreferenceNote) {
+        return ProjectApplication.builder()
+                .project(project)
+                .member(member)
+                .role(role)
+                .status(ApplicationStatus.PENDING)
+                .applicationMessage(applicationMessage)
+                .availableStartDate(availableStartDate)
+                .available_time_slots(availableTimeSlots)
+                .time_preference_note(timePreferenceNote)
+                .appliedAt(LocalDateTime.now())
+                .build();
+    }
     // ======비즈니스 메서드=======
     public void updateStatus(ApplicationStatus newStatus) {
         this.status = newStatus;

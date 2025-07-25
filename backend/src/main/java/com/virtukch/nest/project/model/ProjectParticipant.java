@@ -3,10 +3,7 @@ package com.virtukch.nest.project.model;
 import com.virtukch.nest.project.model.enums.ParticipantStatus;
 import com.virtukch.nest.project.model.enums.Position;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -14,6 +11,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class ProjectParticipant {
@@ -47,15 +46,13 @@ public class ProjectParticipant {
     private LocalDateTime leftAt;
 
     //======팩토리 메서드======
-    public static ProjectParticipant createParticipant(Long memberId, Long roleId, Position position) {
-        ProjectParticipant participant = new ProjectParticipant();
-
-        participant.memberId = memberId;
-        participant.roleId = roleId;
-        participant.position = position;
-        participant.status = ParticipantStatus.ACTIVE;
-
-        return participant;
+    public static ProjectParticipant create(Long memberId, Long roleId, Position position) {
+        return ProjectParticipant.builder()
+                .memberId(memberId)
+                .roleId(roleId)
+                .position(position)
+                .status(ParticipantStatus.ACTIVE)
+                .build();
     }
 
     //======비즈니스 메서드======

@@ -1,6 +1,5 @@
 package com.virtukch.nest.project_application.dto.converter;
 
-import com.virtukch.nest.project_application.dto.ProjectApplicationResponseDto;
 import com.virtukch.nest.project.model.ProjectApplication;
 
 public class ProjectApplicationDtoConverter {

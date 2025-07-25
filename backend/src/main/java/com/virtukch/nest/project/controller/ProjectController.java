@@ -3,8 +3,9 @@ package com.virtukch.nest.project.controller;
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
 import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
-import com.virtukch.nest.project.dto.response.ProjectResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
+import com.virtukch.nest.project.dto.response.ProjectResponseDto;
 import com.virtukch.nest.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,30 +35,14 @@ public class ProjectController {
     @Operation(
             summary = "프로젝트 생성",
             description = """
-                    **프로젝트 생성에 필요한 정보를 받아 프로젝트를 생성합니다.**
-                    - projectTitle: 모집글 제목 (필수)
-                    - projectDescription: 프로젝트 설명
-                    - totalMemberNeeded: 총 모집 인원
-                    - recruitmentEndDate: 모집 마감일
-                    - projectStartDate: 프로젝트 시작일
-                    - projectEndDate: 프로젝트 종료일
-                    - creatorRoleIndex: 생성자의 역할 인덱스
-                    - roles: 역할 목록
-                    - tags: 태그 목록
-
-                    **응답**
-                    - projectId: 생성된 프로젝트 ID
-                    - projectTitle: 생성된 프로젝트 제목
-                    - status: 프로젝트 상태 (기본값: RECRUITING)
-                    - totalMemberNeeded: 총 모집 인원
-                    - currentMembers: 현재 인원 (기본값: 글 작성자 본인 1명)
-                    - recruitmentEndDate: 모집 마감일
-                    - message: 응답 메시지
-
-                    **에러**
-                    - 400 Bad Request: 잘못된 요청 (예: 필수 필드 누락)
-                    - 401 Unauthorized: 인증되지 않은 사용자
-                    - 500 Internal Server Error: 서버 내부 오류
+                    프로젝트 모집 게시글을 생성합니다.
+                    
+                    ### 필수 항목
+                    - 프로젝트 제목, 설명, 시작 예정일, 기간, 모집 마감일
+                    - 최소 하나 이상의 역할(Role) 정보
+                    
+                    ### 선택 항목
+                    - 프로젝트 태그
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
@@ -71,6 +56,26 @@ public class ProjectController {
                 .body(responseDto);
     }
 
+    @Operation(
+            summary = "프로젝트 목록 조회",
+            description = """
+                    프로젝트 모집 게시글 목록을 조회합니다.
+                    
+                    ## 태그 필터링
+                    - 태그 필터링을 하지 않으면 전체 프로젝트를 반환합니다.
+                    - 태그를 필터링하려면 `?tags=JAVA&tags=SPRING`과 같이 쿼리 파라미터로 전달하세요.
+                    
+                    ## 페이지네이션
+                    - 페이지 번호: `?page=0` (기본값: 0, 첫 페이지)
+                    - 페이지 크기: `?size=10` (기본값: 10, 페이지당 10개 항목)
+                    
+                    ## 정렬
+                    - 기본 정렬: 생성일시 내림차순 (최신순)
+                    
+                    ## 전체 사용 예시
+                    - `/api/v1/projects?page=0&size=10&tags=JAVA&tags=SPRING`
+                    """
+    )
     @GetMapping
     public ResponseEntity<ProjectListResponseDto> getProjectList(
             @RequestParam(required = false) List<String> tags,
@@ -85,6 +90,42 @@ public class ProjectController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(
+            summary = "프로젝트 상세 조회",
+            description = """
+                    프로젝트 ID를 기반으로 프로젝트 상세 정보를 조회합니다.
+                    
+                    ### 포함 정보
+                    - 프로젝트 기본 정보 (제목, 설명, 기간 등)
+                    - 역할별 상세 정보 및 필요 기술 스택
+                    - 프로젝트 태그 및 이미지
+                    - 모집 상태 및 현재 지원자 수
+                    """
+    )
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(@PathVariable Long projectId) {
+        ProjectDetailResponseDto responseDto = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
+            summary = "프로젝트 수정",
+            description = """
+                    프로젝트 정보를 수정합니다.
+                    
+                    ### 권한
+                    - 프로젝트 생성자만 수정 가능
+                    
+                    ### 수정 가능 항목
+                    - 프로젝트 기본 정보 (제목, 설명, 기간 등)
+                    - 역할 정보 및 기술 스택
+                    - 프로젝트 태그 및 이미지
+                    
+                    ### 주의사항
+                    - 이미 진행 중인 프로젝트의 경우 일부 항목 수정 제한
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
     @PatchMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDto> updateProject(@AuthenticationPrincipal CustomUserDetails user,
                                                             @PathVariable Long projectId,
@@ -95,10 +136,28 @@ public class ProjectController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(
+            summary = "프로젝트 삭제",
+            description = """
+                    프로젝트를 삭제합니다.
+                    
+                    ### 권한
+                    - 프로젝트 생성자만 삭제 가능
+                    
+                    ### 삭제 정책
+                    - 소프트 삭제 방식 적용
+                    - 관련된 지원서 및 참여자 정보도 함께 처리
+                    
+                    ### 주의사항
+                    - 이미 진행 중인 프로젝트의 경우 삭제 제한 가능
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
     @DeleteMapping("/{projectId}")
     public ResponseEntity<ProjectResponseDto> deleteProject(@AuthenticationPrincipal CustomUserDetails user,
                                                             @PathVariable Long projectId) {  
         Long memberId = user.getMember().getMemberId();
         ProjectResponseDto responseDto = projectService.deleteProject(projectId, memberId);
+        return ResponseEntity.ok(responseDto);
     }
 }

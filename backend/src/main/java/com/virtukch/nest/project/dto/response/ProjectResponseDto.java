@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.virtukch.nest.project.model.enums.ProjectStatus;
 import lombok.Builder;
 import lombok.Getter;

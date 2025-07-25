@@ -1,5 +1,7 @@
 package com.virtukch.nest.project.dto.response;
 
+import com.virtukch.nest.project.dto.common.ApplicationSimpleDto;
+
 import java.util.List;
 
 // 역할 관리용 (팀장에게만 보이는 정보)
