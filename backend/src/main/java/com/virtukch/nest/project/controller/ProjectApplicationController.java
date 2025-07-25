@@ -1,14 +1,17 @@
-package com.virtukch.nest.project_application.controller;
+package com.virtukch.nest.project.controller;
+
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
-import com.virtukch.nest.project_application.service.ProjectApplicationService;
+import com.virtukch.nest.project.dto.request.ApplicationCreateRequestDto;
+import com.virtukch.nest.project.dto.response.ApplicationDetailResponseDto;
+import com.virtukch.nest.project.service.ProjectApplicationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
 
@@ -17,6 +20,7 @@ import java.util.List;
 @RequestMapping("/api/v1/projects")
 @Tag(name = "[프로젝트 모집글 지원 관리] 지원 처리 API", description = "프로젝트 모집글에 지원하고, 지원 현황(지원자 목록 등)을 조회할 수 있는 API입니다.\n문의 : dlwlgur02@gmail.com")
 public class ProjectApplicationController {
+
     private final ProjectApplicationService projectApplicationService;
 
     @Operation(
@@ -29,11 +33,11 @@ public class ProjectApplicationController {
         security = {@SecurityRequirement(name = "bearer-key")}
     )
     @PostMapping("/{projectId}/apply")
-    public ResponseEntity<ProjectApplicationResponseDto> projectApplicationApply(@AuthenticationPrincipal CustomUserDetails user,
-                                      @PathVariable Long projectId,
-                                      @RequestBody ProjectApplicationRequestDto requestDto) {
+    public ResponseEntity<ApplicationDetailResponseDto> projectApplicationApply(@AuthenticationPrincipal CustomUserDetails user,
+                                                                                @PathVariable Long projectId,
+                                                                                @RequestBody ApplicationCreateRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
-        ProjectApplicationResponseDto responseDto = projectApplicationService.applyToProject(projectId, memberId, requestDto);
+        projectApplicationService.applyToProject(projectId, memberId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 

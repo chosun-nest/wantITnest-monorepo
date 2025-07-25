@@ -17,4 +17,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findAll(Pageable pageable);
 
     Page<Project> findByTags(List<ProjectTag> tags, Pageable pageable);
+
+    Page<Project> findByCreatorMemberId(Long memberId, Pageable pageable);
 }

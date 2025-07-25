@@ -18,9 +18,11 @@ import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectParticipant;
 import com.virtukch.nest.project.model.ProjectRole;
 import com.virtukch.nest.project.model.ProjectTag;
+import com.virtukch.nest.project.model.enums.ParticipantStatus;
 import com.virtukch.nest.project.model.enums.Position;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project.repository.ProjectTagRepository;
+import com.virtukch.nest.project.repository.ProjectParticipantRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
 import com.virtukch.nest.tag.service.TagService;
@@ -47,6 +49,7 @@ public class ProjectService {
     private final CommentRepository commentRepository;
     private final MemberService memberService;
     private final ProjectTagRepository projectTagRepository;
+    private final ProjectParticipantRepository projectParticipantRepository;
 
     private final String prefix = "project";
 
@@ -104,6 +107,18 @@ public class ProjectService {
         List<ProjectTag> projectTags = projectTagRepository.findByTagIn(tags);
         Page<Project> projectPage = projectRepository.findByTags(projectTags, pageable);
 
+        return buildListResponseDto(projectPage);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectListResponseDto getMyProjectList(Long memberId, Pageable pageable) {
+        Page<Project> projectPage = projectRepository.findByCreatorMemberId(memberId, pageable);
+        return buildListResponseDto(projectPage);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectListResponseDto getParticipatingProjectList(Long memberId, Pageable pageable) {
+        Page<Project> projectPage = projectParticipantRepository.findProjectsByMemberIdAndStatus(memberId, ParticipantStatus.ACTIVE, pageable);
         return buildListResponseDto(projectPage);
     }
 

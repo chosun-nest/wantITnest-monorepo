@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.exception;
 
+import com.virtukch.nest.project.exception.project_role.ProjectRoleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +48,12 @@ public class ProjectExceptionHandler {
     // 프로젝트 참여 멤버가 아님 - 400 BAD_REQUEST
     @ExceptionHandler(ProjectMemberNotFoundException.class)
     public ResponseEntity<String> handleProjectMemberNotFound(ProjectMemberNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    // 프로젝트 역할을 찾을 수 없음 - 404 NOT_FOUND
+    @ExceptionHandler(ProjectRoleNotFoundException.class)
+    public ResponseEntity<String> handleProjectRoleNotFound(ProjectRoleNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

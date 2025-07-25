@@ -9,6 +9,6 @@ import java.util.List;
 @Builder
 public class RoleListDto {
     List<RoleDetailDto> roleInfos;
-    Integer totalNeededMembers;
+    Integer totalMemberNeeded;
     Integer currentMembers;
 }

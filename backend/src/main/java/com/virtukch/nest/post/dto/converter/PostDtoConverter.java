@@ -1,7 +1,7 @@
 package com.virtukch.nest.post.dto.converter;
 
 import com.virtukch.nest.common.dto.PageInfoDto;
-import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.post.dto.*;
 import com.virtukch.nest.post.model.Post;
@@ -38,7 +38,7 @@ public class PostDtoConverter {
                 .title(post.getTitle())
                 .previewContent(generatePreview(post.getContent()))
                 .tags(tagNames)
-                .author(AuthorDto.create(member))
+                .author(MemberSimpleDto.create(member))
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .dislikeCount(post.getDislikeCount())
@@ -54,7 +54,7 @@ public class PostDtoConverter {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .tags(tagNames)
-                .author(AuthorDto.create(member))
+                .author(MemberSimpleDto.create(member))
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .dislikeCount(post.getDislikeCount())

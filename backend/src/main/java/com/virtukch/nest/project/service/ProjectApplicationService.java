@@ -1,25 +1,24 @@
-package com.virtukch.nest.project_application.service;
+package com.virtukch.nest.project.service;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
-import com.virtukch.nest.project_application.exception.ProjectNotFoundException;
-import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
-import com.virtukch.nest.project_application.exception.*;
-import com.virtukch.nest.project.model.enums.ApplicationStatus;
-import com.virtukch.nest.project.model.ProjectApplication;
-import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.repository.MemberRepository;
-import com.virtukch.nest.project.repository.ProjectRepository;
-import com.virtukch.nest.project.model.ProjectParticipant;
-import com.virtukch.nest.project_participant.repository.ProjectParticipantRepository;
-import com.virtukch.nest.project_application.exception.AlreadyProcessedApplicationException;
+import com.virtukch.nest.member.service.MemberService;
+import com.virtukch.nest.project.dto.request.ApplicationCreateRequestDto;
 import com.virtukch.nest.project.model.Project;
+import com.virtukch.nest.project.model.ProjectApplication;
+import com.virtukch.nest.project.model.ProjectParticipant;
+import com.virtukch.nest.project.model.enums.ApplicationStatus;
+import com.virtukch.nest.project.repository.ProjectParticipantRepository;
+import com.virtukch.nest.project.repository.ProjectRepository;
+import com.virtukch.nest.project_application.dto.converter.ProjectApplicationDtoConverter;
+import com.virtukch.nest.project_application.exception.*;
+import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -27,51 +26,48 @@ import java.util.List;
 @Service
 public class ProjectApplicationService extends BaseTimeEntity {
 
-    private final ProjectApplicationRepository projectApplicationRepository;
+    private final ProjectApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
-    private final ProjectParticipantRepository projectMemberRepository;
+    private final ProjectParticipantRepository participantRepository;
+    private final MemberService memberService;
+    private final ProjectRoleService projectRoleService;
 
     @Transactional
-    public ProjectApplicationResponseDto applyToProject(Long projectId, Long memberId, ProjectApplicationRequestDto requestDto) {
+    public void applyToProject(Long projectId, Long memberId, ApplicationCreateRequestDto requestDto) {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        if (project.getMemberId().equals(memberId)) {
-            throw new ProjectOwnerCannotApplyException(); // 또는 IllegalStateException
+        if (project.getMember().getMemberId().equals(memberId)) {
+            throw new ProjectOwnerCannotApplyException();
         }
 
-        projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
         // 중복 지원 방지 (REJECTED 또는 CANCELLED 제외)
-        if (projectApplicationRepository.existsByProjectIdAndMemberIdAndStatusNotIn(
+        if (applicationRepository.existsByProjectIdAndMemberIdAndStatusNotIn(
                 projectId,
                 memberId,
                 List.of(ApplicationStatus.REJECTED, ApplicationStatus.CANCELED))) {
             throw new DuplicateApplicationException();
         }
 
-        ProjectApplication application = ProjectApplication.builder()
-                .projectId(projectId)
-                .memberId(memberId)
-                .part(requestDto.getPart())
-                .status(ApplicationStatus.PENDING)
-                .appliedAt(LocalDateTime.now())
-                .build();
+        ProjectApplication application = ProjectApplication.create(
+                project,
+                memberService.findOrThrow(memberId),
+                projectRoleService.findProjectRoleOrThrow(projectId, requestDto.getRoleId()),
+                requestDto.getApplicationMessage(),
+                requestDto.getAvailableStartDate(),
+                requestDto.getAvailableTimeSlots(),
+                requestDto.getAvailableTimeSlots()
+        );
 
-        projectApplicationRepository.save(application);
-
-        Member member = memberRepository.findById(memberId).orElse(null);
-
-        return ProjectApplicationDtoConverter.toResponseDto(application, member != null ? member.getMemberName() : "알 수 없음");
+        applicationRepository.save(application);
     }
 
     @Transactional
     public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId) {
 
-        List<ProjectApplication> applications = projectApplicationRepository.findByProjectId(projectId);
+        List<ProjectApplication> applications = applicationRepository.findByProjectId(projectId);
 
         return applications.stream().map(app -> {
             Member member = memberRepository.findById(app.getMemberId()).orElse(null);
@@ -81,7 +77,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
 
     @Transactional
     public ProjectApplicationResponseDto acceptApplication(Long projectId, Long applicationId, Long requesterId) {
-        ProjectApplication application = projectApplicationRepository.findById(applicationId)
+        ProjectApplication application = applicationRepository.findById(applicationId)
                 .orElseThrow(ApplicationNotFoundException::new);
         validateOwnership(projectId, requesterId, application);
         if (application.getStatus() != ApplicationStatus.PENDING) {
@@ -89,34 +85,33 @@ public class ProjectApplicationService extends BaseTimeEntity {
         }
 
         // 현재 ACCEPTED 상태의 인원 수 조회
-        long acceptedCount = projectApplicationRepository.countByProjectIdAndStatus(
-                projectId, ApplicationStatus.ACCEPTED);
+        Long acceptedCount = applicationRepository.countByProjectIdAndStatus(projectId, ApplicationStatus.ACCEPTED);
 
         // 프로젝트 최대 인원 수를 동적으로 계산
-        int maxMember = projectMemberRepository.findByProjectId(projectId).size();
+        int maxMember = participantRepository.findByProjectId(projectId).size();
 
         if (acceptedCount >= maxMember) {
             throw new ProjectFullException("프로젝트 모집 인원을 초과하여 승인할 수 없습니다.");
         }
 
         application.setStatus(ApplicationStatus.ACCEPTED);
-        projectApplicationRepository.save(application);
+        applicationRepository.save(application);
 
-        List<ProjectParticipant> vacantList = projectMemberRepository
+        List<ProjectParticipant> vacantList = participantRepository
                 .findByProjectIdAndPartAndMemberIdIsNull(projectId, application.getPart());
 
         if (!vacantList.isEmpty()) {
             ProjectParticipant vacant = vacantList.get(0);
             vacant.setParticipantId(application.getMemberId());
-            projectMemberRepository.save(vacant);
+            participantRepository.save(vacant);
         } else {
             // 파트별 모집 인원 초과 방지
-            long maxCount = projectMemberRepository.countByProjectIdAndPart(projectId, application.getPart());
-            long approvedCount = projectMemberRepository.countByProjectIdAndPartAndMemberIdIsNotNull(projectId, application.getPart());
+            long maxCount = participantRepository.countByProjectIdAndPart(projectId, application.getPart());
+            long approvedCount = participantRepository.countByProjectIdAndPartAndMemberIdIsNotNull(projectId, application.getPart());
             if (approvedCount >= maxCount) {
                 throw new ProjectFullException(application.getPart() + " 파트의 모집 인원을 초과할 수 없습니다.");
             }
-            projectMemberRepository.save(ProjectParticipant.builder()
+            participantRepository.save(ProjectParticipant.builder()
                     .projectId(projectId)
                     .memberId(application.getMemberId())
                     .role(ProjectParticipant.Role.MEMBER)
@@ -127,7 +122,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        int registeredCount = projectMemberRepository
+        int registeredCount = participantRepository
                 .findByProjectIdAndMemberIdIsNotNull(projectId)
                 .size();
 
@@ -142,7 +137,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
 
     @Transactional
     public ProjectApplicationResponseDto rejectApplication(Long projectId, Long applicationId, Long requesterId) {
-        ProjectApplication application = projectApplicationRepository.findById(applicationId)
+        ProjectApplication application = applicationRepository.findById(applicationId)
                 .orElseThrow(ApplicationNotFoundException::new);
         validateOwnership(projectId, requesterId, application);
         if (application.getStatus() != ApplicationStatus.PENDING) {
@@ -150,7 +145,7 @@ public class ProjectApplicationService extends BaseTimeEntity {
         }
 
         application.setStatus(ApplicationStatus.REJECTED);
-        projectApplicationRepository.save(application);
+        applicationRepository.save(application);
 
         Member member = memberRepository.findById(application.getMemberId()).orElse(null);
         return ProjectApplicationDtoConverter.toResponseDto(application, member != null ? member.getMemberName() : "알 수 없음");

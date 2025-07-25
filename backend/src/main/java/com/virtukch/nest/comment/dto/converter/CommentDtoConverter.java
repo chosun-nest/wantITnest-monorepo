@@ -1,6 +1,6 @@
 package com.virtukch.nest.comment.dto.converter;
 
-import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import com.virtukch.nest.comment.dto.CommentDeleteResponseDto;
 import com.virtukch.nest.comment.dto.CommentListResponseDto;
 import com.virtukch.nest.comment.dto.CommentResponseDto;
@@ -19,7 +19,7 @@ public class CommentDtoConverter {
         return CommentResponseDto.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.getCommentContent())
-                .author(AuthorDto.create(member))
+                .author(MemberSimpleDto.create(member))
                 .createdAt(timeFormat(comment.getCreatedAt()))
                 .updatedAt(timeFormat(comment.getUpdatedAt()))
                 .parentId(comment.getParentId())

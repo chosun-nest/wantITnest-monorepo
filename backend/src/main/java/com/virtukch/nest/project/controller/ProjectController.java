@@ -91,6 +91,46 @@ public class ProjectController {
     }
 
     @Operation(
+            summary = "내 프로젝트 목록 조회",
+            description = """
+                    현재 로그인한 사용자와 관련된 프로젝트 목록을 조회합니다.
+                    
+                    ## 조회 타입
+                    - `type=created` (기본값): 내가 등록한 프로젝트
+                    - `type=participating`: 내가 참여 중인 프로젝트
+                    
+                    ## 페이지네이션
+                    - 페이지 번호: `?page=0` (기본값: 0, 첫 페이지)
+                    - 페이지 크기: `?size=10` (기본값: 10, 페이지당 10개 항목)
+                    
+                    ## 정렬
+                    - 기본 정렬: 생성일시 내림차순 (최신순)
+                    
+                    ## 사용 예시
+                    - `/api/v1/projects/my` (내가 등록한 프로젝트)
+                    - `/api/v1/projects/my?type=created` (내가 등록한 프로젝트)
+                    - `/api/v1/projects/my?type=participating` (내가 참여 중인 프로젝트)
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @GetMapping("/my")
+    public ResponseEntity<ProjectListResponseDto> getMyProjectList(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam(defaultValue = "created") String type,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Long memberId = user.getMember().getMemberId();
+        
+        ProjectListResponseDto responseDto;
+        if ("participating".equals(type)) {
+            responseDto = projectService.getParticipatingProjectList(memberId, pageable);
+        } else {
+            responseDto = projectService.getMyProjectList(memberId, pageable);
+        }
+        
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(
             summary = "프로젝트 상세 조회",
             description = """
                     프로젝트 ID를 기반으로 프로젝트 상세 정보를 조회합니다.

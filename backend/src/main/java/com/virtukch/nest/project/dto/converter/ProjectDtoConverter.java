@@ -1,11 +1,10 @@
 package com.virtukch.nest.project.dto.converter;
 
-import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import com.virtukch.nest.common.dto.PageInfoDto;
 import com.virtukch.nest.common.utils.DateUtils;
 import com.virtukch.nest.common.utils.StringUtils;
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.project.dto.common.RoleSimpleDto;
 import com.virtukch.nest.project.dto.response.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectParticipant;
@@ -52,7 +51,7 @@ public class ProjectDtoConverter {
                 .createdAt(DateUtils.formatDateTime(project.getCreatedAt()))
                 .updatedAt(DateUtils.formatDateTime(project.getUpdatedAt()))
                 .viewCount(project.getViewCount())
-                .author(AuthorDto.builder()
+                .author(MemberSimpleDto.builder()
                         .id(author.getMemberId())
                         .name(author.getMemberName())
                         .memberImageUrl(author.getMemberImageUrl())
@@ -97,7 +96,7 @@ public class ProjectDtoConverter {
                 .recruitmentEndDate(DateUtils.formatDateTime(project.getRecruitmentEndDate()))
                 .createdAt(DateUtils.formatDateTime(project.getCreatedAt()))
                 .commentCount(commentCount)
-                .author(AuthorDto.create(project.getMember()))
+                .author(MemberSimpleDto.create(project.getMember()))
                 .tags(tagNames)
                 .viewCount(project.getViewCount())
                 .build();

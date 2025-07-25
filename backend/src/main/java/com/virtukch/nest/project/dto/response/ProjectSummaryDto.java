@@ -1,6 +1,6 @@
 package com.virtukch.nest.project.dto.response;
 
-import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import com.virtukch.nest.project.model.enums.ProjectStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +28,7 @@ public class ProjectSummaryDto {
     
     private Long commentCount;
 
-    private AuthorDto author;
+    private MemberSimpleDto author;
 
     private List<String> tags;
     private Integer viewCount;

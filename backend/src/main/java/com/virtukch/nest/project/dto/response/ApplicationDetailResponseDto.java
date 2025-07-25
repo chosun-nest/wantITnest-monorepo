@@ -1,11 +1,14 @@
 package com.virtukch.nest.project.dto.response;
 
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import com.virtukch.nest.project.model.enums.ApplicationStatus;
+import com.virtukch.nest.tech_stack.dto.TechStackResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -24,5 +27,5 @@ public class ApplicationDetailResponseDto {
     private LocalDateTime reviewedAt;
     private String reviewComment;
     private MemberSimpleDto reviewer;         // 검토자 정보
-    private List<TechStackDto> memberTechStacks;     // 지원자 보유 기술스택
+    private List<TechStackResponseDto> memberTechStacks;     // 지원자 보유 기술스택
 }

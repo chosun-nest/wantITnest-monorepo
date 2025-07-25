@@ -1,6 +1,6 @@
 package com.virtukch.nest.post.dto;
 
-import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class PostSummaryDto {
     private Long id;
     private String title;
     private String previewContent;
-    private AuthorDto author;
+    private MemberSimpleDto author;
     private List<String> tags;
     private Long viewCount;
     private Long likeCount;

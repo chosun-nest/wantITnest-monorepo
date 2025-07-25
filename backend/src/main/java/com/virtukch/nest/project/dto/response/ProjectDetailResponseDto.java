@@ -1,6 +1,6 @@
 package com.virtukch.nest.project.dto.response;
 
-import com.virtukch.nest.common.dto.AuthorDto;
+import com.virtukch.nest.common.dto.MemberSimpleDto;
 import com.virtukch.nest.project.dto.ParticipantDto;
 import com.virtukch.nest.project.dto.common.RoleSimpleDto;
 import com.virtukch.nest.project.model.enums.ProjectStatus;
@@ -36,7 +36,7 @@ public class ProjectDetailResponseDto {
 
     private Integer viewCount;
 
-    private AuthorDto author;
+    private MemberSimpleDto author;
 
     private List<String> tags;
     private List<String> imageUrls;

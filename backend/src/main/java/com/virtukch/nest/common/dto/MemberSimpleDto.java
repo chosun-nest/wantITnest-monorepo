@@ -8,22 +8,22 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class AuthorDto {
+public class MemberSimpleDto {
     private Long id;
     private String name;
     private String memberImageUrl;
 
-    public static AuthorDto create(Member member) {
+    public static MemberSimpleDto create(Member member) {
         // Member가 null인 경우 탈퇴한 사용자로 처리
         if (member == null) {
-            return AuthorDto.builder()
+            return MemberSimpleDto.builder()
                     .id(null)
                     .name("탈퇴한 사용자")
                     .memberImageUrl(null)
                     .build();
         }
 
-        return AuthorDto.builder()
+        return MemberSimpleDto.builder()
                 .id(member.getMemberId())
                 .name(member.getMemberName())
                 .memberImageUrl(member.getMemberImageUrl())

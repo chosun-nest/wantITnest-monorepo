@@ -24,7 +24,7 @@ public class ProjectRole extends BaseTimeEntity {
     private Project project;
 
     @OneToMany(mappedBy = "projectRole", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProjectRoleTechStack> techStacks = new ArrayList<>();
+    private List<ProjectRoleTechStack> roleTechStacks = new ArrayList<>();
 
     @Column(nullable = false)
     private String roleName;
@@ -58,7 +58,7 @@ public class ProjectRole extends BaseTimeEntity {
 
     //======비즈니스 편의 메서드======
     public void addTechStack(ProjectRoleTechStack projectRoleTechStack) {
-        this.techStacks.add(projectRoleTechStack);
+        this.roleTechStacks.add(projectRoleTechStack);
         projectRoleTechStack.setProjectRole(this);
     }
 
@@ -73,5 +73,14 @@ public class ProjectRole extends BaseTimeEntity {
     }
     public void decreaseCurrentCount() {
         this.currentCount--;
+    }
+    
+    public void updateBasicInfo(String roleName, String roleDescription, String additionalRequirements, Integer requiredCount) {
+        this.roleName = roleName;
+        this.roleDescription = roleDescription;
+        this.additionalRequirements = additionalRequirements;
+        this.requiredCount = requiredCount;
+
+        this.isActive = this.currentCount < requiredCount;
     }
 }

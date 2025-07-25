@@ -2,6 +2,8 @@ package com.virtukch.nest.project.dto.request;
 
 import lombok.Getter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -11,8 +13,7 @@ import java.util.List;
 public class ApplicationCreateRequestDto {
     private Long roleId;
     private String applicationMessage;
-    private String availableStartDate;
+    private LocalDate availableStartDate;
     private String availableTimeSlots;
     private String timePreferenceNote;
-    private List<Long> memberTechStackIds;
 }
