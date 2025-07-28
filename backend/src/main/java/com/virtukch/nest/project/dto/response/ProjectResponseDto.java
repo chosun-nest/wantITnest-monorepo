@@ -15,5 +15,4 @@ public class ProjectResponseDto {
     private Integer totalMemberNeeded;      // 4
     private Integer currentMembers;         // 1
     private String recruitmentEndDate;
-    private String message;                 // "프로젝트가 생성되었습니다"
 }

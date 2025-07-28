@@ -1,7 +1,9 @@
 package com.virtukch.nest.project.controller;
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.common.dto.ApiResponseDto;
 import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
+import com.virtukch.nest.project.dto.request.ProjectStatusUpdateRequestDto;
 import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
@@ -47,13 +49,13 @@ public class ProjectController {
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(@AuthenticationPrincipal CustomUserDetails user,
-                                                            @RequestBody ProjectCreateRequestDto requestDto) {
+    public ResponseEntity<ApiResponseDto<ProjectResponseDto>> createProject(@AuthenticationPrincipal CustomUserDetails user,
+                                                                            @RequestBody ProjectCreateRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         ProjectResponseDto responseDto = projectService.createProject(memberId, requestDto);
         return ResponseEntity
                 .created(URI.create("/api/v1/projects/" + responseDto.getProjectId()))
-                .body(responseDto);
+                .body(ApiResponseDto.created("프로젝트가 성공적으로 생성되었습니다.", responseDto));
     }
 
     @Operation(
@@ -77,7 +79,7 @@ public class ProjectController {
                     """
     )
     @GetMapping
-    public ResponseEntity<ProjectListResponseDto> getProjectList(
+    public ResponseEntity<ApiResponseDto<ProjectListResponseDto>> getProjectList(
             @RequestParam(required = false) List<String> tags,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
@@ -87,7 +89,7 @@ public class ProjectController {
         } else {
             responseDto = projectService.getProjectList(tags, pageable);
         }
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponseDto.success("프로젝트 목록을 성공적으로 조회했습니다.", responseDto));
     }
 
     @Operation(
@@ -114,20 +116,23 @@ public class ProjectController {
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @GetMapping("/my")
-    public ResponseEntity<ProjectListResponseDto> getMyProjectList(
+    public ResponseEntity<ApiResponseDto<ProjectListResponseDto>> getMyProjectList(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(defaultValue = "created") String type,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Long memberId = user.getMember().getMemberId();
         
         ProjectListResponseDto responseDto;
+        String message;
         if ("participating".equals(type)) {
             responseDto = projectService.getParticipatingProjectList(memberId, pageable);
+            message = "참여 중인 프로젝트 목록을 성공적으로 조회했습니다.";
         } else {
             responseDto = projectService.getMyProjectList(memberId, pageable);
+            message = "내가 등록한 프로젝트 목록을 성공적으로 조회했습니다.";
         }
         
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponseDto.success(message, responseDto));
     }
 
     @Operation(
@@ -143,9 +148,9 @@ public class ProjectController {
                     """
     )
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(@PathVariable Long projectId) {
+    public ResponseEntity<ApiResponseDto<ProjectDetailResponseDto>> getProjectDetail(@PathVariable Long projectId) {
         ProjectDetailResponseDto responseDto = projectService.getProjectDetail(projectId);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponseDto.success("프로젝트 상세 정보를 성공적으로 조회했습니다.", responseDto));
     }
 
     @Operation(
@@ -163,17 +168,18 @@ public class ProjectController {
                     
                     ### 주의사항
                     - 이미 진행 중인 프로젝트의 경우 일부 항목 수정 제한
+                    - 요구사항 논의 필요
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @PatchMapping("/{projectId}")
-    public ResponseEntity<ProjectResponseDto> updateProject(@AuthenticationPrincipal CustomUserDetails user,
+    @PatchMapping("/{projectId}") // TODO : 수정 제한할 항목 논의 필요
+    public ResponseEntity<ApiResponseDto<ProjectResponseDto>> updateProject(@AuthenticationPrincipal CustomUserDetails user,
                                                             @PathVariable Long projectId,
                                                             @RequestBody ProjectUpdateRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         ProjectResponseDto responseDto = projectService.updateProject(projectId, memberId, requestDto);
 
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponseDto.success("프로젝트가 성공적으로 수정되었습니다.", responseDto));
     }
 
     @Operation(
@@ -194,10 +200,30 @@ public class ProjectController {
             security = {@SecurityRequirement(name = "bearer-key")}
     )
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<ProjectResponseDto> deleteProject(@AuthenticationPrincipal CustomUserDetails user,
+    public ResponseEntity<ApiResponseDto<ProjectResponseDto>> deleteProject(@AuthenticationPrincipal CustomUserDetails user,
                                                             @PathVariable Long projectId) {  
         Long memberId = user.getMember().getMemberId();
         ProjectResponseDto responseDto = projectService.deleteProject(projectId, memberId);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponseDto.success("프로젝트가 성공적으로 삭제되었습니다.", responseDto));
+    }
+
+    @Operation(
+            summary = "프로젝트 상태 변경",
+            description = """
+                    프로젝트 상태를 변경합니다.
+                    - 모집중 → 진행중 → 완료 상태 관리
+                    """,
+            security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PatchMapping("/{projectId}/status")
+    public ResponseEntity<ApiResponseDto<Void>> updateProjectStatus(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long projectId,
+            @RequestBody ProjectStatusUpdateRequestDto requestDto
+    ) {
+        // 모집중 → 진행중 → 완료 상태 관리
+        Long memberId = user.getMember().getMemberId();
+        projectService.updateProjectStatus(projectId, memberId, requestDto);
+        return ResponseEntity.ok(ApiResponseDto.success());
     }
 }

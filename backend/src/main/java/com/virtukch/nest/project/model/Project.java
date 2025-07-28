@@ -159,6 +159,11 @@ public class Project extends BaseTimeEntity {
             tags =  projectTags;
     }
 
+    public void updateStatus(ProjectStatus status) {
+        if(status != null)
+            this.status = status;
+    }
+
     public List<String> getImageUrlList() {
         if(imageUrls == null || imageUrls.isEmpty()) {
             return Collections.emptyList();

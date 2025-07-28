@@ -9,18 +9,21 @@ import com.virtukch.nest.project.dto.response.*;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectParticipant;
 import com.virtukch.nest.project.model.ProjectRole;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProjectDtoConverter {
 
     public static ProjectResponseDto toCreateResponseDto(Project project) {
-        return buildResponse(project, "프로젝트가 성공적으로 생성되었습니다.");
+        return buildResponse(project);
     }
 
     public static ProjectResponseDto toUpdateResponseDto(Project project) {
-        return buildResponse(project, "게시글이 성공적으로 수정되었습니다.");
+        return buildResponse(project);
     }
 
     public static ProjectResponseDto toDeleteResponseDto(Project project) {
@@ -28,7 +31,6 @@ public class ProjectDtoConverter {
                 .projectId(project.getProjectId())
                 .projectTitle(project.getProjectTitle())
                 .status(project.getStatus())
-                .message("게시글이 성공적으로 삭제되었습니다.")
                 .build();
     }
 
@@ -60,11 +62,13 @@ public class ProjectDtoConverter {
                 .roles(roles.stream()
                         .map(RoleDtoConverter::toSimpleDto)
                         .toList())
-                .participants(null) // TODO
+                .participants(participants.stream()
+                        .map(ParticipantDtoConverter::toParticipantDto)
+                        .toList())
                 .build();
     }
 
-    private static ProjectResponseDto buildResponse(Project project, String message) {
+    private static ProjectResponseDto buildResponse(Project project) {
         return ProjectResponseDto.builder()
                 .projectId(project.getProjectId())
                 .projectTitle(project.getProjectTitle())
@@ -72,7 +76,6 @@ public class ProjectDtoConverter {
                 .currentMembers(project.getCurrentMembers())
                 .totalMemberNeeded(project.getTotalMemberNeeded())
                 .recruitmentEndDate(DateUtils.formatDateTime(project.getRecruitmentEndDate()))
-                .message(message)
                 .build();
     }
 

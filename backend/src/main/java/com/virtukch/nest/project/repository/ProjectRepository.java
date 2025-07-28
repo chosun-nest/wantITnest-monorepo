@@ -19,4 +19,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByTags(List<ProjectTag> tags, Pageable pageable);
 
     Page<Project> findByCreatorMemberId(Long memberId, Pageable pageable);
+
+    @Query("SELECT p FROM Project p " +
+           "LEFT JOIN FETCH p.roles r " +
+           "LEFT JOIN FETCH p.participants part " +
+           "LEFT JOIN FETCH part.member " +
+           "WHERE p.projectId = :projectId")
+    Optional<Project> findByIdWithRolesAndParticipants(@Param("projectId") Long projectId);
 }

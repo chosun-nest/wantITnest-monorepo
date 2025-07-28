@@ -1,5 +1,6 @@
 package com.virtukch.nest.project.model;
 
+import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.model.enums.ParticipantStatus;
 import com.virtukch.nest.project.model.enums.Position;
 import jakarta.persistence.*;
@@ -27,12 +28,13 @@ public class ProjectParticipant {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    // 사용자 아이디
-    @Column(nullable = false)
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(nullable = false)
-    private Long roleId;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private ProjectRole role;
 
     @Enumerated(EnumType.STRING)
     private Position position; // 리더 or 멤버
@@ -46,10 +48,10 @@ public class ProjectParticipant {
     private LocalDateTime leftAt;
 
     //======팩토리 메서드======
-    public static ProjectParticipant create(Long memberId, Long roleId, Position position) {
+    public static ProjectParticipant create(Member member, ProjectRole role, Position position) {
         return ProjectParticipant.builder()
-                .memberId(memberId)
-                .roleId(roleId)
+                .member(member)
+                .role(role)
                 .position(position)
                 .status(ParticipantStatus.ACTIVE)
                 .build();
@@ -66,6 +68,6 @@ public class ProjectParticipant {
     }
 
     public void removeMember() {
-        this.memberId = null;
+        this.member = null;
     }
 }

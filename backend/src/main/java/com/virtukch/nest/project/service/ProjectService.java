@@ -6,12 +6,14 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.service.MemberService;
 import com.virtukch.nest.project.dto.converter.ProjectDtoConverter;
 import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
+import com.virtukch.nest.project.dto.request.ProjectStatusUpdateRequestDto;
 import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.dto.request.RoleCreateRequestDto;
 import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
+import com.virtukch.nest.project.exception.InvalidStatusTransitionException;
 import com.virtukch.nest.project.exception.NoProjectAuthorityException;
 import com.virtukch.nest.project.exception.ProjectNotFoundException;
 import com.virtukch.nest.project.model.Project;
@@ -20,9 +22,10 @@ import com.virtukch.nest.project.model.ProjectRole;
 import com.virtukch.nest.project.model.ProjectTag;
 import com.virtukch.nest.project.model.enums.ParticipantStatus;
 import com.virtukch.nest.project.model.enums.Position;
+import com.virtukch.nest.project.model.enums.ProjectStatus;
+import com.virtukch.nest.project.repository.ProjectParticipantRepository;
 import com.virtukch.nest.project.repository.ProjectRepository;
 import com.virtukch.nest.project.repository.ProjectTagRepository;
-import com.virtukch.nest.project.repository.ProjectParticipantRepository;
 import com.virtukch.nest.tag.model.Tag;
 import com.virtukch.nest.tag.repository.TagRepository;
 import com.virtukch.nest.tag.service.TagService;
@@ -89,7 +92,7 @@ public class ProjectService {
         ProjectRole creatorRole = project.getRoles().get(requestDto.getCreatorRoleIndex());
         creatorRole.increaseCurrentCount();
 
-        ProjectParticipant participant = ProjectParticipant.create(memberId, creatorRole.getId(), Position.LEADER);
+        ProjectParticipant participant = ProjectParticipant.create(member, creatorRole, Position.LEADER);
         project.addParticipant(participant); // 프로젝트 글 작성자가 LEADER
 
         return ProjectDtoConverter.toCreateResponseDto(project);
@@ -141,7 +144,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public ProjectDetailResponseDto getProjectDetail(Long projectId) {
-        Project project = findByIdOrThrow(projectId);
+        Project project = findByIdWithRolesAndParticipantsOrThrow(projectId);
         List<String> tagNames = projectTagRepository.findTagNamesByProjectId(projectId);
         return ProjectDtoConverter.toDetailResponseDto(project, tagNames);
     }
@@ -155,6 +158,73 @@ public class ProjectService {
         return ProjectDtoConverter.toDeleteResponseDto(project);
     }
 
+    @Transactional
+    public void updateProjectStatus(Long projectId, Long memberId, ProjectStatusUpdateRequestDto requestDto) {
+        Project project = validateProjectOwnershipAndGet(projectId, memberId);
+        ProjectStatus newStatus = requestDto.getStatus();
+
+        // 1. 입력값 검증
+        if (newStatus == null) {
+            throw new IllegalArgumentException("프로젝트 상태는 null일 수 없습니다.");
+        }
+
+        // 2. 상태 전환 유효성 검증
+        validateStatusTransition(project.getStatus(), newStatus);
+
+        project.updateStatus(newStatus);
+    }
+
+    /**
+     * 상태 전환 유효성 검증
+     * 논리적으로 가능한 상태 전환인지 확인
+     */
+    private void validateStatusTransition(ProjectStatus currentStatus, ProjectStatus newStatus) {
+        // 같은 상태로의 전환은 허용 (멱등성 보장)
+        if (currentStatus == newStatus) {
+            return;
+        }
+
+        switch (currentStatus) {
+            case RECRUITING:
+                // 모집 중 → 모집 종료, 삭제만 가능
+                if (newStatus != ProjectStatus.CLOSED && newStatus != ProjectStatus.DELETED) {
+                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                }
+                break;
+
+            case CLOSED:
+                // 모집 종료 → 진행 중, 재모집, 삭제 가능
+                if (newStatus != ProjectStatus.IN_PROGRESS &&
+                        newStatus != ProjectStatus.RECRUITING &&
+                        newStatus != ProjectStatus.DELETED) {
+                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                }
+                break;
+
+            case IN_PROGRESS:
+                // 진행 중 → 완료, 재모집(재시작), 삭제 가능
+                if (newStatus != ProjectStatus.COMPLETED &&
+                        newStatus != ProjectStatus.RECRUITING &&
+                        newStatus != ProjectStatus.DELETED) {
+                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                }
+                break;
+
+            case COMPLETED:
+                // 완료 → 삭제만 가능
+                if (newStatus != ProjectStatus.DELETED) {
+                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                }
+                break;
+
+            case DELETED:
+                // 삭제된 프로젝트는 어떤 상태로도 전환 불가
+                throw new InvalidStatusTransitionException(currentStatus, newStatus);
+
+            default:
+                throw new IllegalStateException("알 수 없는 프로젝트 상태: " + currentStatus);
+        }
+    }
 
     private ProjectListResponseDto buildListResponseDto(Page<Project> projectPage) {
         List<Project> projects = projectPage.getContent();
@@ -195,5 +265,10 @@ public class ProjectService {
 
     public Project findByIdOrThrow(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+    }
+
+    public Project findByIdWithRolesAndParticipantsOrThrow(Long projectId) {
+        return projectRepository.findByIdWithRolesAndParticipants(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
 }
