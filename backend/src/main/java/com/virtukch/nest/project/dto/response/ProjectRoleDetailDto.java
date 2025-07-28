@@ -20,5 +20,5 @@ public class ProjectRoleDetailDto {
     private String additionalRequirements;
     private Boolean isActive;
     private LocalDateTime createdAt;
-    private List<ProjectRoleTechStackDto> techStacks;  // 전체 기술스택 요구사항
+    private List<RoleTechStackDto> techStacks;  // 전체 기술스택 요구사항
 }

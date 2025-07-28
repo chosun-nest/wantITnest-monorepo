@@ -1,6 +1,5 @@
 package com.virtukch.nest.project.dto.response;
 
-import com.virtukch.nest.project.dto.ProjectDetailResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -217,7 +217,7 @@ public class ProjectService {
 
             case DELETED:
                 // 삭제된 프로젝트는 어떤 상태로도 전환 불가
-                throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                throw new ProjectException(ProjectErrorCode.INVALID_STATUS_TRANSITION);
 
             default:
                 throw new IllegalStateException("알 수 없는 프로젝트 상태: " + currentStatus);
