@@ -126,6 +126,13 @@ public class ApiResponseDto<T> {
     }
 
     /**
+     * 생성 성공 응답 (데이터 없음, 기본 메시지)
+     */
+    public static ApiResponseDto<Void> created() {
+        return success("리소스가 성공적으로 생성되었습니다.");
+    }
+
+    /**
      * 수정 성공 응답
      */
     public static ApiResponseDto<Void> updated(String message) {

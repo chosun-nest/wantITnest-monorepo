@@ -13,9 +13,8 @@ import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
-import com.virtukch.nest.project.exception.InvalidStatusTransitionException;
-import com.virtukch.nest.project.exception.NoProjectAuthorityException;
-import com.virtukch.nest.project.exception.ProjectNotFoundException;
+import com.virtukch.nest.project.exception.ProjectException;
+import com.virtukch.nest.project.exception.ProjectErrorCode;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectParticipant;
 import com.virtukch.nest.project.model.ProjectRole;
@@ -62,7 +61,7 @@ public class ProjectService {
         log.info("[프로젝트 모집글 작성 시작] title={}, memberId={}", projectTitle, memberId);
 
         // projectId가 필요하므로 먼저 저장
-        Member member = memberService.findOrThrow(memberId);
+        Member member = memberService.findByIdOrThrow(memberId);
         Project project = projectRepository.save(Project.create(
                 member,
                 requestDto.getProjectTitle(),
@@ -149,7 +148,6 @@ public class ProjectService {
         return ProjectDtoConverter.toDetailResponseDto(project, tagNames);
     }
 
-    // TODO: 요구사항 정리 필요 -> 지금은 연관관계 이런 거 다 무시하고 바로 삭제해버림
     @Transactional
     public ProjectResponseDto deleteProject(Long projectId, Long memberId) {
         Project project = validateProjectOwnershipAndGet(projectId, memberId);
@@ -188,7 +186,7 @@ public class ProjectService {
             case RECRUITING:
                 // 모집 중 → 모집 종료, 삭제만 가능
                 if (newStatus != ProjectStatus.CLOSED && newStatus != ProjectStatus.DELETED) {
-                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                    throw new ProjectException(ProjectErrorCode.INVALID_STATUS_TRANSITION);
                 }
                 break;
 
@@ -197,7 +195,7 @@ public class ProjectService {
                 if (newStatus != ProjectStatus.IN_PROGRESS &&
                         newStatus != ProjectStatus.RECRUITING &&
                         newStatus != ProjectStatus.DELETED) {
-                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                    throw new ProjectException(ProjectErrorCode.INVALID_STATUS_TRANSITION);
                 }
                 break;
 
@@ -206,14 +204,14 @@ public class ProjectService {
                 if (newStatus != ProjectStatus.COMPLETED &&
                         newStatus != ProjectStatus.RECRUITING &&
                         newStatus != ProjectStatus.DELETED) {
-                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                    throw new ProjectException(ProjectErrorCode.INVALID_STATUS_TRANSITION);
                 }
                 break;
 
             case COMPLETED:
                 // 완료 → 삭제만 가능
                 if (newStatus != ProjectStatus.DELETED) {
-                    throw new InvalidStatusTransitionException(currentStatus, newStatus);
+                    throw new ProjectException(ProjectErrorCode.INVALID_STATUS_TRANSITION);
                 }
                 break;
 
@@ -258,17 +256,17 @@ public class ProjectService {
     private Project validateProjectOwnershipAndGet(Long projectId, Long memberId) {
         Project project = findByIdOrThrow(projectId);
         if(!project.getMember().getMemberId().equals(memberId)) {
-            throw new NoProjectAuthorityException(projectId, memberId);
+            throw new ProjectException(ProjectErrorCode.NO_PROJECT_AUTHORITY);
         }
         return project;
     }
 
     public Project findByIdOrThrow(Long projectId) {
-        return projectRepository.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
+        return projectRepository.findById(projectId).orElseThrow(() -> new ProjectException(ProjectErrorCode.PROJECT_NOT_FOUND));
     }
 
     public Project findByIdWithRolesAndParticipantsOrThrow(Long projectId) {
         return projectRepository.findByIdWithRolesAndParticipants(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.PROJECT_NOT_FOUND));
     }
 }

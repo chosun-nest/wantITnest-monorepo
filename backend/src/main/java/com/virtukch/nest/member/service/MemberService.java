@@ -313,7 +313,7 @@ public class MemberService {
             .toList();
     }
 
-    public Member findOrThrow(Long memberId) {
+    public Member findByIdOrThrow(Long memberId) {
         String msg = String.format("MemberId [%d] : 회원 정보를 찾을 수 없습니다.", memberId);
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(msg));
     }

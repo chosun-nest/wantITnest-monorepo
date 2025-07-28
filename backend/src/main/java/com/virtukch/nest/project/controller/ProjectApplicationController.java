@@ -2,8 +2,11 @@ package com.virtukch.nest.project.controller;
 
 
 import com.virtukch.nest.auth.security.CustomUserDetails;
+import com.virtukch.nest.common.dto.ApiResponseDto;
 import com.virtukch.nest.project.dto.request.ApplicationCreateRequestDto;
-import com.virtukch.nest.project.dto.response.ApplicationDetailResponseDto;
+import com.virtukch.nest.project.dto.request.ApplicationUpdateRequestDto;
+import com.virtukch.nest.project.dto.response.ApplicationListDto;
+import com.virtukch.nest.project.dto.response.MyApplicationResponseDto;
 import com.virtukch.nest.project.service.ProjectApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,82 +20,105 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/projects")
-@Tag(name = "[프로젝트 모집글 지원 관리] 지원 처리 API", description = "프로젝트 모집글에 지원하고, 지원 현황(지원자 목록 등)을 조회할 수 있는 API입니다.\n문의 : dlwlgur02@gmail.com")
+@Tag(name = "[프로젝트 지원 관리] 지원 처리 API", description = "프로젝트 모집글에 지원하고, 지원 현황(지원자 목록 등)을 조회할 수 있는 API입니다.")
 public class ProjectApplicationController {
 
     private final ProjectApplicationService projectApplicationService;
 
+    //======내 지원서 관리======
     @Operation(
-        summary = "프로젝트 모집글에 지원",
+        summary = "내 지원서 목록 조회",
         description = """
-            로그인된 사용자가 해당 프로젝트 모집글에 지원합니다.
+            로그인된 사용자가 지원한 모든 지원서 목록을 조회합니다.
+            ✔️ 프로젝트 제목, 역할, 상태 등 포함
+            ✔️ 지원 날짜 순으로 정렬 (최신순)
+            """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @GetMapping("/api/v1/applications/my")
+    public ResponseEntity<ApiResponseDto<List<MyApplicationResponseDto>>> getMyApplications(
+            @AuthenticationPrincipal CustomUserDetails user) {
+        Long memberId = user.getMember().getMemberId();
+        List<MyApplicationResponseDto> applications = projectApplicationService.getMyApplications(memberId);
+        return ResponseEntity.ok(ApiResponseDto.success(applications));
+    }
+
+    @Operation(
+        summary = "지원서 수정",
+        description = """
+            대기 중인 지원서를 수정합니다.
+            ✔️ 본인의 지원서만 수정 가능
+            ✔️ PENDING 상태일 때만 수정 가능
+            ✔️ 지원 메시지, 투입 가능 일자, 시간 등 수정
+            """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PutMapping("/api/v1/applications/{applicationId}")
+    public ResponseEntity<ApiResponseDto<MyApplicationResponseDto>> updateApplication(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long applicationId,
+            @RequestBody ApplicationUpdateRequestDto requestDto) {
+        Long memberId = user.getMember().getMemberId();
+        MyApplicationResponseDto updatedApplication = projectApplicationService.updateApplication(applicationId, memberId, requestDto);
+        return ResponseEntity.ok(ApiResponseDto.success(updatedApplication));
+    }
+
+    @Operation(
+        summary = "지원서 취소",
+        description = """
+            대기 중인 지원서를 취소합니다.
+            ✔️ 본인의 지원서만 취소 가능
+            ✔️ PENDING 상태일 때만 취소 가능
+            ✔️ 취소 후 상태가 CANCELED로 변경
+            """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @DeleteMapping("/api/v1/applications/{applicationId}")
+    public ResponseEntity<ApiResponseDto<Void>> cancelApplication(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long applicationId) {
+        Long memberId = user.getMember().getMemberId();
+        projectApplicationService.cancelApplication(applicationId, memberId);
+        return ResponseEntity.ok(ApiResponseDto.success("지원서가 성공적으로 취소되었습니다."));
+    }
+
+    //======프로젝트별 지원======
+    @Operation(
+        summary = "프로젝트에 지원",
+        description = """
+            로그인된 사용자가 해당 프로젝트에 지원합니다.
             ✔️ 같은 프로젝트에 중복 지원 불가
             ✔️ 지원 시 역할 및 자기소개 등 정보 포함
             """,
         security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @PostMapping("/{projectId}/apply")
-    public ResponseEntity<ApplicationDetailResponseDto> projectApplicationApply(@AuthenticationPrincipal CustomUserDetails user,
-                                                                                @PathVariable Long projectId,
-                                                                                @RequestBody ApplicationCreateRequestDto requestDto) {
+    @PostMapping("/api/v1/projects/{projectId}/applications")
+    public ResponseEntity<ApiResponseDto<Void>> projectApplicationApply(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long projectId,
+            @RequestBody ApplicationCreateRequestDto requestDto) {
         Long memberId = user.getMember().getMemberId();
         projectApplicationService.applyToProject(projectId, memberId, requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(ApiResponseDto.created());
     }
 
+    //======지원서 검토 (프로젝트 팀장)======
     @Operation(
-        summary = "프로젝트 모집글 지원자 목록 조회",
+        summary = "프로젝트 지원자 목록 조회",
         description = """
             특정 프로젝트에 지원한 모든 지원자의 목록을 조회합니다.
-            ✔️ 작성자 본인만 조회 가능
+            ✔️ 프로젝트 작성자만 조회 가능
             ✔️ 지원자 이름, 역할, 상태 등 포함
+            ✔️ 지원 날짜 순으로 정렬 (최신순)
             """,
         security = {@SecurityRequirement(name = "bearer-key")}
     )
-    @GetMapping("/{projectId}/applications")
-    public ResponseEntity<List<ProjectApplicationResponseDto>> getProjectApplications(@AuthenticationPrincipal CustomUserDetails user,
+    @GetMapping("/api/v1/projects/{projectId}/applications")
+    public ResponseEntity<ApiResponseDto<List<ApplicationListDto>>> getProjectApplications(
+            @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long projectId) {
-        List<ProjectApplicationResponseDto> applications = projectApplicationService.getApplicationsByProject(projectId);
-        return ResponseEntity.ok(applications);
-    }
-
-
-    @Operation(
-        summary = "프로젝트 지원 수락",
-        description = """
-            프로젝트 작성자가 특정 지원자의 지원을 수락합니다.
-            ✔️ 수락 시 프로젝트 멤버로 등록
-            ✔️ 모집 인원 초과 시 수락 불가
-            """,
-        security = {@SecurityRequirement(name = "bearer-key")}
-    )
-    @PostMapping("/{projectId}/applications/{applicationId}/accept")
-    public ResponseEntity<ProjectApplicationResponseDto> acceptApplication(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long projectId,
-            @PathVariable Long applicationId) {
         Long memberId = user.getMember().getMemberId();
-        ProjectApplicationResponseDto responseDto = projectApplicationService.acceptApplication(projectId, applicationId, memberId);
-        return ResponseEntity.ok(responseDto);
+        List<ApplicationListDto> applications = projectApplicationService.getApplicationsByProject(projectId, memberId);
+        return ResponseEntity.ok(ApiResponseDto.success(applications));
     }
-
-    @Operation(
-        summary = "프로젝트 지원 거절",
-        description = """
-            프로젝트 작성자가 특정 지원자의 지원을 거절합니다.
-            ✔️ 지원 상태를 'REJECTED'로 변경
-            """,
-        security = {@SecurityRequirement(name = "bearer-key")}
-    )
-    @PostMapping("/{projectId}/applications/{applicationId}/reject")
-    public ResponseEntity<ProjectApplicationResponseDto> rejectApplication(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long projectId,
-            @PathVariable Long applicationId) {
-        Long memberId = user.getMember().getMemberId();
-        ProjectApplicationResponseDto responseDto = projectApplicationService.rejectApplication(projectId, applicationId, memberId);
-        return ResponseEntity.ok(responseDto);
-    }
-
 }

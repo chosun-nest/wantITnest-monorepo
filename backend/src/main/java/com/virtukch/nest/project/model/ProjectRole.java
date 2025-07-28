@@ -1,7 +1,8 @@
 package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
-import com.virtukch.nest.project.exception.project_role.RoleCapacityExceededException;
+import com.virtukch.nest.project.exception.ProjectException;
+import com.virtukch.nest.project.exception.ProjectErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -64,7 +65,7 @@ public class ProjectRole extends BaseTimeEntity {
 
     public void increaseCurrentCount() {
         if(requiredCount <= currentCount) {
-            throw new RoleCapacityExceededException(id, roleName, requiredCount, currentCount);
+            throw new ProjectException(ProjectErrorCode.ROLE_CAPACITY_EXCEEDED);
         }
         this.currentCount++;
         if(requiredCount.equals(currentCount)) {

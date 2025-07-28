@@ -8,6 +8,7 @@ import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
 import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectResponseDto;
+import com.virtukch.nest.project.model.enums.ProjectStatus;
 import com.virtukch.nest.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -199,6 +200,7 @@ public class ProjectController {
                     """,
             security = {@SecurityRequirement(name = "bearer-key")}
     )
+    // TODO: 요구사항 정리 필요 -> 지금은 연관관계 이런 거 다 무시하고 바로 삭제해버림
     @DeleteMapping("/{projectId}")
     public ResponseEntity<ApiResponseDto<ProjectResponseDto>> deleteProject(@AuthenticationPrincipal CustomUserDetails user,
                                                             @PathVariable Long projectId) {  
@@ -224,6 +226,10 @@ public class ProjectController {
         // 모집중 → 진행중 → 완료 상태 관리
         Long memberId = user.getMember().getMemberId();
         projectService.updateProjectStatus(projectId, memberId, requestDto);
-        return ResponseEntity.ok(ApiResponseDto.success());
+
+        ProjectStatus prevStatus = projectService.findByIdOrThrow(projectId).getStatus();
+        ProjectStatus newStatus = requestDto.getStatus();
+
+        return ResponseEntity.ok(ApiResponseDto.success(String.format("프로젝트 상태를 %s에서 %s로 변경하였습니다", prevStatus, newStatus)));
     }
 }

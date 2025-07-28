@@ -4,8 +4,8 @@ import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
 import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
-import com.virtukch.nest.project.exception.InvalidProjectTitleException;
-import com.virtukch.nest.project.exception.InvalidTotalMemberCountException;
+import com.virtukch.nest.project.exception.ProjectException;
+import com.virtukch.nest.project.exception.ProjectErrorCode;
 import com.virtukch.nest.project.model.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -91,10 +91,10 @@ public class Project extends BaseTimeEntity {
     public static Project create(Member member, String title, String description, Integer totalMemberNeeded,
                                  LocalDateTime recruitmentEndDate, LocalDateTime projectStartDate, LocalDateTime projectEndDate) {
         if(title == null || title.isBlank()) {
-            throw new InvalidProjectTitleException();
+            throw new ProjectException(ProjectErrorCode.INVALID_PROJECT_TITLE);
         }
         if(totalMemberNeeded == null || totalMemberNeeded == 0) {
-            throw new InvalidTotalMemberCountException(0);
+            throw new ProjectException(ProjectErrorCode.INVALID_TOTAL_MEMBER_COUNT);
         }
 
         return Project.builder()
@@ -137,7 +137,7 @@ public class Project extends BaseTimeEntity {
         if(requestDto.getProjectTitle() != null && !requestDto.getProjectTitle().isBlank()) {
             projectTitle = requestDto.getProjectTitle();
         } else if (requestDto.getProjectTitle() != null && requestDto.getProjectTitle().isBlank()) {
-            throw new InvalidProjectTitleException();
+            throw new ProjectException(ProjectErrorCode.INVALID_PROJECT_TITLE);
         }
 
         if(requestDto.getProjectDescription() != null)

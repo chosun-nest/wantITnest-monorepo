@@ -1,161 +1,156 @@
 package com.virtukch.nest.project.service;
 
-import com.virtukch.nest.common.model.BaseTimeEntity;
+import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.service.MemberService;
+import com.virtukch.nest.project.dto.converter.ApplicationDtoConverter;
 import com.virtukch.nest.project.dto.request.ApplicationCreateRequestDto;
+import com.virtukch.nest.project.dto.request.ApplicationUpdateRequestDto;
+import com.virtukch.nest.project.dto.response.ApplicationListDto;
+import com.virtukch.nest.project.dto.response.MyApplicationResponseDto;
+import com.virtukch.nest.project.exception.ProjectException;
+import com.virtukch.nest.project.exception.ProjectErrorCode;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectApplication;
 import com.virtukch.nest.project.model.enums.ApplicationStatus;
-import com.virtukch.nest.project.repository.ProjectRepository;
-import com.virtukch.nest.project_application.exception.DuplicateApplicationException;
-import com.virtukch.nest.project_application.exception.ProjectNotFoundException;
-import com.virtukch.nest.project_application.exception.ProjectOwnerCannotApplyException;
-import com.virtukch.nest.project_application.repository.ProjectApplicationRepository;
-import jakarta.transaction.Transactional;
+import com.virtukch.nest.project.model.enums.ProjectStatus;
+import com.virtukch.nest.project.repository.ProjectApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ProjectApplicationService extends BaseTimeEntity {
+public class ProjectApplicationService {
 
     private final ProjectApplicationRepository applicationRepository;
-    private final ProjectRepository projectRepository;
     private final MemberService memberService;
     private final ProjectRoleService projectRoleService;
+    private final ProjectService projectService;
 
     @Transactional
     public void applyToProject(Long projectId, Long memberId, ApplicationCreateRequestDto requestDto) {
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+        Project project = projectService.findByIdOrThrow(projectId);
+        Member member = memberService.findByIdOrThrow(memberId);
 
         if (project.getMember().getMemberId().equals(memberId)) {
-            throw new ProjectOwnerCannotApplyException();
+            throw new ProjectException(ProjectErrorCode.PROJECT_OWNER_CANNOT_APPLY);
+        }
+
+        // 프로젝트 모집 상태 확인
+        if (!project.getIsRecruiting() || !ProjectStatus.RECRUITING.equals(project.getStatus())) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_RECRUITMENT_CLOSED);
         }
 
         // 중복 지원 방지 (REJECTED 또는 CANCELLED 제외)
-        if (applicationRepository.existsByProjectIdAndMemberIdAndStatusNotIn(
-                projectId,
-                memberId,
+        if (applicationRepository.existsByProjectAndMemberAndStatusNotIn(
+                project,
+                member,
                 List.of(ApplicationStatus.REJECTED, ApplicationStatus.CANCELED))) {
-            throw new DuplicateApplicationException();
+            throw new ProjectException(ProjectErrorCode.DUPLICATE_APPLICATION);
+        }
+
+        // 프로젝트 전체 정원 확인
+        Long acceptedCount = applicationRepository.countByProjectAndStatus(project, ApplicationStatus.ACCEPTED);
+        if (acceptedCount >= project.getTotalMemberNeeded()) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_CAPACITY_EXCEEDED);
+        }
+
+        // 지원하려는 역할의 정원 확인
+        var projectRole = projectRoleService.findProjectRoleOrThrow(projectId, requestDto.getRoleId());
+        if (projectRole.getCurrentCount() >= projectRole.getRequiredCount()) {
+            throw new ProjectException(ProjectErrorCode.ROLE_CAPACITY_EXCEEDED);
         }
 
         ProjectApplication application = ProjectApplication.create(
                 project,
-                memberService.findOrThrow(memberId),
-                projectRoleService.findProjectRoleOrThrow(projectId, requestDto.getRoleId()),
+                memberService.findByIdOrThrow(memberId),
+                projectRole,
                 requestDto.getApplicationMessage(),
                 requestDto.getAvailableStartDate(),
                 requestDto.getAvailableTimeSlots(),
-                requestDto.getAvailableTimeSlots()
+                requestDto.getTimePreferenceNote()
         );
 
         applicationRepository.save(application);
     }
 
-//    @Transactional
-//    public List<ProjectApplicationResponseDto> getApplicationsByProject(Long projectId) {
-//
-//        List<ProjectApplication> applications = applicationRepository.findByProjectId(projectId);
-//
-//        return applications.stream().map(app -> {
-//            Member member = memberRepository.findById(app.getMemberId()).orElse(null);
-//            return ProjectApplicationDtoConverter.toResponseDto(app, member != null ? member.getMemberName() : "알 수 없음");
-//        }).toList();
-//    }
-//
-//    @Transactional
-//    public ProjectApplicationResponseDto acceptApplication(Long projectId, Long applicationId, Long requesterId) {
-//        ProjectApplication application = applicationRepository.findById(applicationId)
-//                .orElseThrow(ApplicationNotFoundException::new);
-//        validateOwnership(projectId, requesterId, application);
-//        if (application.getStatus() != ApplicationStatus.PENDING) {
-//            throw new AlreadyProcessedApplicationException();
-//        }
-//
-//        // 현재 ACCEPTED 상태의 인원 수 조회
-//        Long acceptedCount = applicationRepository.countByProjectIdAndStatus(projectId, ApplicationStatus.ACCEPTED);
-//
-//        // 프로젝트 최대 인원 수를 동적으로 계산
-//        int maxMember = participantRepository.findByProjectId(projectId).size();
-//
-//        if (acceptedCount >= maxMember) {
-//            throw new ProjectFullException("프로젝트 모집 인원을 초과하여 승인할 수 없습니다.");
-//        }
-//
-//        application.setStatus(ApplicationStatus.ACCEPTED);
-//        applicationRepository.save(application);
-//
-//        List<ProjectParticipant> vacantList = participantRepository
-//                .findByProjectIdAndPartAndMemberIdIsNull(projectId, application.getPart());
-//
-//        if (!vacantList.isEmpty()) {
-//            ProjectParticipant vacant = vacantList.get(0);
-//            vacant.setParticipantId(application.getMemberId());
-//            participantRepository.save(vacant);
-//        } else {
-//            // 파트별 모집 인원 초과 방지
-//            long maxCount = participantRepository.countByProjectIdAndPart(projectId, application.getPart());
-//            long approvedCount = participantRepository.countByProjectIdAndPartAndMemberIdIsNotNull(projectId, application.getPart());
-//            if (approvedCount >= maxCount) {
-//                throw new ProjectFullException(application.getPart() + " 파트의 모집 인원을 초과할 수 없습니다.");
-//            }
-//            participantRepository.save(ProjectParticipant.builder()
-//                    .projectId(projectId)
-//                    .memberId(application.getMemberId())
-//                    .role(ProjectParticipant.Role.MEMBER)
-//                    .part(application.getPart())
-//                    .build());
-//        }
-//
-//        Project project = projectRepository.findById(projectId)
-//                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-//
-//        int registeredCount = participantRepository
-//                .findByProjectIdAndMemberIdIsNotNull(projectId)
-//                .size();
-//
-//        if (registeredCount >= maxMember) {
-//            project.setIsRecruiting(false);
-//            projectRepository.save(project);
-//        }
-//
-//        Member member = memberRepository.findById(application.getMemberId()).orElse(null);
-//        return ProjectApplicationDtoConverter.toResponseDto(application, member != null ? member.getMemberName() : "알 수 없음");
-//    }
-//
-//    @Transactional
-//    public ProjectApplicationResponseDto rejectApplication(Long projectId, Long applicationId, Long requesterId) {
-//        ProjectApplication application = applicationRepository.findById(applicationId)
-//                .orElseThrow(ApplicationNotFoundException::new);
-//        validateOwnership(projectId, requesterId, application);
-//        if (application.getStatus() != ApplicationStatus.PENDING) {
-//            throw new AlreadyProcessedApplicationException();
-//        }
-//
-//        application.setStatus(ApplicationStatus.REJECTED);
-//        applicationRepository.save(application);
-//
-//        Member member = memberRepository.findById(application.getMemberId()).orElse(null);
-//        return ProjectApplicationDtoConverter.toResponseDto(application, member != null ? member.getMemberName() : "알 수 없음");
-//    }
-//
-//    private void validateOwnership(Long projectId, Long requesterId, ProjectApplication application) {
-//        if (!application.getProjectId().equals(projectId)) {
-//            throw new ApplicationNotFoundException();
-//        }
-//
-//        Long writerId = projectRepository.searchWriterIdByProjectId(projectId)
-//                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-//
-//        if (!writerId.equals(requesterId)) {
-//            throw new NotProjectOwnerException();
-//        }
-//    }
+    @Transactional(readOnly = true)
+    public List<MyApplicationResponseDto> getMyApplications(Long memberId) {
+        Member member = memberService.findByIdOrThrow(memberId);
+        List<ProjectApplication> applications = applicationRepository.findByMemberOrderByAppliedAtDesc(member);
+        
+        return applications.stream()
+                .map(ApplicationDtoConverter::toMyApplicationDto)
+                .toList();
+    }
+
+    @Transactional
+    public MyApplicationResponseDto updateApplication(Long applicationId, Long memberId, ApplicationUpdateRequestDto requestDto) {
+        ProjectApplication application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.APPLICATION_NOT_FOUND));
+
+        // 본인의 지원서인지 확인
+        if (!application.getMember().getMemberId().equals(memberId)) {
+            throw new ProjectException(ProjectErrorCode.UNAUTHORIZED_APPLICATION_ACCESS);
+        }
+
+        // PENDING 상태일 때만 수정 가능
+        if (application.getStatus() != ApplicationStatus.PENDING) {
+            throw new ProjectException(ProjectErrorCode.APPLICATION_NOT_EDITABLE);
+        }
+
+        // 지원서 정보 업데이트
+        application.updateApplication(
+                requestDto.getApplicationMessage(),
+                requestDto.getAvailableStartDate(),
+                requestDto.getAvailableTimeSlots(),
+                requestDto.getTimePreferenceNote()
+        );
+
+        applicationRepository.save(application);
+        return ApplicationDtoConverter.toMyApplicationDto(application);
+    }
+
+    @Transactional
+    public void cancelApplication(Long applicationId, Long memberId) {
+        ProjectApplication application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.APPLICATION_NOT_FOUND));
+
+        // 본인의 지원서인지 확인
+        if (!application.getMember().getMemberId().equals(memberId)) {
+            throw new ProjectException(ProjectErrorCode.UNAUTHORIZED_APPLICATION_ACCESS);
+        }
+
+        // PENDING 상태일 때만 취소 가능
+        if (application.getStatus() != ApplicationStatus.PENDING) {
+            throw new ProjectException(ProjectErrorCode.APPLICATION_NOT_EDITABLE);
+        }
+
+        // 지원서 상태를 CANCELED로 변경
+        application.updateStatus(ApplicationStatus.CANCELED);
+        applicationRepository.save(application);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApplicationListDto> getApplicationsByProject(Long projectId, Long requesterId) {
+        // 프로젝트 존재 확인
+        Project project = projectService.findByIdOrThrow(projectId);
+        
+        // 프로젝트 작성자인지 확인
+        if (!project.getMember().getMemberId().equals(requesterId)) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_OWNER_ONLY_ACCESS);
+        }
+
+        // 프로젝트의 모든 지원서 조회 (지원 날짜 순으로 정렬)
+        List<ProjectApplication> applications = applicationRepository.findByProjectOrderByAppliedAtDesc(project);
+        
+        return applications.stream()
+                .map(ApplicationDtoConverter::toApplicationListDto)
+                .toList();
+    }
 }

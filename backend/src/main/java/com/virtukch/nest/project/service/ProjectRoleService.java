@@ -8,7 +8,8 @@ import com.virtukch.nest.project.dto.request.RoleUpdateRequestDto;
 import com.virtukch.nest.project.dto.response.RoleDetailDto;
 import com.virtukch.nest.project.dto.response.RoleListDto;
 import com.virtukch.nest.project.dto.response.RoleTechStackDto;
-import com.virtukch.nest.project.exception.project_role.ProjectRoleNotFoundException;
+import com.virtukch.nest.project.exception.ProjectException;
+import com.virtukch.nest.project.exception.ProjectErrorCode;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectRole;
 import com.virtukch.nest.project.model.ProjectRoleTechStack;
@@ -122,7 +123,7 @@ public class ProjectRoleService {
     public ProjectRole findProjectRoleOrThrow(Long projectId, Long roleId) {
         return projectRoleRepository.findById(roleId)
                 .filter(role -> role.getProject().getProjectId().equals(projectId))
-                .orElseThrow(() -> new ProjectRoleNotFoundException(projectId, roleId));
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.PROJECT_ROLE_NOT_FOUND));
     }
     
     private void updateRoleBasicInfo(ProjectRole role, RoleUpdateRequestDto request) {

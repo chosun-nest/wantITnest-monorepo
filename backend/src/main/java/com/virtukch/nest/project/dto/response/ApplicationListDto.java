@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ProjectApplicationListDto {
+public class ApplicationListDto {
     private Long applicationId;
     private Long memberId;
     private String applicantName;

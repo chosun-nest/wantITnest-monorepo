@@ -92,4 +92,20 @@ public class ProjectApplication {
     public void updateStatus(ApplicationStatus newStatus) {
         this.status = newStatus;
     }
+
+    public void updateApplication(String applicationMessage, LocalDate availableStartDate, 
+                                String availableTimeSlots, String timePreferenceNote) {
+        if (applicationMessage != null) {
+            this.applicationMessage = applicationMessage;
+        }
+        if (availableStartDate != null) {
+            this.availableStartDate = availableStartDate;
+        }
+        if (availableTimeSlots != null) {
+            this.available_time_slots = availableTimeSlots;
+        }
+        if (timePreferenceNote != null) {
+            this.time_preference_note = timePreferenceNote;
+        }
+    }
 }
