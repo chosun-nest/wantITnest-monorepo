@@ -32,6 +32,7 @@ public class ProjectRoleTechStack {
     @Column(nullable = false)
     private Boolean isRequired; // true: 필수, false: 우대사항
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private Proficiency proficiency = Proficiency.NONE;
 

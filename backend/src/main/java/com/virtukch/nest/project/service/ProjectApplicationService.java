@@ -4,6 +4,7 @@ import com.virtukch.nest.member.model.Member;
 import com.virtukch.nest.member.service.MemberService;
 import com.virtukch.nest.project.dto.converter.ApplicationDtoConverter;
 import com.virtukch.nest.project.dto.request.ApplicationCreateRequestDto;
+import com.virtukch.nest.project.dto.request.ApplicationReviewRequestDto;
 import com.virtukch.nest.project.dto.request.ApplicationUpdateRequestDto;
 import com.virtukch.nest.project.dto.response.ApplicationListDto;
 import com.virtukch.nest.project.dto.response.MyApplicationResponseDto;
@@ -152,5 +153,44 @@ public class ProjectApplicationService {
         return applications.stream()
                 .map(ApplicationDtoConverter::toApplicationListDto)
                 .toList();
+    }
+
+    @Transactional
+    public void reviewApplication(Long applicationId, Long reviewerId, ApplicationReviewRequestDto requestDto) {
+        ProjectApplication application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorCode.APPLICATION_NOT_FOUND));
+
+        // 프로젝트 작성자인지 확인
+        if (!application.getProject().getMember().getMemberId().equals(reviewerId)) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_OWNER_ONLY_ACCESS);
+        }
+
+        // PENDING 상태일 때만 검토 가능
+        if (application.getStatus() != ApplicationStatus.PENDING) {
+            throw new ProjectException(ProjectErrorCode.APPLICATION_ALREADY_REVIEWED);
+        }
+
+        // 승인 시 프로젝트 및 역할 정원 확인
+        if (requestDto.getStatus() == ApplicationStatus.ACCEPTED) {
+            // 프로젝트 전체 정원 확인
+            Long acceptedCount = applicationRepository.countByProjectAndStatus(
+                    application.getProject(), ApplicationStatus.ACCEPTED);
+            if (acceptedCount >= application.getProject().getTotalMemberNeeded()) {
+                throw new ProjectException(ProjectErrorCode.PROJECT_CAPACITY_EXCEEDED);
+            }
+
+            // 해당 역할의 정원 확인
+            if (application.getRole().getCurrentCount() >=
+                application.getRole().getRequiredCount()) {
+                throw new ProjectException(ProjectErrorCode.ROLE_CAPACITY_EXCEEDED);
+            }
+
+            // 역할 현재 인원 증가
+            application.getRole().increaseCurrentCount();
+        }
+
+        // 지원서 상태 및 검토 의견 업데이트
+        application.updateStatusWithReview(requestDto.getStatus(), requestDto.getReviewComment());
+        applicationRepository.save(application);
     }
 }

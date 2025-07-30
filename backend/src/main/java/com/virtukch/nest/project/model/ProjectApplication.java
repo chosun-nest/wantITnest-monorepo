@@ -20,7 +20,7 @@ public class ProjectApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long applicationId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
@@ -107,5 +107,11 @@ public class ProjectApplication {
         if (timePreferenceNote != null) {
             this.time_preference_note = timePreferenceNote;
         }
+    }
+
+    public void updateStatusWithReview(ApplicationStatus newStatus, String reviewComment) {
+        this.status = newStatus;
+        this.reviewComment = reviewComment;
+        this.reviewedAt = LocalDateTime.now();
     }
 }

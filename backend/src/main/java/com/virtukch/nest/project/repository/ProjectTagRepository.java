@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProjectTagRepository extends JpaRepository<ProjectTag, Long> {
     @Query("SELECT t.name FROM Tag t " +
             "JOIN ProjectTag pt ON t.id = pt.tag.id " +
-            "WHERE pt.project.projectId = :projectId")
+            "WHERE pt.project.id = :projectId")
     List<String> findTagNamesByProjectId(@Param("projectId") Long projectId);
 
     List<ProjectTag> findByTagIn(Collection<Tag> tags);

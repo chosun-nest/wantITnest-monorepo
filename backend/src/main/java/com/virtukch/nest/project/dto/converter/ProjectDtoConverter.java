@@ -28,7 +28,7 @@ public class ProjectDtoConverter {
 
     public static ProjectResponseDto toDeleteResponseDto(Project project) {
         return ProjectResponseDto.builder()
-                .projectId(project.getProjectId())
+                .projectId(project.getId())
                 .projectTitle(project.getProjectTitle())
                 .status(project.getStatus())
                 .build();
@@ -41,7 +41,7 @@ public class ProjectDtoConverter {
         List<ProjectParticipant> participants = project.getParticipants();
 
         return ProjectDetailResponseDto.builder()
-                .projectId(project.getProjectId())
+                .projectId(project.getId())
                 .projectTitle(project.getProjectTitle())
                 .projectDescription(project.getProjectDescription())
                 .status(project.getStatus())
@@ -70,7 +70,7 @@ public class ProjectDtoConverter {
 
     private static ProjectResponseDto buildResponse(Project project) {
         return ProjectResponseDto.builder()
-                .projectId(project.getProjectId())
+                .projectId(project.getId())
                 .projectTitle(project.getProjectTitle())
                 .status(project.getStatus())
                 .currentMembers(project.getCurrentMembers())
@@ -89,7 +89,7 @@ public class ProjectDtoConverter {
 
     public static ProjectSummaryDto toSummaryDto(Project project, List<String> tagNames, Long commentCount) {
         return ProjectSummaryDto.builder()
-                .projectId(project.getProjectId())
+                .projectId(project.getId())
                 .projectTitle(project.getProjectTitle())
                 .previewContent(StringUtils.generateTextPreview(project.getProjectDescription(), 100))
                 .status(project.getStatus())

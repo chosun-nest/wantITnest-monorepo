@@ -13,8 +13,8 @@ import com.virtukch.nest.project.dto.response.ProjectDetailResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectListResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectResponseDto;
 import com.virtukch.nest.project.dto.response.ProjectSummaryDto;
-import com.virtukch.nest.project.exception.ProjectException;
 import com.virtukch.nest.project.exception.ProjectErrorCode;
+import com.virtukch.nest.project.exception.ProjectException;
 import com.virtukch.nest.project.model.Project;
 import com.virtukch.nest.project.model.ProjectParticipant;
 import com.virtukch.nest.project.model.ProjectRole;
@@ -114,13 +114,15 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public ProjectListResponseDto getMyProjectList(Long memberId, Pageable pageable) {
-        Page<Project> projectPage = projectRepository.findByCreatorMemberId(memberId, pageable);
+        Member member = memberService.findByIdOrThrow(memberId);
+        Page<Project> projectPage = projectRepository.findByMember(member, pageable);
         return buildListResponseDto(projectPage);
     }
 
     @Transactional(readOnly = true)
     public ProjectListResponseDto getParticipatingProjectList(Long memberId, Pageable pageable) {
-        Page<Project> projectPage = projectParticipantRepository.findProjectsByMemberIdAndStatus(memberId, ParticipantStatus.ACTIVE, pageable);
+        Member member = memberService.findByIdOrThrow(memberId);
+        Page<Project> projectPage = projectRepository.findByParticipantMemberAndStatus(member, ParticipantStatus.ACTIVE, pageable);
         return buildListResponseDto(projectPage);
     }
 
@@ -233,14 +235,14 @@ public class ProjectService {
                 project.getTags().stream()
                         .map(projectTag -> projectTag.getTag().getName())
                         .toList(),
-                commentCountMap.getOrDefault(project.getProjectId(), 0L)
+                commentCountMap.getOrDefault(project.getId(), 0L)
         )).toList();
 
         return ProjectDtoConverter.toProjectListResponseDto(summaries, projectPage);
     }
 
     private Map<Long, Long> fetchCommentCountMap(List<Project> projects) {
-        List<Long> projectIds = projects.stream().map(Project::getProjectId).toList();
+        List<Long> projectIds = projects.stream().map(Project::getId).toList();
 
         if (projectIds.isEmpty()) {
             return Collections.emptyMap();

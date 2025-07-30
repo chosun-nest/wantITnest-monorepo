@@ -2,14 +2,12 @@ package com.virtukch.nest.project.model;
 
 import com.virtukch.nest.common.model.BaseTimeEntity;
 import com.virtukch.nest.member.model.Member;
-import com.virtukch.nest.project.dto.request.ProjectCreateRequestDto;
 import com.virtukch.nest.project.dto.request.ProjectUpdateRequestDto;
-import com.virtukch.nest.project.exception.ProjectException;
 import com.virtukch.nest.project.exception.ProjectErrorCode;
+import com.virtukch.nest.project.exception.ProjectException;
 import com.virtukch.nest.project.model.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,18 +24,21 @@ public class Project extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "project_id")
-    private Long projectId; //프로젝트 아이디
+    private Long id; //프로젝트 아이디
 
+    @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectRole> roles = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectApplication> applications = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectParticipant> participants = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectTag> tags = new ArrayList<>();
 
@@ -54,6 +55,7 @@ public class Project extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String projectDescription;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isRecruiting = true;
 
@@ -61,6 +63,7 @@ public class Project extends BaseTimeEntity {
     private ProjectStatus status;
 
     //조회수
+    @Builder.Default
     @Column(nullable = false)
     private Integer viewCount = 0;
 

@@ -4,6 +4,7 @@ package com.virtukch.nest.project.controller;
 import com.virtukch.nest.auth.security.CustomUserDetails;
 import com.virtukch.nest.common.dto.ApiResponseDto;
 import com.virtukch.nest.project.dto.request.ApplicationCreateRequestDto;
+import com.virtukch.nest.project.dto.request.ApplicationReviewRequestDto;
 import com.virtukch.nest.project.dto.request.ApplicationUpdateRequestDto;
 import com.virtukch.nest.project.dto.response.ApplicationListDto;
 import com.virtukch.nest.project.dto.response.MyApplicationResponseDto;
@@ -121,4 +122,26 @@ public class ProjectApplicationController {
         List<ApplicationListDto> applications = projectApplicationService.getApplicationsByProject(projectId, memberId);
         return ResponseEntity.ok(ApiResponseDto.success(applications));
     }
+
+    @Operation(
+        summary = "지원서 승인/거절 처리",
+        description = """
+            특정 지원서를 승인하거나 거절합니다.
+            ✔️ 프로젝트 작성자만 처리 가능
+            ✔️ PENDING 상태의 지원서만 처리 가능
+            ✔️ 승인 시 프로젝트 및 역할 정원 확인
+            ✔️ 검토 의견 추가 가능
+            """,
+        security = {@SecurityRequirement(name = "bearer-key")}
+    )
+    @PatchMapping("/api/v1/applications/{applicationId}/review")
+    public ResponseEntity<ApiResponseDto<Void>> reviewApplication(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long applicationId,
+            @RequestBody ApplicationReviewRequestDto requestDto) {
+        Long memberId = user.getMember().getMemberId();
+        projectApplicationService.reviewApplication(applicationId, memberId, requestDto);
+        return ResponseEntity.ok(ApiResponseDto.success("지원서 검토가 성공적으로 완료되었습니다."));
+    }
+
 }

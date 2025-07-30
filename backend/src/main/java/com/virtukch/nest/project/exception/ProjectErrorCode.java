@@ -29,7 +29,8 @@ public enum ProjectErrorCode {
     PROJECT_OWNER_ONLY_ACCESS("PROJECT_OWNER_ONLY_ACCESS", "프로젝트 작성자만 접근할 수 있습니다.", HttpStatus.FORBIDDEN),
     PROJECT_CAPACITY_EXCEEDED("PROJECT_CAPACITY_EXCEEDED", "프로젝트 전체 모집 정원이 가득 찼습니다.", HttpStatus.BAD_REQUEST),
     PROJECT_RECRUITMENT_CLOSED("PROJECT_RECRUITMENT_CLOSED", "모집이 마감된 프로젝트입니다.", HttpStatus.BAD_REQUEST),
-    
+    APPLICATION_ALREADY_REVIEWED("APPLICATION_ALREADY_REVIEWED", "이미 검토가 완료된 지원서입니다", HttpStatus.BAD_REQUEST),
+
     // ========== 프로젝트 역할 관련 ==========
     PROJECT_ROLE_NOT_FOUND("PROJECT_ROLE_NOT_FOUND", "프로젝트 역할을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ROLE_CAPACITY_EXCEEDED("ROLE_CAPACITY_EXCEEDED", "역할 모집 정원을 초과했습니다.", HttpStatus.BAD_REQUEST);

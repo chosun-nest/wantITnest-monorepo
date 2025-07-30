@@ -24,6 +24,7 @@ public class ProjectRole extends BaseTimeEntity {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    @Builder.Default
     @OneToMany(mappedBy = "projectRole", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProjectRoleTechStack> roleTechStacks = new ArrayList<>();
 
@@ -71,9 +72,6 @@ public class ProjectRole extends BaseTimeEntity {
         if(requiredCount.equals(currentCount)) {
             isActive = false;
         }
-    }
-    public void decreaseCurrentCount() {
-        this.currentCount--;
     }
     
     public void updateBasicInfo(String roleName, String roleDescription, String additionalRequirements, Integer requiredCount) {

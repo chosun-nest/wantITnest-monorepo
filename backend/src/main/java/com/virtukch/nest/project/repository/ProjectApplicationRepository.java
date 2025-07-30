@@ -10,8 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ProjectApplicationRepository extends JpaRepository<ProjectApplication, Long> {
-    List<ProjectApplication> findByProjectId(Long projectId);
-    List<ProjectApplication> findByMember(Member member);
     
     // 지원 날짜 순으로 정렬 (최신순)
     List<ProjectApplication> findByMemberOrderByAppliedAtDesc(Member member);

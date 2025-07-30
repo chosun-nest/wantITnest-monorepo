@@ -122,7 +122,7 @@ public class ProjectRoleService {
     
     public ProjectRole findProjectRoleOrThrow(Long projectId, Long roleId) {
         return projectRoleRepository.findById(roleId)
-                .filter(role -> role.getProject().getProjectId().equals(projectId))
+                .filter(role -> role.getProject().getId().equals(projectId))
                 .orElseThrow(() -> new ProjectException(ProjectErrorCode.PROJECT_ROLE_NOT_FOUND));
     }
     

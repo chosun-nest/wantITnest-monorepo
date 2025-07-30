@@ -12,8 +12,8 @@ public class ApplicationDtoConverter {
     
     public static MyApplicationResponseDto toMyApplicationDto(ProjectApplication application) {
         return MyApplicationResponseDto.builder()
-                .applicationId(application.getApplicationId())
-                .projectId(application.getProject().getProjectId())
+                .applicationId(application.getId())
+                .projectId(application.getProject().getId())
                 .projectTitle(application.getProject().getProjectTitle())
                 .roleName(application.getRole().getRoleName())
                 .status(application.getStatus())
@@ -30,7 +30,7 @@ public class ApplicationDtoConverter {
         }
 
         return ApplicationListDto.builder()
-                .applicationId(application.getApplicationId())
+                .applicationId(application.getId())
                 .memberId(application.getMember().getMemberId())
                 .applicantName(application.getMember().getMemberName())
                 .applicantEmail(application.getMember().getMemberEmail())
