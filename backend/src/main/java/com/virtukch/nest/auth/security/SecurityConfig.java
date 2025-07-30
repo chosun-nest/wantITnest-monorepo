@@ -54,30 +54,26 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(
-                        "/api/v1/auth/login",
-                        "/api/v1/auth/signup",
-                        "/api/v1/auth/refresh",
-                        "/api/v1/auth/password-reset-link-request",
-                        "/api/v1/auth/password-reset",
+                .requestMatchers(
+                    "/api/v1/auth/**",
+                    "/api/v1/tech-stacks",
+                    "/api/v1/interests",
+                    "/api/v1/departments",
+                    "/api/v1/tags/**",
+                    "/api/v1/posts/search",
+                    "/api/v1/notices/**",
+                    "/api/v1/projects",
+                    "/api/v1/projects/search",
+                    "/error"
+                ).permitAll()
 
-                        "/api/v1/tech-stacks",
-                        "/api/v1/interests",
-                        "/api/v1/departments",
-                        "/api/v1/tags/**",
-                        "/api/v1/posts/search",
-                        "/api/v1/notices/**",
-                        "/api/v1/projects",
-                        "/api/v1/projects/search",
-                        "/error"
-                    ).permitAll()
-                    // GET 메서드만 허용하는 경로
-                    .requestMatchers(HttpMethod.GET,
-                        "/api/v1/posts",
-                        "/api/v2/posts",
-                        "/uploaded-images/**",
-                        "/api/v1/projects",
-                        "/api/v2/projects"
+                // GET 메서드만 허용하는 경로
+                .requestMatchers(HttpMethod.GET,
+                    "/api/v1/posts",
+                    "/api/v2/posts",
+                    "/uploaded-images/**",
+                    "/api/v1/projects",
+                    "/api/v2/projects"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
