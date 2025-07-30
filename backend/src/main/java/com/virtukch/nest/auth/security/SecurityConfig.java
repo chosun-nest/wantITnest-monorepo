@@ -55,12 +55,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/api/v1/auth/login",
-                    "/api/v1/auth/signup",
-                    "/api/v1/auth/refresh",
-                    "/api/v1/auth/password-reset-link-request",
-                    "/api/v1/auth/password-reset",
-
+                    "/api/v1/auth/**",
                     "/api/v1/tech-stacks",
                     "/api/v1/interests",
                     "/api/v1/departments",
