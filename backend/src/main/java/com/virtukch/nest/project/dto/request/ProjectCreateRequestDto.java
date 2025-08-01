@@ -12,8 +12,6 @@ public class ProjectCreateRequestDto {
     private String projectTitle;
     private String projectDescription;
 
-    private Integer totalMemberNeeded;
-
     private LocalDateTime recruitmentEndDate;
     private LocalDateTime projectStartDate;
     private LocalDateTime projectEndDate;

@@ -51,9 +51,6 @@ public class ProjectService {
     private final CommentRepository commentRepository;
     private final MemberService memberService;
     private final ProjectTagRepository projectTagRepository;
-    private final ProjectParticipantRepository projectParticipantRepository;
-
-    private final String prefix = "project";
 
     @Transactional
     public ProjectResponseDto createProject(Long memberId, ProjectCreateRequestDto requestDto) {
@@ -62,11 +59,16 @@ public class ProjectService {
 
         // projectId가 필요하므로 먼저 저장
         Member member = memberService.findByIdOrThrow(memberId);
+
+        int totalMemberNeeded = requestDto.getRoles().stream()
+                .mapToInt(RoleCreateRequestDto::getRequiredCount)
+                .sum();
+
         Project project = projectRepository.save(Project.create(
                 member,
                 requestDto.getProjectTitle(),
                 requestDto.getProjectDescription(),
-                requestDto.getTotalMemberNeeded(),
+                totalMemberNeeded,
                 requestDto.getRecruitmentEndDate(),
                 requestDto.getProjectStartDate(),
                 requestDto.getProjectEndDate())
@@ -97,32 +99,58 @@ public class ProjectService {
         return ProjectDtoConverter.toCreateResponseDto(project);
     }
 
-    @Transactional
-    public ProjectListResponseDto getProjectList(Pageable pageable) {
-        Page<Project> projectPage = projectRepository.findAll(pageable);
-        return buildListResponseDto(projectPage);
-    }
-
     @Transactional(readOnly = true)
-    public ProjectListResponseDto getProjectList(List<String> tagNames, Pageable pageable) {
-        List<Tag> tags = tagRepository.findByNameIn(tagNames);
-        List<ProjectTag> projectTags = projectTagRepository.findByTagIn(tags);
-        Page<Project> projectPage = projectRepository.findByTags(projectTags, pageable);
-
+    public ProjectListResponseDto getProjectList(List<String> tagNames, ProjectStatus status, Pageable pageable) {
+        // DELETED 상태 프로젝트는 일반 조회에서 제외
+        if (status == ProjectStatus.DELETED) {
+            throw new ProjectException(ProjectErrorCode.INVALID_STATUS_VALUE);
+        }
+        
+        Page<Project> projectPage;
+        
+        boolean hasTagFilter = tagNames != null && !tagNames.isEmpty();
+        boolean hasStatusFilter = status != null;
+        
+        if (hasTagFilter && hasStatusFilter) {
+            // 태그와 상태 모두 필터링
+            List<Tag> tags = tagRepository.findByNameIn(tagNames);
+            if (tags.isEmpty()) {
+                // 존재하지 않는 태그들로만 검색한 경우 빈 결과 반환
+                return ProjectDtoConverter.toProjectListResponseDto(Collections.emptyList(), Page.empty(pageable));
+            }
+            List<ProjectTag> projectTags = projectTagRepository.findByTagIn(tags);
+            projectPage = projectRepository.findByTagsAndStatus(projectTags, status, pageable);
+        } else if (hasTagFilter) {
+            // 태그만 필터링
+            List<Tag> tags = tagRepository.findByNameIn(tagNames);
+            if (tags.isEmpty()) {
+                // 존재하지 않는 태그들로만 검색한 경우 빈 결과 반환
+                return ProjectDtoConverter.toProjectListResponseDto(Collections.emptyList(), Page.empty(pageable));
+            }
+            List<ProjectTag> projectTags = projectTagRepository.findByTagIn(tags);
+            projectPage = projectRepository.findByTags(projectTags, pageable);
+        } else if (hasStatusFilter) {
+            // 상태만 필터링
+            projectPage = projectRepository.findByStatus(status, pageable);
+        } else {
+            // 필터링 없음 - 전체 조회 (DELETED 제외)
+            projectPage = projectRepository.findByStatusNot(ProjectStatus.DELETED, pageable);
+        }
+        
         return buildListResponseDto(projectPage);
     }
 
     @Transactional(readOnly = true)
     public ProjectListResponseDto getMyProjectList(Long memberId, Pageable pageable) {
         Member member = memberService.findByIdOrThrow(memberId);
-        Page<Project> projectPage = projectRepository.findByMember(member, pageable);
+        Page<Project> projectPage = projectRepository.findByMemberAndStatusNot(member, ProjectStatus.DELETED, pageable);
         return buildListResponseDto(projectPage);
     }
 
     @Transactional(readOnly = true)
     public ProjectListResponseDto getParticipatingProjectList(Long memberId, Pageable pageable) {
         Member member = memberService.findByIdOrThrow(memberId);
-        Page<Project> projectPage = projectRepository.findByParticipantMemberAndStatus(member, ParticipantStatus.ACTIVE, pageable);
+        Page<Project> projectPage = projectRepository.findByParticipantMemberAndStatusExcludeDeleted(member, ParticipantStatus.ACTIVE, pageable);
         return buildListResponseDto(projectPage);
     }
 
@@ -146,15 +174,33 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public ProjectDetailResponseDto getProjectDetail(Long projectId) {
         Project project = findByIdWithRolesAndParticipantsOrThrow(projectId);
+        
+        // DELETED 상태 프로젝트는 조회 불가
+        if (project.getStatus() == ProjectStatus.DELETED) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_NOT_FOUND);
+        }
+        
         List<String> tagNames = projectTagRepository.findTagNamesByProjectId(projectId);
         return ProjectDtoConverter.toDetailResponseDto(project, tagNames);
     }
 
     @Transactional
     public ProjectResponseDto deleteProject(Long projectId, Long memberId) {
-        Project project = validateProjectOwnershipAndGet(projectId, memberId);
+        // 삭제의 경우 DELETED 상태 체크를 별도로 처리
+        Project project = findByIdOrThrow(projectId);
         
-        projectRepository.delete(project);
+        if(!project.getMember().getMemberId().equals(memberId)) {
+            throw new ProjectException(ProjectErrorCode.NO_PROJECT_AUTHORITY);
+        }
+        
+        // 이미 삭제된 프로젝트인지 확인
+        if (project.getStatus() == ProjectStatus.DELETED) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_NOT_FOUND);
+        }
+        
+        // Soft delete: 상태를 DELETED로 변경
+        project.updateStatus(ProjectStatus.DELETED);
+        
         return ProjectDtoConverter.toDeleteResponseDto(project);
     }
 
@@ -165,7 +211,7 @@ public class ProjectService {
 
         // 1. 입력값 검증
         if (newStatus == null) {
-            throw new IllegalArgumentException("프로젝트 상태는 null일 수 없습니다.");
+            throw new ProjectException(ProjectErrorCode.INVALID_STATUS_VALUE);
         }
 
         // 2. 상태 전환 유효성 검증
@@ -257,6 +303,12 @@ public class ProjectService {
 
     private Project validateProjectOwnershipAndGet(Long projectId, Long memberId) {
         Project project = findByIdOrThrow(projectId);
+        
+        // DELETED 상태 프로젝트는 접근 불가 (삭제 API 제외)
+        if (project.getStatus() == ProjectStatus.DELETED) {
+            throw new ProjectException(ProjectErrorCode.PROJECT_NOT_FOUND);
+        }
+        
         if(!project.getMember().getMemberId().equals(memberId)) {
             throw new ProjectException(ProjectErrorCode.NO_PROJECT_AUTHORITY);
         }

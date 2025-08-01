@@ -173,4 +173,11 @@ public class Project extends BaseTimeEntity {
         }
         return Arrays.asList(imageUrls.split("\\|\\|"));
     }
+    
+    /**
+     * 총 모집 인원 수 업데이트
+     */
+    public void updateTotalMemberNeeded(Integer totalMemberNeeded) {
+        this.totalMemberNeeded = totalMemberNeeded;
+    }
 }

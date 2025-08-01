@@ -1,11 +1,17 @@
 package com.virtukch.nest.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * API 공통 응답 DTO
@@ -19,30 +25,42 @@ import java.time.LocalDateTime;
 public class ApiResponseDto<T> {
 
     /**
-     * 요청 성공 여부
+     * API 메타 정보
      */
-    private boolean success;
-
-    /**
-     * 응답 메시지
-     */
-    private String message;
+    private ApiMeta meta;
 
     /**
      * 응답 데이터
      */
+    @JsonUnwrapped
     private T data;
 
-    /**
-     * 에러 코드 (실패시에만)
-     */
-    private String errorCode;
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ApiMeta {
+        /**
+         * 요청 성공 여부
+         */
+        private boolean success;
 
-    /**
-     * 응답 시간
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime timestamp;
+        /**
+         * 응답 메시지
+         */
+        private String message;
+
+        /**
+         * 에러 코드 (실패시에만)
+         */
+        private String errorCode;
+
+        /**
+         * 응답 시간
+         */
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime timestamp;
+    }
 
     // ==================== 성공 응답 팩토리 메서드 ====================
 
@@ -50,13 +68,13 @@ public class ApiResponseDto<T> {
      * 데이터가 있는 성공 응답
      */
     public static <T> ApiResponseDto<T> success(String message, T data) {
-        return new ApiResponseDto<>(
-                true,
-                message,
-                data,
-                null,
-                LocalDateTime.now()
-        );
+        ApiMeta meta = ApiMeta.builder()
+                .success(true)
+                .message(message)
+                .errorCode(null)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ApiResponseDto<>(meta, data);
     }
 
     /**
@@ -86,13 +104,13 @@ public class ApiResponseDto<T> {
      * 에러 코드와 메시지가 있는 실패 응답
      */
     public static <T> ApiResponseDto<T> failure(String errorCode, String message, T data) {
-        return new ApiResponseDto<>(
-                false,
-                message,
-                data,
-                errorCode,
-                LocalDateTime.now()
-        );
+        ApiMeta meta = ApiMeta.builder()
+                .success(false)
+                .message(message)
+                .errorCode(errorCode)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ApiResponseDto<>(meta, data);
     }
 
     /**
@@ -165,27 +183,31 @@ public class ApiResponseDto<T> {
     /**
      * 성공 응답인지 확인
      */
+    @JsonIgnore
     public boolean isSuccess() {
-        return success;
+        return meta != null && meta.success;
     }
 
     /**
      * 실패 응답인지 확인
      */
+    @JsonIgnore
     public boolean isFailure() {
-        return !success;
+        return meta == null || !meta.success;
     }
 
     /**
      * 에러 코드가 있는지 확인
      */
+    @JsonIgnore
     public boolean hasErrorCode() {
-        return errorCode != null && !errorCode.trim().isEmpty();
+        return meta != null && meta.errorCode != null && !meta.errorCode.trim().isEmpty();
     }
 
     /**
      * 데이터가 있는지 확인
      */
+    @JsonIgnore
     public boolean hasData() {
         return data != null;
     }
