@@ -20,7 +20,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // 태그별 프로젝트 조회 (DELETED 제외)
     @Query("SELECT DISTINCT p FROM Project p " +
            "JOIN p.tags pt " +
-           "WHERE pt IN :projectTags AND p.status != 'DELETED'")
+           "WHERE pt IN :projectTags AND p.status != com.virtukch.nest.project.model.enums.ProjectStatus.DELETED")
     Page<Project> findByTags(@Param("projectTags") List<ProjectTag> projectTags, Pageable pageable);
 
     @Query("SELECT p FROM Project p " +
@@ -29,8 +29,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
            "LEFT JOIN FETCH part.member " +
            "WHERE p.id = :projectId")
     Optional<Project> findByIdWithRolesAndParticipants(@Param("projectId") Long projectId);
-
-    Page<Project> findByMember(Member member, Pageable pageable);
     
     // 내 프로젝트 조회 (DELETED 제외)
     Page<Project> findByMemberAndStatusNot(Member member, ProjectStatus excludeStatus, Pageable pageable);
@@ -45,7 +43,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // 참여 프로젝트 조회 (DELETED 제외)
     @Query("SELECT DISTINCT p FROM Project p " +
            "JOIN p.participants part " +
-           "WHERE part.member = :member AND part.status = :status AND p.status != 'DELETED'")
+           "WHERE part.member = :member AND part.status = :status AND p.status != com.virtukch.nest.project.model.enums.ProjectStatus.DELETED")
     Page<Project> findByParticipantMemberAndStatusExcludeDeleted(@Param("member") Member member, 
                                                                @Param("status") ParticipantStatus status,
                                                                Pageable pageable);
