@@ -4,10 +4,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        # 빌드 시점에 환경변수 전달
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
-        VITE_API_CHAT_URL: ${VITE_API_CHAT_URL}
     container_name: react-frontend
     env_file:
       - ./.env.frontend
@@ -19,7 +15,7 @@ services:
   # Python 크롤링 서버
   crawler:
     build:
-      context: ./scheduler
+      context: ./crawler
       dockerfile: Dockerfile
     container_name: crawler
     ports:
@@ -27,8 +23,8 @@ services:
     env_file:
       - ./.env.frontend
     volumes:
-      - ./scheduler/logs:/app/logs
-      - ./scheduler/data:/app/data
+      - ./crawler/logs:/app/logs
+      - ./crawler/data:/app/data
     networks:
       - frontend-network
     restart: unless-stopped
