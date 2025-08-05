@@ -35,7 +35,7 @@ CATEGORIES = {
 # API 설정
 API_CONFIG = {
     # Docker Compose의 SPRING_SERVER_URL을 우선 사용, 없으면 .env의 SPRING_SERVER_BASE_URL 사용
-    "base_url": os.getenv("API_SERVER_URL"),
+    "base_url": f"http://{os.getenv('API_SERVER_URL')}",
     "endpoint_template": "/api/v1/notices/{category}",
     "timeout": 30,
     "retry_count": 3,
