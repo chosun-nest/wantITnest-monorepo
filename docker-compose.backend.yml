@@ -11,6 +11,7 @@ services:
       - ./.env.backend
     user: "1000:1000"
     volumes:
+      - ./.env.backend:/.env.backend
       - ./backend/uploaded-images:/app/uploaded-images
       - ./backend/logs:/app/logs
     networks:
